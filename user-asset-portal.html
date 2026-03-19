@@ -3819,7 +3819,7 @@ function renderDeptDetailSoftware(query) {
                         .includes(ALL_DEPARTMENT_LABEL.toLowerCase());
     const typeLabel = s.type || 'App';
     return `<label class="sw-map-card${isMapped ? ' checked' : ''}${isAll ? ' all-badge' : ''}">
-      <input type="checkbox" ${isMapped ? 'checked' : ''} data-sw-id="${escHtml(s.csvId)}"
+      <input type="checkbox" ${isMapped ? 'checked' : ''} data-sw-id="${escHtml(s.id)}"
              onchange="this.closest('.sw-map-card').classList.toggle('checked',this.checked)">
       <span class="sw-map-name" title="${escHtml(s.name || '')}">${escHtml(s.name || s.csvId)}</span>
       ${isAll ? `<span class="sw-map-type">All Depts</span>` : `<span class="sw-map-type">${escHtml(typeLabel)}</span>`}
@@ -3844,7 +3844,7 @@ async function saveDeptSoftwareMapping() {
 
   for (const cb of checks) {
     const swId = cb.dataset.swId;
-    const sw   = software.find(s => s.csvId === swId);
+    const sw   = software.find(s => s.id === swId);
     if (!sw) continue;
 
     // Current dept list for this software (excluding "All Departments")

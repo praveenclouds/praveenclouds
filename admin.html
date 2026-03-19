@@ -2484,7 +2484,7 @@ function renderAdminDeptSwGrid(query) {
     const isMapped = depts.includes(dept.name.toLowerCase());
     const isAll    = depts.includes(ALL_DEPTS_LABEL.toLowerCase());
     return `<label class="map-card${isMapped||isAll?' checked':''}">
-      <input type="checkbox"${isMapped||isAll?' checked':''} data-swid="${escAdminHtml(s.csvId||s.id)}"
+      <input type="checkbox"${isMapped||isAll?' checked':''} data-swid="${escAdminHtml(s.id)}"
         onchange="this.closest('.map-card').classList.toggle('checked',this.checked)">
       <div class="mc-avatar" style="border-radius:6px;font-size:11px">${escAdminHtml((s.name||'?')[0].toUpperCase())}</div>
       <span class="mc-name" title="${escAdminHtml(s.name||'')}">
@@ -2503,7 +2503,7 @@ async function saveAdminDeptSwMapping() {
   let saved=0, failed=0;
   for (const cb of document.querySelectorAll('#adminDeptSwGrid input[type=checkbox]')) {
     const swId = cb.dataset.swid;
-    const sw = adminSoftware.find(s=>(s.csvId||s.id)===swId);
+    const sw = adminSoftware.find(s=>s.id===swId);
     if (!sw) continue;
     let depts = adminParseDepts(sw.department)
       .filter(v=>v.toLowerCase()!==ALL_DEPTS_LABEL.toLowerCase() && v.toLowerCase()!=='all department');
