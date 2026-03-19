@@ -519,10 +519,6 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
       All Users <span class="nav-badge" id="navUsersCount">40</span>
     </div>
-    <div class="nav-item" onclick="navigate('departments',this)">
-      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      Departments <span class="nav-badge" id="navDeptsCount">0</span>
-    </div>
     <div class="nav-label" style="margin-top:10px">Assets</div>
     <div class="nav-item" onclick="navigate('assets',this)">
       <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
@@ -547,6 +543,10 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       Support Center
     </div>
     <div class="nav-label" style="margin-top:10px">Admin</div>
+    <div class="nav-item" onclick="navigate('departments',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Departments <span class="nav-badge" id="navDeptsCount">0</span>
+    </div>
     <div class="nav-item" id="adminConsoleNav" style="display:none" onclick="location.href='/admin'">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       Admin Console
