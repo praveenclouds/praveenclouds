@@ -1251,6 +1251,21 @@ function formatSoftwareDepartmentLabel(value){
   return departments.length ? departments.join(', ') : '—';
 }
 
+/* Returns department names derived ONLY from the Departments tab mapping.
+   Stale / legacy values not present in departmentsMgmt are filtered out.
+   "All Departments" is preserved as-is. */
+function getSoftwareMappedDepts(sw) {
+  if (!sw) return '—';
+  const depts = normalizeSoftwareDepartmentList(sw.department);
+  if (!depts.length) return '—';
+  if (depts.some(d => d.toLowerCase() === ALL_DEPARTMENT_LABEL.toLowerCase())) {
+    return ALL_DEPARTMENT_LABEL;
+  }
+  const deptsLower = depts.map(d => d.toLowerCase());
+  const matched = (departmentsMgmt || []).filter(d => deptsLower.includes(d.name.toLowerCase()));
+  return matched.length ? matched.map(d => d.name).join(', ') : '—';
+}
+
 function matchesSoftwareDepartment(value, department){
   const departments = normalizeSoftwareDepartmentList(value).map(dept => dept.toLowerCase());
   if(!departments.length) return false;
@@ -2503,7 +2518,7 @@ function renderSoftware(){
           case 'name':
             return `<td onclick="openSwDrawer('${s.id}')" style="cursor:pointer" title="Click to view details"><div style="font-weight:600;font-size:13px;color:var(--primary-light);text-decoration:underline;text-underline-offset:3px">${s.name}</div>${s.purpose?`<div style="font-size:11px;color:var(--gray-400)">${s.purpose}</div>`:''}</td>`;
           case 'department':
-            return `<td style="font-size:12px;color:var(--gray-600)">${formatSoftwareDepartmentLabel(s.department)}</td>`;
+            return `<td style="font-size:12px;color:var(--gray-600)">${getSoftwareMappedDepts(s)}</td>`;
           case 'deploymentType':
             return `<td><span class="sw-type-badge ${typeKey}">${s.deploymentType}</span></td>`;
           case 'subscriptionPlan':
@@ -3168,7 +3183,7 @@ function openSwDm(id){
     ['Owner',      s.owner||'—'],
     ['Admin(s)',   s.admins||'—'],
     ['Billed To',  s.billedTo||'—'],
-    ['Department', formatSoftwareDepartmentLabel(s.department)],
+    ['Department', getSoftwareMappedDepts(s)],
     ['Type',       s.deploymentType||'—'],
     ['Status',     s.status||'Active'],
     ['Sites',      [s.siteUSA&&'🇺🇸 USA',s.siteCAN&&'🇨🇦 CAN',s.siteIND&&'🇮🇳 IND'].filter(Boolean).join('  ')||'—'],
@@ -3211,7 +3226,7 @@ function swdePopulateForm(){
   document.getElementById('swdeType').value     = s.deploymentType||'SAAS';
   document.getElementById('swdeRenewal').value  = s.renewalPeriod||'';
   const deptReadOnly = document.getElementById('swdeDeptReadOnly');
-  if (deptReadOnly) deptReadOnly.textContent = formatSoftwareDepartmentLabel(s.department||'');
+  if (deptReadOnly) deptReadOnly.textContent = getSoftwareMappedDepts(s);
   document.getElementById('swdePurpose').value  = s.purpose||'';
   document.getElementById('swdePlan').value     = s.subscriptionPlan||'';
   document.getElementById('swdeStatus').value   = s.status||'Active';
@@ -3799,20 +3814,13 @@ function renderDeptDetailSoftware(query) {
     const isAll     = parseSoftwareDepartments(s.department).map(v=>v.toLowerCase())
                         .includes(ALL_DEPARTMENT_LABEL.toLowerCase());
     const typeLabel = s.type || 'App';
-    return `<label class="sw-map-card${isMapped ? ' checked' : ''}${isAll ? ' all-badge' : ''}"
-              onclick="toggleSwMapCard(this)">
-      <input type="checkbox" ${isMapped ? 'checked' : ''} data-sw-id="${escHtml(s.csvId)}">
+    return `<label class="sw-map-card${isMapped ? ' checked' : ''}${isAll ? ' all-badge' : ''}">
+      <input type="checkbox" ${isMapped ? 'checked' : ''} data-sw-id="${escHtml(s.csvId)}"
+             onchange="this.closest('.sw-map-card').classList.toggle('checked',this.checked)">
       <span class="sw-map-name" title="${escHtml(s.name || '')}">${escHtml(s.name || s.csvId)}</span>
       ${isAll ? `<span class="sw-map-type">All Depts</span>` : `<span class="sw-map-type">${escHtml(typeLabel)}</span>`}
     </label>`;
   }).join('');
-}
-
-function toggleSwMapCard(label) {
-  const cb = label.querySelector('input[type=checkbox]');
-  if (!cb) return;
-  cb.checked = !cb.checked;
-  label.classList.toggle('checked', cb.checked);
 }
 
 function filterDeptDetailSoftware(q) {
@@ -3881,7 +3889,7 @@ async function saveDeptSoftwareMapping() {
     if (openSw) {
       /* update read-only field in Edit panel */
       const ro = document.getElementById('swdeDeptReadOnly');
-      if (ro) ro.textContent = formatSoftwareDepartmentLabel(openSw.department || '');
+      if (ro) ro.textContent = getSoftwareMappedDepts(openSw);
       /* update Overview → App Information rows */
       const infoBody = document.getElementById('swDrInfoBody');
       if (infoBody) {
@@ -3889,7 +3897,7 @@ async function saveDeptSoftwareMapping() {
           const lbl = el.querySelector('label');
           if (lbl && lbl.textContent === 'Department') {
             const val = el.querySelector('span');
-            if (val) val.textContent = formatSoftwareDepartmentLabel(openSw.department || '');
+            if (val) val.textContent = getSoftwareMappedDepts(openSw);
           }
         });
       }
