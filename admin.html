@@ -182,6 +182,34 @@
     .confirm-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .confirm-msg   { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
     .confirm-btns  { display: flex; gap: 9px; justify-content: flex-end; }
+
+    /* DEPARTMENT MANAGEMENT */
+    .dept-btn { display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(153,102,255,.08);color:#c4b5fd;transition:all .13s; }
+    .dept-btn:hover { background:rgba(153,102,255,.18);border-color:rgba(153,102,255,.4); }
+    .dept-btn svg { width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2; }
+    .dept-btn.danger { color:#f87171;border-color:rgba(220,38,38,.25);background:rgba(220,38,38,.07); }
+    .dept-btn.danger:hover { background:rgba(220,38,38,.15); }
+    .dept-count-badge { display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700; }
+    .dept-count-badge.users { background:rgba(30,64,175,.15);color:#93c5fd; }
+    .dept-count-badge.apps  { background:rgba(147,51,234,.15);color:#c084fc; }
+    /* Mapping modal */
+    .map-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:300;align-items:center;justify-content:center;padding:20px; }
+    .map-overlay.open { display:flex; }
+    .map-box { background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.5);width:100%;max-width:680px;max-height:88vh;display:flex;flex-direction:column; }
+    .map-head { padding:20px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0; }
+    .map-body { padding:20px 24px;overflow-y:auto;flex:1; }
+    .map-foot { padding:14px 24px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0; }
+    .map-search { width:100%;padding:7px 11px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-size:12px;outline:none;margin-bottom:12px; }
+    .map-search:focus { border-color:rgba(99,66,255,.5); }
+    .map-grid { display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:340px;overflow-y:auto; }
+    .map-card { display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all .13s;user-select:none; }
+    .map-card:hover { border-color:rgba(99,66,255,.4);background:rgba(99,66,255,.08); }
+    .map-card.checked { border-color:rgba(99,66,255,.55);background:rgba(99,66,255,.12); }
+    .map-card input[type=checkbox] { width:15px;height:15px;accent-color:var(--primary);flex-shrink:0;cursor:pointer; }
+    .map-card .mc-avatar { width:26px;height:26px;border-radius:50%;background:rgba(30,64,175,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#93c5fd;flex-shrink:0; }
+    .map-card .mc-name { font-size:12.5px;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .map-card .mc-tag { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(14,165,233,.12);color:#38bdf8;white-space:nowrap;flex-shrink:0; }
+    .map-card .mc-tag.sw { background:rgba(147,51,234,.12);color:#c084fc; }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
@@ -225,6 +253,10 @@
     <div class="nav-item" id="nav-integrations" onclick="showPage('integrations',this)">
       <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       Integrations
+    </div>
+    <div class="nav-item" id="nav-departments" onclick="showPage('departments',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Departments
     </div>
     <div class="nav-item" onclick="location.href='/support'">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -641,8 +673,111 @@
       </div>
     </div>
 
+    <!-- ── DEPARTMENTS PAGE ── -->
+    <div class="page" id="page-departments">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Departments <span style="color:rgba(153,102,255,0.5);font-weight:400;font-size:12px" id="adminDeptCountLabel"></span></div>
+          <button class="btn btn-primary btn-sm" onclick="openAddAdminDeptModal()">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Add Department
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Department Name</th>
+              <th style="text-align:center">Users</th>
+              <th style="text-align:center">Software Apps</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminDeptTableBody">
+            <tr><td colspan="4" style="text-align:center;padding:40px;color:rgba(153,102,255,0.4)">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div><!-- /content -->
 </div><!-- /main -->
+
+<!-- ══ DEPT NAME MODAL ══ -->
+<div class="modal-overlay" id="adminDeptNameModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="adminDeptNameModalTitle">Add Department</h3>
+      <button class="modal-close" onclick="closeAdminDeptNameModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Department Name</label>
+        <input type="text" id="adminDeptNameInput" placeholder="e.g. Engineering" oninput="clearAdminDeptNameErr()">
+        <span id="adminDeptNameErr" style="font-size:11.5px;color:#f87171;display:none"></span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAdminDeptNameModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdminDeptName()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DEPT USER MAPPING MODAL ══ -->
+<div class="map-overlay" id="adminDeptUserModal" onclick="if(event.target===this)closeAdminDeptUserModal()">
+  <div class="map-box">
+    <div class="map-head">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--text)" id="adminDeptUserModalName">Department</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="adminDeptUserModalStats"></div>
+      </div>
+      <button onclick="closeAdminDeptUserModal()" style="background:none;border:none;cursor:pointer;font-size:24px;color:var(--text-muted);line-height:1">&times;</button>
+    </div>
+    <div class="map-body">
+      <div style="font-size:11.5px;font-weight:700;color:rgba(153,102,255,0.7);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">
+        User Mapping — <span style="font-weight:400;text-transform:none;font-size:11px">Check the users who belong to this department</span>
+      </div>
+      <input type="text" class="map-search" id="adminDeptUserSearch" placeholder="Search users…" oninput="filterAdminDeptUserGrid(this.value)">
+      <div class="map-grid" id="adminDeptUserGrid"></div>
+      <div id="adminDeptUserEmpty" style="display:none;text-align:center;padding:24px;color:var(--text-muted);font-size:13px">No users found.</div>
+    </div>
+    <div class="map-foot">
+      <button class="btn btn-secondary" onclick="closeAdminDeptUserModal()">Close</button>
+      <button class="btn btn-primary" id="adminDeptUserSaveBtn" onclick="saveAdminDeptUserMapping()">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Mapping
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DEPT SOFTWARE MAPPING MODAL ══ -->
+<div class="map-overlay" id="adminDeptSwModal" onclick="if(event.target===this)closeAdminDeptSwModal()">
+  <div class="map-box">
+    <div class="map-head">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--text)" id="adminDeptSwModalName">Department</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:3px" id="adminDeptSwModalStats"></div>
+      </div>
+      <button onclick="closeAdminDeptSwModal()" style="background:none;border:none;cursor:pointer;font-size:24px;color:var(--text-muted);line-height:1">&times;</button>
+    </div>
+    <div class="map-body">
+      <div style="font-size:11.5px;font-weight:700;color:rgba(153,102,255,0.7);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">
+        Software Mapping — <span style="font-weight:400;text-transform:none;font-size:11px">Check the apps used by this department</span>
+      </div>
+      <input type="text" class="map-search" id="adminDeptSwSearch" placeholder="Search software…" oninput="filterAdminDeptSwGrid(this.value)">
+      <div class="map-grid" id="adminDeptSwGrid"></div>
+      <div id="adminDeptSwEmpty" style="display:none;text-align:center;padding:24px;color:var(--text-muted);font-size:13px">No software found.</div>
+    </div>
+    <div class="map-foot">
+      <button class="btn btn-secondary" onclick="closeAdminDeptSwModal()">Close</button>
+      <button class="btn btn-primary" id="adminDeptSwSaveBtn" onclick="saveAdminDeptSwMapping()">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Mapping
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ADD / EDIT MODAL -->
 <div class="modal-overlay" id="userModal">
@@ -718,7 +853,7 @@
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
     <div class="confirm-icon"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></div>
-    <div class="confirm-title">Delete Portal User</div>
+    <div class="confirm-title" id="confirmTitle">Delete Portal User</div>
     <div class="confirm-msg" id="confirmMsg">Are you sure you want to delete this user? This action cannot be undone.</div>
     <div class="confirm-btns">
       <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
@@ -787,6 +922,7 @@ let rolePermissionDrafts = [];
     loadUsers();
     loadSystemStats();
     loadRolePermissions();
+    loadDepartmentData();
     openInitialAdminPage();
   } catch { clearAuth(); }
 })();
@@ -872,7 +1008,7 @@ function updateSidebar(u) {
 }
 
 /* ── Page navigation ── */
-const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations' };
+const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations', departments: 'Departments' };
 function showPage(name, el) {
   if ((name === 'users' && !hasPermission('managePortalUsers'))
     || (name === 'permissions' && !hasPermission('manageRolePermissions'))
@@ -888,6 +1024,7 @@ function showPage(name, el) {
   if (name === 'scim') loadSCIMConfig();
   if (name === 'integrations') loadIntegrations();
   if (name === 'permissions') loadRolePermissions();
+  if (name === 'departments') { loadDepartmentsMgmt(); renderAdminDepartments(); }
 }
 
 /* ── PORTAL USERS ── */
@@ -1193,8 +1330,18 @@ function confirmDelete(id, name) {
   document.getElementById('confirmMsg').textContent = `Delete "${name}"? This cannot be undone.`;
   document.getElementById('confirmOverlay').classList.add('open');
 }
-function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
+function closeConfirm() {
+  const box = document.getElementById('confirmOverlay');
+  box.classList.remove('open');
+  box._adminDeptDeleteCallback = null;
+  // reset title for next portal-user delete
+  const t = document.getElementById('confirmTitle');
+  if (t) t.textContent = 'Delete Portal User';
+}
 async function doDelete() {
+  /* dept delete takes priority if callback is set */
+  const box = document.getElementById('confirmOverlay');
+  if (box._adminDeptDeleteCallback) { box._adminDeptDeleteCallback(); return; }
   try {
     const r = await authFetch(`/api/admin/users/${deletingId}`, { method: 'DELETE' });
     const data = await r.json();
@@ -2058,6 +2205,324 @@ async function testConnector(appName) {
     result.textContent = '✗ ' + e.message;
   }
   finally { btn.disabled = false; btn.textContent = 'Test Connection'; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DEPARTMENTS — Admin Console
+   Storage: localStorage 'tcDepartments' [{id,name}]
+   User mapping: PUT /api/users/:id  { dept }
+   Software mapping: PUT /api/software/:id { department }
+══════════════════════════════════════════════════════════════ */
+const ADMIN_DEPT_KEY = 'tcDepartments';
+let adminDepts     = [];   // [{id,name}]
+let adminEmployees = [];   // loaded from /api/users
+let adminSoftware  = [];   // loaded from /api/software
+let adminDeptEditId        = null; // for rename
+let adminDeptUserCurrentId = null;
+let adminDeptSwCurrentId   = null;
+const ALL_DEPTS_LABEL = 'All Departments';
+
+/* ── helpers ── */
+function escAdminHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function adminParseDepts(val) {
+  return [...new Set(String(val||'').split(',').map(v=>v.trim()).filter(Boolean))];
+}
+function adminGetUserCount(name) {
+  const n = name.toLowerCase();
+  return adminEmployees.filter(u=>(u.dept||'').toLowerCase()===n).length;
+}
+function adminGetSwMapped(name) {
+  const n = name.toLowerCase();
+  return adminSoftware.filter(s=>{
+    const depts = adminParseDepts(s.department).map(d=>d.toLowerCase());
+    return depts.includes(n) || depts.includes(ALL_DEPTS_LABEL.toLowerCase());
+  });
+}
+
+/* ── load / save localStorage ── */
+function loadDepartmentsMgmt() {
+  try { adminDepts = JSON.parse(localStorage.getItem(ADMIN_DEPT_KEY)||'[]'); } catch { adminDepts=[]; }
+  /* seed from employee dept values */
+  const existing = new Set(adminDepts.map(d=>d.name.toLowerCase()));
+  adminEmployees.forEach(u=>{
+    const d=(u.dept||'').trim();
+    if(d && !existing.has(d.toLowerCase())){
+      adminDepts.push({id:'dept-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:d});
+      existing.add(d.toLowerCase());
+    }
+  });
+  saveDepartmentsMgmt();
+}
+function saveDepartmentsMgmt() {
+  localStorage.setItem(ADMIN_DEPT_KEY, JSON.stringify(adminDepts));
+}
+
+/* ── load employee + software data ── */
+async function loadDepartmentData() {
+  try {
+    const [uRes, sRes] = await Promise.all([
+      authFetch('/api/users'),
+      authFetch('/api/software'),
+    ]);
+    if (uRes.ok) adminEmployees = await uRes.json();
+    if (sRes.ok) adminSoftware  = (await sRes.json()).map(s=>({...s, department: String(s.department||'')}));
+  } catch(e) { console.warn('Dept data load failed', e); }
+}
+
+/* ── render department table ── */
+function renderAdminDepartments() {
+  const body  = document.getElementById('adminDeptTableBody');
+  const label = document.getElementById('adminDeptCountLabel');
+  if (!body) return;
+  label && (label.textContent = `(${adminDepts.length})`);
+
+  if (!adminDepts.length) {
+    body.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:36px;color:rgba(153,102,255,0.4)">No departments yet. Click <strong>Add Department</strong> to create one.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = adminDepts.map(dept=>{
+    const uc = adminGetUserCount(dept.name);
+    const sc = adminGetSwMapped(dept.name).length;
+    return `<tr>
+      <td style="font-weight:600;color:var(--text)">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:30px;height:30px;border-radius:8px;background:rgba(153,102,255,0.15);display:flex;align-items:center;justify-content:center">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#c4b5fd;fill:none;stroke-width:2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          ${escAdminHtml(dept.name)}
+        </div>
+      </td>
+      <td style="text-align:center"><span class="dept-count-badge users">${uc} user${uc!==1?'s':''}</span></td>
+      <td style="text-align:center"><span class="dept-count-badge apps">${sc} app${sc!==1?'s':''}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="dept-btn" onclick="openAdminDeptUserModal('${escAdminHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
+            Map Users
+          </button>
+          <button class="dept-btn" onclick="openAdminDeptSwModal('${escAdminHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Map Software
+          </button>
+          <button class="dept-btn" onclick="openRenameAdminDeptModal('${escAdminHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Rename
+          </button>
+          <button class="dept-btn danger" onclick="confirmDeleteAdminDept('${escAdminHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Delete
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+/* ── Add / Rename dept ── */
+function openAddAdminDeptModal() {
+  adminDeptEditId = null;
+  document.getElementById('adminDeptNameModalTitle').textContent = 'Add Department';
+  document.getElementById('adminDeptNameInput').value = '';
+  clearAdminDeptNameErr();
+  document.getElementById('adminDeptNameModal').classList.add('open');
+  setTimeout(()=>document.getElementById('adminDeptNameInput').focus(),80);
+}
+function openRenameAdminDeptModal(id) {
+  const dept = adminDepts.find(d=>d.id===id);
+  if (!dept) return;
+  adminDeptEditId = id;
+  document.getElementById('adminDeptNameModalTitle').textContent = 'Rename Department';
+  document.getElementById('adminDeptNameInput').value = dept.name;
+  clearAdminDeptNameErr();
+  document.getElementById('adminDeptNameModal').classList.add('open');
+  setTimeout(()=>document.getElementById('adminDeptNameInput').focus(),80);
+}
+function closeAdminDeptNameModal() {
+  document.getElementById('adminDeptNameModal').classList.remove('open');
+  adminDeptEditId = null;
+}
+function clearAdminDeptNameErr() {
+  const e=document.getElementById('adminDeptNameErr'); if(e){ e.style.display='none'; e.textContent=''; }
+}
+function saveAdminDeptName() {
+  const name = document.getElementById('adminDeptNameInput').value.trim();
+  const errEl = document.getElementById('adminDeptNameErr');
+  if (!name) { errEl.textContent='Name is required'; errEl.style.display='block'; return; }
+  const dup = adminDepts.find(d=>d.name.toLowerCase()===name.toLowerCase() && d.id!==adminDeptEditId);
+  if (dup) { errEl.textContent='A department with this name already exists'; errEl.style.display='block'; return; }
+  if (adminDeptEditId) {
+    const dept = adminDepts.find(d=>d.id===adminDeptEditId);
+    if (dept) dept.name = name;
+  } else {
+    adminDepts.push({id:'dept-'+Date.now()+'-'+Math.random().toString(36).slice(2), name});
+  }
+  saveDepartmentsMgmt();
+  closeAdminDeptNameModal();
+  renderAdminDepartments();
+  showToast(adminDeptEditId ? 'Department renamed' : 'Department added');
+}
+
+/* ── Delete dept ── */
+function confirmDeleteAdminDept(id) {
+  const dept = adminDepts.find(d=>d.id===id);
+  if (!dept) return;
+  const box = document.getElementById('confirmOverlay');
+  document.getElementById('confirmTitle').textContent = 'Delete Department';
+  document.getElementById('confirmMsg').textContent   = `Delete "${dept.name}"? This only removes the department record — users and software assignments won't be changed.`;
+  box.classList.add('open');
+  box._adminDeptDeleteId = id;
+  box._adminDeptDeleteCallback = ()=>{
+    adminDepts = adminDepts.filter(d=>d.id!==id);
+    saveDepartmentsMgmt();
+    renderAdminDepartments();
+    showToast('Department deleted');
+    closeConfirm();
+  };
+}
+
+/* ── User Mapping ── */
+function openAdminDeptUserModal(id) {
+  const dept = adminDepts.find(d=>d.id===id);
+  if (!dept) return;
+  adminDeptUserCurrentId = id;
+  document.getElementById('adminDeptUserModalName').textContent  = dept.name;
+  const sc = adminGetSwMapped(dept.name).length;
+  document.getElementById('adminDeptUserModalStats').textContent = `${sc} app${sc!==1?'s':''} mapped`;
+  document.getElementById('adminDeptUserSearch').value = '';
+  renderAdminDeptUserGrid('');
+  document.getElementById('adminDeptUserModal').classList.add('open');
+}
+function closeAdminDeptUserModal() {
+  document.getElementById('adminDeptUserModal').classList.remove('open');
+  adminDeptUserCurrentId = null;
+}
+function renderAdminDeptUserGrid(query) {
+  const dept  = adminDepts.find(d=>d.id===adminDeptUserCurrentId);
+  if (!dept) return;
+  const grid  = document.getElementById('adminDeptUserGrid');
+  const empty = document.getElementById('adminDeptUserEmpty');
+  const q = (query||'').toLowerCase().trim();
+  const list = adminEmployees.filter(u=>{
+    const name = ((u.first||'')+' '+(u.last||'')).trim();
+    if(q && !name.toLowerCase().includes(q) && !(u.email||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!list.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  grid.innerHTML = list.map(u=>{
+    const isMapped = (u.dept||'').toLowerCase()===dept.name.toLowerCase();
+    const name = ((u.first||'')+' '+(u.last||'')).trim()||u.email||'?';
+    const ini  = ((u.first||'')[0]||'')+((u.last||'')[0]||'')||(u.email||'?')[0].toUpperCase();
+    return `<label class="map-card${isMapped?' checked':''}">
+      <input type="checkbox"${isMapped?' checked':''} data-uid="${escAdminHtml(u.id)}"
+        onchange="this.closest('.map-card').classList.toggle('checked',this.checked)">
+      <div class="mc-avatar">${escAdminHtml(ini.toUpperCase())}</div>
+      <span class="mc-name" title="${escAdminHtml(name)}">${escAdminHtml(name)}</span>
+      <span class="mc-tag">${escAdminHtml(u.role||'Staff')}</span>
+    </label>`;
+  }).join('');
+}
+function filterAdminDeptUserGrid(q){ renderAdminDeptUserGrid(q); }
+async function saveAdminDeptUserMapping() {
+  const dept = adminDepts.find(d=>d.id===adminDeptUserCurrentId);
+  if (!dept) return;
+  const btn = document.getElementById('adminDeptUserSaveBtn');
+  btn.disabled=true; btn.textContent='Saving…';
+  let saved=0, failed=0;
+  for (const cb of document.querySelectorAll('#adminDeptUserGrid input[type=checkbox]')) {
+    const u = adminEmployees.find(x=>x.id===cb.dataset.uid);
+    if (!u) continue;
+    const was = (u.dept||'').toLowerCase()===dept.name.toLowerCase();
+    if (cb.checked===was) continue;
+    const newDept = cb.checked ? dept.name : '';
+    try {
+      const r = await authFetch(`/api/users/${u.id}`,{method:'PUT',body:JSON.stringify({dept:newDept})});
+      if(r.ok){ u.dept=newDept; saved++; } else { failed++; }
+    } catch{ failed++; }
+  }
+  btn.disabled=false;
+  btn.innerHTML='<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Mapping';
+  if(failed) showToast(`${saved} saved, ${failed} failed`,'danger');
+  else if(saved) showToast(`User mapping updated (${saved} change${saved!==1?'s':''})`);
+  else showToast('No changes to save');
+  renderAdminDepartments();
+}
+
+/* ── Software Mapping ── */
+function openAdminDeptSwModal(id) {
+  const dept = adminDepts.find(d=>d.id===id);
+  if (!dept) return;
+  adminDeptSwCurrentId = id;
+  document.getElementById('adminDeptSwModalName').textContent  = dept.name;
+  const uc = adminGetUserCount(dept.name);
+  document.getElementById('adminDeptSwModalStats').textContent = `${uc} user${uc!==1?'s':''} in this department`;
+  document.getElementById('adminDeptSwSearch').value = '';
+  renderAdminDeptSwGrid('');
+  document.getElementById('adminDeptSwModal').classList.add('open');
+}
+function closeAdminDeptSwModal() {
+  document.getElementById('adminDeptSwModal').classList.remove('open');
+  adminDeptSwCurrentId = null;
+}
+function renderAdminDeptSwGrid(query) {
+  const dept  = adminDepts.find(d=>d.id===adminDeptSwCurrentId);
+  if (!dept) return;
+  const grid  = document.getElementById('adminDeptSwGrid');
+  const empty = document.getElementById('adminDeptSwEmpty');
+  const q = (query||'').toLowerCase().trim();
+  const list = adminSoftware.filter(s=>{
+    if(q && !(s.name||'').toLowerCase().includes(q) && !(s.csvId||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if (!list.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  grid.innerHTML = list.map(s=>{
+    const depts  = adminParseDepts(s.department).map(v=>v.toLowerCase());
+    const isMapped = depts.includes(dept.name.toLowerCase());
+    const isAll    = depts.includes(ALL_DEPTS_LABEL.toLowerCase());
+    return `<label class="map-card${isMapped||isAll?' checked':''}">
+      <input type="checkbox"${isMapped||isAll?' checked':''} data-swid="${escAdminHtml(s.csvId||s.id)}"
+        onchange="this.closest('.map-card').classList.toggle('checked',this.checked)">
+      <div class="mc-avatar" style="border-radius:6px;font-size:11px">${escAdminHtml((s.name||'?')[0].toUpperCase())}</div>
+      <span class="mc-name" title="${escAdminHtml(s.name||'')}">
+        ${escAdminHtml(s.name||s.csvId)}${isAll?'<span class="mc-tag sw" style="margin-left:4px">All</span>':''}
+      </span>
+      <span class="mc-tag sw">${escAdminHtml(s.deploymentType||'App')}</span>
+    </label>`;
+  }).join('');
+}
+function filterAdminDeptSwGrid(q){ renderAdminDeptSwGrid(q); }
+async function saveAdminDeptSwMapping() {
+  const dept = adminDepts.find(d=>d.id===adminDeptSwCurrentId);
+  if (!dept) return;
+  const btn = document.getElementById('adminDeptSwSaveBtn');
+  btn.disabled=true; btn.textContent='Saving…';
+  let saved=0, failed=0;
+  for (const cb of document.querySelectorAll('#adminDeptSwGrid input[type=checkbox]')) {
+    const swId = cb.dataset.swid;
+    const sw = adminSoftware.find(s=>(s.csvId||s.id)===swId);
+    if (!sw) continue;
+    let depts = adminParseDepts(sw.department)
+      .filter(v=>v.toLowerCase()!==ALL_DEPTS_LABEL.toLowerCase() && v.toLowerCase()!=='all department');
+    const had = depts.map(v=>v.toLowerCase()).includes(dept.name.toLowerCase());
+    if (cb.checked===had) continue;
+    if(cb.checked) depts.push(dept.name);
+    else depts = depts.filter(v=>v.toLowerCase()!==dept.name.toLowerCase());
+    const newVal = depts.join(', ');
+    try {
+      const r = await authFetch(`/api/software/${swId}`,{method:'PUT',body:JSON.stringify({department:newVal})});
+      if(r.ok){ sw.department=newVal; saved++; } else { failed++; }
+    } catch{ failed++; }
+  }
+  btn.disabled=false;
+  btn.innerHTML='<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Mapping';
+  if(failed) showToast(`${saved} saved, ${failed} failed`,'danger');
+  else if(saved) showToast(`Software mapping updated (${saved} change${saved!==1?'s':''})`);
+  else showToast('No changes to save');
+  renderAdminDepartments();
 }
 
 async function syncConnector(appName) {
