@@ -210,6 +210,10 @@
     .map-card .mc-name { font-size:12.5px;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
     .map-card .mc-tag { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(14,165,233,.12);color:#38bdf8;white-space:nowrap;flex-shrink:0; }
     .map-card .mc-tag.sw { background:rgba(147,51,234,.12);color:#c084fc; }
+    .all-depts-btn { font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid rgba(251,191,36,.35);background:rgba(251,191,36,.08);color:#fbbf24;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .13s;line-height:1.4; }
+    .all-depts-btn:hover { background:rgba(251,191,36,.18);border-color:rgba(251,191,36,.6); }
+    .all-depts-btn.active { background:rgba(251,191,36,.22);border-color:rgba(251,191,36,.7);color:#fde68a; }
+    .map-card.all-mapped { border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.07); }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
@@ -2483,18 +2487,41 @@ function renderAdminDeptSwGrid(query) {
     const depts  = adminParseDepts(s.department).map(v=>v.toLowerCase());
     const isMapped = depts.includes(dept.name.toLowerCase());
     const isAll    = depts.includes(ALL_DEPTS_LABEL.toLowerCase());
-    return `<label class="map-card${isMapped||isAll?' checked':''}">
+    return `<label class="map-card${isAll?' all-mapped':isMapped?' checked':''}">
       <input type="checkbox"${isMapped||isAll?' checked':''} data-swid="${escAdminHtml(s.id)}"
-        onchange="this.closest('.map-card').classList.toggle('checked',this.checked)">
+        onchange="this.closest('.map-card').classList.toggle('checked',this.checked)"
+        ${isAll?'disabled':''}>
       <div class="mc-avatar" style="border-radius:6px;font-size:11px">${escAdminHtml((s.name||'?')[0].toUpperCase())}</div>
       <span class="mc-name" title="${escAdminHtml(s.name||'')}">
-        ${escAdminHtml(s.name||s.csvId)}${isAll?'<span class="mc-tag sw" style="margin-left:4px">All</span>':''}
+        ${escAdminHtml(s.name||s.csvId)}
       </span>
-      <span class="mc-tag sw">${escAdminHtml(s.deploymentType||'App')}</span>
+      <button class="all-depts-btn${isAll?' active':''}"
+        onclick="event.preventDefault();event.stopPropagation();toggleAdminSwAllDepts('${escAdminHtml(s.id)}',${!isAll})"
+        title="${isAll?'Remove All Departments mapping':'Set as required for ALL departments'}">
+        ${isAll?'★ All Depts':'☆ All Depts'}
+      </button>
     </label>`;
   }).join('');
 }
 function filterAdminDeptSwGrid(q){ renderAdminDeptSwGrid(q); }
+
+async function toggleAdminSwAllDepts(swId, enable) {
+  const sw = adminSoftware.find(s=>s.id===swId);
+  if (!sw) return;
+  const newVal = enable ? ALL_DEPTS_LABEL : '';
+  try {
+    const r = await authFetch(`/api/software/${swId}`,{method:'PUT',body:JSON.stringify({department:newVal})});
+    if (r.ok) {
+      sw.department = newVal;
+      renderAdminDeptSwGrid(document.getElementById('adminDeptSwSearch').value||'');
+      renderAdminDepartments();
+      showToast(enable ? `"${sw.name}" is now mapped to All Departments` : `"${sw.name}" removed from All Departments`);
+    } else {
+      showToast('Failed to update','danger');
+    }
+  } catch { showToast('Failed to update','danger'); }
+}
+
 async function saveAdminDeptSwMapping() {
   const dept = adminDepts.find(d=>d.id===adminDeptSwCurrentId);
   if (!dept) return;
