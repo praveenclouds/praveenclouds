@@ -1041,19 +1041,8 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       <div class="form-row">
         <div class="form-group">
           <label>Department</label>
-          <div class="dept-dropdown" id="swDept">
-            <button type="button" class="dept-dd-trigger" onclick="swDeptOpen('swDept')">
-              <span class="dept-dd-val placeholder">Select departments…</span>
-              <svg class="dept-dd-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="dept-dd-panel">
-              <label class="dept-all-row">
-                <input type="checkbox" class="dept-all-check" onchange="swDeptAllChanged(this,'swDept')">
-                <span class="dept-all-label">🌐 All Departments</span>
-                <span class="dept-all-badge">Everyone uses this app</span>
-              </label>
-              <div class="dept-list-scroll"></div>
-            </div>
+          <div style="padding:9px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;font-size:12.5px;color:var(--gray-500);line-height:1.4">
+            Assigned via <strong style="color:var(--gray-700)">Departments → Map Software</strong> after saving
           </div>
         </div>
         <div class="form-group"><label>Purpose</label><input type="text" id="swPurpose" placeholder="e.g. CI/CD"></div>
@@ -1401,8 +1390,6 @@ async function loadData(){
       department: normalizeSoftwareDepartmentValue(item?.department),
     }));
     assets = as.map(a=>({...a, assignTo: a.assignedTo||''}));
-    renderSoftwareDepartmentSelect('swDept');
-    renderSoftwareDepartmentSelect('swdeDept');
     renderAll();
   } catch(e){
     console.error('Failed to load data:', e);
@@ -2698,7 +2685,6 @@ async function saveSoftware(){
     csvId, name,
     deploymentType: document.getElementById('swType').value,
     renewalPeriod:  document.getElementById('swRenewal').value,
-    department:     normalizeSoftwareDepartmentValue(getSelectedSoftwareDepartments('swDept')),
     purpose:        document.getElementById('swPurpose').value.trim(),
     licensePricePerUserMonth: parseFloat(document.getElementById('swLicPrice').value)||0,
     annualCost:     parseFloat(document.getElementById('swCost').value)||0,
@@ -3224,7 +3210,8 @@ function swdePopulateForm(){
   document.getElementById('swdeName').value     = s.name||'';
   document.getElementById('swdeType').value     = s.deploymentType||'SAAS';
   document.getElementById('swdeRenewal').value  = s.renewalPeriod||'';
-  setSelectedSoftwareDepartments('swdeDept', s.department||'');
+  const deptReadOnly = document.getElementById('swdeDeptReadOnly');
+  if (deptReadOnly) deptReadOnly.textContent = formatSoftwareDepartmentLabel(s.department||'');
   document.getElementById('swdePurpose').value  = s.purpose||'';
   document.getElementById('swdePlan').value     = s.subscriptionPlan||'';
   document.getElementById('swdeStatus').value   = s.status||'Active';
@@ -3347,7 +3334,6 @@ async function swdeSave(){
     csvId, name,
     deploymentType: document.getElementById('swdeType').value,
     renewalPeriod:  document.getElementById('swdeRenewal').value,
-    department:     normalizeSoftwareDepartmentValue(getSelectedSoftwareDepartments('swdeDept')),
     purpose:        document.getElementById('swdePurpose').value.trim(),
     subscriptionPlan: document.getElementById('swdePlan').value.trim(),
     status:         document.getElementById('swdeStatus').value,
@@ -3887,8 +3873,28 @@ async function saveDeptSoftwareMapping() {
   else showToast('No changes to save');
 
   renderDepartments();
-  renderSoftwareDepartmentSelect('swDept');
-  renderSoftwareDepartmentSelect('swdeDept');
+  renderSoftware();
+
+  /* If the software detail modal is open, refresh its department display */
+  if (_swDmCurrentId) {
+    const openSw = software.find(x => x.id === _swDmCurrentId);
+    if (openSw) {
+      /* update read-only field in Edit panel */
+      const ro = document.getElementById('swdeDeptReadOnly');
+      if (ro) ro.textContent = formatSoftwareDepartmentLabel(openSw.department || '');
+      /* update Overview → App Information rows */
+      const infoBody = document.getElementById('swDrInfoBody');
+      if (infoBody) {
+        infoBody.querySelectorAll('.sw-info-item').forEach(el => {
+          const lbl = el.querySelector('label');
+          if (lbl && lbl.textContent === 'Department') {
+            const val = el.querySelector('span');
+            if (val) val.textContent = formatSoftwareDepartmentLabel(openSw.department || '');
+          }
+        });
+      }
+    }
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -4726,20 +4732,8 @@ function closeDeptModal() {
 
             <div class="form-group">
               <label>Department</label>
-              <div class="dept-dropdown" id="swdeDept">
-                <button type="button" class="dept-dd-trigger" onclick="swDeptOpen('swdeDept')">
-                  <span class="dept-dd-val placeholder">Select departments…</span>
-                  <svg class="dept-dd-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
-                <div class="dept-dd-panel">
-                  <label class="dept-all-row">
-                    <input type="checkbox" class="dept-all-check" onchange="swDeptAllChanged(this,'swdeDept')">
-                    <span class="dept-all-label">🌐 All Departments</span>
-                    <span class="dept-all-badge">Everyone uses this app</span>
-                  </label>
-                  <div class="dept-list-scroll"></div>
-                </div>
-              </div>
+              <div id="swdeDeptReadOnly" style="padding:9px 12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;font-size:12.5px;color:var(--gray-700);min-height:36px;line-height:1.5">—</div>
+              <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Managed via <strong>Departments → Map Software</strong></div>
             </div>
             <div class="form-group"><label>Purpose</label><input type="text" id="swdePurpose" placeholder="e.g. CI/CD"></div>
 
