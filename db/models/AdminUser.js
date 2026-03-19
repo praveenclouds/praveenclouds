@@ -5,6 +5,12 @@
 const mongoose = require('mongoose');
 const bcrypt   = require('bcryptjs');
 
+function normalizeAdminRole(value) {
+  const role = String(value || '').trim().toLowerCase();
+  if (role === 'viewer' || role === 'it_manager') return 'user';
+  return role || 'user';
+}
+
 const adminUserSchema = new mongoose.Schema(
   {
     name: {
@@ -27,8 +33,8 @@ const adminUserSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['super_admin', 'admin', 'viewer', 'it_manager'],
-      default: 'viewer',
+      enum: ['super_admin', 'admin', 'user', 'viewer', 'it_manager'],
+      default: 'user',
     },
     status: {
       type: String,
@@ -46,6 +52,7 @@ const adminUserSchema = new mongoose.Schema(
 // Hash password before save (only when modified)
 // Mongoose v7+: async pre-hooks must NOT call next() — just return/throw
 adminUserSchema.pre('save', async function () {
+  this.role = normalizeAdminRole(this.role);
   if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
@@ -59,3 +66,4 @@ adminUserSchema.methods.comparePassword = function (plain) {
 adminUserSchema.index({ role: 1 });
 
 module.exports = mongoose.model('AdminUser', adminUserSchema);
+module.exports.normalizeAdminRole = normalizeAdminRole;

@@ -9,17 +9,18 @@
  */
 const router = require('express').Router();
 const { AdminUser } = require('../../db');
-const { requireAuth, onlySuperAdmin } = require('../../middleware/auth');
+const { requireAuth, canManagePortalUsers } = require('../../middleware/auth');
+const { normalizeRoleForDisplay } = require('../../services/role-permission.service');
 
 // ── GET /api/admin/users ───────────────────────────────────────────────────────
-router.get('/', requireAuth, onlySuperAdmin, async (req, res) => {
+router.get('/', requireAuth, canManagePortalUsers, async (req, res) => {
   try {
     const users = await AdminUser.find().select('-password').sort({ createdAt: 1 }).lean();
     res.json(users.map(u => ({
       id:        u._id.toString(),
       name:      u.name,
       email:     u.email,
-      role:      u.role,
+      role:      normalizeRoleForDisplay(u.role),
       status:    u.status,
       lastLogin: u.lastLogin,
       createdAt: u.createdAt,
@@ -28,16 +29,16 @@ router.get('/', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── POST /api/admin/users ──────────────────────────────────────────────────────
-router.post('/', requireAuth, onlySuperAdmin, async (req, res) => {
+router.post('/', requireAuth, canManagePortalUsers, async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
     if (!name || !email || !password)
       return res.status(400).json({ error: 'name, email and password are required' });
 
-    const user = await AdminUser.create({ name, email, password, role: role || 'viewer' });
+    const user = await AdminUser.create({ name, email, password, role: role || 'user' });
     res.status(201).json({
       id: user._id.toString(), name: user.name, email: user.email,
-      role: user.role, status: user.status,
+      role: normalizeRoleForDisplay(user.role), status: user.status,
     });
   } catch (e) {
     if (e.code === 11000) return res.status(409).json({ error: 'Email already exists' });
@@ -46,7 +47,7 @@ router.post('/', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── PUT /api/admin/users/:id ───────────────────────────────────────────────────
-router.put('/:id', requireAuth, onlySuperAdmin, async (req, res) => {
+router.put('/:id', requireAuth, canManagePortalUsers, async (req, res) => {
   try {
     const { name, email, role, status } = req.body;
     const user = await AdminUser.findByIdAndUpdate(
@@ -55,12 +56,12 @@ router.put('/:id', requireAuth, onlySuperAdmin, async (req, res) => {
       { new: true, runValidators: true }
     ).select('-password');
     if (!user) return res.status(404).json({ error: 'Portal user not found' });
-    res.json({ id: user._id.toString(), name: user.name, email: user.email, role: user.role, status: user.status });
+    res.json({ id: user._id.toString(), name: user.name, email: user.email, role: normalizeRoleForDisplay(user.role), status: user.status });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
 
 // ── PUT /api/admin/users/:id/reset-password ────────────────────────────────────
-router.put('/:id/reset-password', requireAuth, onlySuperAdmin, async (req, res) => {
+router.put('/:id/reset-password', requireAuth, canManagePortalUsers, async (req, res) => {
   try {
     const { password } = req.body;
     if (!password || password.length < 6)
@@ -76,7 +77,7 @@ router.put('/:id/reset-password', requireAuth, onlySuperAdmin, async (req, res) 
 });
 
 // ── DELETE /api/admin/users/:id ────────────────────────────────────────────────
-router.delete('/:id', requireAuth, onlySuperAdmin, async (req, res) => {
+router.delete('/:id', requireAuth, canManagePortalUsers, async (req, res) => {
   try {
     if (req.params.id === req.user.id)
       return res.status(400).json({ error: 'You cannot delete your own account' });

@@ -106,4 +106,30 @@ function apiPost(hostname, path, body, extraHeaders = {}) {
   });
 }
 
-module.exports = { httpsGet, httpsPost, apiGet, apiPost };
+function apiPostForm(hostname, path, body, extraHeaders = {}) {
+  const bodyStr = typeof body === 'string' ? body : qs.stringify(body);
+  return new Promise((resolve, reject) => {
+    const opts = {
+      hostname, path, method: 'POST',
+      headers: {
+        'Content-Type':   'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(bodyStr),
+        'User-Agent':     'TerzoCloud/1.0',
+        ...extraHeaders,
+      },
+    };
+    const req = https.request(opts, r => {
+      let data = '';
+      r.on('data', c => data += c);
+      r.on('end', () => {
+        if (r.statusCode >= 400) reject(new Error(`HTTP ${r.statusCode}: ${data.substring(0, 300)}`));
+        else resolve(data);
+      });
+    });
+    req.on('error', reject);
+    req.write(bodyStr);
+    req.end();
+  });
+}
+
+module.exports = { httpsGet, httpsPost, apiGet, apiPost, apiPostForm };

@@ -30,7 +30,7 @@
     .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
     .nav-item.active { background: var(--primary-lighter); color: var(--primary); }
     .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 9999px; min-width: 20px; text-align: center; }
-    .sidebar-footer { padding: 14px; border-top: 1px solid var(--gray-200); }
+    .sidebar-footer { margin-top: auto; padding: 14px; border-top: 1px solid var(--gray-200); }
     .user-chip { display: flex; align-items: center; gap: 10px; }
     .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .user-info strong { display: block; color: var(--gray-800); font-size: 12.5px; }
@@ -40,7 +40,7 @@
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
     .topbar { height: 60px; background: #fff; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 24px; gap: 14px; flex-shrink: 0; }
     .topbar h1 { font-size: 17px; font-weight: 700; color: var(--gray-800); flex: 1; }
-    .search-wrap { position: relative; }
+.search-wrap { position: relative; }
     .search-wrap input { padding: 7px 12px 7px 34px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; width: 210px; background: var(--gray-50); outline: none; transition: border .14s; }
     .search-wrap input:focus { border-color: var(--primary-light); background: #fff; }
     .search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--gray-400); fill: none; stroke-width: 2; pointer-events: none; }
@@ -183,108 +183,46 @@
     .theme-btn:hover:not(.active) { background:var(--gray-100); }
 
     /* ══ THEME: DARK (default) ══ */
-    body.theme-dark {
+    body.support-theme-portal {
       --gray-50: #0e0a0f; --gray-100: #16101a; --gray-200: rgba(153,102,255,0.18);
       --gray-300: #2a1f35; --gray-400: #83758a; --gray-600: #b5acb9; --gray-700: #cdc8d0;
       --gray-800: #faf9fa; --primary-lighter: rgba(153,102,255,0.12);
       --success-bg: rgba(22,163,74,0.12); --warning-bg: rgba(217,119,6,0.12); --danger-bg: rgba(220,38,38,0.12);
       background: #0e0a0f; color: #faf9fa;
     }
-    body.theme-dark .sidebar, body.theme-dark .topbar, body.theme-dark .modal,
-    body.theme-dark .confirm-box, body.theme-dark #deptModalBox { background: #16101a !important; }
-    body.theme-dark .stat-card, body.theme-dark .card, body.theme-dark .dept-card { background: #16101a !important; }
-    body.theme-dark .logo-text { color: #faf9fa !important; }
-    body.theme-dark .search-wrap input, body.theme-dark #logSearch { background: #1e1525 !important; color: #faf9fa !important; }
-    body.theme-dark .search-wrap input:focus, body.theme-dark #logSearch:focus { background: #231930 !important; }
-    body.theme-dark .filter-select { background: #1e1525 !important; color: #cdc8d0 !important; }
-    body.theme-dark .form-group input, body.theme-dark .form-group select, body.theme-dark .form-group textarea { background: #1e1525 !important; color: #faf9fa !important; }
-    body.theme-dark .form-group input:focus, body.theme-dark .form-group select:focus, body.theme-dark .form-group textarea:focus { background: #231930 !important; }
-    body.theme-dark .page-btn { background: #1e1525 !important; color: #cdc8d0 !important; }
-    body.theme-dark .stat-icon.blue   { background: rgba(30,64,175,0.18) !important; }
-    body.theme-dark .stat-icon.green  { background: rgba(22,163,74,0.15) !important; }
-    body.theme-dark .stat-icon.yellow { background: rgba(217,119,6,0.15) !important; }
-    body.theme-dark .stat-icon.red    { background: rgba(220,38,38,0.15) !important; }
-    body.theme-dark .stat-icon.sky    { background: rgba(14,165,233,0.15) !important; }
-    body.theme-dark .stat-icon.purple { background: rgba(147,51,234,0.15) !important; }
-    body.theme-dark .badge.in-use       { background: rgba(30,64,175,0.15) !important; }
-    body.theme-dark .badge.available    { background: rgba(22,163,74,0.12) !important; }
-    body.theme-dark .badge.under-repair { background: rgba(217,119,6,0.12) !important; }
-    body.theme-dark .badge.retired      { background: rgba(220,38,38,0.12) !important; }
-    body.theme-dark .badge.idle         { background: rgba(131,117,138,0.15) !important; }
-    body.theme-dark .badge.role-admin   { background: rgba(147,51,234,0.15) !important; }
-    body.theme-dark .badge.role-manager { background: rgba(234,88,12,0.15) !important; }
-    body.theme-dark .badge.role-staff   { background: rgba(30,64,175,0.15) !important; }
-    body.theme-dark .tag { background: #231930 !important; color: #b5acb9 !important; }
-    body.theme-dark #deptModalClose:hover { background: #231930 !important; }
-    body.theme-dark .dept-card:hover { box-shadow: 0 4px 16px rgba(153,102,255,0.2) !important; }
-    body.theme-dark .user-table-scroll::-webkit-scrollbar-track { background: #0e0a0f; }
-    body.theme-dark .user-table-scroll::-webkit-scrollbar-thumb { background: rgba(153,102,255,0.55); border-radius:10px; }
-    body.theme-dark .user-table-scroll::-webkit-scrollbar-thumb:hover { background: #9966ff; }
-    body.theme-dark th.sortable:hover { color: #cea7fb; }
-    body.theme-dark th.sortable.sort-asc .sort-arrow, body.theme-dark th.sortable.sort-desc .sort-arrow { color: #9966ff; }
+    body.support-theme-portal .sidebar, body.support-theme-portal .topbar, body.support-theme-portal .modal,
+    body.support-theme-portal .confirm-box, body.support-theme-portal #deptModalBox { background: #16101a !important; }
+    body.support-theme-portal .stat-card, body.support-theme-portal .card, body.support-theme-portal .dept-card { background: #16101a !important; }
+    body.support-theme-portal .logo-text { color: #faf9fa !important; }
+    body.support-theme-portal .search-wrap input, body.support-theme-portal #logSearch { background: #1e1525 !important; color: #faf9fa !important; }
+    body.support-theme-portal .search-wrap input:focus, body.support-theme-portal #logSearch:focus { background: #231930 !important; }
+    body.support-theme-portal .filter-select { background: #1e1525 !important; color: #cdc8d0 !important; }
+    body.support-theme-portal .form-group input, body.support-theme-portal .form-group select, body.support-theme-portal .form-group textarea { background: #1e1525 !important; color: #faf9fa !important; }
+    body.support-theme-portal .form-group input:focus, body.support-theme-portal .form-group select:focus, body.support-theme-portal .form-group textarea:focus { background: #231930 !important; }
+    body.support-theme-portal .page-btn { background: #1e1525 !important; color: #cdc8d0 !important; }
+    body.support-theme-portal .stat-icon.blue   { background: rgba(30,64,175,0.18) !important; }
+    body.support-theme-portal .stat-icon.green  { background: rgba(22,163,74,0.15) !important; }
+    body.support-theme-portal .stat-icon.yellow { background: rgba(217,119,6,0.15) !important; }
+    body.support-theme-portal .stat-icon.red    { background: rgba(220,38,38,0.15) !important; }
+    body.support-theme-portal .stat-icon.sky    { background: rgba(14,165,233,0.15) !important; }
+    body.support-theme-portal .stat-icon.purple { background: rgba(147,51,234,0.15) !important; }
+    body.support-theme-portal .badge.in-use       { background: rgba(30,64,175,0.15) !important; }
+    body.support-theme-portal .badge.available    { background: rgba(22,163,74,0.12) !important; }
+    body.support-theme-portal .badge.under-repair { background: rgba(217,119,6,0.12) !important; }
+    body.support-theme-portal .badge.retired      { background: rgba(220,38,38,0.12) !important; }
+    body.support-theme-portal .badge.idle         { background: rgba(131,117,138,0.15) !important; }
+    body.support-theme-portal .badge.role-admin   { background: rgba(147,51,234,0.15) !important; }
+    body.support-theme-portal .badge.role-manager { background: rgba(234,88,12,0.15) !important; }
+    body.support-theme-portal .badge.role-staff   { background: rgba(30,64,175,0.15) !important; }
+    body.support-theme-portal .tag { background: #231930 !important; color: #b5acb9 !important; }
+    body.support-theme-portal #deptModalClose:hover { background: #231930 !important; }
+    body.support-theme-portal .dept-card:hover { box-shadow: 0 4px 16px rgba(153,102,255,0.2) !important; }
+    body.support-theme-portal .user-table-scroll::-webkit-scrollbar-track { background: #0e0a0f; }
+    body.support-theme-portal .user-table-scroll::-webkit-scrollbar-thumb { background: rgba(153,102,255,0.55); border-radius:10px; }
+    body.support-theme-portal .user-table-scroll::-webkit-scrollbar-thumb:hover { background: #9966ff; }
+    body.support-theme-portal th.sortable:hover { color: #cea7fb; }
+    body.support-theme-portal th.sortable.sort-asc .sort-arrow, body.support-theme-portal th.sortable.sort-desc .sort-arrow { color: #9966ff; }
 
-    /* ══ THEME: PURPLE ══ */
-    body.theme-purple {
-      --gray-50: #150a2e; --gray-100: #1e0e40; --gray-200: rgba(168,85,247,0.25);
-      --gray-300: #2d1260; --gray-400: #9d7ec7; --gray-600: #cdb8f0; --gray-700: #e0d5f8;
-      --gray-800: #f5eeff; --primary: #a855f7; --primary-light: #c084fc; --primary-dark: #7c3aed;
-      --primary-lighter: rgba(168,85,247,0.18); --accent: #d8b4fe;
-      --success-bg: rgba(22,163,74,0.15); --warning-bg: rgba(217,119,6,0.15); --danger-bg: rgba(220,38,38,0.15);
-      background: #150a2e; color: #f5eeff;
-    }
-    body.theme-purple .sidebar, body.theme-purple .topbar, body.theme-purple .modal,
-    body.theme-purple .confirm-box, body.theme-purple #deptModalBox { background: #1e0e40 !important; }
-    body.theme-purple .stat-card, body.theme-purple .card, body.theme-purple .dept-card { background: #1e0e40 !important; }
-    body.theme-purple .logo-icon { background: #7c3aed !important; }
-    body.theme-purple .logo-text { color: #f5eeff !important; }
-    body.theme-purple .nav-badge { background: #7c3aed !important; }
-    body.theme-purple .btn-primary { background: #7c3aed !important; }
-    body.theme-purple .btn-primary:hover { background: #6d28d9 !important; }
-    body.theme-purple .search-wrap input, body.theme-purple #logSearch { background: #2d1260 !important; color: #f5eeff !important; }
-    body.theme-purple .search-wrap input:focus, body.theme-purple #logSearch:focus { background: #361572 !important; }
-    body.theme-purple .filter-select { background: #2d1260 !important; color: #e0d5f8 !important; }
-    body.theme-purple .form-group input, body.theme-purple .form-group select, body.theme-purple .form-group textarea { background: #2d1260 !important; color: #f5eeff !important; }
-    body.theme-purple .form-group input:focus, body.theme-purple .form-group select:focus, body.theme-purple .form-group textarea:focus { background: #361572 !important; }
-    body.theme-purple .page-btn { background: #2d1260 !important; color: #e0d5f8 !important; }
-    body.theme-purple .page-btn.current { background: #7c3aed !important; color: #fff !important; border-color: #7c3aed !important; }
-    body.theme-purple .nav-item.active { background: rgba(168,85,247,0.18) !important; color: #c084fc !important; }
-    body.theme-purple .stat-icon.blue   { background: rgba(168,85,247,0.20) !important; color: #c084fc !important; }
-    body.theme-purple .stat-icon.green  { background: rgba(22,163,74,0.15) !important; }
-    body.theme-purple .stat-icon.yellow { background: rgba(217,119,6,0.15) !important; }
-    body.theme-purple .stat-icon.red    { background: rgba(220,38,38,0.15) !important; }
-    body.theme-purple .stat-icon.sky    { background: rgba(14,165,233,0.15) !important; }
-    body.theme-purple .stat-icon.purple { background: rgba(168,85,247,0.22) !important; }
-    body.theme-purple .badge.in-use       { background: rgba(168,85,247,0.20) !important; color: #d8b4fe !important; }
-    body.theme-purple .badge.available    { background: rgba(22,163,74,0.15) !important; }
-    body.theme-purple .badge.under-repair { background: rgba(217,119,6,0.15) !important; }
-    body.theme-purple .badge.retired      { background: rgba(220,38,38,0.15) !important; }
-    body.theme-purple .badge.idle         { background: rgba(147,85,200,0.20) !important; }
-    body.theme-purple .badge.role-admin   { background: rgba(168,85,247,0.25) !important; color: #e9d5ff !important; }
-    body.theme-purple .badge.role-manager { background: rgba(234,88,12,0.15) !important; }
-    body.theme-purple .badge.role-staff   { background: rgba(168,85,247,0.15) !important; color: #d8b4fe !important; }
-    body.theme-purple .badge.active       { background: rgba(22,163,74,0.15) !important; }
-    body.theme-purple .badge.inactive     { background: rgba(147,85,200,0.18) !important; }
-    body.theme-purple .tag { background: #2d1260 !important; color: #cdb8f0 !important; }
-    body.theme-purple #deptModalClose:hover { background: #2d1260 !important; }
-    body.theme-purple .dept-card:hover { box-shadow: 0 4px 16px rgba(168,85,247,0.35) !important; border-color: #a855f7 !important; }
-    body.theme-purple .dept-count { color: #c084fc !important; }
-    body.theme-purple .user-table-scroll::-webkit-scrollbar-track { background: #150a2e; }
-    body.theme-purple .user-table-scroll::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.6); border-radius:10px; }
-    body.theme-purple .user-table-scroll::-webkit-scrollbar-thumb:hover { background: #a855f7; }
-    body.theme-purple th.sortable:hover { color: #e9d5ff; }
-    body.theme-purple th.sortable.sort-asc .sort-arrow, body.theme-purple th.sortable.sort-desc .sort-arrow { color: #c084fc; }
-    body.theme-purple .log-chip { background: rgba(168,85,247,0.20) !important; color: #d8b4fe !important; }
-    body.theme-purple .log-chip span { color: #e9d5ff !important; }
-
-    /* ══ THEME: WHITE (Light) ══ */
-    body.theme-white {
-      background: var(--gray-50); color: var(--gray-800);
-    }
-    body.theme-white th.sortable:hover { color: var(--primary-dark); }
-    body.theme-white th.sortable.sort-asc .sort-arrow, body.theme-white th.sortable.sort-desc .sort-arrow { color: var(--primary); }
-    body.theme-white .user-table-scroll::-webkit-scrollbar-track { background: var(--gray-100); }
-    body.theme-white .user-table-scroll::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius:10px; }
-    body.theme-white #logSearch { background: #fff; color: var(--gray-800); }
 
     /* ── Software Inventory ── */
     .sw-type-badge { display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600; }
@@ -330,9 +268,8 @@
     .swde-grid .form-group input, .swde-grid .form-group select { width:100%; box-sizing:border-box; }
     .swde-section-title { font-size:10px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.08em; margin:18px 0 8px; grid-column:1/-1; padding-bottom:6px; border-bottom:1px solid var(--gray-100); }
     .swde-footer { display:flex; gap:8px; justify-content:flex-end; padding-top:18px; border-top:1px solid var(--gray-100); margin-top:8px; grid-column:1/-1; }
-    body.theme-dark  .swde-section-title, body.theme-dark  .swde-footer { border-color:rgba(255,255,255,.08) !important; }
-    body.theme-purple .swde-section-title, body.theme-purple .swde-footer { border-color:rgba(255,255,255,.08) !important; }
-    /* Drawer backward compat (kept for theme overrides below) */
+    body.support-theme-portal  .swde-section-title, body.support-theme-portal  .swde-footer { border-color:rgba(255,255,255,.08) !important; }
+/* Drawer backward compat (kept for theme overrides below) */
     .sw-drawer-overlay,.sw-drawer { display:none !important; }
     .sw-section-title { font-size:10.5px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.08em; margin-bottom:11px; }
     .sw-cost-cards { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
@@ -369,44 +306,27 @@
     .sw-total-spend .ts-total { font-size:13px; font-weight:700; color:var(--primary); border-top:1px solid rgba(59,130,246,.2); padding-top:4px; margin-top:2px; display:flex; gap:8px; }
     .sw-total-spend .ts-total span:first-child { min-width:160px; }
     .sw-total-spend .ts-big { font-size:26px; font-weight:800; color:var(--primary); white-space:nowrap; }
-    /* dark/purple overrides for plan cards */
-    body.theme-dark .sw-plan-card { border-color:rgba(153,102,255,.18) !important; }
-    body.theme-dark .sw-plan-card-head { background:#1e1525 !important; border-color:rgba(153,102,255,.18) !important; }
-    body.theme-dark .sw-plan-card-head .pname { color:#e9d5ff !important; }
-    body.theme-dark .sw-plan-row { border-color:rgba(153,102,255,.1) !important; }
-    body.theme-dark .sw-plan-cell { border-color:rgba(153,102,255,.1) !important; }
-    body.theme-dark .sw-plan-cell .pc-val { color:#e9d5ff !important; }
-    body.theme-dark .sw-plan-cell .pc-label,.sw-plan-cell .pc-sub { color:rgba(255,255,255,.35) !important; }
-    body.theme-dark .sw-plan-annual { background:rgba(99,102,241,.12) !important; border-color:rgba(99,102,241,.2) !important; }
-    body.theme-dark .sw-total-spend { background:rgba(99,102,241,.12) !important; border-color:rgba(99,102,241,.3) !important; }
-    body.theme-purple .sw-plan-card { border-color:rgba(168,85,247,.2) !important; }
-    body.theme-purple .sw-plan-card-head { background:#2d1260 !important; border-color:rgba(168,85,247,.2) !important; }
-    body.theme-purple .sw-plan-card-head .pname { color:#e9d5ff !important; }
-    body.theme-purple .sw-plan-row,.sw-plan-cell { border-color:rgba(168,85,247,.1) !important; }
-    body.theme-purple .sw-plan-cell .pc-val { color:#e9d5ff !important; }
-    body.theme-purple .sw-plan-annual,.sw-total-spend { background:rgba(168,85,247,.1) !important; border-color:rgba(168,85,247,.25) !important; }
-    body.theme-dark .sw-dm-box, body.theme-dark .sw-dm-head, body.theme-dark .sw-dm-tabs { background:#16101a !important; border-color:rgba(153,102,255,0.18) !important; }
-    body.theme-dark .sw-dm-tab { color:rgba(255,255,255,.45); }
-    body.theme-dark .sw-dm-tab.active { color:#a78bfa; border-bottom-color:#a78bfa; }
-    body.theme-dark .sw-cost-card, body.theme-dark .sw-lic-cards .sw-cost-card { background:#1e1525 !important; border-color:rgba(153,102,255,0.18) !important; }
-    body.theme-dark .sw-cost-card .cv { color:#e9d5ff !important; }
-    body.theme-dark .sw-cost-card .cl { color:rgba(255,255,255,.4) !important; }
-    body.theme-dark .sw-section-title { color:rgba(255,255,255,.4) !important; }
-    body.theme-dark .sw-svc-table th { color:rgba(255,255,255,.35) !important; border-color:rgba(153,102,255,.14) !important; }
-    body.theme-dark .sw-svc-table td { border-color:rgba(153,102,255,.1) !important; color:rgba(255,255,255,.75); }
-    body.theme-dark .sw-info-item label { color:rgba(255,255,255,.35) !important; }
-    body.theme-dark .sw-info-item span { color:rgba(255,255,255,.8) !important; }
-    body.theme-purple .sw-dm-box, body.theme-purple .sw-dm-head, body.theme-purple .sw-dm-tabs { background:#1e0e40 !important; border-color:rgba(168,85,247,0.2) !important; }
-    body.theme-purple .sw-dm-tab { color:rgba(255,255,255,.4); }
-    body.theme-purple .sw-dm-tab.active { color:#c084fc; border-bottom-color:#c084fc; }
-    body.theme-purple .sw-cost-card { background:#2d1260 !important; border-color:rgba(168,85,247,.2) !important; }
-    body.theme-purple .sw-cost-card .cv { color:#e9d5ff !important; }
-    body.theme-purple .sw-cost-card .cl { color:rgba(255,255,255,.4) !important; }
-    body.theme-purple .sw-section-title { color:rgba(255,255,255,.4) !important; }
-    body.theme-purple .sw-svc-table th { color:rgba(255,255,255,.35) !important; border-color:rgba(168,85,247,.15) !important; }
-    body.theme-purple .sw-svc-table td { border-color:rgba(168,85,247,.1) !important; color:rgba(255,255,255,.75); }
-    body.theme-purple .sw-info-item label { color:rgba(255,255,255,.35) !important; }
-    body.theme-purple .sw-info-item span { color:rgba(255,255,255,.8) !important; }
+    /* dark overrides for plan cards */
+    body.support-theme-portal .sw-plan-card { border-color:rgba(153,102,255,.18) !important; }
+    body.support-theme-portal .sw-plan-card-head { background:#1e1525 !important; border-color:rgba(153,102,255,.18) !important; }
+    body.support-theme-portal .sw-plan-card-head .pname { color:#e9d5ff !important; }
+    body.support-theme-portal .sw-plan-row { border-color:rgba(153,102,255,.1) !important; }
+    body.support-theme-portal .sw-plan-cell { border-color:rgba(153,102,255,.1) !important; }
+    body.support-theme-portal .sw-plan-cell .pc-val { color:#e9d5ff !important; }
+    body.support-theme-portal .sw-plan-cell .pc-label,.sw-plan-cell .pc-sub { color:rgba(255,255,255,.35) !important; }
+    body.support-theme-portal .sw-plan-annual { background:rgba(99,102,241,.12) !important; border-color:rgba(99,102,241,.2) !important; }
+    body.support-theme-portal .sw-total-spend { background:rgba(99,102,241,.12) !important; border-color:rgba(99,102,241,.3) !important; }
+body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, body.support-theme-portal .sw-dm-tabs { background:#16101a !important; border-color:rgba(153,102,255,0.18) !important; }
+    body.support-theme-portal .sw-dm-tab { color:rgba(255,255,255,.45); }
+    body.support-theme-portal .sw-dm-tab.active { color:#a78bfa; border-bottom-color:#a78bfa; }
+    body.support-theme-portal .sw-cost-card, body.support-theme-portal .sw-lic-cards .sw-cost-card { background:#1e1525 !important; border-color:rgba(153,102,255,0.18) !important; }
+    body.support-theme-portal .sw-cost-card .cv { color:#e9d5ff !important; }
+    body.support-theme-portal .sw-cost-card .cl { color:rgba(255,255,255,.4) !important; }
+    body.support-theme-portal .sw-section-title { color:rgba(255,255,255,.4) !important; }
+    body.support-theme-portal .sw-svc-table th { color:rgba(255,255,255,.35) !important; border-color:rgba(153,102,255,.14) !important; }
+    body.support-theme-portal .sw-svc-table td { border-color:rgba(153,102,255,.1) !important; color:rgba(255,255,255,.75); }
+    body.support-theme-portal .sw-info-item label { color:rgba(255,255,255,.35) !important; }
+    body.support-theme-portal .sw-info-item span { color:rgba(255,255,255,.8) !important; }
 
     /* ── Export Dropdown ── */
     .export-wrap { position: relative; display: inline-flex; }
@@ -416,16 +336,12 @@
     .export-menu-item:hover { background:var(--gray-100); }
     .export-menu-item svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; flex-shrink:0; }
     .export-menu-sep { height:1px; background:var(--gray-100); margin:3px 6px; }
-    body.theme-dark .export-menu { background:#1e1525 !important; border-color:rgba(153,102,255,0.22) !important; }
-    body.theme-dark .export-menu-item { color:#cdc8d0 !important; }
-    body.theme-dark .export-menu-item:hover { background:#231930 !important; }
-    body.theme-dark .export-menu-sep { background:rgba(153,102,255,0.15) !important; }
-    body.theme-purple .export-menu { background:#2d1260 !important; border-color:rgba(168,85,247,0.22) !important; }
-    body.theme-purple .export-menu-item { color:#d8b4fe !important; }
-    body.theme-purple .export-menu-item:hover { background:#3b1f7a !important; }
-    body.theme-purple .export-menu-sep { background:rgba(168,85,247,0.15) !important; }
+    body.support-theme-portal .export-menu { background:#1e1525 !important; border-color:rgba(153,102,255,0.22) !important; }
+    body.support-theme-portal .export-menu-item { color:#cdc8d0 !important; }
+    body.support-theme-portal .export-menu-item:hover { background:#231930 !important; }
+    body.support-theme-portal .export-menu-sep { background:rgba(153,102,255,0.15) !important; }
 
-    /* ── Export Column Picker ── */
+/* ── Export Column Picker ── */
     .exc-overlay { position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:500;display:none;align-items:center;justify-content:center;padding:20px; }
     .exc-overlay.open { display:flex; }
     .exc-box { background:#fff;border-radius:16px;box-shadow:0 24px 80px rgba(0,0,0,.28);width:100%;max-width:580px;display:flex;flex-direction:column;max-height:88vh;overflow:hidden; }
@@ -439,17 +355,13 @@
     .exc-chip .exc-dot { width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;transition:background .13s; }
     .exc-foot { padding:14px 22px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;flex-shrink:0; }
     .exc-count { font-size:11px;color:var(--gray-400);font-weight:500; }
-    body.theme-dark .exc-box { background:#16101a !important; border-color:rgba(153,102,255,.2) !important; }
-    body.theme-dark .exc-head, body.theme-dark .exc-foot { border-color:rgba(255,255,255,.08) !important; }
-    body.theme-dark .exc-head h3 { color:#faf9fa !important; }
-    body.theme-dark .exc-chip { background:#231930 !important; border-color:#3d2d4a !important; color:#9d8aaf !important; }
-    body.theme-dark .exc-chip.on { background:#3b1f7a !important; border-color:#7c3aed !important; color:#c4b5fd !important; }
-    body.theme-purple .exc-box { background:#1e0e40 !important; }
-    body.theme-purple .exc-head, body.theme-purple .exc-foot { border-color:rgba(255,255,255,.08) !important; }
-    body.theme-purple .exc-chip { background:#2d1260 !important; border-color:#6b21a8 !important; color:#c084fc !important; }
-    body.theme-purple .exc-chip.on { background:#4c1d95 !important; border-color:#a855f7 !important; color:#e9d5ff !important; }
+    body.support-theme-portal .exc-box { background:#16101a !important; border-color:rgba(153,102,255,.2) !important; }
+    body.support-theme-portal .exc-head, body.support-theme-portal .exc-foot { border-color:rgba(255,255,255,.08) !important; }
+    body.support-theme-portal .exc-head h3 { color:#faf9fa !important; }
+    body.support-theme-portal .exc-chip { background:#231930 !important; border-color:#3d2d4a !important; color:#9d8aaf !important; }
+    body.support-theme-portal .exc-chip.on { background:#3b1f7a !important; border-color:#7c3aed !important; color:#c4b5fd !important; }
 
-    /* ── Column Picker ── */
+/* ── Column Picker ── */
     .col-picker-wrap { position:relative; display:inline-flex; }
     .col-picker-drop { position:absolute; right:0; top:calc(100% + 6px); background:#fff; border:1px solid var(--gray-200); border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.13); padding:6px 4px; min-width:210px; z-index:60; display:none; }
     .col-picker-drop.open { display:block; }
@@ -459,10 +371,10 @@
     .col-picker-item input[type="checkbox"] { width:14px;height:14px;accent-color:var(--primary);cursor:pointer;flex-shrink:0; }
     .col-picker-item.locked { color:var(--gray-400);cursor:default; }
     .col-picker-item.locked input { opacity:.4;cursor:default; }
-    body.theme-dark .col-picker-drop { background:#1e1525;border-color:rgba(153,102,255,.2); }
-    body.theme-dark .col-picker-item { color:#ccc; }
-    body.theme-dark .col-picker-item:hover { background:rgba(255,255,255,.05); }
-    body.theme-dark .col-picker-head { color:rgba(153,102,255,.6);border-color:rgba(255,255,255,.08); }
+    body.support-theme-portal .col-picker-drop { background:#1e1525;border-color:rgba(153,102,255,.2); }
+    body.support-theme-portal .col-picker-item { color:#ccc; }
+    body.support-theme-portal .col-picker-item:hover { background:rgba(255,255,255,.05); }
+    body.support-theme-portal .col-picker-head { color:rgba(153,102,255,.6);border-color:rgba(255,255,255,.08); }
 
     /* ── Advanced Search Panel ── */
     .adv-search-panel { padding:12px 18px 14px; border-bottom:1px solid var(--gray-100); background:var(--gray-50); display:none; flex-wrap:wrap; gap:8px; align-items:flex-end; }
@@ -481,14 +393,35 @@
     .tag-chip-x { cursor:pointer; font-size:13px; line-height:1; opacity:.7; }
     .tag-chip-x:hover { opacity:1; }
     .tag-picker-input { border:none; outline:none; background:transparent; font-size:12px; color:var(--gray-800); min-width:80px; flex:1; }
-    body.theme-dark .adv-search-panel  { background:var(--gray-100) !important; }
-    body.theme-dark .adv-field input, body.theme-dark .adv-field select { background:#1e1525 !important; color:#faf9fa !important; }
-    body.theme-dark .tag-picker { background:#1e1525 !important; border-color:#3d2d4a !important; }
-    body.theme-dark .tag-picker-input { color:#faf9fa !important; }
-    body.theme-purple .adv-search-panel{ background:var(--gray-100) !important; }
-    body.theme-purple .adv-field input, body.theme-purple .adv-field select { background:#2d1260 !important; color:#f5eeff !important; }
-    body.theme-purple .tag-picker { background:#2d1260 !important; border-color:#6b21a8 !important; }
-    body.theme-purple .tag-picker-input { color:#f5eeff !important; }
+    body.support-theme-portal .adv-search-panel  { background:var(--gray-100) !important; }
+    body.support-theme-portal .adv-field input, body.support-theme-portal .adv-field select { background:#1e1525 !important; color:#faf9fa !important; }
+    body.support-theme-portal .tag-picker { background:#1e1525 !important; border-color:#3d2d4a !important; }
+    body.support-theme-portal .tag-picker-input { color:#faf9fa !important; }
+
+/* ── Department dropdown ── */
+    .dept-dropdown { position:relative; }
+    .dept-dd-trigger { width:100%; display:flex; align-items:center; justify-content:space-between; gap:6px; padding:8px 11px; border:1px solid var(--gray-200); border-radius:8px; font-size:13px; font-family:inherit; background:#fff; color:var(--gray-800); cursor:pointer; text-align:left; transition:border .14s; }
+    .dept-dd-trigger:focus, .dept-dd-trigger.open { border-color:var(--primary-light); box-shadow:0 0 0 3px rgba(59,130,246,.1); outline:none; }
+    .dept-dd-val { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .dept-dd-val.placeholder { color:var(--gray-400); }
+    .dept-dd-arrow { width:14px; height:14px; stroke:var(--gray-400); fill:none; stroke-width:2.2; flex-shrink:0; transition:transform .15s; }
+    .dept-dd-trigger.open .dept-dd-arrow { transform:rotate(180deg); }
+    .dept-dd-panel { display:none; position:absolute; top:calc(100% + 3px); left:0; right:0; background:#fff; border:1px solid var(--gray-200); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.13); z-index:1200; overflow:hidden; }
+    .dept-dd-panel.open { display:block; }
+    .dept-all-row { display:flex; align-items:center; gap:10px; padding:9px 12px; background:var(--primary-lighter); border-bottom:1px solid var(--gray-200); cursor:pointer; user-select:none; }
+    .dept-all-row:hover { filter:brightness(.96); }
+    .dept-all-check { width:15px; height:15px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; margin:0; }
+    .dept-all-label { font-size:13px; font-weight:700; color:var(--primary); flex:1; }
+    .dept-all-badge { font-size:10px; font-weight:600; color:var(--primary); background:rgba(255,255,255,.55); border:1px solid var(--primary-light); border-radius:99px; padding:1px 8px; white-space:nowrap; }
+    .dept-list-scroll { max-height:160px; overflow-y:auto; padding:4px 0; }
+    .dept-list-scroll.disabled { opacity:0.35; pointer-events:none; }
+    .dept-empty-msg { padding:10px 12px; font-size:12px; color:var(--gray-400); }
+    .dept-check-row { display:flex; align-items:center; gap:9px; padding:5px 12px; cursor:pointer; user-select:none; transition:background .1s; }
+    .dept-check-row:hover { background:var(--gray-50); }
+    .dept-check-row input[type="checkbox"] { width:14px; height:14px; accent-color:var(--primary); cursor:pointer; flex-shrink:0; margin:0; }
+    .dept-check-row span { font-size:13px; color:var(--gray-700); }
+    /* Dept dropdown colours are handled entirely by portal-theme.css using the correct
+       body.support-theme-portal selectors. No duplicate overrides here. */
 
     /* ── Modal Tabs ── */
     .modal-tabs { display:flex; gap:0; padding:0 22px; border-bottom:1px solid var(--gray-100); flex-shrink:0; background:#fff; }
@@ -497,19 +430,39 @@
     .modal-tab-btn:hover:not(.active) { color:var(--gray-700); }
     .modal-tab-panel { display:none; }
     .modal-tab-panel.active { display:flex; flex-direction:column; gap:12px; padding:18px 22px; }
-    body.theme-dark .modal-tabs  { background:#16101a !important; }
-    body.theme-purple .modal-tabs{ background:#1e0e40 !important; }
+    body.support-theme-portal .modal-tabs  { background:#16101a !important; }
 
-    /* ── Services inline table ── */
+/* ── Services inline table ── */
     .svc-mini-table { width:100%; border-collapse:collapse; font-size:12px; }
     .svc-mini-table th { padding:5px 6px; text-align:left; font-size:10px; font-weight:700; color:var(--gray-400); text-transform:uppercase; border-bottom:1px solid var(--gray-200); white-space:nowrap; }
     .svc-mini-table td { padding:4px 4px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
     .svc-mini-table input, .svc-mini-table select { padding:4px 6px; border:1px solid var(--gray-200); border-radius:5px; font-size:11.5px; width:100%; background:#fff; color:var(--gray-800); outline:none; }
     .svc-mini-table input:focus, .svc-mini-table select:focus { border-color:var(--primary-light); }
-    body.theme-dark .svc-mini-table input, body.theme-dark .svc-mini-table select   { background:#1e1525 !important; color:#faf9fa !important; }
-    body.theme-purple .svc-mini-table input, body.theme-purple .svc-mini-table select { background:#2d1260 !important; color:#f5eeff !important; }
+    body.support-theme-portal .svc-mini-table input, body.support-theme-portal .svc-mini-table select   { background:#1e1525 !important; color:#faf9fa !important; }
 
-    /* ── Activity Log ── */
+/* ── Departments Management Page ── */
+    #deptMgmtTable td { vertical-align:middle; }
+    .dept-mgmt-name { font-size:13px;font-weight:600;color:var(--gray-800);display:flex;align-items:center;gap:8px; }
+    .dept-mgmt-name-icon { width:30px;height:30px;border-radius:8px;background:rgba(124,92,255,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .dept-mgmt-name-icon svg { width:15px;height:15px;stroke:#9b8aff;fill:none;stroke-width:2; }
+    .dept-mgmt-count { display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700; }
+    .dept-mgmt-count.users { background:rgba(124,92,255,.14);color:#9b8aff; }
+    .dept-mgmt-count.software { background:rgba(56,189,248,.12);color:#38bdf8; }
+    .dept-mgmt-actions { display:flex;gap:6px;justify-content:flex-end; }
+    .dept-mgmt-btn { display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:7px;border:1px solid var(--support-border,rgba(130,96,185,.28));background:transparent;color:var(--gray-600);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .13s; }
+    .dept-mgmt-btn:hover { background:rgba(124,92,255,.12);border-color:rgba(124,92,255,.4);color:#9b8aff; }
+    .dept-mgmt-btn.danger:hover { background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.35);color:#f87171; }
+    .dept-mgmt-btn svg { width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2; }
+    /* Dept detail software mapping cards */
+    .sw-map-card { display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--support-border,rgba(130,96,185,.22));background:rgba(29,20,38,.7);cursor:pointer;transition:all .13s;user-select:none; }
+    .sw-map-card:hover { border-color:rgba(124,92,255,.4);background:rgba(124,92,255,.08); }
+    .sw-map-card.checked { border-color:rgba(124,92,255,.55);background:rgba(124,92,255,.14); }
+    .sw-map-card input[type=checkbox] { width:15px;height:15px;accent-color:#7c5cff;flex-shrink:0;cursor:pointer; }
+    .sw-map-card .sw-map-name { font-size:12.5px;font-weight:600;color:var(--gray-700,#efe8ff);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    .sw-map-card .sw-map-type { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(56,189,248,.12);color:#38bdf8;white-space:nowrap;flex-shrink:0; }
+    .sw-map-card.all-badge .sw-map-type { background:rgba(52,211,153,.12);color:#34d399; }
+
+/* ── Activity Log ── */
     .log-event-badge {
       display: inline-flex; align-items: center; gap: 5px;
       padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap;
@@ -540,9 +493,10 @@
     }
     .log-chip span { color: var(--gray-300); font-weight: 400; }
   </style>
+  <link rel="stylesheet" href="/portal-theme.css" />
 </head>
 <body>
-<script>document.body.className='theme-'+(localStorage.getItem('tcTheme')||'dark');</script>
+<script>document.body.className='support-theme support-theme-portal';</script>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -565,6 +519,10 @@
       <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.87"/></svg>
       All Users <span class="nav-badge" id="navUsersCount">40</span>
     </div>
+    <div class="nav-item" onclick="navigate('departments',this)">
+      <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      Departments <span class="nav-badge" id="navDeptsCount">0</span>
+    </div>
     <div class="nav-label" style="margin-top:10px">Assets</div>
     <div class="nav-item" onclick="navigate('assets',this)">
       <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
@@ -582,6 +540,11 @@
     <div class="nav-item" onclick="navigate('logs',this)">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       Activity Log
+    </div>
+    <div class="nav-label" style="margin-top:10px">Support</div>
+    <div class="nav-item" onclick="location.href='/support'">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Support Center
     </div>
     <div class="nav-label" style="margin-top:10px">Admin</div>
     <div class="nav-item" id="adminConsoleNav" style="display:none" onclick="location.href='/admin'">
@@ -607,12 +570,7 @@
       </div>
       <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#7c3aed;fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     </a>
-    <div class="theme-switcher" id="themeSwitcher">
-      <button class="theme-btn" id="btn-dark"   onclick="setTheme('dark')"   title="Dark">🌑 Dark</button>
-      <button class="theme-btn" id="btn-purple" onclick="setTheme('purple')" title="Purple">🔮 Purple</button>
-      <button class="theme-btn" id="btn-white"  onclick="setTheme('white')"  title="White">☀️ White</button>
-    </div>
-    <div class="user-chip">
+<div class="user-chip">
       <div class="avatar" id="portalAvatar">TC</div>
       <div class="user-info">
         <strong id="sidebarUserName">Loading…</strong>
@@ -630,7 +588,7 @@
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="globalSearch" placeholder="Search…" oninput="handleSearch(this.value)">
     </div>
-    <button class="btn btn-primary rbac-write" id="addBtn" onclick="openAddModal()" style="display:none">
+<button class="btn btn-primary rbac-write" id="addBtn" onclick="openAddModal()" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       <span id="addBtnLabel">Add</span>
     </button>
@@ -784,8 +742,6 @@
 
     <!-- SOFTWARE INVENTORY -->
     <div class="page" id="page-software">
-      <!-- Software Inventory summary tile -->
-      <div id="swInventoryTile" style="margin-bottom:16px"></div>
 
       <div class="card">
         <div class="card-header" style="flex-wrap:wrap;gap:10px">
@@ -845,6 +801,39 @@
           <tbody id="swTableBody"></tbody>
         </table>
         <div class="pagination" id="swPagination"></div>
+      </div>
+    </div>
+
+    <!-- DEPARTMENTS -->
+    <div class="page" id="page-departments">
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:10px">
+          <div class="card-title" style="flex:1">
+            Departments
+            <span style="color:var(--gray-400);font-weight:400;font-size:12px;margin-left:8px" id="deptMgmtCountLabel"></span>
+          </div>
+          <button class="btn btn-primary btn-sm rbac-write" onclick="openAddDeptModal()">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 5v14M5 12h14"/></svg>
+            Add Department
+          </button>
+        </div>
+        <table id="deptMgmtTable">
+          <thead>
+            <tr>
+              <th style="width:36%">Department Name</th>
+              <th style="width:14%;text-align:center">Users</th>
+              <th style="width:22%;text-align:center">Software Apps</th>
+              <th style="width:28%;text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="deptMgmtBody"></tbody>
+        </table>
+        <div id="deptMgmtEmpty" style="display:none;text-align:center;padding:56px 20px;color:var(--gray-400)">
+          <svg viewBox="0 0 24 24" style="width:44px;height:44px;stroke:currentColor;fill:none;stroke-width:1.2;margin-bottom:14px;display:block;margin-inline:auto;opacity:.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <div style="font-size:14px;font-weight:600;margin-bottom:6px">No departments yet</div>
+          <div style="font-size:12px;opacity:.7">Click <strong>Add Department</strong> above to create your first one.</div>
+        </div>
+        <div class="pagination" id="deptMgmtPagination"></div>
       </div>
     </div>
 
@@ -1050,7 +1039,23 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>Department</label><input type="text" id="swDept" placeholder="Engineering"></div>
+        <div class="form-group">
+          <label>Department</label>
+          <div class="dept-dropdown" id="swDept">
+            <button type="button" class="dept-dd-trigger" onclick="swDeptOpen('swDept')">
+              <span class="dept-dd-val placeholder">Select departments…</span>
+              <svg class="dept-dd-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="dept-dd-panel">
+              <label class="dept-all-row">
+                <input type="checkbox" class="dept-all-check" onchange="swDeptAllChanged(this,'swDept')">
+                <span class="dept-all-label">🌐 All Departments</span>
+                <span class="dept-all-badge">Everyone uses this app</span>
+              </label>
+              <div class="dept-list-scroll"></div>
+            </div>
+          </div>
+        </div>
         <div class="form-group"><label>Purpose</label><input type="text" id="swPurpose" placeholder="e.g. CI/CD"></div>
       </div>
       <div class="form-row" id="swLicPriceRow">
@@ -1190,18 +1195,24 @@ async function initAuth() {
 
 function applyRBACUI() {
   if (!portalUser) return;
-  const role = portalUser.role;
-  // viewer: hide all write buttons
-  if (role === 'viewer') {
+  const perms = portalUser.permissions || {};
+  if (!perms.manageAssets && !perms.manageEmployeeUsers && !perms.manageSoftware) {
     document.querySelectorAll('.rbac-write').forEach(el => el.style.display = 'none');
   }
-  // it_manager: hide write buttons for users and software, keep assets
-  if (role === 'it_manager') {
-    document.querySelectorAll('.rbac-users-write, .rbac-sw-write').forEach(el => el.style.display = 'none');
+  if (!perms.manageEmployeeUsers) {
+    document.querySelectorAll('.rbac-users-write').forEach(el => el.style.display = 'none');
   }
-  // Show Admin Console link only to super_admin
-  if (role === 'super_admin') {
+  if (!perms.manageSoftware) {
+    document.querySelectorAll('.rbac-sw-write').forEach(el => el.style.display = 'none');
+    document.getElementById('swDmTabEditBtn')?.style && (document.getElementById('swDmTabEditBtn').style.display = 'none');
+  }
+  if (perms.managePortalUsers || perms.manageIntegrations || perms.manageRolePermissions) {
     document.getElementById('adminConsoleNav')?.style && (document.getElementById('adminConsoleNav').style.display = 'flex');
+  }
+  if (!perms.viewActivityLog) {
+    document.querySelectorAll('.nav-item').forEach(el => {
+      if (el.textContent.includes('Activity Log')) el.style.display = 'none';
+    });
   }
 }
 
@@ -1212,7 +1223,7 @@ function updateTopbarUser() {
   const avatarEl = document.getElementById('portalAvatar');
   if (nameEl) nameEl.textContent = portalUser.name;
   if (roleEl) {
-    const LABELS = { super_admin:'Super Admin', admin:'Admin', viewer:'Viewer', it_manager:'IT Manager' };
+    const LABELS = { super_admin:'Super Admin', admin:'Admin', user:'User' };
     roleEl.textContent = LABELS[portalUser.role] || portalUser.role;
   }
   if (avatarEl) {
@@ -1227,6 +1238,147 @@ const aColor = n => COLORS[(n.charCodeAt(0)+(n.charCodeAt(n.length-1)||0))%COLOR
 const ini = (f,l) => ((f||'')[0]||'').toUpperCase()+((l||'')[0]||'').toUpperCase() || ((f||'')[0]||'?').toUpperCase();
 const uid = () => 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
 const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN',{year:'numeric',month:'short',day:'numeric'}) : '—';
+const ALL_DEPARTMENT_LABEL = 'All Departments';
+
+function parseSoftwareDepartments(value){
+  const rawValues = Array.isArray(value) ? value : String(value||'').split(',');
+  return [...new Set(rawValues.map(v=>String(v||'').trim()).filter(Boolean))];
+}
+
+function normalizeSoftwareDepartmentList(values){
+  const list = parseSoftwareDepartments(values);
+  // treat legacy "All Department" (no s) as the canonical label too
+  return list.some(dept => dept.toLowerCase() === ALL_DEPARTMENT_LABEL.toLowerCase() || dept.toLowerCase() === 'all department')
+    ? [ALL_DEPARTMENT_LABEL]
+    : list;
+}
+
+function normalizeSoftwareDepartmentValue(values){
+  return normalizeSoftwareDepartmentList(values).join(', ');
+}
+
+function formatSoftwareDepartmentLabel(value){
+  const departments = normalizeSoftwareDepartmentList(value);
+  return departments.length ? departments.join(', ') : '—';
+}
+
+function matchesSoftwareDepartment(value, department){
+  const departments = normalizeSoftwareDepartmentList(value).map(dept => dept.toLowerCase());
+  if(!departments.length) return false;
+  if(departments.includes(ALL_DEPARTMENT_LABEL.toLowerCase())) return true;
+  return departments.includes(String(department||'').trim().toLowerCase());
+}
+
+function softwareDepartmentOptionValues(extraValues = []){
+  const values = new Set([
+    ...users.map(u=>u?.dept).filter(Boolean),
+    ...software.flatMap(s=>parseSoftwareDepartments(s?.department))
+      .filter(v => v.toLowerCase() !== ALL_DEPARTMENT_LABEL.toLowerCase() && v.toLowerCase() !== 'all department'),
+    ...parseSoftwareDepartments(extraValues)
+      .filter(v => v.toLowerCase() !== ALL_DEPARTMENT_LABEL.toLowerCase() && v.toLowerCase() !== 'all department'),
+  ]);
+  return [...values].sort((a,b) => a.localeCompare(b));
+}
+
+/* ── Dept dropdown — open / close ── */
+function swDeptOpen(pickerId){
+  const picker  = document.getElementById(pickerId);
+  if(!picker) return;
+  const trigger = picker.querySelector('.dept-dd-trigger');
+  const panel   = picker.querySelector('.dept-dd-panel');
+  const isOpen  = panel.classList.contains('open');
+  // close every other open dept panel first
+  document.querySelectorAll('.dept-dd-panel.open').forEach(p => {
+    p.classList.remove('open');
+    p.closest('.dept-dropdown')?.querySelector('.dept-dd-trigger')?.classList.remove('open');
+  });
+  if(!isOpen){ panel.classList.add('open'); trigger.classList.add('open'); }
+}
+
+/* update the visible trigger label based on selection */
+function swDeptUpdateValue(pickerId){
+  const picker = document.getElementById(pickerId);
+  if(!picker) return;
+  const valEl    = picker.querySelector('.dept-dd-val');
+  if(!valEl) return;
+  const allCheck = picker.querySelector('.dept-all-check');
+  if(allCheck && allCheck.checked){
+    valEl.textContent = '🌐 All Departments';
+    valEl.classList.remove('placeholder');
+    return;
+  }
+  const checked = [...picker.querySelectorAll('.dept-list-scroll input[type="checkbox"]:checked')];
+  if(checked.length === 0){
+    valEl.textContent = 'Select departments…';
+    valEl.classList.add('placeholder');
+  } else if(checked.length <= 2){
+    valEl.textContent = checked.map(c => c.value).join(', ');
+    valEl.classList.remove('placeholder');
+  } else {
+    valEl.textContent = `${checked[0].value} +${checked.length - 1} more`;
+    valEl.classList.remove('placeholder');
+  }
+}
+
+/* called when "All Departments" checkbox changes */
+function swDeptAllChanged(checkbox, pickerId){
+  const picker = document.getElementById(pickerId);
+  if(!picker) return;
+  const list = picker.querySelector('.dept-list-scroll');
+  if(list) list.classList.toggle('disabled', checkbox.checked);
+  swDeptUpdateValue(pickerId);
+}
+function swDeptToggleAll(checkbox, pickerId){ swDeptAllChanged(checkbox, pickerId); }
+
+/* ── Dept dropdown — render checkboxes ── */
+function renderSoftwareDepartmentSelect(pickerId, selectedValues = []){
+  const picker = document.getElementById(pickerId);
+  if(!picker) return;
+  const selected = new Set(normalizeSoftwareDepartmentList(selectedValues));
+  const isAll    = selected.has(ALL_DEPARTMENT_LABEL);
+  const depts    = softwareDepartmentOptionValues(selectedValues);
+
+  const allCheck = picker.querySelector('.dept-all-check');
+  if(allCheck) allCheck.checked = isAll;
+
+  const list = picker.querySelector('.dept-list-scroll');
+  if(list){
+    list.innerHTML = depts.length === 0
+      ? `<div class="dept-empty-msg">No departments found. Add employees to populate this list.</div>`
+      : depts.map(dept =>
+          `<label class="dept-check-row">
+            <input type="checkbox" value="${dept.replace(/"/g,'&quot;')}"${selected.has(dept)?' checked':''}
+              onchange="swDeptUpdateValue('${pickerId}')">
+            <span>${dept}</span>
+          </label>`
+        ).join('');
+    list.classList.toggle('disabled', isAll);
+  }
+  swDeptUpdateValue(pickerId);
+}
+
+function getSelectedSoftwareDepartments(pickerId){
+  const picker = document.getElementById(pickerId);
+  if(!picker) return [];
+  const allCheck = picker.querySelector('.dept-all-check');
+  if(allCheck && allCheck.checked) return [ALL_DEPARTMENT_LABEL];
+  const checked = [...picker.querySelectorAll('.dept-list-scroll input[type="checkbox"]:checked')];
+  return normalizeSoftwareDepartmentList(checked.map(c => c.value));
+}
+
+function setSelectedSoftwareDepartments(pickerId, value){
+  renderSoftwareDepartmentSelect(pickerId, normalizeSoftwareDepartmentList(value));
+}
+
+/* close dept dropdown on outside click */
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.dept-dropdown')){
+    document.querySelectorAll('.dept-dd-panel.open').forEach(p => {
+      p.classList.remove('open');
+      p.closest('.dept-dropdown')?.querySelector('.dept-dd-trigger')?.classList.remove('open');
+    });
+  }
+});
 
 /* ── Data – loaded from API ── */
 let users = [];
@@ -1244,8 +1396,13 @@ async function loadData(){
       safeFetch(`${API}/software`),
     ]);
     users    = us;
-    software = sw || [];
+    software = (sw || []).map(item => ({
+      ...item,
+      department: normalizeSoftwareDepartmentValue(item?.department),
+    }));
     assets = as.map(a=>({...a, assignTo: a.assignedTo||''}));
+    renderSoftwareDepartmentSelect('swDept');
+    renderSoftwareDepartmentSelect('swdeDept');
     renderAll();
   } catch(e){
     console.error('Failed to load data:', e);
@@ -1358,28 +1515,35 @@ function navigate(page, el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   currentPage=page;
-  const titles={dashboard:'Dashboard',users:'User Management',assets:'Asset Inventory',assignments:'Assignments',software:'Software Inventory',logs:'Activity Log'};
+  const titles={dashboard:'Dashboard',users:'User Management',assets:'Asset Inventory',assignments:'Assignments',software:'Software Inventory',logs:'Activity Log',departments:'Departments'};
   document.getElementById('pageTitle').textContent=titles[page]||page;
   const showAdd=page==='users'||page==='assets'||page==='software';
   // Only show Add button if role allows it
-  const role = portalUser?.role;
+  const perms = portalUser?.permissions || {};
   const canAdd = showAdd && (
-    role === 'super_admin' || role === 'admin' ||
-    (role === 'it_manager' && page === 'assets')
+    (page === 'users' && perms.manageEmployeeUsers)
+    || (page === 'assets' && perms.manageAssets)
+    || (page === 'software' && perms.manageSoftware)
   );
   document.getElementById('addBtn').style.display = canAdd ? 'inline-flex' : 'none';
   document.getElementById('addBtnLabel').textContent=page==='users'?'Add User':page==='software'?'Add Software':'Add Asset';
   searchQ=''; document.getElementById('globalSearch').value='';
   userPage=1; assetPage=1;
+  if(page==='logs' && !(portalUser?.permissions || {}).viewActivityLog) {
+    showToast('This role cannot view Activity Log.');
+    return;
+  }
   if(page==='logs') renderLogs(1);
   else if(page==='software') renderSoftware();
+  else if(page==='departments') renderDepartments();
   else renderAll();
 }
 
 function handleSearch(v){ searchQ=v.toLowerCase(); userPage=1; assetPage=1; renderAll(); }
 
 /* ══ RENDER ALL ══ */
-function renderAll(){ updateBadges(); renderDashboard(); renderUsers(); renderAssets(); renderAssignments(); populateSwAdvDropdowns(); }
+function renderAll(){ updateBadges(); renderDashboard(); renderUsers(); renderAssets(); renderAssignments(); populateSwAdvDropdowns(); updateDeptNavBadge(); }
+function updateDeptNavBadge(){ loadDepartmentsMgmt(); const b=document.getElementById('navDeptsCount'); if(b) b.textContent=departmentsMgmt.length; }
 
 /* ── Populate Software Adv-Search Datalists ── */
 function populateSwAdvDropdowns(){
@@ -1389,7 +1553,7 @@ function populateSwAdvDropdowns(){
       .map(v=>`<option value="${v.replace(/"/g,'&quot;')}">`).join('');
   };
   fill('dlSwName',   software.map(s=>s.name));
-  fill('dlSwDept',   software.map(s=>s.department));
+  fill('dlSwDept',   software.flatMap(s=>parseSoftwareDepartments(s.department)));
   fill('dlSwOwner',  software.map(s=>s.owner));
   fill('dlSwAdmin',  software.flatMap(s=>(s.admins||'').split(',').map(a=>a.trim()).filter(Boolean)));
 }
@@ -1565,7 +1729,7 @@ function renderUsers(){
             return `<td style="font-size:12px">${privApps.length?privApps.map(s=>`<span class="tag" style="margin:1px">${s.name}</span>`).join(''):'<span style="color:var(--gray-400)">—</span>'}</td>`;
           }
           case 'appAccess': {
-            const appList = software.filter(s=>s.department===u.dept||(s.admins||'').split(',').map(a=>a.trim().toLowerCase()).includes(fullNameLow));
+            const appList = software.filter(s=>matchesSoftwareDepartment(s.department, u.dept)||(s.admins||'').split(',').map(a=>a.trim().toLowerCase()).includes(fullNameLow));
             return `<td style="font-size:12px;max-width:240px">${appList.length?appList.map(s=>`<span class="tag" style="margin:1px;font-size:11px">${s.name}</span>`).join(''):'<span style="color:var(--gray-400)">—</span>'}</td>`;
           }
           default:
@@ -1753,7 +1917,7 @@ function openUserModal(u=null){
           <div style="width:30px;height:30px;border-radius:7px;background:var(--primary-lighter);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--primary)">${(s.name||'?')[0].toUpperCase()}</div>
           <div>
             <div style="font-size:13px;font-weight:600;color:var(--gray-800)">${s.name}</div>
-            <div style="font-size:11px;color:var(--gray-400)">${s.department||''} · ${s.subscriptionPlan||s.deploymentType||''}</div>
+            <div style="font-size:11px;color:var(--gray-400)">${formatSoftwareDepartmentLabel(s.department)} · ${s.subscriptionPlan||s.deploymentType||''}</div>
           </div>
           <div style="margin-left:auto;font-size:10px;font-weight:700;color:var(--primary);background:var(--primary-lighter);padding:2px 8px;border-radius:99px">Admin</div>
         </div>`).join('');
@@ -2273,12 +2437,13 @@ function renderSoftware(){
   const advSwCostTo  = parseFloat(document.getElementById('advSwCostTo')?.value)||Infinity;
 
   let list = software.filter(s => {
+    const departmentText = formatSoftwareDepartmentLabel(s.department).toLowerCase();
     if(typeF   && s.deploymentType !== typeF)  return false;
     if(renewF  && s.renewalPeriod  !== renewF) return false;
     if(statusF && s.status         !== statusF)return false;
-    if(q && ![s.name, s.department, s.owner, s.csvId, s.purpose].join(' ').toLowerCase().includes(q)) return false;
+    if(q && ![s.name, departmentText, s.owner, s.csvId, s.purpose].join(' ').toLowerCase().includes(q)) return false;
     if(advSwName  && !(s.name||'').toLowerCase().includes(advSwName))         return false;
-    if(advSwDept  && !(s.department||'').toLowerCase().includes(advSwDept))   return false;
+    if(advSwDept  && !departmentText.includes(advSwDept))                     return false;
     if(advSwOwner && !(s.owner||'').toLowerCase().includes(advSwOwner))       return false;
     if(advSwAdmin && !(s.admins||'').toLowerCase().includes(advSwAdmin))      return false;
     const annualCost = (s.purchasedLicenses||0) * (s.licensePricePerUserMonth||0) * 12
@@ -2309,44 +2474,6 @@ function renderSoftware(){
   document.getElementById('swCountLabel').textContent = `${total} app${total!==1?'s':''}${swBudgetFilter?' (filtered)':''}`;
   document.getElementById('navSoftwareCount').textContent = software.length;
 
-  // Software Inventory summary tile (replaces budget chips)
-  const totalBudget = software.reduce((s,x)=>s+swTotalCost(x),0);
-  const paidList    = software.filter(x=>swTotalCost(x)>0);
-  const freeList    = software.filter(x=>swTotalCost(x)===0);
-  const totalLic    = software.reduce((s,x)=>s+(x.purchasedLicenses||0),0);
-  const usedLic     = software.reduce((s,x)=>s+(x.usedLicenses||0),0);
-  const licPct      = totalLic>0 ? Math.round(usedLic/totalLic*100) : 0;
-  const licColor    = licPct>100?'var(--danger)':licPct>85?'#d97706':'var(--success)';
-  const activeStyle = 'border-color:var(--primary);box-shadow:0 0 0 2px rgba(59,130,246,.2);';
-
-  document.getElementById('swInventoryTile').innerHTML = `
-    <div class="card" style="padding:0;overflow:hidden">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);divide-x:1px solid var(--gray-100)">
-        <div style="padding:18px 22px;border-right:1px solid var(--gray-100)">
-          <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Total Annual Spend</div>
-          <div style="font-size:26px;font-weight:800;color:var(--primary);line-height:1.1">${totalBudget>=1000000?'$'+(totalBudget/1000000).toFixed(2)+'M':'$'+(totalBudget/1000).toFixed(1)+'K'}</div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">across ${software.length} apps</div>
-        </div>
-        <div style="padding:18px 22px;border-right:1px solid var(--gray-100);cursor:pointer;transition:background .15s${swBudgetFilter==='paid'?';background:rgba(59,130,246,.05)':''}" onclick="swBudgetChipClick('paid')" title="Click to filter paid apps">
-          <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Paid Apps ${swBudgetFilter==='paid'?'<span style="color:var(--primary)">✓</span>':''}</div>
-          <div style="font-size:26px;font-weight:800;color:#3b82f6;line-height:1.1">${paidList.length}</div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${Math.round(paidList.length/Math.max(software.length,1)*100)}% of inventory</div>
-        </div>
-        <div style="padding:18px 22px;border-right:1px solid var(--gray-100);cursor:pointer;transition:background .15s${swBudgetFilter==='free'?';background:rgba(22,163,74,.05)':''}" onclick="swBudgetChipClick('free')" title="Click to filter free / open-source">
-          <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Free / Open Source ${swBudgetFilter==='free'?'<span style="color:var(--success)">✓</span>':''}</div>
-          <div style="font-size:26px;font-weight:800;color:var(--success);line-height:1.1">${freeList.length}</div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${Math.round(freeList.length/Math.max(software.length,1)*100)}% of inventory</div>
-        </div>
-        <div style="padding:18px 22px">
-          <div style="font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">License Utilization</div>
-          <div style="font-size:26px;font-weight:800;color:${licColor};line-height:1.1">${licPct}%</div>
-          <div style="margin-top:6px;background:var(--gray-100);border-radius:99px;height:5px;overflow:hidden">
-            <div style="height:100%;width:${Math.min(licPct,100)}%;background:${licColor};border-radius:99px;transition:width .4s"></div>
-          </div>
-          <div style="font-size:11px;color:var(--gray-400);margin-top:4px">${usedLic} used of ${totalLic} total</div>
-        </div>
-      </div>
-    </div>`;
 
   // Table head — driven by swColVis
   const swVisCols = Object.entries(swColVis).filter(([,c])=>c.visible);
@@ -2389,7 +2516,7 @@ function renderSoftware(){
           case 'name':
             return `<td onclick="openSwDrawer('${s.id}')" style="cursor:pointer" title="Click to view details"><div style="font-weight:600;font-size:13px;color:var(--primary-light);text-decoration:underline;text-underline-offset:3px">${s.name}</div>${s.purpose?`<div style="font-size:11px;color:var(--gray-400)">${s.purpose}</div>`:''}</td>`;
           case 'department':
-            return `<td style="font-size:12px;color:var(--gray-600)">${s.department||'—'}</td>`;
+            return `<td style="font-size:12px;color:var(--gray-600)">${formatSoftwareDepartmentLabel(s.department)}</td>`;
           case 'deploymentType':
             return `<td><span class="sw-type-badge ${typeKey}">${s.deploymentType}</span></td>`;
           case 'subscriptionPlan':
@@ -2531,7 +2658,7 @@ function openSoftwareModal(s=null){
   document.getElementById('swName').value     = s?.name||'';
   document.getElementById('swType').value     = s?.deploymentType||'SAAS';
   document.getElementById('swRenewal').value  = s?.renewalPeriod||'';
-  document.getElementById('swDept').value     = s?.department||'';
+  setSelectedSoftwareDepartments('swDept', s?.department||'');
   document.getElementById('swPurpose').value  = s?.purpose||'';
   document.getElementById('swLicPrice').value = s?.licensePricePerUserMonth||0;
   document.getElementById('swCost').value     = s?.annualCost||0;
@@ -2571,7 +2698,7 @@ async function saveSoftware(){
     csvId, name,
     deploymentType: document.getElementById('swType').value,
     renewalPeriod:  document.getElementById('swRenewal').value,
-    department:     document.getElementById('swDept').value.trim(),
+    department:     normalizeSoftwareDepartmentValue(getSelectedSoftwareDepartments('swDept')),
     purpose:        document.getElementById('swPurpose').value.trim(),
     licensePricePerUserMonth: parseFloat(document.getElementById('swLicPrice').value)||0,
     annualCost:     parseFloat(document.getElementById('swCost').value)||0,
@@ -2672,12 +2799,13 @@ function filteredSoftware(){
   const advSwCostFrom= parseFloat(document.getElementById('advSwCostFrom')?.value)||0;
   const advSwCostTo  = parseFloat(document.getElementById('advSwCostTo')?.value)||Infinity;
   let list = software.filter(s=>{
+    const departmentText = formatSoftwareDepartmentLabel(s.department).toLowerCase();
     if(typeF   && s.deploymentType !== typeF)  return false;
     if(renewF  && s.renewalPeriod  !== renewF) return false;
     if(statusF && s.status         !== statusF)return false;
-    if(q && ![s.name, s.department, s.owner, s.csvId, s.purpose].join(' ').toLowerCase().includes(q)) return false;
+    if(q && ![s.name, departmentText, s.owner, s.csvId, s.purpose].join(' ').toLowerCase().includes(q)) return false;
     if(advSwName  && !(s.name||'').toLowerCase().includes(advSwName))         return false;
-    if(advSwDept  && !(s.department||'').toLowerCase().includes(advSwDept))   return false;
+    if(advSwDept  && !departmentText.includes(advSwDept))                     return false;
     if(advSwOwner && !(s.owner||'').toLowerCase().includes(advSwOwner))       return false;
     if(advSwAdmin && !(s.admins||'').toLowerCase().includes(advSwAdmin))      return false;
     const annualCost = (s.purchasedLicenses||0) * (s.licensePricePerUserMonth||0) * 12
@@ -2699,7 +2827,7 @@ function exportSwCSV(){
   const rows = list.map(s=>{
     const svcCount = (s.services||[]).filter(sv=>sv.status!=='Inactive').length;
     return [
-      s.csvId, s.name, s.deploymentType, s.department||'', s.purpose||'',
+      s.csvId, s.name, s.deploymentType, formatSoftwareDepartmentLabel(s.department), s.purpose||'',
       s.subscriptionPlan||'', s.renewalPeriod||'',
       s.licensePricePerUserMonth||0, s.purchasedLicenses||0, s.usedLicenses||0,
       (s.annualCost||0) > 0 ? s.annualCost : (s.renewalPeriod==='Pay-as-you-go' ? 'Variable' : 0),
@@ -2740,7 +2868,7 @@ async function exportSwPDF(){
         const tc = swTotalCost(s);
         const svcCnt = (s.services||[]).filter(sv=>sv.status!=='Inactive').length;
         return [
-          s.csvId, s.name, s.deploymentType, s.department||'—',
+          s.csvId, s.name, s.deploymentType, formatSoftwareDepartmentLabel(s.department),
           s.subscriptionPlan||'—', s.renewalPeriod||'—',
           s.licensePricePerUserMonth?'$'+s.licensePricePerUserMonth:'—',
           (s.annualCost>0?'$'+s.annualCost.toLocaleString() : s.renewalPeriod==='Pay-as-you-go'?'Variable':'Free'),
@@ -3054,7 +3182,7 @@ function openSwDm(id){
     ['Owner',      s.owner||'—'],
     ['Admin(s)',   s.admins||'—'],
     ['Billed To',  s.billedTo||'—'],
-    ['Department', s.department||'—'],
+    ['Department', formatSoftwareDepartmentLabel(s.department)],
     ['Type',       s.deploymentType||'—'],
     ['Status',     s.status||'Active'],
     ['Sites',      [s.siteUSA&&'🇺🇸 USA',s.siteCAN&&'🇨🇦 CAN',s.siteIND&&'🇮🇳 IND'].filter(Boolean).join('  ')||'—'],
@@ -3096,7 +3224,7 @@ function swdePopulateForm(){
   document.getElementById('swdeName').value     = s.name||'';
   document.getElementById('swdeType').value     = s.deploymentType||'SAAS';
   document.getElementById('swdeRenewal').value  = s.renewalPeriod||'';
-  document.getElementById('swdeDept').value     = s.department||'';
+  setSelectedSoftwareDepartments('swdeDept', s.department||'');
   document.getElementById('swdePurpose').value  = s.purpose||'';
   document.getElementById('swdePlan').value     = s.subscriptionPlan||'';
   document.getElementById('swdeStatus').value   = s.status||'Active';
@@ -3219,7 +3347,7 @@ async function swdeSave(){
     csvId, name,
     deploymentType: document.getElementById('swdeType').value,
     renewalPeriod:  document.getElementById('swdeRenewal').value,
-    department:     document.getElementById('swdeDept').value.trim(),
+    department:     normalizeSoftwareDepartmentValue(getSelectedSoftwareDepartments('swdeDept')),
     purpose:        document.getElementById('swdePurpose').value.trim(),
     subscriptionPlan: document.getElementById('swdePlan').value.trim(),
     status:         document.getElementById('swdeStatus').value,
@@ -3329,7 +3457,7 @@ const EXPORT_DEFS = {
       { key:'csvId',    label:'App ID',            def:true,  get: s => s.csvId||'' },
       { key:'name',     label:'Name',              def:true,  get: s => s.name||'' },
       { key:'type',     label:'Type',              def:true,  get: s => s.deploymentType||'' },
-      { key:'dept',     label:'Department',        def:true,  get: s => s.department||'' },
+      { key:'dept',     label:'Department',        def:true,  get: s => formatSoftwareDepartmentLabel(s.department) },
       { key:'purpose',  label:'Purpose',           def:false, get: s => s.purpose||'' },
       { key:'plan',     label:'Subscription Plan', def:true,  get: s => s.subscriptionPlan||'' },
       { key:'renewal',  label:'Renewal',           def:true,  get: s => s.renewalPeriod||'' },
@@ -3460,18 +3588,307 @@ async function _excDoPDF(section, activeCols, list, def){
 }
 
 /* ══ THEME ══ */
-function setTheme(t) {
-  document.body.className = 'theme-' + t;
-  localStorage.setItem('tcTheme', t);
-  ['dark','purple','white'].forEach(n => {
-    const btn = document.getElementById('btn-' + n);
-    if (btn) btn.classList.toggle('active', n === t);
+// Sun icon SVG path (for white/light mode indicator)
+/* Purple is the permanent theme — no toggle needed */
+
+/* ══════════════════════════════════════════════════════════════
+   DEPARTMENT MANAGEMENT
+   Departments are stored in localStorage ('tcDepartments').
+   On first load the list is seeded from unique user.dept values.
+   Software mapping is saved back to the /api/software/:id endpoint.
+══════════════════════════════════════════════════════════════ */
+let departmentsMgmt = [];   // [{id, name}]
+let deptDetailCurrentId = null;
+let deptNameModalMode = null; // 'add' | 'edit'
+let deptNameModalId   = null;
+const DEPT_STORE_KEY  = 'tcDepartments';
+
+/* ── Persistence ── */
+function loadDepartmentsMgmt() {
+  try {
+    const raw = localStorage.getItem(DEPT_STORE_KEY);
+    departmentsMgmt = raw ? JSON.parse(raw) : [];
+  } catch(e) { departmentsMgmt = []; }
+  // Seed from user dept values for any new dept not yet in the list
+  const existing = new Set(departmentsMgmt.map(d => d.name.toLowerCase()));
+  users.forEach(u => {
+    const d = (u.dept || '').trim();
+    if (d && !existing.has(d.toLowerCase())) {
+      departmentsMgmt.push({ id: 'dept-' + Date.now() + '-' + Math.random().toString(36).slice(2), name: d });
+      existing.add(d.toLowerCase());
+    }
   });
+  saveDepartmentsMgmt();
 }
 
-function initThemeButtons() {
-  const saved = localStorage.getItem('tcTheme') || 'dark';
-  setTheme(saved);
+function saveDepartmentsMgmt() {
+  localStorage.setItem(DEPT_STORE_KEY, JSON.stringify(departmentsMgmt));
+}
+
+/* ── Helpers ── */
+function getDeptUserCount(name) {
+  const n = name.toLowerCase();
+  return users.filter(u => (u.dept || '').toLowerCase() === n).length;
+}
+
+function getDeptSoftwareMapped(name) {
+  // Returns software that lists this dept (or "All Departments") in its department field
+  const n = name.toLowerCase();
+  return software.filter(s => matchesSoftwareDepartment(s.department, name));
+}
+
+/* ── Render Departments Table ── */
+function renderDepartments() {
+  loadDepartmentsMgmt();
+  const body  = document.getElementById('deptMgmtBody');
+  const empty = document.getElementById('deptMgmtEmpty');
+  const label = document.getElementById('deptMgmtCountLabel');
+  const badge = document.getElementById('navDeptsCount');
+  if (!body) return;
+
+  if (badge) badge.textContent = departmentsMgmt.length;
+  if (label) label.textContent = departmentsMgmt.length
+    ? `${departmentsMgmt.length} department${departmentsMgmt.length !== 1 ? 's' : ''}`
+    : '';
+
+  if (!departmentsMgmt.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  body.innerHTML = departmentsMgmt.map(dept => {
+    const uc = getDeptUserCount(dept.name);
+    const sc = getDeptSoftwareMapped(dept.name).length;
+    return `<tr>
+      <td>
+        <div class="dept-mgmt-name">
+          <div class="dept-mgmt-name-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <span>${escHtml(dept.name)}</span>
+        </div>
+      </td>
+      <td style="text-align:center"><span class="dept-mgmt-count users">${uc} user${uc !== 1 ? 's' : ''}</span></td>
+      <td style="text-align:center"><span class="dept-mgmt-count software">${sc} app${sc !== 1 ? 's' : ''}</span></td>
+      <td>
+        <div class="dept-mgmt-actions">
+          <button class="dept-mgmt-btn" onclick="openDeptDetailModal('${escHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Map Software
+          </button>
+          <button class="dept-mgmt-btn" onclick="openEditDeptModal('${escHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Rename
+          </button>
+          <button class="dept-mgmt-btn danger" onclick="confirmDeleteDept('${escHtml(dept.id)}')">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+            Delete
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── Add / Edit Department Modal ── */
+function openAddDeptModal() {
+  deptNameModalMode = 'add';
+  deptNameModalId   = null;
+  document.getElementById('deptNameModalTitle').textContent = 'Add Department';
+  document.getElementById('deptNameInput').value = '';
+  const modal = document.getElementById('deptNameModal');
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('deptNameInput').focus(), 80);
+}
+
+function openEditDeptModal(id) {
+  const dept = departmentsMgmt.find(d => d.id === id);
+  if (!dept) return;
+  deptNameModalMode = 'edit';
+  deptNameModalId   = id;
+  document.getElementById('deptNameModalTitle').textContent = 'Rename Department';
+  document.getElementById('deptNameInput').value = dept.name;
+  const modal = document.getElementById('deptNameModal');
+  modal.style.display = 'flex';
+  setTimeout(() => { const inp = document.getElementById('deptNameInput'); inp.focus(); inp.select(); }, 80);
+}
+
+function closeDeptNameModal() {
+  document.getElementById('deptNameModal').style.display = 'none';
+}
+
+function saveDeptName() {
+  const name = (document.getElementById('deptNameInput').value || '').trim();
+  if (!name) { showToast('Please enter a department name', 'warning'); return; }
+
+  if (deptNameModalMode === 'add') {
+    // Prevent duplicates
+    if (departmentsMgmt.some(d => d.name.toLowerCase() === name.toLowerCase())) {
+      showToast('A department with this name already exists', 'warning'); return;
+    }
+    departmentsMgmt.push({ id: 'dept-' + Date.now() + '-' + Math.random().toString(36).slice(2), name });
+    showToast(`Department "${name}" created`, 'success');
+  } else {
+    const dept = departmentsMgmt.find(d => d.id === deptNameModalId);
+    if (!dept) return;
+    const oldName = dept.name;
+    if (departmentsMgmt.some(d => d.id !== deptNameModalId && d.name.toLowerCase() === name.toLowerCase())) {
+      showToast('A department with this name already exists', 'warning'); return;
+    }
+    dept.name = name;
+    showToast(`Renamed "${oldName}" → "${name}"`, 'success');
+  }
+  saveDepartmentsMgmt();
+  closeDeptNameModal();
+  renderDepartments();
+}
+
+/* ── Delete Department ── */
+function confirmDeleteDept(id) {
+  const dept = departmentsMgmt.find(d => d.id === id);
+  if (!dept) return;
+  const uc = getDeptUserCount(dept.name);
+  const sc = getDeptSoftwareMapped(dept.name).length;
+  let detail = '';
+  if (uc) detail += ` ${uc} user(s) in this department.`;
+  if (sc) detail += ` ${sc} software mapping(s) will remain.`;
+  openConfirm(
+    `Delete "${dept.name}"?`,
+    `This department will be removed from the list.${detail}`,
+    () => {
+      departmentsMgmt = departmentsMgmt.filter(d => d.id !== id);
+      saveDepartmentsMgmt();
+      renderDepartments();
+      showToast(`Department deleted`, 'success');
+    }
+  );
+}
+
+/* ── Department Detail / Software Mapping Modal ── */
+function openDeptDetailModal(id) {
+  const dept = departmentsMgmt.find(d => d.id === id);
+  if (!dept) return;
+  deptDetailCurrentId = id;
+
+  document.getElementById('deptDetailName').textContent = dept.name;
+  const uc = getDeptUserCount(dept.name);
+  document.getElementById('deptDetailStats').textContent = `${uc} user${uc !== 1 ? 's' : ''}`;
+  document.getElementById('deptDetailSwSearch').value = '';
+
+  renderDeptDetailSoftware('');
+
+  const modal = document.getElementById('deptDetailModal');
+  modal.style.display = 'flex';
+}
+
+function closeDeptDetailModal() {
+  document.getElementById('deptDetailModal').style.display = 'none';
+  deptDetailCurrentId = null;
+}
+
+function renderDeptDetailSoftware(query) {
+  const dept = departmentsMgmt.find(d => d.id === deptDetailCurrentId);
+  if (!dept) return;
+  const grid  = document.getElementById('deptDetailSwGrid');
+  const empty = document.getElementById('deptDetailSwEmpty');
+  const q = query.toLowerCase();
+
+  const list = software.filter(s => !q || (s.name || '').toLowerCase().includes(q));
+
+  if (!list.length) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(s => {
+    const isMapped  = matchesSoftwareDepartment(s.department, dept.name);
+    const isAll     = parseSoftwareDepartments(s.department).map(v=>v.toLowerCase())
+                        .includes(ALL_DEPARTMENT_LABEL.toLowerCase());
+    const typeLabel = s.type || 'App';
+    return `<label class="sw-map-card${isMapped ? ' checked' : ''}${isAll ? ' all-badge' : ''}"
+              onclick="toggleSwMapCard(this)">
+      <input type="checkbox" ${isMapped ? 'checked' : ''} data-sw-id="${escHtml(s.csvId)}">
+      <span class="sw-map-name" title="${escHtml(s.name || '')}">${escHtml(s.name || s.csvId)}</span>
+      ${isAll ? `<span class="sw-map-type">All Depts</span>` : `<span class="sw-map-type">${escHtml(typeLabel)}</span>`}
+    </label>`;
+  }).join('');
+}
+
+function toggleSwMapCard(label) {
+  const cb = label.querySelector('input[type=checkbox]');
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  label.classList.toggle('checked', cb.checked);
+}
+
+function filterDeptDetailSoftware(q) {
+  renderDeptDetailSoftware(q);
+}
+
+async function saveDeptSoftwareMapping() {
+  const dept = departmentsMgmt.find(d => d.id === deptDetailCurrentId);
+  if (!dept) return;
+
+  const btn = document.getElementById('deptDetailSaveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const checks = document.querySelectorAll('#deptDetailSwGrid input[type=checkbox]');
+  let saved = 0, failed = 0;
+
+  for (const cb of checks) {
+    const swId = cb.dataset.swId;
+    const sw   = software.find(s => s.csvId === swId);
+    if (!sw) continue;
+
+    // Current dept list for this software (excluding "All Departments")
+    let depts = parseSoftwareDepartments(sw.department)
+      .filter(v => v.toLowerCase() !== ALL_DEPARTMENT_LABEL.toLowerCase()
+                && v.toLowerCase() !== 'all department');
+
+    const hasThisDept = depts.map(v=>v.toLowerCase()).includes(dept.name.toLowerCase());
+    const wantThisDept = cb.checked;
+
+    if (wantThisDept === hasThisDept) continue; // no change
+
+    if (wantThisDept) {
+      depts.push(dept.name);
+    } else {
+      depts = depts.filter(v => v.toLowerCase() !== dept.name.toLowerCase());
+    }
+
+    const newVal = depts.length ? depts.join(', ') : '';
+    try {
+      const resp = await authFetch(`${API}/software/${swId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ department: newVal }),
+      });
+      if (resp.ok) {
+        sw.department = normalizeSoftwareDepartmentValue(newVal);
+        saved++;
+      } else { failed++; }
+    } catch(e) { failed++; }
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Save Mapping';
+
+  if (failed) showToast(`${saved} saved, ${failed} failed`, 'warning');
+  else if (saved) showToast(`Software mapping updated (${saved} change${saved !== 1 ? 's' : ''})`, 'success');
+  else showToast('No changes to save');
+
+  renderDepartments();
+  renderSoftwareDepartmentSelect('swDept');
+  renderSoftwareDepartmentSelect('swdeDept');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -4138,7 +4555,6 @@ async function testConnectorSetup(){
   await loadData();
   initColPickers();
   refreshOwnerBilledToDatalists();
-  initThemeButtons();
 
   // ── SCIM auto-refresh: poll software data every 60s ──────────────────────
   setInterval(async () => {
@@ -4308,7 +4724,23 @@ function closeDeptModal() {
               <select id="swdeRenewal" onchange="swTogglePaygHint('swdeCostLabel','swdeRecalcBtn','swdeLicPriceRow',this.value)"><option value="">—</option><option>Annual</option><option>Monthly</option><option>Quarterly</option><option>Freeware</option><option>Pay-as-you-go</option></select>
             </div>
 
-            <div class="form-group"><label>Department</label><input type="text" id="swdeDept" placeholder="Engineering"></div>
+            <div class="form-group">
+              <label>Department</label>
+              <div class="dept-dropdown" id="swdeDept">
+                <button type="button" class="dept-dd-trigger" onclick="swDeptOpen('swdeDept')">
+                  <span class="dept-dd-val placeholder">Select departments…</span>
+                  <svg class="dept-dd-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="dept-dd-panel">
+                  <label class="dept-all-row">
+                    <input type="checkbox" class="dept-all-check" onchange="swDeptAllChanged(this,'swdeDept')">
+                    <span class="dept-all-label">🌐 All Departments</span>
+                    <span class="dept-all-badge">Everyone uses this app</span>
+                  </label>
+                  <div class="dept-list-scroll"></div>
+                </div>
+              </div>
+            </div>
             <div class="form-group"><label>Purpose</label><input type="text" id="swdePurpose" placeholder="e.g. CI/CD"></div>
 
             <div class="form-group"><label>Subscription Plan</label><input type="text" id="swdePlan" placeholder="e.g. Business Pro"></div>
@@ -4516,6 +4948,62 @@ function closeDeptModal() {
       <button id="deptModalClose" onclick="closeDeptModal()" title="Close">&times;</button>
     </div>
     <div id="deptModalBody"></div>
+  </div>
+</div>
+
+<!-- ══ ADD / EDIT DEPARTMENT MODAL ══ -->
+<div id="deptNameModal" onclick="if(event.target===this)closeDeptNameModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--support-surface,#1f1628);border:1px solid var(--support-border,rgba(130,96,185,.28));border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.45);width:100%;max-width:420px;padding:28px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-size:15px;font-weight:800;color:var(--gray-800,#f5efff)" id="deptNameModalTitle">Add Department</div>
+      <button onclick="closeDeptNameModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--gray-400);line-height:1">&times;</button>
+    </div>
+    <div class="form-group" style="margin-bottom:20px">
+      <label>Department Name</label>
+      <input type="text" id="deptNameInput" placeholder="e.g. Engineering" maxlength="60"
+        onkeydown="if(event.key==='Enter')saveDeptName()"
+        style="width:100%">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="closeDeptNameModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDeptName()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DEPARTMENT DETAIL / SOFTWARE MAPPING MODAL ══ -->
+<div id="deptDetailModal" onclick="if(event.target===this)closeDeptDetailModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:700;align-items:center;justify-content:center;padding:20px">
+  <div style="background:var(--support-surface,#1f1628);border:1px solid var(--support-border,rgba(130,96,185,.28));border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.45);width:100%;max-width:680px;max-height:88vh;display:flex;flex-direction:column">
+    <!-- Header -->
+    <div style="padding:22px 24px 16px;border-bottom:1px solid var(--support-border,rgba(130,96,185,.18));display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:16px;font-weight:800;color:var(--gray-800,#f5efff)" id="deptDetailName">Department</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-top:3px" id="deptDetailStats"></div>
+      </div>
+      <button onclick="closeDeptDetailModal()" style="background:none;border:none;cursor:pointer;font-size:24px;color:var(--gray-400);line-height:1">&times;</button>
+    </div>
+    <!-- Body -->
+    <div style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="font-size:12px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">
+        Software Mapping
+        <span style="font-weight:400;font-size:11px;margin-left:8px;text-transform:none">Check the apps used by this department</span>
+      </div>
+      <div style="margin-bottom:12px">
+        <input type="text" id="deptDetailSwSearch" placeholder="Search software…"
+          oninput="filterDeptDetailSoftware(this.value)"
+          style="width:100%;padding:7px 11px;border:1px solid var(--support-border,rgba(130,96,185,.28));border-radius:8px;background:rgba(29,20,38,.8);color:var(--gray-800,#f5efff);font-size:12px;outline:none">
+      </div>
+      <div id="deptDetailSwGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:7px;max-height:340px;overflow-y:auto"></div>
+      <div id="deptDetailSwEmpty" style="display:none;text-align:center;padding:24px;color:var(--gray-400);font-size:13px">No software found.</div>
+    </div>
+    <!-- Footer -->
+    <div style="padding:16px 24px;border-top:1px solid var(--support-border,rgba(130,96,185,.18));display:flex;gap:8px;justify-content:flex-end;flex-shrink:0">
+      <button class="btn btn-secondary" onclick="closeDeptDetailModal()">Close</button>
+      <button class="btn btn-primary" id="deptDetailSaveBtn" onclick="saveDeptSoftwareMapping()">
+        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Mapping
+      </button>
+    </div>
   </div>
 </div>
 

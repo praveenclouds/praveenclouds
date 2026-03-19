@@ -191,8 +191,9 @@
     .sso-error.show { display: flex; }
     .sso-error svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; flex-shrink: 0; }
   </style>
+  <link rel="stylesheet" href="/portal-theme.css" />
 </head>
-<body>
+<body class="support-theme support-theme-login">
   <div class="login-card">
     <div class="logo-row">
       <div class="logo-icon">
@@ -286,7 +287,7 @@
           token:    'Failed to exchange authorization code. Check your Client Secret.',
           noemail:  'Could not retrieve your email from Google.',
           domain:   'Your Google account domain is not authorized for this portal.',
-          notfound: 'Your Google account is not registered as a portal user.',
+          notfound: 'Access denied: this Google account is not registered.',
           inactive: 'Your portal account is disabled. Contact a Super Admin.',
           server:   'An unexpected server error occurred. Please try again.',
         };

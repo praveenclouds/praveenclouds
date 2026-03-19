@@ -8,10 +8,10 @@
 const router  = require('express').Router();
 const crypto  = require('crypto');
 const { SCIMConfig } = require('../../db');
-const { requireAuth, onlySuperAdmin } = require('../../middleware/auth');
+const { requireAuth, canManageIntegrations } = require('../../middleware/auth');
 
 // ── GET /api/admin/scim ────────────────────────────────────────────────────────
-router.get('/', requireAuth, onlySuperAdmin, async (req, res) => {
+router.get('/', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const cfg = await SCIMConfig.findOne() || {};
     res.json({
@@ -24,7 +24,7 @@ router.get('/', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── PUT /api/admin/scim ────────────────────────────────────────────────────────
-router.put('/', requireAuth, onlySuperAdmin, async (req, res) => {
+router.put('/', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const { enabled } = req.body;
     const cfg = await SCIMConfig.findOneAndUpdate(
@@ -37,7 +37,7 @@ router.put('/', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── POST /api/admin/scim/regenerate-token ─────────────────────────────────────
-router.post('/regenerate-token', requireAuth, onlySuperAdmin, async (req, res) => {
+router.post('/regenerate-token', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const token     = crypto.randomBytes(32).toString('hex'); // 64-char hex
     const tokenHint = token.slice(-6);

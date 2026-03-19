@@ -1,5 +1,24 @@
 const mongoose = require('mongoose');
 
+const ASSET_DEPARTMENTS = [
+  'Engineering',
+  'AI-Service',
+  'QA',
+  'IT',
+  'HR',
+  'Product',
+  'Customer Support',
+  'Accounts',
+  'Data Science',
+  'Sales',
+  'Marketing',
+  'Legal',
+  'Executive',
+  'Operations',
+  'Finance',
+  'Other',
+];
+
 const assetSchema = new mongoose.Schema(
   {
     csvId: {
@@ -53,22 +72,23 @@ const assetSchema = new mongoose.Schema(
     },
     dept: {
       type: String,
-      enum: [
-        'Engineering',
-        'AI-Service',
-        'QA',
-        'IT',
-        'HR',
-        'Product',
-        'Customer Support',
-        'Accounts',
-      ],
+      enum: ASSET_DEPARTMENTS,
       default: null,
     },
     vendor: {
       type: String,
       default: '',
       trim: true,
+    },
+    purchaseDate: {
+      type: String,
+      default: null,
+      match: [/^\d{4}-\d{2}-\d{2}$/, 'Purchase date must be in YYYY-MM-DD format'],
+    },
+    warrantyEnd: {
+      type: String,
+      default: null,
+      match: [/^\d{4}-\d{2}-\d{2}$/, 'Warranty end date must be in YYYY-MM-DD format'],
     },
     notes: {
       type: String,
@@ -92,12 +112,11 @@ assetSchema.virtual('assignedUser', {
   justOne: true,
 });
 
-// Indexes
+// Indexes  (csvId unique index is declared on the field — not repeated here)
 assetSchema.index({ status: 1 });
 assetSchema.index({ type: 1 });
 assetSchema.index({ dept: 1 });
 assetSchema.index({ location: 1 });
 assetSchema.index({ assignedTo: 1 });
-assetSchema.index({ csvId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Asset', assetSchema);

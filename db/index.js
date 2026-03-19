@@ -8,9 +8,7 @@
  */
 
 const mongoose = require('mongoose');
-
-const MONGO_URI =
-  process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/terzocloud_assets';
+const { MONGO_URI } = require('../config');
 
 /**
  * Connect to MongoDB.
@@ -49,5 +47,9 @@ const AdminUser           = require('./models/AdminUser');
 const IntegrationSettings = require('./models/IntegrationSettings');
 const SCIMConfig          = require('./models/SCIMConfig');
 const AppConnector        = require('./models/AppConnector');
+const SupportRequest      = require('./models/SupportRequest');
+const SupportRequestType  = require('./models/SupportRequestType');
+const SlackWorkflowImport = require('./models/SlackWorkflowImport');
+const RolePermission      = require('./models/RolePermission');
 
-module.exports = { connect, disconnect, User, Asset, Log, Software, AdminUser, IntegrationSettings, SCIMConfig, AppConnector };
+module.exports = { connect, disconnect, User, Asset, Log, Software, AdminUser, IntegrationSettings, SCIMConfig, AppConnector, SupportRequest, SupportRequestType, SlackWorkflowImport, RolePermission };

@@ -5,10 +5,10 @@
  */
 const router = require('express').Router();
 const { Log }  = require('../db');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, canViewActivityLog } = require('../middleware/auth');
 
 // ── GET /api/logs ──────────────────────────────────────────────────────────────
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, canViewActivityLog, async (req, res) => {
   try {
     const { type, entityType, search, page = 1, limit = 25 } = req.query;
 

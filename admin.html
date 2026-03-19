@@ -32,7 +32,7 @@
     .nav-item.active { background: rgba(99,66,255,0.18); color: #a78bfa; }
     .nav-divider { height: 1px; background: var(--border); margin: 10px 8px; }
 
-    .sidebar-footer { padding: 12px; border-top: 1px solid var(--border); }
+    .sidebar-footer { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
     .user-chip { display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: rgba(153,102,255,0.08); border-radius: 9px; }
     .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .user-info strong { display: block; color: var(--text); font-size: 12px; }
@@ -40,8 +40,7 @@
     .role-chip { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
     .role-chip.super_admin { background: rgba(147,51,234,0.2); color: #c084fc; border: 1px solid rgba(147,51,234,0.3); }
     .role-chip.admin       { background: rgba(30,64,175,0.2);  color: #93c5fd; border: 1px solid rgba(30,64,175,0.3); }
-    .role-chip.viewer      { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.25); }
-    .role-chip.it_manager  { background: rgba(14,165,233,0.15);color: #38bdf8; border: 1px solid rgba(14,165,233,0.25); }
+    .role-chip.user        { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.25); }
 
     /* MAIN */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -184,8 +183,9 @@
     .confirm-msg   { font-size: 13px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.5; }
     .confirm-btns  { display: flex; gap: 9px; justify-content: flex-end; }
   </style>
+  <link rel="stylesheet" href="/portal-theme.css" />
 </head>
-<body>
+<body class="support-theme support-theme-admin">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -225,6 +225,10 @@
     <div class="nav-item" id="nav-integrations" onclick="showPage('integrations',this)">
       <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       Integrations
+    </div>
+    <div class="nav-item" onclick="location.href='/support'">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Support Center
     </div>
     <div class="nav-divider"></div>
     <div class="nav-item" onclick="location.href='/'">
@@ -277,7 +281,7 @@
         <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div><div><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total Portal Users</div></div></div>
         <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><div class="stat-num" id="statAdmins">—</div><div class="stat-label">Admins</div></div></div>
         <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="stat-num" id="statActive">—</div><div class="stat-label">Active</div></div></div>
-        <div class="stat-card"><div class="stat-icon sky"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><div class="stat-num" id="statRoles">4</div><div class="stat-label">Roles Defined</div></div></div>
+        <div class="stat-card"><div class="stat-icon sky"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div><div class="stat-num" id="statRoles">3</div><div class="stat-label">Roles Defined</div></div></div>
       </div>
 
       <div class="card">
@@ -311,56 +315,19 @@
     <div class="page" id="page-permissions">
       <div class="card" style="margin-bottom:20px">
         <div class="card-header"><div class="card-title">Role Definitions</div></div>
-        <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-              <span class="role-chip super_admin">Super Admin</span>
-            </div>
-            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5">Full access to everything — manage portal users, all data, system settings. Cannot be deleted by others.</p>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-              <span class="role-chip admin">Admin</span>
-            </div>
-            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5">Can manage users, assets and software inventory. Cannot manage other portal user accounts.</p>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-              <span class="role-chip it_manager">IT Manager</span>
-            </div>
-            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5">Full access to device/asset inventory. Read-only access to users and software.</p>
-          </div>
-          <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-              <span class="role-chip viewer">Viewer</span>
-            </div>
-            <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5">Read-only access to all pages. Cannot create, edit or delete any records.</p>
-          </div>
-        </div>
+        <div id="roleDefinitionsGrid" style="padding:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px"></div>
       </div>
 
       <div class="card">
-        <div class="card-header"><div class="card-title">Permission Matrix</div></div>
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div class="card-title">Permission Matrix</div>
+          <button class="btn btn-primary btn-sm" id="saveRolePermissionsBtn" onclick="saveRolePermissions()" style="display:none">Save Permissions</button>
+        </div>
         <div style="padding:16px;overflow-x:auto">
+          <div id="rolePermissionsErr" style="font-size:12px;color:rgba(220,38,38,0.8);margin-bottom:10px"></div>
           <table class="perm-table">
-            <thead>
-              <tr>
-                <th>Permission</th>
-                <th><span class="role-chip super_admin">Super Admin</span></th>
-                <th><span class="role-chip admin">Admin</span></th>
-                <th><span class="role-chip it_manager">IT Manager</span></th>
-                <th><span class="role-chip viewer">Viewer</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>View all pages</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td></tr>
-              <tr><td><strong>Add / Edit / Delete Users</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td></tr>
-              <tr><td><strong>Add / Edit / Delete Assets</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">—</span></td></tr>
-              <tr><td><strong>Add / Edit / Delete Software</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td></tr>
-              <tr><td><strong>Manage Portal Users (Admin Console)</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td><td><span class="perm-cross">—</span></td></tr>
-              <tr><td><strong>Export CSV / PDF</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td></tr>
-              <tr><td><strong>View Activity Log</strong></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td><td><span class="perm-check">✓</span></td></tr>
-            </tbody>
+            <thead id="rolePermissionHead"></thead>
+            <tbody id="rolePermissionBody"></tbody>
           </table>
         </div>
       </div>
@@ -498,16 +465,180 @@
 
     <!-- ── INTEGRATIONS PAGE ── -->
     <div class="page" id="page-integrations">
-      <div id="integrationsEmpty" style="text-align:center;padding:80px 40px 60px">
-        <svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke:rgba(153,102,255,0.28);fill:none;stroke-width:1.5;margin:0 auto 16px;display:block"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        <div style="font-size:16px;font-weight:700;color:rgba(153,102,255,0.55);margin-bottom:8px">No integrations added yet</div>
-        <div style="font-size:13px;color:var(--text-muted);margin-bottom:24px;max-width:340px;margin-left:auto;margin-right:auto">Connect third-party services to extend TerzoCloud's capabilities</div>
-        <button class="btn btn-primary" onclick="openAddIntegrationModal()">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Add Integration
-        </button>
+      <div class="integration-card" style="max-width:860px">
+        <div class="integration-header">
+          <div class="integration-logo">
+            <svg viewBox="0 0 48 48" style="width:26px;height:26px">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+          </div>
+          <div style="flex:1">
+            <div class="integration-title">Google SSO</div>
+            <div class="integration-desc">Configure Sign in with Google for portal admins. Leave Allowed Domain blank to permit any Google account, then rely on Admin Console email matching.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="status-dot inactive" id="googleSsoStatusDot"></span>
+            <span style="font-size:12px;color:var(--text-muted)" id="googleSsoStatusLabel">Not configured</span>
+          </div>
+        </div>
+        <div class="integration-body" style="display:grid;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(153,102,255,0.06);border-radius:9px;border:1px solid var(--border)">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Enable Google Sign-In</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Users will still only be allowed in if their email already exists in Admin Console User Management.</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="googleSsoEnabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Client ID</label>
+              <input type="text" id="googleClientId" placeholder="Google OAuth Client ID"/>
+            </div>
+            <div class="form-group">
+              <label>Allowed Domain (Optional)</label>
+              <input type="text" id="googleAllowedDomain" placeholder="Leave blank to allow any Google domain"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Client Secret</label>
+            <input type="password" id="googleClientSecret" placeholder="Paste your Google OAuth Client Secret"/>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Redirect URI: <code style="background:rgba(0,0,0,0.3);padding:1px 4px;border-radius:3px" id="googleRedirectUri"></code></div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+            To allow any Google account to attempt sign-in, leave Allowed Domain empty. Access is still granted only when the Google email exists in Portal User Management.
+          </div>
+        </div>
+        <div class="integration-footer">
+          <span style="font-size:12px;color:rgba(220,38,38,0.8);flex:1" id="integrationsErr"></span>
+          <button class="btn btn-primary btn-sm" id="googleSsoSaveBtn" onclick="saveIntegrations()">Save Google SSO</button>
+        </div>
       </div>
-      <div id="integrationsList" style="display:none"></div>
+
+      <div class="integration-card" style="max-width:860px;margin-top:18px">
+        <div class="integration-header">
+          <div class="integration-logo" style="background:#fff">
+            <svg viewBox="0 0 24 24" style="width:26px;height:26px"><path fill="#E01E5A" d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z"/></svg>
+          </div>
+          <div style="flex:1">
+            <div class="integration-title">Slack Support Requests</div>
+            <div class="integration-desc">Launch a Slack modal from a slash command so users can create Support Center requests with a request-type dropdown and form fields.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="status-dot inactive" id="slackWorkflowStatusDot"></span>
+            <span style="font-size:12px;color:var(--text-muted)" id="slackWorkflowStatusLabel">Slack command not configured</span>
+          </div>
+        </div>
+        <div class="integration-body" style="display:grid;gap:14px">
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+            This setup uses a Slack slash command and modal, not workflow import. The modal shows the default Support Center request types and creates the request when the user submits it.
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Slack Signing Secret</label>
+              <input type="password" id="slackSigningSecret" placeholder="Paste Slack signing secret to verify slash commands" />
+            </div>
+            <div class="form-group">
+              <label>Slack Command URL</label>
+              <input type="text" id="slackCommandUrl" readonly style="font-family:monospace;font-size:12px;background:rgba(0,0,0,0.2);cursor:default" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Slack Interactivity URL</label>
+              <input type="text" id="slackInteractivityUrl" readonly style="font-family:monospace;font-size:12px;background:rgba(0,0,0,0.2);cursor:default" />
+            </div>
+            <div class="form-group">
+              <label>Slack Bot Token Source</label>
+              <input type="text" value="Uses the Slack connector bot token saved under SCIM -> App Connectors" readonly style="font-size:12px;background:rgba(0,0,0,0.2);cursor:default" />
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+            Configure a Slack slash command such as <code style="background:rgba(0,0,0,0.3);padding:1px 4px;border-radius:3px">/it-request</code> to point at the command URL above. Then configure Slack Interactivity to point at the interactivity URL above. When a user enters the slash command, Slack will open a modal with the request type dropdown and support request form.
+          </div>
+        </div>
+        <div class="integration-footer">
+          <span style="font-size:12px;color:rgba(220,38,38,0.8);flex:1" id="slackWorkflowErr"></span>
+          <button class="btn btn-secondary btn-sm" id="slackSettingsSaveBtn" onclick="saveSlackSettings()">Save Slack Setup</button>
+        </div>
+      </div>
+
+      <div class="integration-card" style="max-width:860px;margin-top:18px">
+        <div class="integration-header">
+          <div class="integration-logo" style="background:#fff;color:#111827;font-weight:800;font-size:18px">
+            @
+          </div>
+          <div style="flex:1">
+            <div class="integration-title">Support Email Automation</div>
+            <div class="integration-desc">Send assignment emails automatically and deliver approve or reject links to managers for approval steps.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="status-dot inactive" id="emailAutomationStatusDot"></span>
+            <span style="font-size:12px;color:var(--text-muted)" id="emailAutomationStatusLabel">Email not configured</span>
+          </div>
+        </div>
+        <div class="integration-body" style="display:grid;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(153,102,255,0.06);border-radius:9px;border:1px solid var(--border)">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Enable support emails</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:3px">Assignment emails and manager approvals start automatically after SMTP is configured.</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="emailAutomationEnabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>SMTP Host</label>
+              <input type="text" id="emailSmtpHost" placeholder="smtp.gmail.com" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Port</label>
+              <input type="number" id="emailSmtpPort" placeholder="587" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>SMTP Username</label>
+              <input type="text" id="emailSmtpUser" placeholder="smtp-user" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Password</label>
+              <input type="password" id="emailSmtpPass" placeholder="SMTP password or app password" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>From Email</label>
+              <input type="email" id="emailFromEmail" placeholder="support@company.com" />
+            </div>
+            <div class="form-group">
+              <label>From Name</label>
+              <input type="text" id="emailFromName" placeholder="TerzoCloud Support" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Public App Base URL</label>
+              <input type="text" id="emailAppBaseUrl" placeholder="https://portal.company.com" />
+            </div>
+            <div class="form-group">
+              <label>SMTP Security</label>
+              <select id="emailSmtpSecure">
+                <option value="false">STARTTLS / Opportunistic TLS</option>
+                <option value="true">Implicit TLS</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);line-height:1.7;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:10px">
+            Use a public app base URL so manager approve or reject links work outside your local machine. If you are testing locally, a tunnel URL such as ngrok is required.
+          </div>
+        </div>
+        <div class="integration-footer">
+          <span style="font-size:12px;color:rgba(220,38,38,0.8);flex:1" id="emailAutomationErr"></span>
+          <button class="btn btn-primary btn-sm" id="emailAutomationSaveBtn" onclick="saveEmailSettings()">Save Email Setup</button>
+        </div>
+      </div>
     </div>
 
   </div><!-- /content -->
@@ -539,8 +670,7 @@
         <div class="form-group">
           <label>Role</label>
           <select id="mRole">
-            <option value="viewer">Viewer</option>
-            <option value="it_manager">IT Manager</option>
+            <option value="user">User</option>
             <option value="admin">Admin</option>
             <option value="super_admin">Super Admin</option>
           </select>
@@ -638,6 +768,13 @@
 /* ── Auth guard ── */
 const token = localStorage.getItem('tcToken');
 let currentUser = null;
+let googleSsoHasClientId = false;
+let googleSsoHasClientSecret = false;
+let slackHasSigningSecret = false;
+let emailHasSmtpPass = false;
+let slackWorkflowImports = [];
+let rolePermissionConfigs = [];
+let rolePermissionDrafts = [];
 
 (async function init() {
   if (!token) { location.href = '/login'; return; }
@@ -645,18 +782,12 @@ let currentUser = null;
     const r = await authFetch('/api/auth/me');
     if (!r.ok) { clearAuth(); return; }
     currentUser = await r.json();
-    if (currentUser.role !== 'super_admin') {
-      // Non-super-admins can view but not manage users
-      document.getElementById('page-users').innerHTML =
-        `<div style="text-align:center;padding:60px;color:rgba(153,102,255,0.5)">
-           <svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0 auto 16px;display:block"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-           <div style="font-size:16px;font-weight:700;color:rgba(153,102,255,0.7);margin-bottom:8px">Access Restricted</div>
-           <div style="font-size:13px">Only Super Admins can manage portal users.</div>
-         </div>`;
-    }
+    applyAdminAccessState();
     updateSidebar(currentUser);
     loadUsers();
     loadSystemStats();
+    loadRolePermissions();
+    openInitialAdminPage();
   } catch { clearAuth(); }
 })();
 
@@ -683,28 +814,80 @@ function signOut() {
   location.href = '/login';
 }
 
+function hasPermission(key) {
+  return !!currentUser?.permissions?.[key];
+}
+
+function applyAdminAccessState() {
+  if (!hasPermission('managePortalUsers')) {
+    document.getElementById('page-users').innerHTML =
+      `<div style="text-align:center;padding:60px;color:rgba(153,102,255,0.5)">
+         <svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0 auto 16px;display:block"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+         <div style="font-size:16px;font-weight:700;color:rgba(153,102,255,0.7);margin-bottom:8px">Access Restricted</div>
+         <div style="font-size:13px">This role cannot manage portal user accounts.</div>
+       </div>`;
+  }
+  if (!hasPermission('manageRolePermissions')) {
+    document.getElementById('page-permissions').innerHTML =
+      `<div style="text-align:center;padding:60px;color:rgba(153,102,255,0.5)">
+         <svg viewBox="0 0 24 24" style="width:48px;height:48px;stroke:currentColor;fill:none;stroke-width:1.5;margin:0 auto 16px;display:block"><path d="M12 1v22"/><path d="M5 5h14v14H5z"/></svg>
+         <div style="font-size:16px;font-weight:700;color:rgba(153,102,255,0.7);margin-bottom:8px">Access Restricted</div>
+         <div style="font-size:13px">This role cannot edit role permissions.</div>
+       </div>`;
+  }
+  ['nav-users','nav-permissions','nav-scim','nav-integrations'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let allowed = true;
+    if (id === 'nav-users') allowed = hasPermission('managePortalUsers');
+    if (id === 'nav-permissions') allowed = hasPermission('manageRolePermissions');
+    if (id === 'nav-scim' || id === 'nav-integrations') allowed = hasPermission('manageIntegrations');
+    el.style.display = allowed ? '' : 'none';
+  });
+}
+
+function openInitialAdminPage() {
+  const preferredPages = [
+    ['users', hasPermission('managePortalUsers')],
+    ['permissions', hasPermission('manageRolePermissions')],
+    ['integrations', hasPermission('manageIntegrations')],
+    ['scim', hasPermission('manageIntegrations')],
+    ['system', true],
+  ];
+  const [pageName] = preferredPages.find(([, allowed]) => allowed) || ['system'];
+  const activeNav = document.querySelector(`.nav-item[onclick*="'${pageName}'"]`);
+  showPage(pageName, activeNav);
+}
+
 function updateSidebar(u) {
   const ini = u.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
   document.getElementById('sidebarAvatar').textContent = ini;
   document.getElementById('sidebarName').textContent   = u.name;
   const rc = document.getElementById('sidebarRole');
-  rc.textContent  = u.role.replace('_',' ');
+  rc.textContent  = ROLE_LABELS[u.role] || u.role.replace('_',' ');
   rc.className    = 'role-chip ' + u.role;
   document.getElementById('siName').textContent  = u.name;
   document.getElementById('siEmail').textContent = u.email;
-  document.getElementById('siRole').innerHTML    = `<span class="role-chip ${u.role}">${u.role.replace('_',' ')}</span>`;
+  document.getElementById('siRole').innerHTML    = `<span class="role-chip ${u.role}">${ROLE_LABELS[u.role] || u.role.replace('_',' ')}</span>`;
 }
 
 /* ── Page navigation ── */
 const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations' };
 function showPage(name, el) {
+  if ((name === 'users' && !hasPermission('managePortalUsers'))
+    || (name === 'permissions' && !hasPermission('manageRolePermissions'))
+    || ((name === 'scim' || name === 'integrations') && !hasPermission('manageIntegrations'))) {
+    showToast('This role does not have access to that page.', 'danger');
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   if (el) el.classList.add('active');
   document.getElementById('pageTitle').textContent = PAGE_TITLES[name] || name;
   if (name === 'scim') loadSCIMConfig();
-  if (name === 'integrations') loadConnectors();
+  if (name === 'integrations') loadIntegrations();
+  if (name === 'permissions') loadRolePermissions();
 }
 
 /* ── PORTAL USERS ── */
@@ -713,12 +896,143 @@ let editingId  = null;
 let deletingId = null;
 let resetId    = null;
 
-const ROLE_LABELS = { super_admin: 'Super Admin', admin: 'Admin', it_manager: 'IT Manager', viewer: 'Viewer' };
+const ROLE_LABELS = { super_admin: 'Super Admin', admin: 'Admin', user: 'User' };
+const PERMISSION_LABELS = {
+  viewAllPages: 'View all pages',
+  manageEmployeeUsers: 'Add / Edit / Delete Users',
+  manageAssets: 'Add / Edit / Delete Assets',
+  manageSoftware: 'Add / Edit / Delete Software',
+  manageSupportRequests: 'Manage Support Requests',
+  manageRequestTypes: 'Manage Request Types',
+  managePortalUsers: 'Manage Portal Users (Admin Console)',
+  manageIntegrations: 'Manage Integrations / SCIM / Connectors',
+  viewActivityLog: 'View Activity Log',
+  exportData: 'Export CSV / PDF',
+  manageRolePermissions: 'Edit Role Permissions',
+};
+
+async function loadRolePermissions() {
+  if (!hasPermission('manageRolePermissions')) return;
+  const errEl = document.getElementById('rolePermissionsErr');
+  if (errEl) errEl.textContent = '';
+  try {
+    const r = await authFetch('/api/admin/role-permissions');
+    const data = await r.json();
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Failed to load role permissions.';
+      return;
+    }
+    rolePermissionConfigs = data.roles || [];
+    rolePermissionDrafts = JSON.parse(JSON.stringify(rolePermissionConfigs));
+    renderRoleDefinitions();
+    renderRolePermissionMatrix();
+    updateStats();
+  } catch (e) {
+    if (errEl) errEl.textContent = e.message || 'Failed to load role permissions.';
+  }
+}
+
+function renderRoleDefinitions() {
+  const grid = document.getElementById('roleDefinitionsGrid');
+  if (!grid) return;
+  if (!rolePermissionDrafts.length) {
+    grid.innerHTML = `<div style="color:var(--text-muted);font-size:13px">No role definitions found.</div>`;
+    return;
+  }
+  grid.innerHTML = rolePermissionDrafts.map(role => `
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span class="role-chip ${role.role}">${escapeHtml(role.label || ROLE_LABELS[role.role] || role.role)}</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5">${escapeHtml(role.description || '')}</p>
+    </div>
+  `).join('');
+}
+
+function renderRolePermissionMatrix() {
+  const head = document.getElementById('rolePermissionHead');
+  const body = document.getElementById('rolePermissionBody');
+  const saveBtn = document.getElementById('saveRolePermissionsBtn');
+  if (!head || !body) return;
+  if (!rolePermissionDrafts.length) {
+    head.innerHTML = '';
+    body.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:30px;color:rgba(153,102,255,0.4)">No role permissions loaded.</td></tr>`;
+    if (saveBtn) saveBtn.style.display = 'none';
+    return;
+  }
+
+  head.innerHTML = `
+    <tr>
+      <th>Permission</th>
+      ${rolePermissionDrafts.map(role => `<th><span class="role-chip ${role.role}">${escapeHtml(role.label || ROLE_LABELS[role.role] || role.role)}</span></th>`).join('')}
+    </tr>
+  `;
+
+  const permissionKeys = Object.keys(PERMISSION_LABELS);
+  body.innerHTML = permissionKeys.map(permissionKey => `
+    <tr>
+      <td><strong>${escapeHtml(PERMISSION_LABELS[permissionKey])}</strong></td>
+      ${rolePermissionDrafts.map(role => {
+        const checked = !!role.permissions?.[permissionKey];
+        const disabled = role.role === 'super_admin';
+        return `<td style="text-align:center">
+          <label style="display:inline-flex;align-items:center;justify-content:center;cursor:${disabled ? 'default' : 'pointer'}">
+            <input type="checkbox" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="updateRolePermissionDraft('${role.role}', '${permissionKey}', this.checked)" />
+          </label>
+        </td>`;
+      }).join('')}
+    </tr>
+  `).join('');
+
+  if (saveBtn) saveBtn.style.display = 'inline-flex';
+}
+
+function updateRolePermissionDraft(roleKey, permissionKey, value) {
+  const draft = rolePermissionDrafts.find(role => role.role === roleKey);
+  if (!draft) return;
+  draft.permissions = draft.permissions || {};
+  draft.permissions[permissionKey] = !!value;
+}
+
+async function saveRolePermissions() {
+  if (!hasPermission('manageRolePermissions')) return;
+  const btn = document.getElementById('saveRolePermissionsBtn');
+  const errEl = document.getElementById('rolePermissionsErr');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  if (errEl) errEl.textContent = '';
+  try {
+    for (const role of rolePermissionDrafts.filter(item => item.role !== 'super_admin')) {
+      const r = await authFetch(`/api/admin/role-permissions/${role.role}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          label: role.label,
+          description: role.description,
+          permissions: role.permissions || {},
+        }),
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || `Failed to save ${role.role} permissions.`);
+    }
+    showToast('Role permissions saved');
+    await loadRolePermissions();
+  } catch (e) {
+    if (errEl) errEl.textContent = e.message || 'Failed to save role permissions.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Permissions';
+  }
+}
 
 async function loadUsers() {
+  if (!hasPermission('managePortalUsers')) {
+    adminUsers = [];
+    updateStats();
+    return;
+  }
   try {
     const r = await authFetch('/api/admin/users');
-    if (r.status === 403) return; // non-super-admin handled above
+    if (r.status === 403) return;
     if (!r.ok) throw new Error('Failed to load users');
     adminUsers = await r.json();
     renderUsersTable();
@@ -727,14 +1041,21 @@ async function loadUsers() {
 }
 
 function updateStats() {
-  document.getElementById('statTotal').textContent  = adminUsers.length;
-  document.getElementById('statAdmins').textContent = adminUsers.filter(u => u.role === 'super_admin' || u.role === 'admin').length;
-  document.getElementById('statActive').textContent = adminUsers.filter(u => u.status === 'Active').length;
-  document.getElementById('userCountLabel').textContent = `(${adminUsers.length})`;
+  const statTotal = document.getElementById('statTotal');
+  const statAdmins = document.getElementById('statAdmins');
+  const statActive = document.getElementById('statActive');
+  const userCountLabel = document.getElementById('userCountLabel');
+  const statRoles = document.getElementById('statRoles');
+  if (statTotal) statTotal.textContent = adminUsers.length;
+  if (statAdmins) statAdmins.textContent = adminUsers.filter(u => u.role === 'super_admin' || u.role === 'admin').length;
+  if (statActive) statActive.textContent = adminUsers.filter(u => u.status === 'Active').length;
+  if (userCountLabel) userCountLabel.textContent = `(${adminUsers.length})`;
+  if (statRoles) statRoles.textContent = rolePermissionDrafts.length || rolePermissionConfigs.length || Object.keys(ROLE_LABELS).length;
 }
 
 function renderUsersTable() {
   const tbody = document.getElementById('usersTableBody');
+  if (!tbody) return;
   if (!adminUsers.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:rgba(153,102,255,0.4)">No portal users found</td></tr>`;
     return;
@@ -783,7 +1104,7 @@ function openAddModal() {
   document.getElementById('mName').value    = '';
   document.getElementById('mEmail').value   = '';
   document.getElementById('mPassword').value= '';
-  document.getElementById('mRole').value    = 'viewer';
+  document.getElementById('mRole').value    = 'user';
   document.getElementById('mStatus').value  = 'Active';
   document.getElementById('mPasswordRow').style.display = '';
   document.getElementById('mStatusRow').style.display   = 'none';
@@ -898,6 +1219,329 @@ async function loadSystemStats() {
     document.getElementById('sysSoftware').textContent  = Array.isArray(sw)      ? sw.length      : '—';
     document.getElementById('sysPortalUsers').textContent = adminUsers.length || '—';
   } catch {}
+}
+
+/* ── Integrations ── */
+function updateGoogleSsoStatus(google = {}) {
+  const configured = !!(google.enabled && google.hasClientId && google.hasClientSecret);
+  const dot = document.getElementById('googleSsoStatusDot');
+  const label = document.getElementById('googleSsoStatusLabel');
+  if (dot) dot.className = 'status-dot ' + (configured ? 'active' : 'inactive');
+  if (label) label.textContent = configured ? 'Configured' : 'Not configured';
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function updateSlackWorkflowStatus(imports = []) {
+  const total = imports.reduce((sum, item) => sum + (item.workflowCount || 0), 0);
+  const dot = document.getElementById('slackWorkflowStatusDot');
+  const label = document.getElementById('slackWorkflowStatusLabel');
+  if (dot) dot.className = 'status-dot ' + (total > 0 ? 'active' : 'inactive');
+  if (label) {
+    label.textContent = total > 0
+      ? `${total} workflow${total === 1 ? '' : 's'} imported`
+      : 'No workflows imported';
+  }
+}
+
+function updateEmailAutomationStatus(email = {}) {
+  const configured = !!(email.enabled && email.smtpHost && email.fromEmail && (email.hasSmtpPass || document.getElementById('emailSmtpPass')?.value.trim()));
+  const dot = document.getElementById('emailAutomationStatusDot');
+  const label = document.getElementById('emailAutomationStatusLabel');
+  if (dot) dot.className = 'status-dot ' + (configured ? 'active' : 'inactive');
+  if (label) label.textContent = configured ? 'Email automation configured' : 'Email not configured';
+}
+
+function renderSlackWorkflowImports(imports = []) {
+  slackWorkflowImports = imports;
+  updateSlackWorkflowStatus(imports);
+  const listEl = document.getElementById('slackWorkflowList');
+  if (!listEl) return;
+
+  if (!imports.length) {
+    listEl.innerHTML = `
+      <div style="text-align:center;padding:22px 18px;background:rgba(153,102,255,0.03);border:1px dashed rgba(153,102,255,0.18);border-radius:12px">
+        <div style="font-size:13px;font-weight:600;color:rgba(153,102,255,0.55);margin-bottom:5px">No Slack workflows imported yet</div>
+        <div style="font-size:12px;color:var(--text-muted)">Import from Slack with an App Configuration token, or paste a manifest JSON export.</div>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = imports.map(item => {
+    const workflows = Array.isArray(item.workflows) ? item.workflows : [];
+    const importedAt = item.importedAt ? new Date(item.importedAt).toLocaleString('en-IN') : 'Unknown';
+    const workflowCards = workflows.map(workflow => `
+      <div style="padding:10px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${escapeHtml(workflow.title || workflow.callbackId || workflow.key)}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${escapeHtml(workflow.description || 'No description')}</div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);white-space:nowrap">${workflow.stepCount || 0} steps</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <span style="font-size:11px;color:var(--text-muted);padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:999px">Callback: ${escapeHtml(workflow.callbackId || workflow.key || 'n/a')}</span>
+          <span style="font-size:11px;color:var(--text-muted);padding:4px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:999px">Triggers: ${escapeHtml((workflow.triggerTypes || []).join(', ') || 'n/a')}</span>
+        </div>
+      </div>`).join('');
+
+    return `
+      <div style="padding:14px;border:1px solid var(--border);border-radius:12px;background:rgba(15,23,42,0.2)">
+        <div style="display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--text)">${escapeHtml(item.sourceAppName || item.sourceAppId)}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Source: ${escapeHtml(item.sourceAppId)} · Imported ${escapeHtml(importedAt)} · ${item.workflowCount || workflows.length} workflow${(item.workflowCount || workflows.length) === 1 ? '' : 's'}</div>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);padding:5px 8px;border-radius:999px;border:1px solid var(--border);background:var(--surface2)">${escapeHtml(item.sourceType || 'unknown')}</div>
+        </div>
+        <div style="display:grid;gap:10px">${workflowCards}</div>
+      </div>`;
+  }).join('');
+}
+
+async function loadSlackWorkflowImports() {
+  const errEl = document.getElementById('slackWorkflowErr');
+  if (errEl) errEl.textContent = '';
+  try {
+    const r = await authFetch('/api/admin/slack-workflows');
+    const data = await r.json();
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Failed to load Slack workflow imports.';
+      return;
+    }
+    renderSlackWorkflowImports(data.imports || []);
+  } catch (e) {
+    if (errEl) errEl.textContent = e.message || 'Failed to load Slack workflow imports.';
+  }
+}
+
+async function loadIntegrations() {
+  const errEl = document.getElementById('integrationsErr');
+  const emailErrEl = document.getElementById('emailAutomationErr');
+  const redirectEl = document.getElementById('googleRedirectUri');
+  if (redirectEl) redirectEl.textContent = `${location.protocol}//${location.host}/api/auth/google/callback`;
+  const slackCommandUrlEl = document.getElementById('slackCommandUrl');
+  if (slackCommandUrlEl) slackCommandUrlEl.value = `${location.protocol}//${location.host}/api/slack/support-command`;
+  const slackInteractivityUrlEl = document.getElementById('slackInteractivityUrl');
+  if (slackInteractivityUrlEl) slackInteractivityUrlEl.value = `${location.protocol}//${location.host}/api/slack/interactivity`;
+  if (errEl) errEl.textContent = '';
+  if (emailErrEl) emailErrEl.textContent = '';
+
+  try {
+    const r = await authFetch('/api/admin/integrations');
+    const data = await r.json();
+    if (r.status === 403) {
+      if (errEl) errEl.textContent = 'Only Super Admins can manage integrations.';
+      return;
+    }
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Failed to load integration settings.';
+      return;
+    }
+
+    const google = data.google || {};
+    const slack = data.slack || {};
+    const email = data.email || {};
+    googleSsoHasClientId = !!google.hasClientId;
+    googleSsoHasClientSecret = !!google.hasClientSecret;
+    slackHasSigningSecret = !!slack.hasSigningSecret;
+    emailHasSmtpPass = !!email.hasSmtpPass;
+    document.getElementById('googleSsoEnabled').checked = !!google.enabled;
+    document.getElementById('googleClientId').value = '';
+    document.getElementById('googleClientSecret').value = '';
+    document.getElementById('slackSigningSecret').value = '';
+    document.getElementById('emailAutomationEnabled').checked = !!email.enabled;
+    document.getElementById('emailSmtpHost').value = email.smtpHost || '';
+    document.getElementById('emailSmtpPort').value = email.smtpPort || 587;
+    document.getElementById('emailSmtpUser').value = email.smtpUser || '';
+    document.getElementById('emailSmtpPass').value = '';
+    document.getElementById('emailFromEmail').value = email.fromEmail || '';
+    document.getElementById('emailFromName').value = email.fromName || 'TerzoCloud Support';
+    document.getElementById('emailAppBaseUrl').value = email.appBaseUrl || `${location.protocol}//${location.host}`;
+    document.getElementById('emailSmtpSecure').value = email.smtpSecure ? 'true' : 'false';
+    document.getElementById('googleClientId').placeholder = googleSsoHasClientId
+      ? 'Stored securely — enter a new Client ID to replace it'
+      : 'Google OAuth Client ID';
+    document.getElementById('googleClientSecret').placeholder = googleSsoHasClientSecret
+      ? 'Stored securely — enter a new Client Secret to replace it'
+      : 'Paste your Google OAuth Client Secret';
+    document.getElementById('slackSigningSecret').placeholder = slackHasSigningSecret
+      ? 'Stored securely — enter a new signing secret to replace it'
+      : 'Paste Slack signing secret';
+    document.getElementById('emailSmtpPass').placeholder = emailHasSmtpPass
+      ? 'Stored securely — enter a new SMTP password to replace it'
+      : 'SMTP password or app password';
+    document.getElementById('googleAllowedDomain').value = google.allowedDomain || '';
+    updateGoogleSsoStatus(google);
+    updateEmailAutomationStatus(email);
+    const slackDot = document.getElementById('slackWorkflowStatusDot');
+    const slackLabel = document.getElementById('slackWorkflowStatusLabel');
+    if (slackDot) slackDot.className = 'status-dot ' + (slackHasSigningSecret ? 'active' : 'inactive');
+    if (slackLabel) slackLabel.textContent = slackHasSigningSecret ? 'Slack command ready for setup' : 'Slack command not configured';
+  } catch (e) {
+    if (errEl) errEl.textContent = e.message || 'Failed to load integration settings.';
+  }
+}
+
+async function saveIntegrations() {
+  const btn = document.getElementById('googleSsoSaveBtn');
+  const errEl = document.getElementById('integrationsErr');
+  const enabled = document.getElementById('googleSsoEnabled').checked;
+  const clientId = document.getElementById('googleClientId').value.trim();
+  const clientSecret = document.getElementById('googleClientSecret').value.trim();
+  const allowedDomain = document.getElementById('googleAllowedDomain').value.trim().toLowerCase();
+
+  if (enabled && !clientId && !googleSsoHasClientId) {
+    errEl.textContent = 'Client ID is required when Google SSO is enabled.';
+    return;
+  }
+  if (enabled && !clientSecret && !googleSsoHasClientSecret) {
+    errEl.textContent = 'Client Secret is required when Google SSO is enabled.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  errEl.textContent = '';
+
+  try {
+    const r = await authFetch('/api/admin/integrations', {
+      method: 'PUT',
+      body: JSON.stringify({
+        google: { enabled, clientId, clientSecret, allowedDomain },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      errEl.textContent = data.error || 'Failed to save integration settings.';
+      return;
+    }
+
+    showToast('Google SSO settings saved');
+    await loadIntegrations();
+  } catch (e) {
+    errEl.textContent = e.message || 'Failed to save integration settings.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Google SSO';
+  }
+}
+
+async function saveSlackSettings() {
+  const btn = document.getElementById('slackSettingsSaveBtn');
+  const errEl = document.getElementById('slackWorkflowErr');
+  const signingSecret = document.getElementById('slackSigningSecret').value.trim();
+
+  if (!signingSecret && !slackHasSigningSecret) {
+    errEl.textContent = 'Slack signing secret is required before slash commands can be verified.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  errEl.textContent = '';
+
+  try {
+    const r = await authFetch('/api/admin/integrations', {
+      method: 'PUT',
+      body: JSON.stringify({
+        google: {
+          enabled: document.getElementById('googleSsoEnabled').checked,
+          clientId: document.getElementById('googleClientId').value.trim(),
+          clientSecret: document.getElementById('googleClientSecret').value.trim(),
+          allowedDomain: document.getElementById('googleAllowedDomain').value.trim().toLowerCase(),
+        },
+        slack: { signingSecret },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      errEl.textContent = data.error || 'Failed to save Slack settings.';
+      return;
+    }
+
+    showToast('Slack settings saved');
+    await loadIntegrations();
+  } catch (e) {
+    errEl.textContent = e.message || 'Failed to save Slack settings.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Slack Setup';
+  }
+}
+
+async function saveEmailSettings() {
+  const btn = document.getElementById('emailAutomationSaveBtn');
+  const errEl = document.getElementById('emailAutomationErr');
+  const enabled = document.getElementById('emailAutomationEnabled').checked;
+  const smtpHost = document.getElementById('emailSmtpHost').value.trim();
+  const smtpPort = document.getElementById('emailSmtpPort').value.trim();
+  const smtpSecure = document.getElementById('emailSmtpSecure').value === 'true';
+  const smtpUser = document.getElementById('emailSmtpUser').value.trim();
+  const smtpPass = document.getElementById('emailSmtpPass').value.trim();
+  const fromEmail = document.getElementById('emailFromEmail').value.trim();
+  const fromName = document.getElementById('emailFromName').value.trim();
+  const appBaseUrl = document.getElementById('emailAppBaseUrl').value.trim();
+
+  if (enabled && !smtpHost) {
+    errEl.textContent = 'SMTP host is required when email automation is enabled.';
+    return;
+  }
+  if (enabled && !fromEmail) {
+    errEl.textContent = 'From email is required when email automation is enabled.';
+    return;
+  }
+  if (enabled && !smtpPass && !emailHasSmtpPass) {
+    errEl.textContent = 'SMTP password is required when email automation is enabled.';
+    return;
+  }
+  if (enabled && !appBaseUrl) {
+    errEl.textContent = 'Public app base URL is required for approval links.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  errEl.textContent = '';
+
+  try {
+    const r = await authFetch('/api/admin/integrations', {
+      method: 'PUT',
+      body: JSON.stringify({
+        email: {
+          enabled,
+          smtpHost,
+          smtpPort,
+          smtpSecure,
+          smtpUser,
+          smtpPass,
+          fromEmail,
+          fromName,
+          appBaseUrl,
+        },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      errEl.textContent = data.error || 'Failed to save email settings.';
+      return;
+    }
+
+    showToast('Email settings saved');
+    await loadIntegrations();
+  } catch (e) {
+    errEl.textContent = e.message || 'Failed to save email settings.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Email Setup';
+  }
 }
 
 /* ── Toast ── */

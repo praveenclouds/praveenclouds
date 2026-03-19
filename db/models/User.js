@@ -124,11 +124,10 @@ userSchema.virtual('assignedAssets', {
   foreignField: 'assignedTo',
 });
 
-// Indexes
+// Indexes  (email unique index is declared on the field — not repeated here)
 userSchema.index({ dept: 1 });
 userSchema.index({ location: 1 });
 userSchema.index({ status: 1 });
 userSchema.index({ role: 1 });
-userSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', userSchema);

@@ -3,15 +3,21 @@
  *
  * Exports:
  *   requireAuth       — verifies Bearer JWT, sets req.user
- *   requireRole(...)  — checks req.user.role against allowed list
- *   canWrite          — super_admin | admin | it_manager
- *   canWriteUsers     — super_admin | admin
- *   canWriteSoftware  — super_admin | admin
- *   canWriteAssets    — super_admin | admin | it_manager
- *   onlySuperAdmin    — super_admin only
+ *   requireRole(...)          — checks req.user.role against allowed list
+ *   requirePermission(name)   — checks role permission settings from DB
+ *   canWrite                  — manage support requests
+ *   canWriteUsers             — manage employee users
+ *   canWriteSoftware          — manage software
+ *   canWriteAssets            — manage assets
+ *   canManagePortalUsers      — manage admin console users
+ *   canManageIntegrations     — manage integrations / SCIM / connectors
+ *   canManageRolePermissions  — edit role permissions
+ *   canViewActivityLog        — view logs
+ *   onlySuperAdmin            — super_admin only
  */
 const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../config');
+const { getResolvedPermissions } = require('../services/role-permission.service');
 
 function requireAuth(req, res, next) {
   const header = req.headers['authorization'] || '';
@@ -34,18 +40,43 @@ function requireRole(...roles) {
   };
 }
 
-const canWrite         = requireRole('super_admin', 'admin', 'it_manager');
-const canWriteUsers    = requireRole('super_admin', 'admin');
-const canWriteSoftware = requireRole('super_admin', 'admin');
-const canWriteAssets   = requireRole('super_admin', 'admin', 'it_manager');
+function requirePermission(permissionKey) {
+  return async (req, res, next) => {
+    if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+    try {
+      const permissions = await getResolvedPermissions(req.user.role);
+      req.user.permissions = permissions;
+      if (!permissions?.[permissionKey]) {
+        return res.status(403).json({ error: 'Insufficient permissions' });
+      }
+      next();
+    } catch (error) {
+      return res.status(500).json({ error: error.message });
+    }
+  };
+}
+
+const canWrite                = requirePermission('manageSupportRequests');
+const canWriteUsers           = requirePermission('manageEmployeeUsers');
+const canWriteSoftware        = requirePermission('manageSoftware');
+const canWriteAssets          = requirePermission('manageAssets');
+const canManagePortalUsers    = requirePermission('managePortalUsers');
+const canManageIntegrations   = requirePermission('manageIntegrations');
+const canManageRolePermissions = requirePermission('manageRolePermissions');
+const canViewActivityLog      = requirePermission('viewActivityLog');
 const onlySuperAdmin   = requireRole('super_admin');
 
 module.exports = {
   requireAuth,
   requireRole,
+  requirePermission,
   canWrite,
   canWriteUsers,
   canWriteSoftware,
   canWriteAssets,
+  canManagePortalUsers,
+  canManageIntegrations,
+  canManageRolePermissions,
+  canViewActivityLog,
   onlySuperAdmin,
 };

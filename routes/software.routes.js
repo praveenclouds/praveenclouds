@@ -25,6 +25,35 @@ function fmtSw(s) {
   return o;
 }
 
+function diffSoftware(before, after) {
+  const fields = [
+    'csvId', 'name', 'deploymentType', 'renewalPeriod', 'department', 'purpose',
+    'licensePricePerUserMonth', 'annualCost', 'subscriptionPlan', 'purchasedLicenses',
+    'usedLicenses', 'owner', 'admins', 'billedTo', 'status', 'siteUSA', 'siteCAN', 'siteIND',
+  ];
+  const changes = [];
+  for (const field of fields) {
+    const oldValue = before?.[field];
+    const newValue = after?.[field];
+    if (JSON.stringify(oldValue ?? '') === JSON.stringify(newValue ?? '')) continue;
+    changes.push({
+      field,
+      oldValue: oldValue === undefined || oldValue === '' ? '—' : String(oldValue),
+      newValue: newValue === undefined || newValue === '' ? '—' : String(newValue),
+    });
+  }
+
+  if (JSON.stringify(before?.services || []) !== JSON.stringify(after?.services || [])) {
+    changes.push({
+      field: 'services',
+      oldValue: `Count: ${(before?.services || []).length}`,
+      newValue: `Count: ${(after?.services || []).length}`,
+    });
+  }
+
+  return changes;
+}
+
 // ── GET /api/software ──────────────────────────────────────────────────────────
 router.get('/', requireAuth, async (req, res) => {
   try {
@@ -65,7 +94,7 @@ router.post('/', requireAuth, canWriteSoftware, async (req, res) => {
     const sw = await Software.create(req.body);
     const o  = fmtSw(sw);
     await writeLog({
-      eventType: 'asset_created', entityType: 'asset',
+      eventType: 'software_created', entityType: 'software',
       entityId: o.id, entityLabel: o.name,
       summary: `Software added: ${o.name} (${o.csvId})`,
     });
@@ -79,6 +108,7 @@ router.put('/:id', requireAuth, canWriteSoftware, async (req, res) => {
     // Use findById + save so nested arrays (services) are properly validated
     const sw = await Software.findById(req.params.id);
     if (!sw) return res.status(404).json({ error: 'Software not found' });
+    const before = fmtSw(sw);
 
     const allowed = [
       'csvId', 'name', 'deploymentType', 'renewalPeriod', 'department', 'purpose',
@@ -90,6 +120,17 @@ router.put('/:id', requireAuth, canWriteSoftware, async (req, res) => {
     await sw.save();
 
     const o = fmtSw(sw);
+    const changes = diffSoftware(before, o);
+    if (changes.length) {
+      await writeLog({
+        eventType: 'software_updated',
+        entityType: 'software',
+        entityId: o.id,
+        entityLabel: o.name,
+        changes,
+        summary: `Software updated: ${o.name} (${o.csvId})`,
+      });
+    }
     res.json(o);
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
@@ -99,6 +140,14 @@ router.delete('/:id', requireAuth, canWriteSoftware, async (req, res) => {
   try {
     const sw = await Software.findByIdAndDelete(req.params.id);
     if (!sw) return res.status(404).json({ error: 'Software not found' });
+    const o = fmtSw(sw);
+    await writeLog({
+      eventType: 'software_deleted',
+      entityType: 'software',
+      entityId: o.id,
+      entityLabel: o.name,
+      summary: `Software deleted: ${o.name} (${o.csvId})`,
+    });
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

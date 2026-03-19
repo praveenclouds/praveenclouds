@@ -9,6 +9,9 @@ const mongoose = require('mongoose');
  *   asset_created      – new asset added
  *   asset_updated      – asset details edited (non-allocation change)
  *   asset_deleted      – asset removed
+ *   software_created   – new software added
+ *   software_updated   – software details edited
+ *   software_deleted   – software removed
  *   user_created       – new user added
  *   user_updated       – user info modified
  *   user_deleted       – user removed
@@ -35,6 +38,9 @@ const logSchema = new mongoose.Schema(
         'asset_created',
         'asset_updated',
         'asset_deleted',
+        'software_created',
+        'software_updated',
+        'software_deleted',
         'user_created',
         'user_updated',
         'user_deleted',
@@ -42,7 +48,7 @@ const logSchema = new mongoose.Schema(
     },
 
     // The record that was affected
-    entityType: { type: String, enum: ['user', 'asset'], required: true },
+    entityType: { type: String, enum: ['user', 'asset', 'software'], required: true },
     entityId:   { type: String, required: true },
     entityLabel:{ type: String, default: '' },   // e.g. "Macbook Pro 15 (A-42)"
 

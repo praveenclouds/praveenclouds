@@ -1,0 +1,495 @@
+:root {
+  --support-bg: #140f18;
+  --support-bg-soft: #1f1628;
+  --support-surface: rgba(39, 27, 52, 0.94);
+  --support-surface-soft: rgba(50, 35, 68, 0.9);
+  --support-border: rgba(130, 96, 185, 0.28);
+  --support-border-strong: rgba(130, 96, 185, 0.44);
+  --support-text: #f5efff;
+  --support-text-soft: #d8ccec;
+  --support-muted: #b8a9cf;
+  --support-accent: #7c5cff;
+  --support-accent-2: #38bdf8;
+  --support-success: #34d399;
+  --support-warning: #f59e0b;
+  --support-danger: #f87171;
+  --support-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+  --support-radius: 20px;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(124, 92, 255, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 24%),
+    linear-gradient(180deg, #140f18 0%, #0f0a13 100%);
+}
+
+body.support-theme {
+  color: var(--support-text);
+  background:
+    radial-gradient(circle at top left, rgba(124, 92, 255, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 24%),
+    linear-gradient(180deg, #140f18 0%, #0f0a13 100%) !important;
+}
+
+body.support-theme ::selection {
+  background: rgba(124, 92, 255, 0.34);
+  color: #fff;
+}
+
+body.support-theme ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+body.support-theme ::-webkit-scrollbar-track {
+  background: rgba(20, 15, 24, 0.88);
+}
+
+body.support-theme ::-webkit-scrollbar-thumb {
+  background: rgba(124, 92, 255, 0.42);
+  border-radius: 999px;
+}
+
+body.support-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 92, 255, 0.6);
+}
+
+body.support-theme :is(input, select, textarea, button) {
+  font: inherit;
+}
+
+body.support-theme :is(input, select, textarea):focus {
+  outline: none;
+}
+
+body.support-theme :is(.btn, .btn-login, .btn-google, .theme-btn) {
+  transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.14s ease, background 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+body.support-theme :is(.btn, .btn-login, .btn-google):hover {
+  transform: translateY(-1px);
+}
+
+body.support-theme :is(.btn-primary, .btn-login) {
+  background: linear-gradient(135deg, #3757e6, #7c5cff) !important;
+  color: #fff !important;
+  box-shadow: 0 18px 34px rgba(76, 89, 232, 0.25);
+}
+
+body.support-theme :is(.btn-primary, .btn-login):hover:not(:disabled) {
+  background: linear-gradient(135deg, #4464f2, #8b6bff) !important;
+}
+
+body.support-theme :is(.btn-secondary, .btn-back, .theme-btn) {
+  background: rgba(124, 92, 255, 0.12) !important;
+  border-color: rgba(124, 92, 255, 0.24) !important;
+  color: var(--support-text-soft) !important;
+}
+
+body.support-theme :is(.btn-secondary, .btn-back, .theme-btn):hover {
+  background: rgba(124, 92, 255, 0.2) !important;
+  color: var(--support-text) !important;
+}
+
+body.support-theme .btn-danger {
+  background: rgba(248, 113, 113, 0.12) !important;
+  border-color: rgba(248, 113, 113, 0.3) !important;
+  color: #ffb6b6 !important;
+}
+
+body.support-theme .btn-danger:hover {
+  background: rgba(248, 113, 113, 0.2) !important;
+}
+
+body.support-theme :is(.sidebar, .topbar, .card, .stat-card, .modal, .modal-box, .confirm-box, .login-card, .panel, .summary-card, .sidebar-footer, .user-chip, .integration-card, .sw-dm-box, .sw-dm-head, .sw-dm-tabs, .exc-box, .adv-search-panel, .export-menu, .dept-card, #deptModalBox) {
+  box-shadow: var(--support-shadow);
+}
+
+body.support-theme :is(input, select, textarea, .search-wrap input, .filter-select, .form-group input, .form-group select, .form-group textarea, #logSearch, .tag-picker, .tag-picker-input, .svc-mini-table input, .svc-mini-table select) {
+  background: rgba(29, 20, 38, 0.9) !important;
+  border-color: var(--support-border) !important;
+  color: var(--support-text) !important;
+}
+
+body.support-theme :is(input, select, textarea, .search-wrap input, .filter-select, .form-group input, .form-group select, .form-group textarea, #logSearch, .tag-picker, .tag-picker-input, .svc-mini-table input, .svc-mini-table select)::placeholder {
+  color: #8a76ad !important;
+}
+
+body.support-theme :is(input, select, textarea, .search-wrap input, .filter-select, .form-group input, .form-group select, .form-group textarea, #logSearch, .tag-picker, .svc-mini-table input, .svc-mini-table select):focus {
+  border-color: rgba(124, 92, 255, 0.58) !important;
+  box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14) !important;
+}
+
+body.support-theme :is(table thead, .req-table th, .perm-table th) {
+  background: rgba(31, 22, 40, 0.88) !important;
+}
+
+body.support-theme :is(th, .req-table th, .perm-table th) {
+  color: #9b8ab9 !important;
+  border-color: var(--support-border) !important;
+}
+
+body.support-theme :is(td, .req-table td, .perm-table td) {
+  border-color: rgba(130, 96, 185, 0.14) !important;
+}
+
+body.support-theme :is(tr:hover td, .req-table tr:hover td) {
+  background: rgba(124, 92, 255, 0.08) !important;
+}
+
+body.support-theme :is(.logo-icon, .brand-icon, .avatar, .ava-sm) {
+  background: linear-gradient(135deg, #3153d8, #6d4cf8) !important;
+  box-shadow: 0 18px 40px rgba(49, 83, 216, 0.25);
+}
+
+body.support-theme :is(.logo-text, .logo-title, .brand-text, .topbar h1, .card-title, .stat-num, .section-title, h1, h2, h3) {
+  color: var(--support-text);
+}
+
+body.support-theme :is(.logo-sub, .brand-sub, .subtitle, .section-desc, .stat-label, .nav-label, .nav-title, .field label, .form-group label, .user-info span, .workflow-meta, .task-area, .log-meta, .muted-note, .title p, .support-muted, .progress-label, .toggle-label, .integration-desc) {
+  color: var(--support-muted) !important;
+}
+
+body.support-theme :is(.nav-item, .nav-link, .tab, .theme-btn) {
+  color: var(--support-muted) !important;
+}
+
+body.support-theme :is(.nav-item:hover, .nav-link:hover, .tab:hover) {
+  color: var(--support-text) !important;
+}
+
+body.support-theme :is(.nav-item.active, .nav-link.active, .tab.active, .theme-btn.active) {
+  background: rgba(124, 92, 255, 0.18) !important;
+  color: #efe8ff !important;
+  border-color: rgba(124, 92, 255, 0.28) !important;
+}
+
+body.support-theme :is(.nav-badge, .role-chip.admin, .badge.in-use, .badge.role-staff) {
+  background: rgba(124, 92, 255, 0.18) !important;
+  color: #d5caff !important;
+  border-color: rgba(124, 92, 255, 0.28) !important;
+}
+
+body.support-theme :is(.role-chip.super_admin, .badge.role-admin) {
+  background: rgba(168, 85, 247, 0.22) !important;
+  color: #e5d5ff !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+}
+
+body.support-theme :is(.role-chip.it_manager, .badge.available, .badge.active) {
+  background: rgba(52, 211, 153, 0.16) !important;
+  color: #a3ffd3 !important;
+  border-color: rgba(52, 211, 153, 0.24) !important;
+}
+
+body.support-theme :is(.role-chip.viewer, .badge.idle, .badge.inactive) {
+  background: rgba(148, 163, 184, 0.16) !important;
+  color: #d3dce9 !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+}
+
+body.support-theme :is(.badge.under-repair) {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #ffd88a !important;
+}
+
+body.support-theme :is(.badge.retired) {
+  background: rgba(248, 113, 113, 0.18) !important;
+  color: #ffb6b6 !important;
+}
+
+body.support-theme .tag {
+  background: rgba(40, 30, 56, 0.9) !important;
+  color: var(--support-text-soft) !important;
+}
+
+body.support-theme .log-chip {
+  background: rgba(124, 92, 255, 0.16) !important;
+  color: #d5caff !important;
+}
+
+body.support-theme .log-chip span {
+  color: var(--support-muted) !important;
+}
+
+body.support-theme-support .sidebar {
+  border-right: 1px solid rgba(130, 96, 185, 0.18);
+  background: rgba(18, 12, 25, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+body.support-theme-support .panel,
+body.support-theme-support .summary-card,
+body.support-theme-support .workflow-card,
+body.support-theme-support .task,
+body.support-theme-support .modal-box,
+body.support-theme-support .sidebar-footer {
+  backdrop-filter: blur(16px);
+}
+
+body.support-theme-login {
+  min-height: 100vh;
+}
+
+body.support-theme-login .login-card {
+  background: rgba(26, 18, 35, 0.92) !important;
+  border: 1px solid var(--support-border) !important;
+  border-radius: 22px !important;
+  backdrop-filter: blur(18px);
+}
+
+body.support-theme-login .logo-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+}
+
+body.support-theme-login .btn-google {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(130, 96, 185, 0.2) !important;
+  color: #3c4043 !important;
+}
+
+body.support-theme-login .btn-google:hover {
+  background: #fff !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18) !important;
+}
+
+body.support-theme-login .error-msg,
+body.support-theme-login .sso-error {
+  background: rgba(248, 113, 113, 0.12) !important;
+  border-color: rgba(248, 113, 113, 0.24) !important;
+  color: #ffb6b6 !important;
+}
+
+body.support-theme-admin .sidebar,
+body.support-theme-admin .topbar,
+body.support-theme-admin .card,
+body.support-theme-admin .stat-card,
+body.support-theme-admin .modal-box,
+body.support-theme-admin .confirm-box,
+body.support-theme-admin .integration-card {
+  background: var(--support-surface) !important;
+  border-color: var(--support-border) !important;
+  backdrop-filter: blur(18px);
+}
+
+body.support-theme-admin .sidebar {
+  background: rgba(18, 12, 25, 0.88) !important;
+}
+
+body.support-theme-admin .logo-icon,
+body.support-theme-admin .avatar {
+  background: linear-gradient(135deg, #3153d8, #6d4cf8) !important;
+}
+
+body.support-theme-admin .nav-item:hover {
+  background: rgba(124, 92, 255, 0.12) !important;
+}
+
+body.support-theme-admin .integration-logo {
+  background: rgba(255, 255, 255, 0.98) !important;
+}
+
+body.support-theme-admin :is(.toggle-slider, .perm-table th) {
+  border-color: var(--support-border) !important;
+}
+
+body.support-theme-admin .toggle-slider {
+  background: rgba(29, 20, 38, 0.96) !important;
+}
+
+body.support-theme-admin .toast.success {
+  background: rgba(52, 211, 153, 0.16) !important;
+  border-color: rgba(52, 211, 153, 0.24) !important;
+  color: #a3ffd3 !important;
+}
+
+body.support-theme-admin .toast.danger {
+  background: rgba(248, 113, 113, 0.16) !important;
+  border-color: rgba(248, 113, 113, 0.24) !important;
+  color: #ffb6b6 !important;
+}
+
+body.support-theme-portal {
+  --gray-50: #140f18;
+  --gray-100: #1f1628;
+  --gray-200: rgba(130, 96, 185, 0.2);
+  --gray-300: rgba(130, 96, 185, 0.3);
+  --gray-400: #aa9bbb;
+  --gray-500: #b8a9cf;
+  --gray-600: #d8ccec;
+  --gray-700: #efe8ff;
+  --gray-800: #f5efff;
+  --primary: #7c5cff;
+  --primary-light: #9b8aff;
+  --primary-dark: #3757e6;
+  --primary-lighter: rgba(124, 92, 255, 0.16);
+  --accent: #38bdf8;
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.16);
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.16);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.16);
+  color: var(--support-text);
+}
+
+body.support-theme-portal .sidebar {
+  background: rgba(18, 12, 25, 0.88) !important;
+  border-right-color: rgba(130, 96, 185, 0.18) !important;
+  backdrop-filter: blur(16px);
+}
+
+body.support-theme-portal .topbar,
+body.support-theme-portal .card,
+body.support-theme-portal .stat-card,
+body.support-theme-portal .modal,
+body.support-theme-portal .confirm-box,
+body.support-theme-portal #deptModalBox,
+body.support-theme-portal .dept-card,
+body.support-theme-portal .sw-dm-box,
+body.support-theme-portal .sw-dm-head,
+body.support-theme-portal .sw-dm-tabs,
+body.support-theme-portal .exc-box,
+body.support-theme-portal .adv-search-panel,
+body.support-theme-portal .export-menu {
+  background: var(--support-surface) !important;
+  border-color: var(--support-border) !important;
+  backdrop-filter: blur(16px);
+}
+
+body.support-theme-portal .theme-switcher {
+  display: none !important;
+}
+
+body.support-theme-portal .user-chip,
+body.support-theme-portal .sidebar-footer {
+  background: rgba(44, 29, 60, 0.74) !important;
+  border-color: var(--support-border) !important;
+}
+
+body.support-theme-portal .search-wrap svg {
+  stroke: #9f82dd !important;
+}
+
+body.support-theme-portal .page-btn.current {
+  background: linear-gradient(135deg, #3757e6, #7c5cff) !important;
+  border-color: rgba(124, 92, 255, 0.45) !important;
+  color: #fff !important;
+}
+
+body.support-theme-portal .dept-card:hover {
+  border-color: rgba(124, 92, 255, 0.42) !important;
+  box-shadow: 0 18px 34px rgba(76, 89, 232, 0.18) !important;
+}
+
+body.support-theme-learning {
+  color: var(--support-text);
+}
+
+body.support-theme-learning .sidebar {
+  background: rgba(18, 12, 25, 0.9) !important;
+  border-right-color: rgba(130, 96, 185, 0.18) !important;
+  backdrop-filter: blur(18px);
+}
+
+body.support-theme-learning .hero {
+  background:
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 32%),
+    linear-gradient(135deg, #1a1430 0%, #3153d8 46%, #7c5cff 100%) !important;
+  box-shadow: inset 0 -1px 0 rgba(130, 96, 185, 0.22);
+}
+
+body.support-theme-learning .card,
+body.support-theme-learning .connector-card,
+body.support-theme-learning .req-table,
+body.support-theme-learning .callout,
+body.support-theme-learning .code-block {
+  box-shadow: var(--support-shadow);
+}
+
+body.support-theme-learning .card,
+body.support-theme-learning .connector-card {
+  background: var(--support-surface) !important;
+  border-color: var(--support-border) !important;
+  color: var(--support-text);
+  backdrop-filter: blur(16px);
+}
+
+body.support-theme-learning .callout.info {
+  background: rgba(56, 189, 248, 0.12) !important;
+  border-color: rgba(56, 189, 248, 0.22) !important;
+  color: #8fe8ff !important;
+}
+
+body.support-theme-learning .callout.success {
+  background: rgba(52, 211, 153, 0.12) !important;
+  border-color: rgba(52, 211, 153, 0.22) !important;
+  color: #a3ffd3 !important;
+}
+
+body.support-theme-learning .callout.warning {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: rgba(245, 158, 11, 0.22) !important;
+  color: #ffd88a !important;
+}
+
+body.support-theme-learning .callout.danger {
+  background: rgba(248, 113, 113, 0.12) !important;
+  border-color: rgba(248, 113, 113, 0.22) !important;
+  color: #ffb6b6 !important;
+}
+
+body.support-theme-learning .code-block {
+  background: rgba(13, 10, 20, 0.96) !important;
+  border: 1px solid rgba(130, 96, 185, 0.22);
+}
+
+body.support-theme-learning .tab.active {
+  border-bottom-color: var(--support-accent) !important;
+}
+
+body.support-theme-learning .connector-card.selected {
+  background: rgba(124, 92, 255, 0.16) !important;
+}
+
+@media (max-width: 900px) {
+  body.support-theme-admin .content,
+  body.support-theme-portal .content,
+  body.support-theme-learning .content {
+    padding-inline: 18px !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   DEPARTMENT DROPDOWN — portal theme integration
+   Must use body.support-theme-portal selectors to override #fff
+════════════════════════════════════════════════════════════════ */
+body.support-theme-portal .dept-dd-trigger {
+  background: rgba(29,20,38,.9) !important;
+  border-color: var(--support-border) !important;
+  color: var(--support-text) !important;
+}
+body.support-theme-portal .dept-dd-val.placeholder { color: #8a76ad !important; }
+body.support-theme-portal .dept-dd-arrow { stroke: #9f82dd !important; }
+body.support-theme-portal .dept-dd-panel {
+  background: rgba(26,18,38,.98) !important;
+  border-color: var(--support-border) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,.55) !important;
+}
+body.support-theme-portal .dept-all-row {
+  background: rgba(124,92,255,.16) !important;
+  border-bottom-color: var(--support-border) !important;
+}
+body.support-theme-portal .dept-all-label { color: var(--primary) !important; }
+body.support-theme-portal .dept-all-badge {
+  background: rgba(124,92,255,.18) !important;
+  border-color: rgba(124,92,255,.35) !important;
+  color: var(--primary) !important;
+}
+body.support-theme-portal .dept-check-row span { color: var(--support-text) !important; }
+body.support-theme-portal .dept-check-row:hover { background: rgba(124,92,255,.08) !important; }
+
+/* No theme toggle or light-mode overrides — Purple is the permanent theme */

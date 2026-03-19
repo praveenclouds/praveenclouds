@@ -8,11 +8,11 @@
  */
 const router = require('express').Router();
 const { AppConnector, Software } = require('../../db');
-const { requireAuth, onlySuperAdmin } = require('../../middleware/auth');
+const { requireAuth, canManageIntegrations } = require('../../middleware/auth');
 const { syncConnector } = require('../../services/connector.service');
 
 // ── GET /api/admin/connectors ─────────────────────────────────────────────────
-router.get('/', requireAuth, onlySuperAdmin, async (req, res) => {
+router.get('/', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const connectors = await AppConnector.find().lean();
     // Mask the raw apiToken — return a presence flag only
@@ -22,7 +22,7 @@ router.get('/', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── PUT /api/admin/connectors/:app ────────────────────────────────────────────
-router.put('/:app', requireAuth, onlySuperAdmin, async (req, res) => {
+router.put('/:app', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const appName  = req.params.app;
     const { enabled, orgSlug, softwareCsvId, apiToken } = req.body;
@@ -49,7 +49,7 @@ router.put('/:app', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── POST /api/admin/connectors/:app/test ──────────────────────────────────────
-router.post('/:app/test', requireAuth, onlySuperAdmin, async (req, res) => {
+router.post('/:app/test', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const appName   = req.params.app;
     const connector = await AppConnector.findOne({ appName });
@@ -64,7 +64,7 @@ router.post('/:app/test', requireAuth, onlySuperAdmin, async (req, res) => {
 });
 
 // ── POST /api/admin/connectors/:app/sync ─────────────────────────────────────
-router.post('/:app/sync', requireAuth, onlySuperAdmin, async (req, res) => {
+router.post('/:app/sync', requireAuth, canManageIntegrations, async (req, res) => {
   try {
     const appName   = req.params.app;
     const connector = await AppConnector.findOne({ appName });

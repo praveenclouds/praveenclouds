@@ -1,0 +1,162 @@
+const mongoose = require('mongoose');
+const SupportRequestType = require('./SupportRequestType');
+
+const WORKFLOW_TEMPLATES = Object.fromEntries(
+  (SupportRequestType.DEFAULT_REQUEST_TYPE_DEFINITIONS || []).map(definition => [
+    definition.workflowType,
+    definition.checklist || [],
+  ])
+);
+
+function buildChecklist(workflowType) {
+  return (WORKFLOW_TEMPLATES[workflowType] || []).map(task => ({
+    ...task,
+    status: 'pending',
+    owner: '',
+    ownerUserId: '',
+    ownerEmail: '',
+    notes: '',
+    completedAt: null,
+    approvalMode: task.approvalMode === 'manager' ? 'manager' : 'none',
+    approvalStatus: 'not_requested',
+    approvalRequestedAt: null,
+    approvalRespondedAt: null,
+    approvalActorName: '',
+    approvalActorEmail: '',
+    approvalDecision: '',
+    approvalTokenHash: '',
+    approvalTokenExpiresAt: null,
+  }));
+}
+
+const checklistItemSchema = new mongoose.Schema(
+  {
+    key:         { type: String, required: true, trim: true },
+    label:       { type: String, required: true, trim: true },
+    area:        { type: String, default: '', trim: true },
+    softwareCsvId: { type: String, default: '', trim: true },
+    dependsOn:   { type: String, default: '', trim: true },
+    status:      { type: String, enum: ['pending', 'done'], default: 'pending' },
+    owner:       { type: String, default: '', trim: true },
+    ownerUserId: { type: String, default: '', trim: true },
+    ownerEmail:  { type: String, default: '', trim: true, lowercase: true },
+    notes:       { type: String, default: '', trim: true },
+    completedAt: { type: Date, default: null },
+    approvalMode: { type: String, enum: ['none', 'manager'], default: 'none' },
+    approvalStatus: {
+      type: String,
+      enum: ['not_requested', 'pending', 'approved', 'rejected'],
+      default: 'not_requested',
+    },
+    approvalRequestedAt: { type: Date, default: null },
+    approvalRespondedAt: { type: Date, default: null },
+    approvalActorName: { type: String, default: '', trim: true },
+    approvalActorEmail: { type: String, default: '', trim: true, lowercase: true },
+    approvalDecision: { type: String, enum: ['', 'approve', 'reject'], default: '' },
+    approvalTokenHash: { type: String, default: '', trim: true },
+    approvalTokenExpiresAt: { type: Date, default: null },
+  },
+  { _id: false }
+);
+
+const requestApplicationSchema = new mongoose.Schema(
+  {
+    csvId: { type: String, default: '', trim: true },
+    name: { type: String, default: '', trim: true },
+  },
+  { _id: false }
+);
+
+const supportRequestSchema = new mongoose.Schema(
+  {
+    requestId: { type: String, unique: true, index: true },
+    workflowType: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    workflowLabel: { type: String, default: '', trim: true },
+    sourceSystem: { type: String, default: 'portal', trim: true },
+    sourceWorkflowSourceId: { type: String, default: '', trim: true },
+    sourceWorkflowKey: { type: String, default: '', trim: true },
+    requestedVia: { type: String, enum: ['portal', 'slack_command'], default: 'portal' },
+    status: {
+      type: String,
+      enum: ['open', 'in_progress', 'blocked', 'completed', 'cancelled'],
+      default: 'open',
+      index: true,
+    },
+    priority: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
+    employeeName: { type: String, default: '', trim: true },
+    employeeEmail: {
+      type: String,
+      default: '',
+      lowercase: true,
+      trim: true,
+      validate: {
+        validator(value) {
+          return !value || /^\S+@\S+\.\S+$/.test(value);
+        },
+        message: 'Please enter a valid employee email address',
+      },
+    },
+    department: { type: String, default: '', trim: true },
+    jobTitle: { type: String, default: '', trim: true },
+    location: { type: String, default: '', trim: true },
+    managerName: { type: String, default: '', trim: true },
+    managerUserId: { type: String, default: '', trim: true },
+    managerEmail: { type: String, default: '', trim: true, lowercase: true },
+    startDate: { type: String, default: '', trim: true },
+    endDate: { type: String, default: '', trim: true },
+    requestedById: { type: String, default: '', trim: true },
+    requestedByName: { type: String, default: '', trim: true },
+    requestedByEmail: { type: String, default: '', trim: true, lowercase: true },
+    assignee: { type: String, default: '', trim: true },
+    assigneeUserId: { type: String, default: '', trim: true },
+    assigneeEmail: { type: String, default: '', trim: true, lowercase: true },
+    applications: { type: [requestApplicationSchema], default: [] },
+    notes: { type: String, default: '', trim: true },
+    checklist: { type: [checklistItemSchema], default: [] },
+  },
+  { timestamps: true }
+);
+
+supportRequestSchema.pre('validate', function () {
+  if (!this.requestId) {
+    this.requestId = `SUP-${Date.now().toString().slice(-6)}`;
+  }
+  if (!Array.isArray(this.checklist) || this.checklist.length === 0) {
+    this.checklist = buildChecklist(this.workflowType);
+  }
+  for (const item of this.checklist) {
+    if (item.status === 'done' && !item.completedAt) item.completedAt = new Date();
+    if (item.status !== 'done') item.completedAt = null;
+    item.approvalMode = item.approvalMode === 'manager' ? 'manager' : 'none';
+    if (item.approvalMode === 'none') {
+      item.approvalStatus = 'not_requested';
+      item.approvalRequestedAt = null;
+      item.approvalRespondedAt = null;
+      item.approvalActorName = '';
+      item.approvalActorEmail = '';
+      item.approvalDecision = '';
+      item.approvalTokenHash = '';
+      item.approvalTokenExpiresAt = null;
+    } else if (item.status === 'done') {
+      item.approvalStatus = 'approved';
+      item.approvalDecision = 'approve';
+    } else if (item.approvalStatus === 'approved') {
+      item.approvalStatus = 'pending';
+      item.approvalDecision = '';
+      item.approvalRespondedAt = null;
+    }
+  }
+});
+
+supportRequestSchema.index({ workflowType: 1, status: 1 });
+supportRequestSchema.index({ employeeEmail: 1 });
+supportRequestSchema.index({ createdAt: -1 });
+
+supportRequestSchema.statics.buildChecklist = buildChecklist;
+supportRequestSchema.statics.workflowTemplates = WORKFLOW_TEMPLATES;
+
+module.exports = mongoose.model('SupportRequest', supportRequestSchema);

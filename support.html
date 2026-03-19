@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TerzoCloud — Support Workflows</title>
+  <style>
+    :root {
+      --bg: #140f18;
+      --bg-soft: #1f1628;
+      --panel: rgba(39, 27, 52, 0.94);
+      --panel-2: rgba(50, 35, 68, 0.9);
+      --border: rgba(130, 96, 185, 0.28);
+      --border-strong: rgba(130, 96, 185, 0.44);
+      --text: #f5efff;
+      --muted: #b8a9cf;
+      --accent: #7c5cff;
+      --accent-2: #38bdf8;
+      --success: #34d399;
+      --warning: #f59e0b;
+      --danger: #f87171;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(124,92,255,0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(56,189,248,0.12), transparent 24%),
+        linear-gradient(180deg, #140f18 0%, #0f0a13 100%);
+      color: var(--text);
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      padding: 28px 20px;
+      border-right: 1px solid rgba(130, 96, 185, 0.18);
+      background: rgba(18, 12, 25, 0.88);
+      backdrop-filter: blur(16px);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .logo-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #3153d8, #6d4cf8);
+      box-shadow: 0 18px 40px rgba(49, 83, 216, 0.35);
+    }
+    .logo-icon svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2; }
+    .logo-title { font-size: 1.85rem; font-weight: 800; line-height: 1; }
+    .logo-sub { color: #9f82dd; margin-top: 4px; }
+    .nav-title {
+      color: #8f77bb;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .78rem;
+      margin: 22px 0 10px;
+      font-weight: 700;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      margin-bottom: 8px;
+      transition: background .16s ease, color .16s ease, transform .16s ease;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(124, 92, 255, 0.18);
+      color: #efe8ff;
+      transform: translateX(2px);
+    }
+    .nav-link svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: rgba(44, 29, 60, 0.74);
+    }
+    .sidebar-footer strong { display: block; margin-bottom: 4px; }
+    .sidebar-footer span { color: var(--muted); font-size: .92rem; }
+    .main {
+      padding: 28px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .title h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+    .title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 700;
+      font-size: .95rem;
+      cursor: pointer;
+      transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, #3757e6, #7c5cff);
+      box-shadow: 0 18px 34px rgba(76, 89, 232, 0.25);
+    }
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(124, 92, 255, 0.14);
+      border: 1px solid rgba(124, 92, 255, 0.24);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .panel-title { font-size: 1.08rem; font-weight: 800; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .summary-card {
+      background: linear-gradient(180deg, rgba(45, 32, 61, 0.9), rgba(31, 22, 41, 0.92));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .summary-card strong { display: block; font-size: 1.7rem; margin-top: 4px; }
+    .summary-card span { color: var(--muted); font-size: .9rem; }
+    .filters {
+      display: grid;
+      grid-template-columns: 1.3fr .7fr .7fr;
+      gap: 10px;
+      padding: 18px 20px 0;
+    }
+    input, select, textarea {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(29, 20, 38, 0.9);
+      color: var(--text);
+      padding: 12px 14px;
+      font: inherit;
+      outline: none;
+    }
+    input:disabled, select:disabled, textarea:disabled {
+      opacity: .58;
+      cursor: not-allowed;
+    }
+    input::placeholder, textarea::placeholder { color: #8a76ad; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px 16px; text-align: left; font-size: .92rem; }
+    th {
+      color: #9b8ab9;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: .72rem;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(130, 96, 185, 0.12);
+      cursor: pointer;
+    }
+    tbody tr:hover { background: rgba(124, 92, 255, 0.08); }
+    tbody tr.active { background: rgba(124, 92, 255, 0.16); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .pill.application-access { background: rgba(56, 189, 248, 0.16); color: #8fe8ff; }
+    .pill.new-app { background: rgba(124, 92, 255, 0.16); color: #d5caff; }
+    .pill.new-hardware { background: rgba(52, 211, 153, 0.16); color: #a3ffd3; }
+    .pill.app-hardware-issue { background: rgba(245, 158, 11, 0.18); color: #ffd88a; }
+    .pill.onboarding { background: rgba(56, 189, 248, 0.16); color: #8fe8ff; }
+    .pill.offboarding { background: rgba(248, 113, 113, 0.16); color: #ffb6b6; }
+    .pill.status-open { background: rgba(124, 92, 255, 0.16); color: #d5caff; }
+    .pill.status-in_progress { background: rgba(245, 158, 11, 0.18); color: #ffd88a; }
+    .pill.status-blocked { background: rgba(248, 113, 113, 0.18); color: #ffb6b6; }
+    .pill.status-completed { background: rgba(52, 211, 153, 0.16); color: #a3ffd3; }
+    .pill.status-cancelled { background: rgba(148, 163, 184, 0.16); color: #d3dce9; }
+    .request-list { max-height: calc(100vh - 320px); overflow: auto; }
+    .detail {
+      padding: 20px;
+      display: grid;
+      gap: 18px;
+      height: 100%;
+      overflow: auto;
+    }
+    .detail-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(760px, 92vw);
+      height: 100vh;
+      background: rgba(28, 19, 38, 0.98);
+      border-left: 1px solid var(--border);
+      box-shadow: -18px 0 60px rgba(0, 0, 0, 0.32);
+      z-index: 1200;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      transform: translateX(100%);
+      transition: transform .24s ease;
+      backdrop-filter: blur(14px);
+    }
+    .detail-drawer.open { transform: translateX(0); }
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 7, 12, 0.55);
+      z-index: 1100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(36, 24, 48, 0.98);
+    }
+    .drawer-head .panel-title { font-size: 1.08rem; font-weight: 800; }
+    .empty {
+      padding: 42px 26px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .field label {
+      display: block;
+      color: #9b8ab9;
+      margin-bottom: 6px;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 700;
+    }
+    .workflow-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(24, 18, 33, 0.72);
+      display: grid;
+      gap: 10px;
+    }
+    .workflow-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .workflow-meta {
+      color: var(--muted);
+      font-size: .85rem;
+    }
+    .progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(124, 92, 255, 0.14);
+      overflow: hidden;
+    }
+    .progress > div {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #7c5cff);
+    }
+    .checklist {
+      display: grid;
+      gap: 10px;
+    }
+    .task {
+      border: 1px solid rgba(130, 96, 185, 0.18);
+      border-radius: 14px;
+      padding: 12px;
+      background: rgba(34, 24, 47, 0.84);
+    }
+    .task-top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .task-title {
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .task-area {
+      font-size: .82rem;
+      color: var(--muted);
+    }
+    .task-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .task input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+    }
+    .task.locked {
+      opacity: .72;
+    }
+    .task-lock-note {
+      margin-top: 8px;
+      color: #f6c177;
+      font-size: .8rem;
+    }
+    .export-wrap { position: relative; display: inline-flex; }
+    .export-menu {
+      display:none;
+      position:absolute;
+      top:calc(100% + 6px);
+      right:0;
+      background: rgba(34, 24, 47, 0.98);
+      border:1px solid var(--border);
+      border-radius:12px;
+      box-shadow: 0 16px 34px rgba(0,0,0,.28);
+      z-index:200;
+      min-width:170px;
+      padding:6px;
+    }
+    .export-wrap.open .export-menu { display:block; }
+    .export-menu-item {
+      display:flex;
+      align-items:center;
+      gap:9px;
+      padding:9px 12px;
+      border-radius:9px;
+      font-size:12.5px;
+      font-weight:600;
+      color:var(--text);
+      cursor:pointer;
+      white-space:nowrap;
+      transition:background .12s;
+    }
+    .export-menu-item:hover { background: rgba(124, 92, 255, 0.14); }
+    .export-menu-item svg { width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; flex-shrink:0; }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: stretch;
+      justify-content: flex-end;
+      background: rgba(9, 7, 12, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 0;
+      z-index: 1000;
+    }
+    .modal.open { display: flex; }
+    .modal-box {
+      width: min(760px, 100%);
+      height: 100vh;
+      max-height: 100vh;
+      background: var(--panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 28px 0 0 28px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform .24s ease;
+    }
+    .modal.open .modal-box { transform: translateX(0); }
+    .modal-head, .modal-foot {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .modal-foot {
+      border-bottom: none;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .modal-body {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .form-grid .full { grid-column: 1 / -1; }
+    .muted-note {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.65;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(22, 16, 31, 0.76);
+    }
+    .preview-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      background: rgba(24, 18, 33, 0.72);
+      display: grid;
+      gap: 12px;
+    }
+    .preview-card[hidden] { display: none; }
+    .preview-list {
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .preview-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(130, 96, 185, 0.18);
+      border-radius: 12px;
+      background: rgba(34, 24, 47, 0.84);
+      color: var(--text);
+      font-size: .92rem;
+    }
+    .preview-item input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      pointer-events: none;
+    }
+    .multi-picker {
+      position: relative;
+    }
+    .multi-picker-trigger {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(18, 12, 27, 0.92);
+      color: var(--text);
+      text-align: left;
+      padding: 12px 14px;
+      font-size: .96rem;
+      cursor: pointer;
+    }
+    .multi-picker-trigger:disabled {
+      opacity: .58;
+      cursor: not-allowed;
+    }
+    .multi-picker-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      z-index: 18;
+      background: rgba(21, 15, 31, 0.98);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px;
+      display: none;
+      gap: 8px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    }
+    .multi-picker.open .multi-picker-panel {
+      display: grid;
+    }
+    .multi-picker-search {
+      width: 100%;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(13, 9, 20, 0.9);
+      color: var(--text);
+      padding: 10px 12px;
+      font-size: .92rem;
+    }
+    .multi-picker-list {
+      display: grid;
+      gap: 8px;
+      max-height: 220px;
+      overflow: auto;
+    }
+    .multi-picker-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(130, 96, 185, 0.18);
+      background: rgba(32, 24, 44, 0.86);
+      color: var(--text);
+      font-size: .92rem;
+    }
+    .multi-picker-option input {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+    }
+    .multi-picker-empty {
+      color: var(--muted);
+      font-size: .88rem;
+      padding: 12px;
+      text-align: center;
+      border: 1px dashed rgba(130, 96, 185, 0.2);
+      border-radius: 12px;
+    }
+    .toast-wrap {
+      position: fixed;
+      top: 22px;
+      right: 22px;
+      display: grid;
+      gap: 10px;
+      z-index: 1200;
+    }
+    .toast {
+      min-width: 250px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      color: #fff;
+      box-shadow: var(--shadow);
+      animation: fadein .18s ease;
+    }
+    .toast.success { background: rgba(16, 185, 129, 0.96); }
+    .toast.danger { background: rgba(239, 68, 68, 0.96); }
+    .toast.info { background: rgba(59, 130, 246, 0.96); }
+    .section-menu { display:flex; gap:10px; margin: 0 0 18px; }
+    .section-tab {
+      border: 1px solid rgba(130,96,185,.18);
+      background: rgba(24, 17, 38, 0.92);
+      color: var(--muted);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .section-tab.active {
+      background: linear-gradient(135deg, rgba(87,114,255,.24), rgba(128,89,255,.22));
+      color: var(--text);
+      border-color: rgba(100,116,255,.42);
+      box-shadow: 0 10px 24px rgba(36, 31, 71, 0.26);
+    }
+    .page-view { display:none; }
+    .page-view.active { display:block; }
+    .request-type-layout {
+      display:grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 18px;
+      align-items:start;
+    }
+    .request-type-list {
+      background: var(--panel);
+      border: 1px solid rgba(130,96,185,.18);
+      border-radius: 28px;
+      overflow: hidden;
+    }
+    .request-type-list-body {
+      max-height: calc(100vh - 280px);
+      overflow-y: auto;
+      padding: 10px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .request-type-card {
+      border: 1px solid rgba(130,96,185,.16);
+      background: rgba(28, 21, 45, 0.94);
+      border-radius: 18px;
+      padding: 14px 16px;
+      cursor:pointer;
+      transition: .2s ease;
+    }
+    .request-type-card.active {
+      border-color: rgba(100,116,255,.45);
+      box-shadow: 0 14px 28px rgba(40, 34, 73, 0.28);
+      transform: translateY(-1px);
+    }
+    .request-type-card strong {
+      display:block;
+      font-size:1rem;
+      margin-bottom:6px;
+    }
+    .request-type-card .meta {
+      color: var(--muted);
+      font-size:.86rem;
+    }
+    .request-type-editor {
+      background: var(--panel);
+      border: 1px solid rgba(130,96,185,.18);
+      border-radius: 28px;
+      overflow:hidden;
+    }
+    .builder-wrap {
+      padding: 22px 28px 28px;
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+    }
+    .builder-section-title {
+      font-size: .82rem;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: var(--muted);
+      font-weight: 800;
+    }
+    .builder-grid {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px 18px;
+    }
+    .builder-grid .full { grid-column: 1 / -1; }
+    .toggle-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border: 1px solid rgba(130,96,185,.16);
+      border-radius: 18px;
+      background: rgba(23, 17, 37, 0.84);
+    }
+    .workflow-step-list {
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .workflow-step-card {
+      border: 1px solid rgba(130,96,185,.16);
+      border-radius: 20px;
+      background: rgba(24, 18, 39, 0.92);
+      padding: 16px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .workflow-step-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .workflow-step-grid {
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 12px;
+    }
+    .workflow-step-grid .full { grid-column: 1 / -1; }
+    @keyframes fadein {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+@media (max-width: 1100px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid rgba(130,96,185,.18); }
+      .grid { grid-template-columns: 1fr; }
+      .summary { grid-template-columns: repeat(2, 1fr); }
+      .modal-box { width: min(100vw, 720px); }
+      .request-type-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .main { padding: 18px; }
+      .summary, .detail-grid, .form-grid, .filters, .task-grid, .builder-grid, .workflow-step-grid { grid-template-columns: 1fr; }
+      .topbar, .panel-head, .modal-head, .modal-foot { flex-direction: column; align-items: stretch; }
+      .modal-box {
+        width: 100vw;
+        border-radius: 0;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/portal-theme.css" />
+</head>
+<body class="support-theme support-theme-support">
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div>
+          <div class="logo-title">TerzoCloud</div>
+          <div class="logo-sub">Support Workflows</div>
+        </div>
+      </div>
+      <div class="nav-title">Navigate</div>
+      <a class="nav-link" href="/">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Back to Portal
+      </a>
+      <a class="nav-link" href="/admin">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Admin Console
+      </a>
+      <a class="nav-link active" href="/support">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Support Center
+      </a>
+      <div class="sidebar-footer">
+        <strong id="currentUserName">Loading…</strong>
+        <span id="currentUserRole">Checking access…</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title">
+          <h1>Employee Support Requests</h1>
+          <p>Track application, hardware, onboarding, and offboarding requests from one shared queue.</p>
+        </div>
+<div id="requestActions" style="display:flex;gap:10px;flex-wrap:wrap">
+          <div class="export-wrap" id="requestExportWrap">
+            <button class="btn btn-secondary" type="button" onclick="toggleRequestExportMenu()">
+              Export
+            </button>
+            <div class="export-menu">
+              <div class="export-menu-item" onclick="exportRequestsCsv()">
+                <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+                CSV
+              </div>
+              <div class="export-menu-item" onclick="exportRequestsPdf()">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2a1 1 0 0 1 0 2H8v3"/><path d="M14 18v-5h1a2 2 0 0 1 0 4h-1"/><path d="M18 18v-5h2"/></svg>
+                PDF
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-secondary" onclick="loadRequests()">Refresh</button>
+          <button class="btn btn-primary" onclick="openCreateModal()">New Request</button>
+        </div>
+        <div id="requestTypeActions" style="display:none;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="loadRequestTypes()">Refresh Types</button>
+          <button class="btn btn-primary" onclick="createRequestTypeDraft()">New Request Type</button>
+        </div>
+      </div>
+
+      <div class="section-menu">
+        <button class="section-tab active" id="requestsTab" onclick="setSupportView('requests')">Requests</button>
+        <button class="section-tab" id="requestTypesTab" onclick="setSupportView('request-types')">Request Type</button>
+      </div>
+
+      <div class="page-view active" id="requestsView">
+        <div class="summary" id="summaryGrid"></div>
+
+        <div class="grid">
+          <section class="panel">
+            <div class="panel-head">
+              <div class="panel-title">Request Queue</div>
+              <div style="color:var(--muted);font-size:.9rem" id="requestCountLabel">0 requests</div>
+            </div>
+            <div class="filters">
+              <input type="text" id="supportSearch" placeholder="Search by employee, request ID, assignee…" oninput="renderRequests()" />
+              <select id="workflowFilter" onchange="renderRequests()">
+                <option value="">All request types</option>
+              </select>
+              <select id="statusFilter" onchange="renderRequests()">
+                <option value="">All statuses</option>
+                <option value="open">Open</option>
+                <option value="in_progress">In Progress</option>
+                <option value="blocked">Blocked</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="request-list">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Request</th>
+                    <th>Request Type</th>
+                    <th>Status</th>
+                    <th>Progress</th>
+                  </tr>
+                </thead>
+                <tbody id="requestTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="page-view" id="requestTypesView">
+        <div class="request-type-layout">
+          <section class="request-type-list">
+            <div class="panel-head">
+              <div class="panel-title">Request Types</div>
+              <div style="color:var(--muted);font-size:.9rem" id="requestTypeCountLabel">0 types</div>
+            </div>
+            <div class="request-type-list-body" id="requestTypeList"></div>
+          </section>
+
+          <section class="request-type-editor">
+            <div class="panel-head">
+              <div class="panel-title">Workflow Builder</div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <button class="btn btn-secondary" type="button" onclick="addRequestTypeStep()">Add Step</button>
+                <button class="btn btn-primary" type="button" id="saveRequestTypeBtn" onclick="saveRequestType()">Save Request Type</button>
+              </div>
+            </div>
+            <div class="builder-wrap" id="requestTypeEditor">
+              <div class="empty">Select a request type to edit its workflow, or create a new one.</div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="drawer-overlay" id="detailDrawerOverlay" onclick="closeDetailPanel()"></div>
+  <aside class="detail-drawer" id="detailDrawer">
+    <div class="drawer-head">
+      <div class="panel-title">Request Detail</div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn btn-danger" id="deleteDetailBtn" onclick="deleteSelectedRequest()" style="display:none">Delete Request</button>
+        <button class="btn btn-secondary" id="saveDetailBtn" onclick="saveSelectedRequest()" style="display:none">Save Changes</button>
+        <button class="btn btn-secondary" type="button" onclick="closeDetailPanel()">Close</button>
+      </div>
+    </div>
+    <div class="detail" id="detailPanel">
+      <div class="empty">Select a request to review details, ownership, and checklist progress.</div>
+    </div>
+  </aside>
+
+  <div class="modal" id="createModal" onclick="if(event.target===this)closeCreateModal()">
+    <div class="modal-box">
+      <div class="modal-head">
+        <strong>Create Support Request</strong>
+        <button class="btn btn-secondary" onclick="closeCreateModal()">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="muted-note">Start by choosing the request type. A matching checklist will be generated automatically so the right team can begin work immediately.</div>
+        <div class="form-grid">
+          <div>
+            <label>Request Type</label>
+            <select id="newWorkflowType" onchange="toggleCreateFormLock()">
+              <option value="">Select request type</option>
+            </select>
+          </div>
+          <div id="createField_priority">
+            <label id="createLabel_priority">Priority</label>
+            <select id="newPriority" disabled>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div id="createField_employeeName">
+            <label id="createLabel_employeeName">Employee Name</label>
+            <input id="newEmployeeName" type="text" placeholder="Employee full name" disabled />
+          </div>
+          <div id="createField_employeeEmail">
+            <label id="createLabel_employeeEmail">Employee Email</label>
+            <input id="newEmployeeEmail" type="email" placeholder="employee@company.com" disabled />
+          </div>
+          <div id="createField_department">
+            <label id="createLabel_department">Department</label>
+            <select id="newDepartment" disabled onchange="updateDepartmentChecklistPreview()">
+              <option value="">Select department</option>
+            </select>
+          </div>
+          <div class="full" id="createField_applications">
+            <label id="createLabel_applications">Applications</label>
+            <div class="multi-picker" id="newApplicationsPicker">
+              <button type="button" class="multi-picker-trigger" id="newApplicationsButton" onclick="toggleApplicationPicker('create')" disabled>Select applications</button>
+              <div class="multi-picker-panel" id="newApplicationsPanel">
+                <input class="multi-picker-search" id="newApplicationsSearch" type="search" placeholder="Search applications" oninput="renderApplicationPickerOptions('create')" />
+                <div class="multi-picker-list" id="newApplicationsList"></div>
+              </div>
+            </div>
+          </div>
+          <div id="createField_jobTitle">
+            <label id="createLabel_jobTitle">Job Title</label>
+            <input id="newJobTitle" type="text" placeholder="Software Engineer" disabled />
+          </div>
+          <div id="createField_location">
+            <label id="createLabel_location">Location</label>
+            <input id="newLocation" type="text" placeholder="Chennai" disabled />
+          </div>
+          <div id="createField_managerName">
+            <label id="createLabel_managerName">Manager</label>
+            <select id="newManagerName" disabled>
+              <option value="">Select manager</option>
+            </select>
+          </div>
+          <div id="createField_startDate">
+            <label id="createLabel_startDate">Start Date</label>
+            <input id="newStartDate" type="date" disabled />
+          </div>
+          <div id="createField_endDate">
+            <label id="createLabel_endDate">End Date</label>
+            <input id="newEndDate" type="date" disabled />
+          </div>
+          <div class="full" id="createField_notes">
+            <label id="createLabel_notes">Notes</label>
+            <textarea id="newNotes" rows="4" placeholder="Anything the IT team should know before starting this request" disabled></textarea>
+          </div>
+          <div class="full preview-card" id="departmentAppsPreview" hidden>
+            <div>
+              <div style="font-size:1rem;font-weight:800">Department App Checklist</div>
+              <div style="color:var(--muted);font-size:.88rem;margin-top:4px" id="departmentAppsPreviewNote">Select Employee Onboarding and a department to load software access tasks.</div>
+            </div>
+            <div class="preview-list" id="departmentAppsPreviewList"></div>
+          </div>
+        </div>
+        <div id="createErr" style="color:var(--danger);font-size:.9rem"></div>
+      </div>
+      <div class="modal-foot">
+        <span style="color:var(--muted);font-size:.9rem">Request will be visible immediately after creation.</span>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary" onclick="closeCreateModal()">Cancel</button>
+          <button class="btn btn-primary" id="createSubmitBtn" onclick="createRequest()" disabled>Create Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap" id="toastWrap"></div>
+
+  <script>
+    const token = localStorage.getItem('tcToken');
+    const API = '/api/support';
+    const ALL_DEPARTMENT_LABEL = 'All Department';
+    const BUILTIN_REQUEST_TYPE_META = {
+      application_access: { label: 'Application Access Request', className: 'application-access' },
+      new_app: { label: 'New App Request', className: 'new-app' },
+      new_hardware: { label: 'New Hardware Request', className: 'new-hardware' },
+      app_hardware_issue: { label: 'Application and Hardware Issue', className: 'app-hardware-issue' },
+      onboarding: { label: 'Employee Onboarding', className: 'onboarding' },
+      offboarding: { label: 'Employee Offboarding', className: 'offboarding' },
+    };
+    const REQUEST_TYPE_STYLE_OPTIONS = [
+      { value: 'application-access', label: 'Application Access' },
+      { value: 'new-app', label: 'New App' },
+      { value: 'new-hardware', label: 'New Hardware' },
+      { value: 'app-hardware-issue', label: 'Issue' },
+      { value: 'onboarding', label: 'Onboarding' },
+      { value: 'offboarding', label: 'Offboarding' },
+    ];
+    let REQUEST_TYPE_META = { ...BUILTIN_REQUEST_TYPE_META };
+    let SUMMARY_REQUEST_TYPES = Object.keys(BUILTIN_REQUEST_TYPE_META);
+    let workflowOptions = [];
+    let requestTypeDefinitions = [];
+    let requestTypeDraft = null;
+    let currentUser = null;
+    let requests = [];
+    let selectedRequestId = null;
+    let selectedRequestTypeId = null;
+    let supportView = 'requests';
+    let supportUsers = [];
+    let createSelectedApplications = [];
+    let detailSelectedApplications = [];
+    let departmentOptions = [];
+    let softwareInventory = [];
+    const CREATE_FORM_FIELD_CONFIG = {
+      priority: { inputId: 'newPriority', wrapperId: 'createField_priority', labelId: 'createLabel_priority', defaultLabel: 'Priority' },
+      employeeName: { inputId: 'newEmployeeName', wrapperId: 'createField_employeeName', labelId: 'createLabel_employeeName', defaultLabel: 'Employee Name' },
+      employeeEmail: { inputId: 'newEmployeeEmail', wrapperId: 'createField_employeeEmail', labelId: 'createLabel_employeeEmail', defaultLabel: 'Employee Email' },
+      department: { inputId: 'newDepartment', wrapperId: 'createField_department', labelId: 'createLabel_department', defaultLabel: 'Department' },
+      applications: { inputId: 'newApplicationsButton', wrapperId: 'createField_applications', labelId: 'createLabel_applications', defaultLabel: 'Applications', defaultEnabled: false },
+      jobTitle: { inputId: 'newJobTitle', wrapperId: 'createField_jobTitle', labelId: 'createLabel_jobTitle', defaultLabel: 'Job Title' },
+      location: { inputId: 'newLocation', wrapperId: 'createField_location', labelId: 'createLabel_location', defaultLabel: 'Location' },
+      managerName: { inputId: 'newManagerName', wrapperId: 'createField_managerName', labelId: 'createLabel_managerName', defaultLabel: 'Manager' },
+      startDate: { inputId: 'newStartDate', wrapperId: 'createField_startDate', labelId: 'createLabel_startDate', defaultLabel: 'Start Date' },
+      endDate: { inputId: 'newEndDate', wrapperId: 'createField_endDate', labelId: 'createLabel_endDate', defaultLabel: 'End Date' },
+      notes: { inputId: 'newNotes', wrapperId: 'createField_notes', labelId: 'createLabel_notes', defaultLabel: 'Notes' },
+    };
+    function authFetch(url, opts = {}) {
+      return fetch(url, {
+        ...opts,
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+          ...(opts.headers || {}),
+        },
+      });
+    }
+
+    async function readApiResponse(res) {
+      const contentType = res.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        return res.json();
+      }
+
+      const text = await res.text();
+      return {
+        error: text && text.trim().startsWith('<')
+          ? 'Server returned an HTML error page. Restart the app server and try again.'
+          : (text || 'Unexpected server response.'),
+      };
+    }
+
+    function showToast(msg, type = 'success') {
+      const wrap = document.getElementById('toastWrap');
+      const div = document.createElement('div');
+      div.className = `toast ${type}`;
+      div.textContent = msg;
+      wrap.appendChild(div);
+      setTimeout(() => div.remove(), 3200);
+    }
+
+    function toggleRequestExportMenu() {
+      document.getElementById('requestExportWrap')?.classList.toggle('open');
+    }
+
+    function clearAuth() {
+      localStorage.removeItem('tcToken');
+      localStorage.removeItem('tcUser');
+      location.href = '/login';
+    }
+
+    function canEditRequests() {
+      return !!currentUser?.permissions?.manageSupportRequests;
+    }
+
+    function canEditRequestTypes() {
+      return !!currentUser?.permissions?.manageRequestTypes;
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function slugify(value) {
+      return String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_+|_+$/g, '')
+        .slice(0, 80);
+    }
+
+    function userFullName(user) {
+      return `${String(user?.first || '').trim()} ${String(user?.last || '').trim()}`.trim();
+    }
+
+    function normalizedApplicationOptions() {
+      return (softwareInventory || [])
+        .filter(app => app?.csvId && app?.name && app?.status !== 'Inactive')
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function selectedApplications(target) {
+      return target === 'detail' ? detailSelectedApplications : createSelectedApplications;
+    }
+
+    function setSelectedApplications(target, values = []) {
+      const unique = new Map();
+      (values || []).forEach(app => {
+        const csvId = String(app?.csvId || '').trim();
+        const name = String(app?.name || '').trim();
+        if (!csvId || !name) return;
+        unique.set(csvId, { csvId, name });
+      });
+      if (target === 'detail') detailSelectedApplications = [...unique.values()];
+      else createSelectedApplications = [...unique.values()];
+      renderApplicationPicker(target);
+      updateDepartmentChecklistPreview();
+    }
+
+    function applicationSummary(selected = []) {
+      if (!selected.length) return 'Select applications';
+      if (selected.length === 1) return selected[0].name;
+      return `${selected.length} applications selected`;
+    }
+
+    function toggleApplicationPicker(target) {
+      const pickerId = target === 'detail' ? 'detailApplicationsPicker' : 'newApplicationsPicker';
+      const buttonId = target === 'detail' ? 'detailApplicationsButton' : 'newApplicationsButton';
+      const picker = document.getElementById(pickerId);
+      const button = document.getElementById(buttonId);
+      if (!picker || button?.disabled) return;
+      picker.classList.toggle('open');
+      if (picker.classList.contains('open')) {
+        renderApplicationPickerOptions(target);
+      }
+    }
+
+    function renderApplicationPicker(target, editable = true) {
+      const buttonId = target === 'detail' ? 'detailApplicationsButton' : 'newApplicationsButton';
+      const button = document.getElementById(buttonId);
+      if (!button) return;
+      button.textContent = applicationSummary(selectedApplications(target));
+      button.disabled = !editable;
+      renderApplicationPickerOptions(target);
+    }
+
+    function renderApplicationPickerOptions(target) {
+      const listId = target === 'detail' ? 'detailApplicationsList' : 'newApplicationsList';
+      const searchId = target === 'detail' ? 'detailApplicationsSearch' : 'newApplicationsSearch';
+      const list = document.getElementById(listId);
+      const search = document.getElementById(searchId);
+      if (!list) return;
+
+      const query = String(search?.value || '').trim().toLowerCase();
+      const selected = selectedApplications(target);
+      const selectedIds = new Set(selected.map(app => app.csvId));
+      const options = normalizedApplicationOptions().filter(app => (
+        !query
+        || `${app.name} ${app.csvId} ${app.department || ''}`.toLowerCase().includes(query)
+      ));
+
+      if (!options.length) {
+        list.innerHTML = '<div class="multi-picker-empty">No applications found.</div>';
+        return;
+      }
+
+      list.innerHTML = options.map(app => `
+        <label class="multi-picker-option">
+          <input type="checkbox" ${selectedIds.has(app.csvId) ? 'checked' : ''} onchange="toggleApplicationSelection('${target}', '${escapeHtml(app.csvId)}', this.checked)" />
+          <span>${escapeHtml(app.name)}${app.department ? ` · ${escapeHtml(app.department)}` : ''}</span>
+        </label>
+      `).join('');
+    }
+
+    function toggleApplicationSelection(target, csvId, checked) {
+      const options = normalizedApplicationOptions();
+      const app = options.find(item => item.csvId === csvId);
+      if (!app) return;
+      const current = selectedApplications(target);
+      const next = checked
+        ? [...current, { csvId: app.csvId, name: app.name }]
+        : current.filter(item => item.csvId !== csvId);
+      setSelectedApplications(target, next);
+    }
+
+    function normalizeSupportUsers(users = []) {
+      return (users || [])
+        .map(user => ({
+          id: user.id,
+          name: userFullName(user) || user.email || '',
+          email: String(user.email || '').trim().toLowerCase(),
+          dept: user.dept || '',
+          role: user.role || '',
+        }))
+        .filter(user => user.id && user.name)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    function supportUserById(userId) {
+      return supportUsers.find(user => user.id === userId) || null;
+    }
+
+    function supportUserByName(name) {
+      const normalized = String(name || '').trim().toLowerCase();
+      if (!normalized) return null;
+      return supportUsers.find(user => user.name.toLowerCase() === normalized || user.email === normalized) || null;
+    }
+
+    function userOptionsMarkup({ selectedUserId = '', blankLabel = 'Select user', currentName = '', currentEmail = '' } = {}) {
+      const selectedUser = supportUserById(selectedUserId);
+      const currentUser = selectedUser || supportUserByName(currentName) || supportUserByName(currentEmail);
+      const legacyLabel = !currentUser && currentName
+        ? `${currentName} (not in User Management)`
+        : blankLabel;
+      const legacyOption = !currentUser && currentName
+        ? `<option value="" data-legacy-name="${escapeHtml(currentName)}" data-legacy-email="${escapeHtml(currentEmail || '')}" selected>${escapeHtml(legacyLabel)}</option>`
+        : `<option value="" ${selectedUserId || currentUser ? '' : 'selected'}>${escapeHtml(blankLabel)}</option>`;
+
+      return [
+        legacyOption,
+        ...supportUsers.map(user => `<option value="${escapeHtml(user.id)}" data-user-name="${escapeHtml(user.name)}" data-user-email="${escapeHtml(user.email)}" ${(currentUser?.id || selectedUserId) === user.id ? 'selected' : ''}>${escapeHtml(user.name)}${user.dept ? ` · ${escapeHtml(user.dept)}` : ''}</option>`),
+      ].join('');
+    }
+
+    function resolveUserSelection(selectId) {
+      const select = document.getElementById(selectId);
+      if (!select) return { name: '', userId: '', email: '' };
+      const option = select.options[select.selectedIndex];
+      const userId = select.value;
+      const user = supportUserById(userId);
+      if (user) {
+        return { name: user.name, userId: user.id, email: user.email };
+      }
+      return {
+        name: option?.dataset?.legacyName || '',
+        userId: '',
+        email: option?.dataset?.legacyEmail || '',
+      };
+    }
+
+    function currentRequestTypeDefinition() {
+      return requestTypeDraft;
+    }
+
+    function emptyRequestTypeDefinition() {
+      return {
+        id: '',
+        workflowType: '',
+        workflowLabel: '',
+        description: '',
+        className: 'new-app',
+        sortOrder: requestTypeDefinitions.length + 10,
+        isActive: true,
+        defaultAssignee: '',
+        autoAddDepartmentApps: false,
+        formFields: Object.entries(CREATE_FORM_FIELD_CONFIG).map(([key, config]) => ({
+          key,
+          label: config.defaultLabel,
+          enabled: config.defaultEnabled !== false,
+          required: ['priority', 'employeeName', 'employeeEmail', 'department'].includes(key),
+        })),
+        checklist: [
+          { key: 'step_1', label: '', area: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' },
+        ],
+      };
+    }
+
+    function normalizedFormFields(definition) {
+      const provided = new Map((definition?.formFields || []).map(field => [field.key, field]));
+      return Object.entries(CREATE_FORM_FIELD_CONFIG).map(([key, config]) => {
+        const override = provided.get(key) || {};
+        return {
+          key,
+          label: override.label || config.defaultLabel,
+          enabled: override.enabled === undefined ? config.defaultEnabled !== false : !!override.enabled,
+          required: !!override.required,
+        };
+      });
+    }
+
+    function currentCreateDefinition() {
+      return requestTypeDefinitionByWorkflowType(document.getElementById('newWorkflowType').value);
+    }
+
+    async function loadReferenceData() {
+      try {
+        const [usersRes, softwareRes, requestTypeRes] = await Promise.all([
+          authFetch('/api/users'),
+          authFetch('/api/software'),
+          authFetch('/api/support/request-types'),
+        ]);
+        if (!usersRes.ok) throw new Error('Failed to load user inventory departments');
+        if (!softwareRes.ok) throw new Error('Failed to load software inventory');
+        if (!requestTypeRes.ok) throw new Error('Failed to load request type definitions');
+
+        const users = await usersRes.json();
+        supportUsers = normalizeSupportUsers(users);
+        softwareInventory = await softwareRes.json();
+        requestTypeDefinitions = await requestTypeRes.json();
+        workflowOptions = requestTypeDefinitions
+          .filter(definition => definition.isActive !== false)
+          .map(definition => ({
+            workflowType: definition.workflowType,
+            workflowLabel: definition.workflowLabel,
+            className: definition.className,
+            autoAddDepartmentApps: !!definition.autoAddDepartmentApps,
+            sourceSystem: definition.sourceSystem || 'portal',
+          }));
+        departmentOptions = [...new Set((users || [])
+          .map(user => user?.dept)
+          .filter(Boolean))]
+          .sort((a, b) => a.localeCompare(b));
+        renderWorkflowOptions();
+        renderDepartmentOptions();
+        renderManagerOptions();
+        renderRequestTypeList();
+        renderRequestTypeEditor();
+      } catch (e) {
+        supportUsers = [];
+        requestTypeDefinitions = [];
+        workflowOptions = builtinWorkflowOptions();
+        renderWorkflowOptions();
+        renderManagerOptions();
+        renderRequestTypeList();
+        renderRequestTypeEditor();
+        showToast(e.message, 'danger');
+      }
+    }
+
+    function workflowClassName(option) {
+      if (BUILTIN_REQUEST_TYPE_META[option.workflowType]) return BUILTIN_REQUEST_TYPE_META[option.workflowType].className;
+      return option.sourceSystem === 'slack' ? 'application-access' : 'new-app';
+    }
+
+    function builtinWorkflowOptions() {
+      return Object.entries(BUILTIN_REQUEST_TYPE_META).map(([workflowType, meta]) => ({
+        workflowType,
+        workflowLabel: meta.label,
+        sourceSystem: 'portal',
+      }));
+    }
+
+    function renderWorkflowOptions() {
+      const options = (workflowOptions && workflowOptions.length) ? workflowOptions : builtinWorkflowOptions();
+      const filterOptions = requestTypeDefinitions.length
+        ? requestTypeDefinitions
+        : options;
+
+      REQUEST_TYPE_META = Object.fromEntries(filterOptions.map(option => [
+        option.workflowType,
+        {
+          label: option.workflowLabel,
+          className: option.className || workflowClassName(option),
+        },
+      ]));
+      SUMMARY_REQUEST_TYPES = options.filter(option => option.isActive !== false).map(option => option.workflowType);
+
+      const createSelect = document.getElementById('newWorkflowType');
+      const filterSelect = document.getElementById('workflowFilter');
+      const currentCreateValue = createSelect.value;
+      const currentFilterValue = filterSelect.value;
+
+      createSelect.innerHTML = `
+        <option value="">Select request type</option>
+        ${options.map(option => `<option value="${escapeHtml(option.workflowType)}">${escapeHtml(option.workflowLabel)}</option>`).join('')}
+      `;
+      filterSelect.innerHTML = `
+        <option value="">All request types</option>
+        ${filterOptions.map(option => `<option value="${escapeHtml(option.workflowType)}">${escapeHtml(option.workflowLabel)}</option>`).join('')}
+      `;
+
+      if (options.some(option => option.workflowType === currentCreateValue)) createSelect.value = currentCreateValue;
+      if (filterOptions.some(option => option.workflowType === currentFilterValue)) filterSelect.value = currentFilterValue;
+    }
+
+    function renderDepartmentOptions() {
+      const select = document.getElementById('newDepartment');
+      const current = select.value;
+      select.innerHTML = `
+        <option value="">Select department</option>
+        ${departmentOptions.map(dept => `<option value="${escapeHtml(dept)}">${escapeHtml(dept)}</option>`).join('')}
+      `;
+      if (departmentOptions.includes(current)) {
+        select.value = current;
+      }
+    }
+
+    function renderManagerOptions() {
+      const select = document.getElementById('newManagerName');
+      if (!select) return;
+      const current = resolveUserSelection('newManagerName');
+      select.innerHTML = userOptionsMarkup({
+        selectedUserId: current.userId,
+        blankLabel: 'Select manager',
+        currentName: current.name,
+        currentEmail: current.email,
+      });
+    }
+
+    function parseSoftwareDepartments(value) {
+      const rawValues = Array.isArray(value) ? value : String(value || '').split(',');
+      return [...new Set(rawValues.map(item => String(item || '').trim()).filter(Boolean))];
+    }
+
+    function matchesSoftwareDepartment(value, department) {
+      const departments = parseSoftwareDepartments(value).map(item => item.toLowerCase());
+      if (!departments.length) return false;
+      if (departments.includes(ALL_DEPARTMENT_LABEL.toLowerCase())) return true;
+      return departments.includes(String(department || '').trim().toLowerCase());
+    }
+
+    function softwareOwnerCandidates(software) {
+      if (!software) return [];
+      return [...new Set([
+        software.owner,
+        ...(String(software.admins || '')
+          .split(/[,\n/;|]+/g)
+          .map(value => value.trim())
+          .filter(Boolean)),
+      ].filter(Boolean))];
+    }
+
+    function softwareDefaultOwner(source) {
+      const software = source?.softwareCsvId
+        ? (softwareInventory || []).find(app => app?.csvId === source.softwareCsvId)
+        : source;
+      return softwareOwnerCandidates(software)[0] || '';
+    }
+
+    function requestTypeDefinitionByWorkflowType(workflowType) {
+      return requestTypeDefinitions.find(definition => definition.workflowType === workflowType) || null;
+    }
+
+    function renderCreateFormLayout() {
+      const definition = currentCreateDefinition();
+      const formFields = normalizedFormFields(definition);
+      formFields.forEach(field => {
+        const config = CREATE_FORM_FIELD_CONFIG[field.key];
+        const wrapper = document.getElementById(config.wrapperId);
+        const input = document.getElementById(config.inputId);
+        const label = document.getElementById(config.labelId);
+        if (!wrapper || !input || !label) return;
+        wrapper.hidden = !definition || !field.enabled;
+        label.textContent = `${field.label}${field.required ? ' *' : ''}`;
+        if (definition && !field.enabled) {
+          if (field.key === 'applications') {
+            setSelectedApplications('create', []);
+          } else if (input.tagName === 'SELECT') input.value = '';
+          else input.value = '';
+        }
+      });
+      renderApplicationPicker('create', !!definition && !!formFields.find(field => field.key === 'applications')?.enabled);
+    }
+
+    function appsForDepartment(department) {
+      return (softwareInventory || [])
+        .filter(app => app?.status !== 'Inactive')
+        .filter(app => matchesSoftwareDepartment(app?.department, department))
+        .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+    }
+
+    function buildCreateChecklistPayload() {
+      const requestType = document.getElementById('newWorkflowType').value;
+      const department = document.getElementById('newDepartment').value;
+      const definition = requestTypeDefinitionByWorkflowType(requestType);
+      if (!definition) return null;
+
+      const baseSteps = (definition.checklist || []).map(step => ({
+        key: step.key,
+        label: step.label,
+        area: step.area || '',
+        dependsOn: step.dependsOn || '',
+        status: 'pending',
+        owner: step.defaultOwner || '',
+        ownerUserId: step.defaultOwnerUserId || '',
+        ownerEmail: step.defaultOwnerEmail || '',
+        notes: '',
+        approvalMode: step.approvalMode === 'manager' ? 'manager' : 'none',
+      }));
+
+      if (requestType === 'application_access') {
+        const dependencyKey = (definition.checklist || []).find(step => step.key === 'approval_recorded')?.key
+          || (definition.checklist || []).find(step => step.key === 'access_review')?.key
+          || '';
+        const applicationTasks = selectedApplications('create').map(app => {
+          const software = (softwareInventory || []).find(item => item.csvId === app.csvId);
+          return {
+            key: `app_access_${String(app.csvId || app.name || 'app').toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+            label: `${app.name} access granted`,
+            area: 'Applications',
+            softwareCsvId: app.csvId || '',
+            dependsOn: dependencyKey,
+            status: 'pending',
+            owner: softwareDefaultOwner(software),
+            notes: '',
+            approvalMode: 'none',
+          };
+        });
+        return [...baseSteps, ...applicationTasks];
+      }
+
+      if (!definition.autoAddDepartmentApps || !department) return null;
+
+      const departmentApps = appsForDepartment(department);
+      const dependencyKey = (definition.checklist || []).some(step => step.key === 'workspace_account') ? 'workspace_account' : '';
+      return [
+        ...baseSteps,
+        ...departmentApps.map(app => ({
+          key: `app_access_${String(app.csvId || app.name || 'app').toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+          label: `${app.name} access granted`,
+          area: 'Applications',
+          softwareCsvId: app.csvId || '',
+          dependsOn: dependencyKey,
+          status: 'pending',
+          owner: softwareDefaultOwner(app),
+          notes: '',
+          approvalMode: 'none',
+        })),
+      ];
+    }
+
+    function updateDepartmentChecklistPreview() {
+      const preview = document.getElementById('departmentAppsPreview');
+      const note = document.getElementById('departmentAppsPreviewNote');
+      const list = document.getElementById('departmentAppsPreviewList');
+      const requestType = document.getElementById('newWorkflowType').value;
+      const department = document.getElementById('newDepartment').value;
+      const definition = requestTypeDefinitionByWorkflowType(requestType);
+      const selectedApps = selectedApplications('create');
+
+      if (!definition) {
+        preview.hidden = true;
+        list.innerHTML = '';
+        return;
+      }
+
+      if (requestType === 'application_access') {
+        preview.hidden = false;
+        if (!selectedApps.length) {
+          note.textContent = 'Select one or more applications to generate application access tasks.';
+          list.innerHTML = '';
+          return;
+        }
+        note.textContent = `${selectedApps.length} application access task${selectedApps.length === 1 ? '' : 's'} will be added to this request.`;
+        list.innerHTML = selectedApps.map(app => `
+          <label class="preview-item">
+            <input type="checkbox" checked disabled />
+            <span>${escapeHtml(app.name)} access granted</span>
+          </label>
+        `).join('');
+        return;
+      }
+
+      if (!definition.autoAddDepartmentApps) {
+        preview.hidden = true;
+        list.innerHTML = '';
+        return;
+      }
+
+      preview.hidden = false;
+      if (!department) {
+        note.textContent = 'Select a department to load software access tasks from Software Inventory.';
+        list.innerHTML = '';
+        return;
+      }
+
+      const apps = appsForDepartment(department);
+      if (!apps.length) {
+        note.textContent = `No software inventory apps are mapped to ${department}.`;
+        list.innerHTML = '';
+        return;
+      }
+
+      note.textContent = `${apps.length} software access task${apps.length === 1 ? '' : 's'} will be added for ${department}.`;
+      list.innerHTML = apps.map(app => `
+        <label class="preview-item">
+          <input type="checkbox" checked disabled />
+          <span>${escapeHtml(app.name)} access granted</span>
+        </label>
+      `).join('');
+    }
+
+    function setSupportView(view) {
+      supportView = view;
+      document.getElementById('requestsTab').classList.toggle('active', view === 'requests');
+      document.getElementById('requestTypesTab').classList.toggle('active', view === 'request-types');
+      document.getElementById('requestsView').classList.toggle('active', view === 'requests');
+      document.getElementById('requestTypesView').classList.toggle('active', view === 'request-types');
+      document.getElementById('requestActions').style.display = view === 'requests' ? 'flex' : 'none';
+      document.getElementById('requestTypeActions').style.display = view === 'request-types' ? 'flex' : 'none';
+    }
+
+    function renderRequestTypeList() {
+      const list = document.getElementById('requestTypeList');
+      const count = document.getElementById('requestTypeCountLabel');
+      count.textContent = `${requestTypeDefinitions.length} type${requestTypeDefinitions.length === 1 ? '' : 's'}`;
+
+      if (!requestTypeDefinitions.length) {
+        list.innerHTML = `<div class="empty">No request types configured yet.</div>`;
+        return;
+      }
+
+      list.innerHTML = requestTypeDefinitions.map(definition => `
+        <div class="request-type-card ${selectedRequestTypeId === definition.id ? 'active' : ''}" onclick="selectRequestType('${definition.id}')">
+          <strong>${escapeHtml(definition.workflowLabel)}</strong>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+            ${workflowPill(definition.workflowType, definition.workflowLabel)}
+            ${definition.isActive ? '<span class="pill status-open">active</span>' : '<span class="pill status-cancelled">inactive</span>'}
+          </div>
+          <div class="meta">${escapeHtml(definition.workflowType)} · ${definition.stepCount || (definition.checklist || []).length} step${(definition.stepCount || (definition.checklist || []).length) === 1 ? '' : 's'}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderRequestTypeEditor() {
+      const editor = document.getElementById('requestTypeEditor');
+      const saveBtn = document.getElementById('saveRequestTypeBtn');
+      const definition = currentRequestTypeDefinition();
+      if (!definition) {
+        editor.innerHTML = `<div class="empty">Select a request type to edit its workflow, or create a new one.</div>`;
+        saveBtn.style.display = 'none';
+        return;
+      }
+
+      const editable = canEditRequestTypes();
+      saveBtn.style.display = editable ? 'inline-flex' : 'none';
+      const checklist = Array.isArray(definition.checklist) ? definition.checklist : [];
+      const formFields = normalizedFormFields(definition).map(field => (
+        field.key === 'department' && definition.autoAddDepartmentApps
+          ? { ...field, enabled: true, required: true }
+          : field
+      ));
+
+      editor.innerHTML = `
+        <div class="builder-section-title">Request Type</div>
+        <div class="builder-grid">
+          <div>
+            <label>Request Type Key</label>
+            <input id="requestTypeWorkflowType" value="${escapeHtml(definition.workflowType || '')}" placeholder="employee_transfer" ${definition.id ? 'disabled' : ''} ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Display Label</label>
+            <input id="requestTypeWorkflowLabel" value="${escapeHtml(definition.workflowLabel || '')}" placeholder="Employee Transfer" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="full">
+            <label>Description</label>
+            <input id="requestTypeDescription" value="${escapeHtml(definition.description || '')}" placeholder="Short summary shown to admins configuring request flows" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Badge Style</label>
+            <select id="requestTypeClassName" ${editable ? '' : 'disabled'}>
+              ${REQUEST_TYPE_STYLE_OPTIONS.map(option => `<option value="${option.value}" ${definition.className === option.value ? 'selected' : ''}>${option.label}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label>Sort Order</label>
+            <input id="requestTypeSortOrder" type="number" value="${escapeHtml(definition.sortOrder || 0)}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="full">
+            <label>Default Request Assignee</label>
+            <select id="requestTypeDefaultAssignee" ${editable ? '' : 'disabled'}>
+              ${userOptionsMarkup({
+                selectedUserId: definition.defaultAssigneeUserId || '',
+                blankLabel: 'Select default assignee',
+                currentName: definition.defaultAssignee || '',
+                currentEmail: definition.defaultAssigneeEmail || '',
+              })}
+            </select>
+          </div>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:800">Visible in new requests</div>
+            <div style="color:var(--muted);font-size:.88rem">Turn off a request type to keep it out of the request form without deleting existing records.</div>
+          </div>
+          <input id="requestTypeActive" type="checkbox" ${definition.isActive ? 'checked' : ''} ${editable ? '' : 'disabled'} />
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:800">Auto-add department software tasks</div>
+            <div style="color:var(--muted);font-size:.88rem">Useful for onboarding-style request types that should pull app-access steps from Software Inventory.</div>
+          </div>
+          <input id="requestTypeAutoApps" type="checkbox" ${definition.autoAddDepartmentApps ? 'checked' : ''} ${editable ? '' : 'disabled'} />
+        </div>
+
+        <div class="builder-section-title">Request Form</div>
+        <div class="workflow-step-list">
+          ${formFields.map((field, index) => `
+            <div class="workflow-step-card">
+              <div class="workflow-step-head">
+                <strong>${escapeHtml(field.key)}</strong>
+              </div>
+              <div class="workflow-step-grid">
+                <div class="full">
+                  <label>Field Label</label>
+                  <input value="${escapeHtml(field.label || '')}" placeholder="${escapeHtml(field.key)}" oninput="updateRequestTypeFormField(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
+                </div>
+                <div>
+                  <label>Show On Request Form</label>
+                  <select onchange="updateRequestTypeFormField(${index}, 'enabled', this.value === 'true')" ${(editable && !(definition.autoAddDepartmentApps && field.key === 'department')) ? '' : 'disabled'}>
+                    <option value="true" ${field.enabled ? 'selected' : ''}>Visible</option>
+                    <option value="false" ${field.enabled ? '' : 'selected'}>Hidden</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Required</label>
+                  <select onchange="updateRequestTypeFormField(${index}, 'required', this.value === 'true')" ${(editable && !(definition.autoAddDepartmentApps && field.key === 'department')) ? '' : 'disabled'}>
+                    <option value="true" ${field.required ? 'selected' : ''}>Required</option>
+                    <option value="false" ${field.required ? '' : 'selected'}>Optional</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="builder-section-title">Workflow Steps</div>
+        <div class="workflow-step-list">
+          ${checklist.map((step, index) => `
+            <div class="workflow-step-card">
+              <div class="workflow-step-head">
+                <strong>Step ${index + 1}</strong>
+                ${editable ? `<button class="btn btn-secondary" type="button" onclick="removeRequestTypeStep(${index})">Remove</button>` : ''}
+              </div>
+              <div class="workflow-step-grid">
+                <div class="full">
+                  <label>Step Label</label>
+                  <input value="${escapeHtml(step.label || '')}" placeholder="Create user account" oninput="updateRequestTypeStep(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
+                </div>
+                <div>
+                  <label>Area</label>
+                  <input value="${escapeHtml(step.area || '')}" placeholder="Identity" oninput="updateRequestTypeStep(${index}, 'area', this.value)" ${editable ? '' : 'disabled'} />
+                </div>
+                <div>
+                  <label>Step Key</label>
+                  <input value="${escapeHtml(step.key || '')}" placeholder="account_created" oninput="updateRequestTypeStep(${index}, 'key', this.value)" ${editable ? '' : 'disabled'} />
+                </div>
+                <div>
+                  <label>Default Step Assignee</label>
+                  <select onchange="updateRequestTypeStepOwner(${index}, this.value)" ${editable ? '' : 'disabled'}>
+                    ${userOptionsMarkup({
+                      selectedUserId: step.defaultOwnerUserId || '',
+                      blankLabel: 'Select step assignee',
+                      currentName: step.defaultOwner || '',
+                      currentEmail: step.defaultOwnerEmail || '',
+                    })}
+                  </select>
+                </div>
+                <div>
+                  <label>Depends On</label>
+                  <select onchange="updateRequestTypeStep(${index}, 'dependsOn', this.value)" ${editable ? '' : 'disabled'}>
+                    <option value="">No dependency</option>
+                    ${checklist
+                      .filter((candidate, candidateIndex) => candidateIndex !== index)
+                      .map(candidate => `<option value="${escapeHtml(candidate.key || '')}" ${step.dependsOn === candidate.key ? 'selected' : ''}>${escapeHtml(candidate.label || candidate.key || 'Step')}</option>`)
+                      .join('')}
+                  </select>
+                </div>
+                <div>
+                  <label>Approval</label>
+                  <select onchange="updateRequestTypeStep(${index}, 'approvalMode', this.value)" ${editable ? '' : 'disabled'}>
+                    <option value="none" ${step.approvalMode === 'manager' ? '' : 'selected'}>No approval link</option>
+                    <option value="manager" ${step.approvalMode === 'manager' ? 'selected' : ''}>Manager approval required</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function selectRequestType(id) {
+      selectedRequestTypeId = id;
+      const definition = requestTypeDefinitions.find(item => item.id === id);
+      requestTypeDraft = definition ? clone(definition) : null;
+      renderRequestTypeList();
+      renderRequestTypeEditor();
+    }
+
+    function createRequestTypeDraft() {
+      selectedRequestTypeId = 'new';
+      requestTypeDraft = emptyRequestTypeDefinition();
+      setSupportView('request-types');
+      renderRequestTypeList();
+      renderRequestTypeEditor();
+    }
+
+    function updateRequestTypeStep(index, field, value) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.checklist?.[index]) return;
+      definition.checklist[index][field] = value;
+      if (field === 'label' && !definition.checklist[index].key) {
+        definition.checklist[index].key = slugify(value) || `step_${index + 1}`;
+      }
+      renderRequestTypeEditor();
+    }
+
+    function updateRequestTypeStepOwner(index, userId) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.checklist?.[index]) return;
+      const user = supportUserById(userId);
+      definition.checklist[index].defaultOwner = user?.name || '';
+      definition.checklist[index].defaultOwnerUserId = user?.id || '';
+      definition.checklist[index].defaultOwnerEmail = user?.email || '';
+      renderRequestTypeEditor();
+    }
+
+    function updateRequestTypeFormField(index, field, value) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.formFields?.[index]) return;
+      definition.formFields[index][field] = value;
+      if (field === 'enabled' && value === false) {
+        definition.formFields[index].required = false;
+      }
+      renderRequestTypeEditor();
+    }
+
+    function addRequestTypeStep() {
+      const definition = currentRequestTypeDefinition();
+      if (!definition) {
+        createRequestTypeDraft();
+        return;
+      }
+      definition.checklist.push({
+        key: `step_${definition.checklist.length + 1}`,
+        label: '',
+        area: '',
+        dependsOn: '',
+        defaultOwner: '',
+        defaultOwnerUserId: '',
+        defaultOwnerEmail: '',
+        approvalMode: 'none',
+      });
+      renderRequestTypeEditor();
+    }
+
+    function removeRequestTypeStep(index) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition) return;
+      definition.checklist.splice(index, 1);
+      if (!definition.checklist.length) {
+        definition.checklist.push({ key: 'step_1', label: '', area: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' });
+      }
+      renderRequestTypeEditor();
+    }
+
+    async function loadRequestTypes() {
+      try {
+        const res = await authFetch('/api/support/request-types');
+        const data = await readApiResponse(res);
+        if (!res.ok) throw new Error(data.error || 'Failed to load request types');
+        requestTypeDefinitions = data;
+        workflowOptions = requestTypeDefinitions
+          .filter(definition => definition.isActive !== false)
+          .map(definition => ({
+            workflowType: definition.workflowType,
+            workflowLabel: definition.workflowLabel,
+            className: definition.className,
+            autoAddDepartmentApps: !!definition.autoAddDepartmentApps,
+            sourceSystem: definition.sourceSystem || 'portal',
+          }));
+        if (selectedRequestTypeId && selectedRequestTypeId !== 'new') {
+          const current = requestTypeDefinitions.find(item => item.id === selectedRequestTypeId);
+          requestTypeDraft = current ? clone(current) : null;
+          if (!current) selectedRequestTypeId = null;
+        }
+        renderWorkflowOptions();
+        renderRequestTypeList();
+        renderRequestTypeEditor();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      }
+    }
+
+    async function saveRequestType() {
+      const definition = currentRequestTypeDefinition();
+      if (!definition || !canEditRequestTypes()) return;
+
+      const payload = {
+        workflowType: document.getElementById('requestTypeWorkflowType').value.trim(),
+        workflowLabel: document.getElementById('requestTypeWorkflowLabel').value.trim(),
+        description: document.getElementById('requestTypeDescription').value.trim(),
+        className: document.getElementById('requestTypeClassName').value,
+        sortOrder: Number(document.getElementById('requestTypeSortOrder').value || 0),
+        isActive: document.getElementById('requestTypeActive').checked,
+        ...(() => {
+          const assignee = resolveUserSelection('requestTypeDefaultAssignee');
+          return {
+            defaultAssignee: assignee.name,
+            defaultAssigneeUserId: assignee.userId,
+            defaultAssigneeEmail: assignee.email,
+          };
+        })(),
+        autoAddDepartmentApps: document.getElementById('requestTypeAutoApps').checked,
+        formFields: normalizedFormFields(definition).map(field => ({
+          key: field.key,
+          label: String(field.label || '').trim(),
+          enabled: !!field.enabled,
+          required: !!field.required,
+        })),
+        checklist: (definition.checklist || []).map(step => ({
+          key: String(step.key || '').trim(),
+          label: String(step.label || '').trim(),
+          area: String(step.area || '').trim(),
+          dependsOn: String(step.dependsOn || '').trim(),
+          defaultOwner: String(step.defaultOwner || '').trim(),
+          defaultOwnerUserId: String(step.defaultOwnerUserId || '').trim(),
+          defaultOwnerEmail: String(step.defaultOwnerEmail || '').trim(),
+          approvalMode: step.approvalMode === 'manager' ? 'manager' : 'none',
+        })),
+      };
+
+      const btn = document.getElementById('saveRequestTypeBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const res = await authFetch(definition.id ? `${API}/request-types/${definition.id}` : `${API}/request-types`, {
+          method: definition.id ? 'PUT' : 'POST',
+          body: JSON.stringify(payload),
+        });
+        const data = await readApiResponse(res);
+        if (!res.ok) {
+          showToast(data.error || 'Failed to save request type', 'danger');
+          return;
+        }
+        showToast('Request type saved');
+        selectedRequestTypeId = data.id;
+        requestTypeDraft = clone(data);
+        await loadRequestTypes();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Request Type';
+      }
+    }
+
+    async function init() {
+      if (!token) { location.href = '/login'; return; }
+      try {
+        const authRes = await authFetch('/api/auth/me');
+        if (!authRes.ok) { clearAuth(); return; }
+        currentUser = await authRes.json();
+        document.getElementById('currentUserName').textContent = currentUser.name;
+        document.getElementById('currentUserRole').textContent = currentUser.role.replace('_', ' ');
+        document.getElementById('requestExportWrap').style.display = currentUser?.permissions?.exportData ? 'inline-flex' : 'none';
+        document.querySelector('a.nav-link[href="/admin"]').style.display = (currentUser?.permissions?.managePortalUsers || currentUser?.permissions?.manageIntegrations || currentUser?.permissions?.manageRolePermissions) ? '' : 'none';
+        document.querySelector('#requestActions .btn.btn-primary').style.display = currentUser?.permissions?.manageSupportRequests ? '' : 'none';
+        document.querySelector('#requestTypeActions .btn.btn-primary').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
+        document.querySelector('#requestTypeActions .btn.btn-secondary').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
+        document.getElementById('requestTypesTab').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
+        await loadReferenceData();
+        await loadRequests();
+        setSupportView('requests');
+      } catch {
+        clearAuth();
+      }
+    }
+
+    async function loadRequests() {
+      try {
+        const res = await authFetch(API);
+        if (!res.ok) throw new Error('Failed to load support requests');
+        requests = await res.json();
+        if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) selectedRequestId = null;
+        renderSummary();
+        renderRequests();
+        renderDetail();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      }
+    }
+
+    function filteredRequests() {
+      const search = document.getElementById('supportSearch').value.trim().toLowerCase();
+      const workflowType = document.getElementById('workflowFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      return requests.filter(request => {
+        if (workflowType && request.workflowType !== workflowType) return false;
+        if (status && request.status !== status) return false;
+        if (!search) return true;
+        return [
+          request.requestId,
+          request.employeeName,
+          request.employeeEmail,
+          request.department,
+          ...(request.applications || []).map(app => app.name),
+          request.assignee,
+          request.requestedByName,
+          request.workflowLabel,
+        ].join(' ').toLowerCase().includes(search);
+      });
+    }
+
+    function renderSummary() {
+      const summaryTypes = [...new Set([
+        ...(SUMMARY_REQUEST_TYPES || []),
+        ...requests.map(r => r.workflowType),
+      ])];
+      document.getElementById('summaryGrid').innerHTML = `
+        ${summaryTypes.map(type => `
+          <div class="summary-card">
+            <span>${(REQUEST_TYPE_META[type] || {}).label || type}</span>
+            <strong>${requests.filter(r => r.workflowType === type).length}</strong>
+          </div>
+        `).join('')}
+      `;
+    }
+
+    function workflowPill(type, label) {
+      const meta = REQUEST_TYPE_META[type] || {
+        label: label || String(type || 'Unknown').replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase()),
+        className: 'new-app',
+      };
+      return `<span class="pill ${meta.className}">${meta.label}</span>`;
+    }
+
+    function statusPill(status) {
+      const label = status.replace('_', ' ');
+      return `<span class="pill status-${status}">${label}</span>`;
+    }
+
+    function softwareOwnerOptions(task) {
+      const software = task?.softwareCsvId
+        ? (softwareInventory || []).find(app => app?.csvId === task.softwareCsvId)
+        : null;
+      return softwareOwnerCandidates(software);
+    }
+
+    function ownerFieldControl(task, index, editable) {
+      return `<select data-task-owner="${index}" ${editable ? '' : 'disabled'}>
+        ${userOptionsMarkup({
+          selectedUserId: task.ownerUserId || '',
+          blankLabel: 'Select owner',
+          currentName: task.owner || softwareDefaultOwner(task),
+          currentEmail: task.ownerEmail || '',
+        })}
+      </select>`;
+    }
+
+    function managerFieldControl(request, editable) {
+      return `<select id="detailManagerName" ${editable ? '' : 'disabled'}>
+        ${userOptionsMarkup({
+          selectedUserId: request.managerUserId || '',
+          blankLabel: 'Select manager',
+          currentName: request.managerName || '',
+          currentEmail: request.managerEmail || '',
+        })}
+      </select>`;
+    }
+
+    function assigneeFieldControl(request, editable) {
+      return `<select id="detailAssignee" ${editable ? '' : 'disabled'}>
+        ${userOptionsMarkup({
+          selectedUserId: request.assigneeUserId || '',
+          blankLabel: 'Select assignee',
+          currentName: request.assignee || '',
+          currentEmail: request.assigneeEmail || '',
+        })}
+      </select>`;
+    }
+
+    function detailApplicationsFieldControl(editable) {
+      return `
+        <div class="multi-picker" id="detailApplicationsPicker">
+          <button type="button" class="multi-picker-trigger" id="detailApplicationsButton" onclick="toggleApplicationPicker('detail')" ${editable ? '' : 'disabled'}>Select applications</button>
+          <div class="multi-picker-panel" id="detailApplicationsPanel">
+            <input class="multi-picker-search" id="detailApplicationsSearch" type="search" placeholder="Search applications" oninput="renderApplicationPickerOptions('detail')" />
+            <div class="multi-picker-list" id="detailApplicationsList"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function taskKeyToIndexMap() {
+      const map = new Map();
+      document.querySelectorAll('[data-task-key]').forEach(taskEl => {
+        map.set(taskEl.getAttribute('data-task-key'), Number(taskEl.getAttribute('data-task-index')));
+      });
+      return map;
+    }
+
+    function isTaskLocked(taskEl, keyMap) {
+      const dependsOn = taskEl.getAttribute('data-task-depends-on') || '';
+      if (!dependsOn) return false;
+      const dependencyIndex = keyMap.get(dependsOn);
+      if (dependencyIndex === undefined) return false;
+      const dependencyCheckbox = document.querySelector(`[data-task-done="${dependencyIndex}"]`);
+      return !(dependencyCheckbox && dependencyCheckbox.checked);
+    }
+
+    function updateTaskFreezeState() {
+      const keyMap = taskKeyToIndexMap();
+      document.querySelectorAll('[data-task-index]').forEach(taskEl => {
+        const locked = isTaskLocked(taskEl, keyMap);
+        taskEl.classList.toggle('locked', locked);
+        const index = taskEl.getAttribute('data-task-index');
+        const controls = taskEl.querySelectorAll(`[data-task-done="${index}"], [data-task-owner="${index}"], [data-task-notes="${index}"]`);
+        controls.forEach(control => {
+          const editable = control.getAttribute('data-editable') === 'true';
+          control.disabled = !editable || locked;
+        });
+        const noteEl = taskEl.querySelector('.task-lock-note');
+        if (noteEl) {
+          noteEl.style.display = locked ? 'block' : 'none';
+          if (locked) {
+            const dependsOn = taskEl.getAttribute('data-task-depends-on') || '';
+            const dependencyIndex = keyMap.get(dependsOn);
+            const dependencyTitle = dependencyIndex === undefined
+              ? 'the previous step'
+              : (document.querySelector(`[data-task-title="${dependencyIndex}"]`)?.textContent || 'the previous step');
+            noteEl.textContent = `Complete "${dependencyTitle}" to unlock this step.`;
+          } else {
+            noteEl.textContent = '';
+          }
+        }
+      });
+    }
+
+    function closeDetailPanel() {
+      selectedRequestId = null;
+      document.getElementById('detailDrawer')?.classList.remove('open');
+      document.getElementById('detailDrawerOverlay')?.classList.remove('open');
+      renderRequests();
+      renderDetail();
+    }
+
+    function csvCell(value) {
+      const str = String(value ?? '');
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+
+    function exportRequestsCsv() {
+      document.getElementById('requestExportWrap')?.classList.remove('open');
+      const rows = filteredRequests();
+      if (!rows.length) {
+        showToast('No requests to export', 'danger');
+        return;
+      }
+
+      const headers = [
+        'Request ID', 'Request Type', 'Status', 'Priority', 'Employee Name', 'Employee Email',
+        'Department', 'Applications', 'Job Title', 'Location', 'Manager', 'Requested By', 'Requested Via',
+        'Assignee', 'Progress %', 'Completed Tasks', 'Total Tasks', 'Created At', 'Updated At', 'Notes',
+      ];
+      const lines = [
+        headers.map(csvCell).join(','),
+        ...rows.map(request => [
+          request.requestId,
+          request.workflowLabel || request.workflowType,
+          request.status,
+          request.priority,
+          request.employeeName,
+          request.employeeEmail,
+          request.department,
+          (request.applications || []).map(app => app.name).join('; '),
+          request.jobTitle,
+          request.location,
+          request.managerName,
+          request.requestedByName,
+          request.requestedVia,
+          request.assignee,
+          request.progressPercent,
+          request.completedCount,
+          request.totalTasks,
+          request.createdAt ? new Date(request.createdAt).toISOString() : '',
+          request.updatedAt ? new Date(request.updatedAt).toISOString() : '',
+          request.notes,
+        ].map(csvCell).join(',')),
+      ];
+
+      const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `support-requests-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast(`Exported ${rows.length} request${rows.length === 1 ? '' : 's'}`);
+    }
+
+    async function exportRequestsPdf() {
+      document.getElementById('requestExportWrap')?.classList.remove('open');
+      const rows = filteredRequests();
+      if (!rows.length) {
+        showToast('No requests to export', 'danger');
+        return;
+      }
+
+      try {
+        if (!window.jspdf) {
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        doc.setFontSize(18);
+        doc.text('Support Requests', 14, 16);
+        doc.setFontSize(9);
+        doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Requests: ${rows.length}`, 14, 23);
+        doc.autoTable({
+          startY: 28,
+          head: [[
+            'Request ID', 'Type', 'Status', 'Priority', 'Employee', 'Department',
+            'Requested By', 'Assignee', 'Progress',
+          ]],
+          body: rows.map(request => [
+            request.requestId,
+            request.workflowLabel || request.workflowType,
+            request.status,
+            request.priority,
+            `${request.employeeName}\n${request.employeeEmail}`,
+            `${request.department || '—'}${(request.applications || []).length ? `\n${request.applications.map(app => app.name).join(', ')}` : ''}`,
+            request.requestedByName || '—',
+            request.assignee || '—',
+            `${request.progressPercent}% (${request.completedCount}/${request.totalTasks})`,
+          ]),
+          styles: { fontSize: 8, cellPadding: 2 },
+          headStyles: { fillColor: [55, 87, 230], textColor: 255, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [248, 250, 252] },
+        });
+        doc.save(`support-requests-${new Date().toISOString().slice(0, 10)}.pdf`);
+        showToast(`PDF exported (${rows.length} request${rows.length === 1 ? '' : 's'})`);
+      } catch (e) {
+        showToast(`PDF export failed: ${e.message}`, 'danger');
+      }
+    }
+
+    function renderRequests() {
+      const list = filteredRequests();
+      document.getElementById('requestCountLabel').textContent = `${list.length} request${list.length === 1 ? '' : 's'}`;
+      const body = document.getElementById('requestTableBody');
+      if (!list.length) {
+        body.innerHTML = `<tr><td colspan="4" class="empty">No support requests match the current filters.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = list.map(request => `
+        <tr class="${request.id === selectedRequestId ? 'active' : ''}" onclick="selectRequest('${request.id}')">
+          <td>
+            <div style="font-weight:700">${request.employeeName}</div>
+            <div style="color:var(--muted);font-size:.82rem">${request.requestId} · ${request.department || 'No department'}</div>
+          </td>
+          <td>${workflowPill(request.workflowType, request.workflowLabel)}</td>
+          <td>${statusPill(request.status)}</td>
+          <td>
+            <div style="font-weight:700">${request.progressPercent}%</div>
+            <div style="color:var(--muted);font-size:.82rem">${request.completedCount}/${request.totalTasks} tasks</div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function selectRequest(id) {
+      selectedRequestId = id;
+      document.getElementById('detailDrawer')?.classList.add('open');
+      document.getElementById('detailDrawerOverlay')?.classList.add('open');
+      renderRequests();
+      renderDetail();
+    }
+
+    function currentRequest() {
+      return requests.find(r => r.id === selectedRequestId) || null;
+    }
+
+    function renderDetail() {
+      const request = currentRequest();
+      const panel = document.getElementById('detailPanel');
+      const saveBtn = document.getElementById('saveDetailBtn');
+      const deleteBtn = document.getElementById('deleteDetailBtn');
+      if (!request) {
+        detailSelectedApplications = [];
+        saveBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        panel.innerHTML = `<div class="empty">Select a request to review details, ownership, and checklist progress.</div>`;
+        return;
+      }
+
+      const editable = canEditRequests();
+      detailSelectedApplications = Array.isArray(request.applications) ? request.applications.map(app => ({
+        csvId: app.csvId,
+        name: app.name,
+      })) : [];
+      saveBtn.style.display = editable ? 'inline-flex' : 'none';
+      deleteBtn.style.display = editable ? 'inline-flex' : 'none';
+
+      panel.innerHTML = `
+        <div class="workflow-card">
+          <div class="workflow-head">
+            <div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                ${workflowPill(request.workflowType, request.workflowLabel)}
+                ${statusPill(request.status)}
+              </div>
+              <div style="font-size:1.2rem;font-weight:800;margin-top:10px">${request.employeeName}</div>
+              <div class="workflow-meta">${request.employeeEmail} · Requested by ${request.requestedByName || 'Unknown requester'}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:1.1rem;font-weight:800">${request.progressPercent}%</div>
+              <div class="workflow-meta">Progress</div>
+            </div>
+          </div>
+          <div class="progress"><div style="width:${request.progressPercent}%"></div></div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="field">
+            <label>Status</label>
+            <select id="detailStatus" ${editable ? '' : 'disabled'}>
+              ${['open','in_progress','blocked','completed','cancelled'].map(status => `<option value="${status}" ${request.status === status ? 'selected' : ''}>${status.replace('_', ' ')}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label>Priority</label>
+            <select id="detailPriority" ${editable ? '' : 'disabled'}>
+              ${['low','medium','high'].map(priority => `<option value="${priority}" ${request.priority === priority ? 'selected' : ''}>${priority}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field">
+            <label>Department</label>
+            <input id="detailDepartment" value="${escapeHtml(request.department || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Applications</label>
+            ${detailApplicationsFieldControl(editable)}
+          </div>
+          <div class="field">
+            <label>Job Title</label>
+            <input id="detailJobTitle" value="${escapeHtml(request.jobTitle || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="field">
+            <label>Location</label>
+            <input id="detailLocation" value="${escapeHtml(request.location || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="field">
+            <label>Manager</label>
+            ${managerFieldControl(request, editable)}
+          </div>
+          <div class="field">
+            <label>Start Date</label>
+            <input id="detailStartDate" type="date" value="${escapeHtml(request.startDate || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="field">
+            <label>End Date</label>
+            <input id="detailEndDate" type="date" value="${escapeHtml(request.endDate || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Assignee</label>
+            ${assigneeFieldControl(request, editable)}
+          </div>
+          <div class="field" style="grid-column:1/-1">
+            <label>Notes</label>
+            <textarea id="detailNotes" rows="4" ${editable ? '' : 'disabled'}>${escapeHtml(request.notes || '')}</textarea>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:1rem;font-weight:800;margin-bottom:10px">Request Checklist</div>
+          <div class="checklist">
+            ${(request.checklist || []).map((task, index) => `
+              <div class="task" data-task-index="${index}" data-task-key="${escapeHtml(task.key)}" data-task-depends-on="${escapeHtml(task.dependsOn || '')}">
+                <div class="task-top">
+                  <div>
+                    <div class="task-title" data-task-title="${index}">${escapeHtml(task.label)}</div>
+                    <div class="task-area">
+                      ${escapeHtml(task.area || 'General')}
+                      ${task.approvalMode === 'manager' ? ` · Manager approval: ${escapeHtml(task.approvalStatus || 'not_requested')}` : ''}
+                    </div>
+                  </div>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)">
+                    <input type="checkbox" data-task-done="${index}" data-editable="${editable ? 'true' : 'false'}" onchange="updateTaskFreezeState()" ${task.status === 'done' ? 'checked' : ''} ${editable ? '' : 'disabled'}>
+                    Done
+                  </label>
+                </div>
+                <div class="task-grid">
+                  <div class="field">
+                    <label>Owner</label>
+                    ${ownerFieldControl(task, index, editable)}
+                  </div>
+                  <div class="field">
+                    <label>Notes</label>
+                    <input data-task-notes="${index}" data-editable="${editable ? 'true' : 'false'}" value="${escapeHtml(task.notes || '')}" ${editable ? '' : 'disabled'} />
+                  </div>
+                </div>
+                <div class="task-lock-note" style="display:none"></div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.querySelectorAll('[data-task-owner]').forEach(el => {
+        el.setAttribute('data-editable', editable ? 'true' : 'false');
+      });
+      renderApplicationPicker('detail', editable);
+      updateTaskFreezeState();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.addEventListener('click', event => {
+      if (!event.target.closest('.export-wrap')) {
+        document.getElementById('requestExportWrap')?.classList.remove('open');
+      }
+      if (!event.target.closest('.multi-picker')) {
+        document.querySelectorAll('.multi-picker.open').forEach(el => el.classList.remove('open'));
+      }
+    });
+
+    function resetCreateForm() {
+      document.getElementById('createErr').textContent = '';
+      document.getElementById('newWorkflowType').value = '';
+      document.getElementById('newPriority').value = 'medium';
+      document.getElementById('newEmployeeName').value = '';
+      document.getElementById('newEmployeeEmail').value = '';
+      document.getElementById('newDepartment').value = '';
+      document.getElementById('newJobTitle').value = '';
+      document.getElementById('newLocation').value = '';
+      document.getElementById('newManagerName').value = '';
+      document.getElementById('newStartDate').value = '';
+      document.getElementById('newEndDate').value = '';
+      document.getElementById('newNotes').value = '';
+      document.getElementById('newDepartment').value = '';
+      document.getElementById('newApplicationsSearch').value = '';
+      document.getElementById('newApplicationsPicker')?.classList.remove('open');
+      setSelectedApplications('create', []);
+      toggleCreateFormLock();
+      updateDepartmentChecklistPreview();
+    }
+
+    function toggleCreateFormLock() {
+      const requestType = document.getElementById('newWorkflowType').value;
+      const definition = currentCreateDefinition();
+      const hasRequestType = !!requestType && !!definition;
+      renderCreateFormLayout();
+
+      Object.entries(CREATE_FORM_FIELD_CONFIG).forEach(([key, config]) => {
+        const fieldDefinition = normalizedFormFields(definition).find(field => field.key === key);
+        const input = document.getElementById(config.inputId);
+        if (!input) return;
+        input.disabled = !hasRequestType || !fieldDefinition?.enabled;
+        if (key === 'applications' && (!hasRequestType || !fieldDefinition?.enabled)) {
+          document.getElementById('newApplicationsPicker')?.classList.remove('open');
+        }
+      });
+
+      document.getElementById('createSubmitBtn').disabled = !hasRequestType;
+      if (!requestType) {
+        document.getElementById('createErr').textContent = 'Select a request type to unlock the form.';
+      } else if (!definition) {
+        document.getElementById('createErr').textContent = 'This request type is not available.';
+      } else {
+        document.getElementById('createErr').textContent = '';
+      }
+      updateDepartmentChecklistPreview();
+    }
+
+    function openCreateModal() {
+      resetCreateForm();
+      document.getElementById('createModal').classList.add('open');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('createModal').classList.remove('open');
+    }
+
+    async function createRequest() {
+      const btn = document.getElementById('createSubmitBtn');
+      const errEl = document.getElementById('createErr');
+      const definition = currentCreateDefinition();
+      const payload = {
+        workflowType: document.getElementById('newWorkflowType').value,
+        priority: document.getElementById('newPriority').value,
+        employeeName: document.getElementById('newEmployeeName').value.trim(),
+        employeeEmail: document.getElementById('newEmployeeEmail').value.trim(),
+        department: document.getElementById('newDepartment').value.trim(),
+        applications: selectedApplications('create'),
+        jobTitle: document.getElementById('newJobTitle').value.trim(),
+        location: document.getElementById('newLocation').value.trim(),
+        ...(() => {
+          const manager = resolveUserSelection('newManagerName');
+          return {
+            managerName: manager.name,
+            managerUserId: manager.userId,
+            managerEmail: manager.email,
+          };
+        })(),
+        startDate: document.getElementById('newStartDate').value,
+        endDate: document.getElementById('newEndDate').value,
+        notes: document.getElementById('newNotes').value.trim(),
+      };
+      const checklist = buildCreateChecklistPayload();
+      if (checklist) payload.checklist = checklist;
+
+      if (!payload.workflowType) {
+        errEl.textContent = 'Please select a request type.';
+        return;
+      }
+
+      if (!definition) {
+        errEl.textContent = 'Selected request type is unavailable.';
+        return;
+      }
+
+      const fieldMap = new Map(normalizedFormFields(definition).map(field => [field.key, field]));
+      const requiredField = [...fieldMap.values()].find(field => {
+        if (!field.enabled || !field.required) return false;
+        if (field.key === 'applications') return !Array.isArray(payload.applications) || !payload.applications.length;
+        return !String(payload[field.key] || '').trim();
+      });
+      if (requiredField) {
+        errEl.textContent = `${requiredField.label} is required.`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating…';
+      errEl.textContent = '';
+
+      try {
+        const res = await authFetch(API, { method: 'POST', body: JSON.stringify(payload) });
+        const data = await readApiResponse(res);
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Failed to create support request.';
+          return;
+        }
+        closeCreateModal();
+        showToast('Support request created');
+        await loadRequests();
+        selectedRequestId = null;
+      } catch (e) {
+        errEl.textContent = e.message;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Create Request';
+      }
+    }
+
+    async function saveSelectedRequest() {
+      const request = currentRequest();
+      if (!request || !canEditRequests()) return;
+
+      const checklist = (request.checklist || []).map((task, index) => ({
+        ...task,
+        status: document.querySelector(`[data-task-done="${index}"]`)?.checked ? 'done' : 'pending',
+        ...(() => {
+          const ownerSelect = document.querySelector(`[data-task-owner="${index}"]`);
+          const ownerUser = ownerSelect ? (supportUserById(ownerSelect.value) || null) : null;
+          const ownerOption = ownerSelect?.options?.[ownerSelect.selectedIndex];
+          return {
+            owner: ownerUser?.name || ownerOption?.dataset?.legacyName || '',
+            ownerUserId: ownerUser?.id || '',
+            ownerEmail: ownerUser?.email || ownerOption?.dataset?.legacyEmail || '',
+          };
+        })(),
+        notes: document.querySelector(`[data-task-notes="${index}"]`)?.value.trim() || '',
+      }));
+
+      const manager = resolveUserSelection('detailManagerName');
+      const assignee = resolveUserSelection('detailAssignee');
+      const payload = {
+        status: document.getElementById('detailStatus').value,
+        priority: document.getElementById('detailPriority').value,
+        department: document.getElementById('detailDepartment').value.trim(),
+        applications: selectedApplications('detail'),
+        jobTitle: document.getElementById('detailJobTitle').value.trim(),
+        location: document.getElementById('detailLocation').value.trim(),
+        managerName: manager.name,
+        managerUserId: manager.userId,
+        managerEmail: manager.email,
+        startDate: document.getElementById('detailStartDate').value,
+        endDate: document.getElementById('detailEndDate').value,
+        assignee: assignee.name,
+        assigneeUserId: assignee.userId,
+        assigneeEmail: assignee.email,
+        notes: document.getElementById('detailNotes').value.trim(),
+        checklist,
+      };
+
+      const btn = document.getElementById('saveDetailBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const res = await authFetch(`${API}/${request.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        });
+        const data = await readApiResponse(res);
+        if (!res.ok) {
+          showToast(data.error || 'Failed to update request', 'danger');
+          return;
+        }
+        showToast('Request updated');
+        await loadRequests();
+        selectedRequestId = data.id;
+        renderRequests();
+        renderDetail();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+      }
+    }
+
+    async function deleteSelectedRequest() {
+      const request = currentRequest();
+      if (!request || !canEditRequests()) return;
+      if (!window.confirm(`Delete support request ${request.requestId}? This cannot be undone.`)) return;
+
+      const btn = document.getElementById('deleteDetailBtn');
+      btn.disabled = true;
+      btn.textContent = 'Deleting…';
+
+      try {
+        const res = await authFetch(`${API}/${request.id}`, {
+          method: 'DELETE',
+        });
+        const data = await readApiResponse(res);
+        if (!res.ok) {
+          showToast(data.error || 'Failed to delete request', 'danger');
+          return;
+        }
+        showToast('Request deleted');
+        closeDetailPanel();
+        await loadRequests();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Delete Request';
+      }
+    }
+
+    /* Purple is the permanent theme */
+    document.body.className = 'support-theme support-theme-support';
+
+    init();
+  </script>
+</body>
+</html>

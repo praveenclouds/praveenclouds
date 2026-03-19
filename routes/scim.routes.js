@@ -141,7 +141,7 @@ router.get('/Users/:id', requireSCIM, async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'], status: '404', detail: 'User not found.' });
     res.json(userToSCIM(user));
-  } catch (e) {
+  } catch {
     res.status(404).json({ schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'], status: '404', detail: 'User not found.' });
   }
 });
