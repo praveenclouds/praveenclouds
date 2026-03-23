@@ -500,6 +500,125 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       background: rgba(153,102,255,0.12); color: #c084fc;
     }
     .log-chip span { color: var(--gray-300); font-weight: 400; }
+
+    /* ── NOTIFICATION BELL ── */
+    /* ── NOTIFICATION BELL (topbar icon only) ── */
+    .notif-bell-btn {
+      position: relative; background: var(--gray-50); border: 1px solid var(--gray-200);
+      border-radius: 9px; padding: 8px 10px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s; color: var(--gray-500);
+    }
+    .notif-bell-btn:hover { background: var(--gray-100); color: var(--gray-700); border-color: var(--gray-300); }
+    .notif-bell-btn svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2; display: block; }
+    .notif-bell-btn .bell-badge {
+      display: none; position: absolute; top: -5px; right: -5px;
+      min-width: 18px; height: 18px; padding: 0 4px;
+      background: #ef4444; color: #fff; border-radius: 99px;
+      font-size: 10px; font-weight: 700; border: 2px solid #fff;
+      align-items: center; justify-content: center; line-height: 1;
+    }
+    .notif-bell-btn .bell-badge.show { display: flex; }
+
+    /* ── NOTIFICATION SECTION — inline at top of dashboard ── */
+    .notif-section {
+      display: none; margin-bottom: 20px;
+      background: #fff; border: 1px solid var(--gray-200);
+      border-radius: 14px; overflow: hidden;
+      animation: notifSlideDown .22s ease;
+    }
+    .notif-section.visible { display: block; }
+    @keyframes notifSlideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .notif-section-head {
+      padding: 13px 18px; background: linear-gradient(135deg,#fff8f0,#fff);
+      border-bottom: 1px solid var(--gray-100);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .notif-section-head-left { display: flex; align-items: center; gap: 10px; }
+    .notif-section-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: #fef2f2; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .notif-section-icon svg { width: 16px; height: 16px; stroke: #ef4444; fill: none; stroke-width: 2; }
+    .notif-section-icon.all-clear { background: #f0fdf4; }
+    .notif-section-icon.all-clear svg { stroke: #16a34a; }
+    .notif-section-title { font-size: 14px; font-weight: 700; color: var(--gray-800); }
+    .notif-section-sub   { font-size: 11.5px; color: var(--gray-400); margin-top: 2px; }
+    .notif-section-head-right { display: flex; align-items: center; gap: 8px; }
+    .notif-clear-all {
+      font-size: 12px; font-weight: 600; color: var(--primary); background: #eff6ff;
+      border: 1px solid #bfdbfe; cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all .13s;
+    }
+    .notif-clear-all:hover { background: #dbeafe; }
+    .notif-collapse-btn {
+      font-size: 12px; font-weight: 600; color: var(--gray-500); background: var(--gray-50);
+      border: 1px solid var(--gray-200); cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all .13s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .notif-collapse-btn:hover { background: var(--gray-100); color: var(--gray-700); }
+    .notif-collapse-btn svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5; transition: transform .2s; }
+    .notif-collapse-btn.collapsed svg { transform: rotate(180deg); }
+
+    /* Notification grid */
+    .notif-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1px; background: var(--gray-100);
+    }
+    .notif-grid.collapsed { display: none; }
+    .notif-item {
+      display: flex; gap: 12px; padding: 13px 18px;
+      background: #fff; transition: background .12s; cursor: default;
+    }
+    .notif-item:hover { background: #fafafa; }
+    .notif-item-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+    }
+    .notif-item-dot.critical { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
+    .notif-item-dot.warning  { background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
+    .notif-item-dot.info     { background: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+    .notif-item-body { flex: 1; min-width: 0; }
+    .notif-item-title { font-size: 13px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
+    .notif-item-msg   { font-size: 12px; color: var(--gray-600); line-height: 1.5; }
+    .notif-item-meta  { display: flex; align-items: center; gap: 7px; margin-top: 6px; flex-wrap: wrap; }
+    .notif-cat-badge  {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: .04em;
+    }
+    .notif-cat-badge.users    { background: #faf5ff; color: #9333ea; border: 1px solid #e9d5ff; }
+    .notif-cat-badge.software { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+    .notif-cat-badge.assets   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .notif-sev-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; }
+    .notif-sev-badge.critical { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+    .notif-sev-badge.warning  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+    .notif-sev-badge.info     { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .notif-item-time  { font-size: 10.5px; color: var(--gray-400); }
+    .notif-dismiss {
+      background: none; border: none; cursor: pointer; color: var(--gray-300);
+      padding: 3px; border-radius: 4px; flex-shrink: 0; align-self: flex-start;
+      transition: color .12s, background .12s; display: flex;
+    }
+    .notif-dismiss:hover { color: #ef4444; background: #fef2f2; }
+    .notif-dismiss svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; display: block; }
+
+    /* dark-theme overrides */
+    body.support-theme-portal .notif-section        { background: #1e1525; border-color: rgba(153,102,255,.22); }
+    body.support-theme-portal .notif-section-head   { background: rgba(153,102,255,.05); border-color: rgba(153,102,255,.15); }
+    body.support-theme-portal .notif-section-title  { color: #f0eeff; }
+    body.support-theme-portal .notif-section-sub    { color: rgba(153,102,255,.6); }
+    body.support-theme-portal .notif-grid           { background: rgba(153,102,255,.08); }
+    body.support-theme-portal .notif-item           { background: #1e1525; }
+    body.support-theme-portal .notif-item:hover     { background: rgba(153,102,255,.07); }
+    body.support-theme-portal .notif-item-title     { color: #f0eeff; }
+    body.support-theme-portal .notif-item-msg       { color: rgba(180,170,210,.8); }
+    body.support-theme-portal .notif-bell-btn       { background: rgba(153,102,255,.1); border-color: rgba(153,102,255,.25); color: #c4b5fd; }
+    body.support-theme-portal .notif-bell-btn:hover { background: rgba(153,102,255,.2); }
+    body.support-theme-portal .notif-bell-btn .bell-badge { border-color: #16101a; }
+    body.support-theme-portal .notif-clear-all      { background: rgba(99,66,255,.12); border-color: rgba(99,66,255,.3); color: #a78bfa; }
+    body.support-theme-portal .notif-clear-all:hover { background: rgba(99,66,255,.22); }
+    body.support-theme-portal .notif-collapse-btn   { background: rgba(153,102,255,.08); border-color: rgba(153,102,255,.2); color: rgba(153,102,255,.7); }
+    body.support-theme-portal .notif-dismiss:hover  { background: rgba(248,113,113,.12); color: #f87171; }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
@@ -562,17 +681,17 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
   </nav>
   <div class="sidebar-footer">
     <!-- Learning Portal link -->
-    <a href="scim-learning-portal.html" target="_blank"
-      style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;margin-bottom:10px;background:linear-gradient(135deg,#eff6ff,#f3e8ff);border:1px solid #c4b5fd;text-decoration:none;transition:box-shadow .15s"
-      onmouseover="this.style.boxShadow='0 2px 10px rgba(124,58,237,.2)'" onmouseout="this.style.boxShadow='none'">
-      <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#1e40af,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+    <a href="scim-learning-portal.html" target="_blank" class="learning-link-card"
+      style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;margin-bottom:10px;background:linear-gradient(135deg,rgba(49,83,216,.18),rgba(124,92,255,.18));border:1px solid rgba(130,96,185,.35);text-decoration:none;transition:box-shadow .15s"
+      onmouseover="this.style.boxShadow='0 2px 10px rgba(124,92,255,.25)'" onmouseout="this.style.boxShadow='none'">
+      <div class="learning-link-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3757e6,#7c5cff);display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:700;color:#1e40af;white-space:nowrap">SCIM Setup Guide</div>
-        <div style="font-size:10.5px;color:#7c3aed;white-space:nowrap">Learning Portal →</div>
+        <div class="learning-link-title" style="font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap">Learning Portal</div>
+        <div class="learning-link-sub" style="font-size:10.5px;color:rgba(167,139,250,0.7);white-space:nowrap">Admin guides &amp; how-tos →</div>
       </div>
-      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#7c3aed;fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <svg viewBox="0 0 24 24" class="learning-link-arrow" style="width:13px;height:13px;stroke:rgba(167,139,250,0.7);fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     </a>
 <div class="user-chip">
       <div class="avatar" id="portalAvatar">TC</div>
@@ -592,7 +711,14 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="globalSearch" placeholder="Search…" oninput="handleSearch(this.value)">
     </div>
-<button class="btn btn-primary rbac-write" id="addBtn" onclick="openAddModal()" style="display:none">
+
+    <!-- ── Notification Bell ── -->
+    <button class="notif-bell-btn" id="notifBellBtn" onclick="goToNotifications()" title="View Notifications">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="bell-badge" id="notifBadge">0</span>
+    </button>
+
+    <button class="btn btn-primary rbac-write" id="addBtn" onclick="openAddModal()" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       <span id="addBtnLabel">Add</span>
     </button>
@@ -602,6 +728,30 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
 
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
+
+      <!-- ── Notification Panel — always at top of dashboard ── -->
+      <div class="notif-section" id="notifSection">
+        <div class="notif-section-head">
+          <div class="notif-section-head-left">
+            <div class="notif-section-icon" id="notifSectionIcon">
+              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            </div>
+            <div>
+              <div class="notif-section-title" id="notifSectionTitle">🔔 Active Notifications</div>
+              <div class="notif-section-sub" id="notifSectionSub">Evaluating alerts…</div>
+            </div>
+          </div>
+          <div class="notif-section-head-right">
+            <button class="notif-clear-all" id="notifClearAllBtn" onclick="dismissAllNotifs()" style="display:none">Clear all</button>
+            <button class="notif-collapse-btn" id="notifCollapseBtn" onclick="toggleNotifCollapse()">
+              <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+              Collapse
+            </button>
+          </div>
+        </div>
+        <div class="notif-grid" id="notifGrid"></div>
+      </div>
+
       <div class="stat-grid" id="statGrid"></div>
       <div style="margin-bottom:16px">
         <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px">Users by Department</div>
@@ -634,16 +784,20 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <div class="filter-bar">
             <select class="filter-select" id="userDeptFilter" onchange="renderUsers()">
               <option value="">All Departments</option>
-              <option>Engineering</option><option>AI-Service</option><option>QA</option>
-              <option>IT</option><option>HR</option><option>Product</option>
-              <option>Customer Support</option><option>Accounts</option>
+              <option>Engineering</option><option>Data Science - Engineering</option><option>Data Science</option>
+              <option>AI Services</option><option>AI-Service</option><option>Product</option>
+              <option>Customer Operations</option><option>Customer Support</option>
+              <option>Operations</option><option>Sales</option><option>Marketing</option>
+              <option>Legal</option><option>Human Resources</option><option>Executive</option>
+              <option>Executive Administration</option><option>IT</option><option>HR</option>
+              <option>Accounts</option><option>QA</option>
             </select>
             <select class="filter-select" id="userRoleFilter" onchange="renderUsers()">
               <option value="">All Roles</option>
               <option>Admin</option><option>Manager</option><option>Staff</option>
             </select>
             <select class="filter-select" id="userLocFilter" onchange="renderUsers()">
-              <option value="">All Locations</option><option>Chennai</option><option>Coimbatore</option>
+              <option value="">All Locations</option><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option>
             </select>
             <select class="filter-select" id="userStatusFilter" onchange="renderUsers()">
               <option value="">All Status</option><option>Active</option><option>Inactive</option>
@@ -694,7 +848,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <option>Customer Support</option><option>Accounts</option>
             </select>
             <select class="filter-select" id="assetLocFilter" onchange="renderAssets()">
-              <option value="">All Locations</option><option>Chennai</option><option>Coimbatore</option>
+              <option value="">All Locations</option><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option>
             </select>
             <select class="filter-select" id="assetTypeFilter" onchange="renderAssets()">
               <option value="">All Types</option><option>Laptop</option><option>Monitor</option><option>Phone</option><option>Tablet</option><option>Other</option>
@@ -797,7 +951,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <div class="adv-field"><label>Department</label><input type="text" id="advSwDept" placeholder="Dept…" list="dlSwDept" oninput="renderSoftware()"><datalist id="dlSwDept"></datalist></div>
           <div class="adv-field"><label>Owner</label><input type="text" id="advSwOwner" placeholder="Owner…" list="dlSwOwner" oninput="renderSoftware()"><datalist id="dlSwOwner"></datalist></div>
           <div class="adv-field"><label>Admin</label><input type="text" id="advSwAdmin" placeholder="Admin name…" list="dlSwAdmin" oninput="renderSoftware()"><datalist id="dlSwAdmin"></datalist></div>
-          <div class="adv-field" style="max-width:260px"><label>Annual Cost Range ($)</label><div class="adv-range-pair"><input type="number" id="advSwCostFrom" placeholder="From" min="0" oninput="renderSoftware()"><span class="adv-range-sep">–</span><input type="number" id="advSwCostTo" placeholder="To" min="0" oninput="renderSoftware()"></div></div>
+
           <button class="btn btn-secondary btn-sm" onclick="clearAdvSearch('software')" style="align-self:flex-end">✕ Clear</button>
         </div>
         <table>
@@ -917,14 +1071,14 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <select id="userRole"><option>Admin</option><option>Manager</option><option>Staff</option></select>
         </div>
         <div class="form-group"><label>Location</label>
-          <select id="userLocation"><option>Chennai</option><option>Coimbatore</option><option>Remote</option></select>
+          <select id="userLocation"><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option></select>
         </div>
         <div class="form-group"><label>Status</label>
           <select id="userStatus"><option>Active</option><option>Inactive</option></select>
         </div>
         <div class="form-group"><label>Job Title</label><input type="text" id="userJobTitle" placeholder="e.g. Software Engineer III"></div>
         <div class="form-group"><label>Phone</label><input type="text" id="userPhone" placeholder="+91 …"></div>
-        <div class="form-group" style="grid-column:1/-1"><label>Reporting Manager</label><input type="text" id="userReportingManager" placeholder="e.g. Vasanth Pandian"></div>
+        <div class="form-group" style="grid-column:1/-1"><label>Reporting Manager</label><select id="userReportingManager"></select></div>
         <!-- Software Admin Insight (only visible when editing existing user) -->
         <div id="userSwAdminSection" style="display:none;grid-column:1/-1">
           <div style="font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;padding-top:4px;border-top:1px solid var(--gray-100)">🛡️ Privileged Access</div>
@@ -973,7 +1127,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       <input type="hidden" id="assetId">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px">
         <div class="form-group"><label>Asset ID</label><input type="text" id="assetCsvId" placeholder="A-43"></div>
-        <div class="form-group"><label>Asset Name *</label><input type="text" id="assetName"></div>
+        <div class="form-group"><label>Asset Name *</label><input type="text" id="assetName" oninput="autoFillAssetBrand()"></div>
         <div class="form-group"><label>Type</label>
           <select id="assetType"><option>Laptop</option><option>Monitor</option><option>Phone</option><option>Tablet</option><option>Keyboard</option><option>Mouse</option><option>Headset</option><option>Other</option></select>
         </div>
@@ -984,7 +1138,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         <div class="form-group"><label>Brand / Chip</label><input type="text" id="assetBrand" placeholder="Apple / M2 Pro"></div>
         <div class="form-group" style="grid-column:1/-1"><label>Specification</label><input type="text" id="assetDesc" placeholder="16GB RAM - 512GB SSD M2-PRO CHIP"></div>
         <div class="form-group"><label>Location</label>
-          <select id="assetLocation"><option>Chennai</option><option>Coimbatore</option></select>
+          <select id="assetLocation"><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option></select>
         </div>
         <div class="form-group"><label>Vendor</label><input type="text" id="assetVendor" placeholder="Sniper Systems"></div>
         <div class="form-group"><label>Purchase Date</label><input type="date" id="assetPurchaseDate"></div>
@@ -1045,6 +1199,26 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           </div>
         </div>
         <div class="form-group"><label>Purpose</label><input type="text" id="swPurpose" placeholder="e.g. CI/CD"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Provisioning Method</label>
+          <select id="swProvisioningMethod">
+            <option>Manual</option>
+            <option>SCIM</option>
+            <option>API</option>
+            <option>SSO Only</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Connector Type</label><input type="text" id="swConnectorType" placeholder="e.g. Google Workspace, Slack, Custom API"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="display:flex;align-items:flex-end">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500">
+            <input type="checkbox" id="swSupportsDeprovision">
+            Supports automatic deprovision
+          </label>
+        </div>
+        <div class="form-group"><label>Provisioning Notes</label><input type="text" id="swProvisioningNotes" placeholder="e.g. Managed through Entra SCIM connector"></div>
       </div>
       <div class="form-row" id="swLicPriceRow">
         <div class="form-group"><label>License Price / User / Month ($)</label><input type="number" id="swLicPrice" placeholder="0.00" min="0" step="0.01" oninput="calcSwAnnualCost()"></div>
@@ -1405,6 +1579,7 @@ async function loadData(){
     }));
     assets = as.map(a=>({...a, assignTo: a.assignedTo||''}));
     renderAll();
+    evaluateAlerts(); // run alert engine after data loads
   } catch(e){
     console.error('Failed to load data:', e);
     showToast('Could not connect to server','danger');
@@ -1441,8 +1616,10 @@ const assetColVis = {
   dept:     { label:'Department',  locked:false, visible:true  },
   location: { label:'Location',    locked:false, visible:true  },
   status:   { label:'Status',      locked:false, visible:true  },
-  brand:    { label:'Brand',       locked:false, visible:false },
-  type:     { label:'Type',        locked:false, visible:false },
+  brand:        { label:'Brand',            locked:false, visible:false },
+  type:         { label:'Type',             locked:false, visible:false },
+  purchaseDate: { label:'Purchase Date',    locked:false, visible:true  },
+  warrantyEnd:  { label:'Warranty End',     locked:false, visible:true  },
 };
 const swColVis = {
   csvId:           { label:'ID',           locked:true,  visible:true  },
@@ -1560,7 +1737,7 @@ function populateSwAdvDropdowns(){
 }
 
 function updateBadges(){
-  document.getElementById('navUsersCount').textContent=users.length;
+  document.getElementById('navUsersCount').textContent=users.filter(u=>(u.status||'').toLowerCase()!=='inactive').length;
   document.getElementById('navAssetsCount').textContent=assets.length;
   document.getElementById('navSoftwareCount').textContent=software.length;
 }
@@ -1570,10 +1747,10 @@ function renderDashboard(){
   const inUse=assets.filter(a=>a.status==='In-Use').length;
   const avail=assets.filter(a=>a.status==='Available').length;
 
-  // dept breakdown
+  // dept breakdown — exclude inactive users
   const deptCounts={};
-  users.forEach(u=>{ deptCounts[u.dept]=(deptCounts[u.dept]||0)+1; });
-  const deptColors={'Engineering':'var(--primary)','AI-Service':'#9333ea','QA':'#ea580c','IT':'#0891b2','HR':'#16a34a','Product':'#d97706','Customer Support':'#dc2626','Accounts':'#be185d'};
+  users.filter(u=>(u.status||'').toLowerCase()!=='inactive').forEach(u=>{ deptCounts[u.dept]=(deptCounts[u.dept]||0)+1; });
+  const deptColors={'Engineering':'var(--primary)','Data Science - Engineering':'#6366f1','Data Science':'#4f46e5','AI Services':'#9333ea','AI-Service':'#9333ea','Product':'#d97706','Customer Operations':'#0369a1','Customer Support':'#dc2626','Operations':'#0891b2','Sales':'#16a34a','Marketing':'#db2777','Legal':'#7c3aed','Human Resources':'#0d9488','Executive':'#0f172a','Executive Administration':'#334155','IT':'#0891b2','HR':'#16a34a','QA':'#ea580c','Accounts':'#be185d','Finance':'#059669'};
   document.getElementById('deptGrid').innerHTML=Object.entries(deptCounts).sort((a,b)=>b[1]-a[1]).map(([d,c])=>`
     <div class="dept-card" onclick="showDeptUsers('${d.replace(/'/g,"\\'")}')">
       <div>
@@ -1590,13 +1767,23 @@ function renderDashboard(){
   const usedLicD      = software.reduce((s,x)=>s+(x.usedLicenses||0),0);
   const licPctD       = totalLicD>0 ? Math.round(usedLicD/totalLicD*100) : 0;
 
+  const activeUsers=users.filter(u=>(u.status||'').toLowerCase()!=='inactive');
   document.getElementById('statGrid').innerHTML=`
-    ${sc('blue','<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',users.length,'Total Users')}
-    ${sc('green','<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',users.filter(u=>u.status==='Active').length,'Active Users')}
+    ${sc('blue','<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',activeUsers.length,'Total Users')}
+    ${sc('green','<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',activeUsers.filter(u=>u.status==='Active').length,'Active Users')}
     ${sc('sky','<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',assets.length,'Total Assets')}
     ${sc('blue','<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>',inUse,'Assets In-Use')}
     ${sc('green','<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',avail,'Available')}
     ${sc('purple','<rect x="2" y="3" width="20" height="14" rx="2"/><circle cx="8" cy="10" r="2"/><path d="M10 10h8"/>',Object.keys(deptCounts).length,'Departments')}
+    <div class="stat-card stat-card-alerts" id="alertStatTile" onclick="goToNotifications()" style="cursor:pointer;border-top:3px solid #f59e0b;display:none">
+      <div class="stat-icon" id="alertStatIcon" style="background:#fffbeb;color:#f59e0b">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div>
+        <div class="stat-num" id="alertStatNum" style="color:#f59e0b">0</div>
+        <div class="stat-label">Active Alerts</div>
+      </div>
+    </div>
   `;
 
   // Software stat tiles row (4 tiles)
@@ -1645,6 +1832,8 @@ function filteredUsers(){
   const advJobTitle= (document.getElementById('advUserJobTitle')?.value||'').toLowerCase();
   const advManager = (document.getElementById('advUserManager')?.value||'').toLowerCase();
   let list=users.filter(u=>{
+    // Hide inactive users unless explicitly filtering for them or "All Status"
+    if(!sf && (u.status||'').toLowerCase()==='inactive') return false;
     if(searchQ && !`${u.first} ${u.last} ${u.email} ${u.dept} ${u.role} ${u.location} ${u.jobTitle||''} ${u.reportingManager||''}`.toLowerCase().includes(searchQ)) return false;
     if(df && u.dept!==df) return false;
     if(rf && u.role!==rf) return false;
@@ -1681,7 +1870,7 @@ function renderUsers(){
   if(userPage>pages) userPage=pages;
   const slice=list.slice((userPage-1)*PAGE_SIZE, userPage*PAGE_SIZE);
   const lbl=document.getElementById('userCountLabel');
-  if(lbl) lbl.textContent=`(${list.length} of ${users.length})`;
+  if(lbl) lbl.textContent=`(${list.length} of ${users.filter(u=>(u.status||'').toLowerCase()!=='inactive').length})`;
 
   const visCols = Object.entries(userColVis).filter(([,c])=>c.visible);
   const colCount = visCols.length;
@@ -1781,6 +1970,8 @@ function filteredAssets(){
       else if(c==='dept'){av=a.dept||'';bv=b.dept||'';}
       else if(c==='location'){av=a.location||'';bv=b.location||'';}
       else if(c==='status'){av=a.status||'';bv=b.status||'';}
+      else if(c==='purchaseDate'){av=a.purchaseDate||'';bv=b.purchaseDate||'';}
+      else if(c==='warrantyEnd'){av=a.warrantyEnd||'';bv=b.warrantyEnd||'';}
       return d*av.localeCompare(bv);
     });
   }
@@ -1797,7 +1988,7 @@ function renderAssets(){
 
   const visCols = Object.entries(assetColVis).filter(([,c])=>c.visible);
   const colCount = visCols.length;
-  const sortableKeys = new Set(['csvId','name','serial','assignTo','dept','location','status']);
+  const sortableKeys = new Set(['csvId','name','serial','assignTo','dept','location','status','purchaseDate','warrantyEnd']);
 
   const head=document.getElementById('assetTableHead');
   if(head){
@@ -1827,8 +2018,21 @@ function renderAssets(){
           case 'dept':     return `<td><span class="tag">${a.dept}</span></td>`;
           case 'location': return `<td><span class="loc-tag"><svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>${a.location}</span></td>`;
           case 'status':   return `<td><span class="badge ${stcls}">${a.status}</span></td>`;
-          case 'brand':    return `<td style="font-size:12px;color:var(--gray-600)">${a.brand||'—'}</td>`;
-          case 'type':     return `<td style="font-size:12px;color:var(--gray-600)">${a.type||'—'}</td>`;
+          case 'brand':        return `<td style="font-size:12px;color:var(--gray-600)">${a.brand||'—'}</td>`;
+          case 'type':         return `<td style="font-size:12px;color:var(--gray-600)">${a.type||'—'}</td>`;
+          case 'purchaseDate': return `<td style="font-size:12px;color:var(--gray-600)">${a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>`;
+          case 'warrantyEnd': {
+            if (!a.warrantyEnd) return `<td style="font-size:12px;color:var(--gray-400)">—</td>`;
+            const wEnd = new Date(a.warrantyEnd);
+            const today = new Date(); today.setHours(0,0,0,0);
+            const diffDays = Math.ceil((wEnd - today) / 86400000);
+            const wLabel = wEnd.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+            if (diffDays < 0)
+              return `<td><span style="font-size:11px;background:#fef2f2;color:#ef4444;padding:2px 6px;border-radius:4px;font-weight:600">⚠ Expired<br><span style="font-weight:400">${wLabel}</span></span></td>`;
+            if (diffDays <= 90)
+              return `<td><span style="font-size:11px;background:#fffbeb;color:#d97706;padding:2px 6px;border-radius:4px;font-weight:600">⏰ ${diffDays}d left<br><span style="font-weight:400">${wLabel}</span></span></td>`;
+            return `<td style="font-size:12px;color:var(--gray-600)">${wLabel}</td>`;
+          }
           default:         return `<td>${a[key]||'—'}</td>`;
         }
       }
@@ -1902,7 +2106,7 @@ function openUserModal(u=null){
   document.getElementById('userLocation').value=u?.location||'Chennai';
   document.getElementById('userStatus').value=u?.status||'Active';
   document.getElementById('userJobTitle').value=u?.jobTitle||'';
-  document.getElementById('userReportingManager').value=u?.reportingManager||'';
+  populateReportingManagerSelect(u?.reportingManager||'');
   document.getElementById('userPhone').value=u?.phone||'';
   document.getElementById('userDeleteBtn').style.display=u?'inline-flex':'none';
   // Software Admin Insight
@@ -1948,6 +2152,24 @@ function openUserModal(u=null){
   }
 
   showOverlay('userModal');
+}
+
+function populateReportingManagerSelect(currentName=''){
+  const select = document.getElementById('userReportingManager');
+  if(!select) return;
+  const activeUsers = users
+    .filter(u => (u.status || '').toLowerCase() === 'active')
+    .sort((a,b)=>`${a.first||''} ${a.last||''}`.trim().localeCompare(`${b.first||''} ${b.last||''}`.trim()));
+  const normalizedCurrent = String(currentName || '').trim().toLowerCase();
+  const matchedUser = activeUsers.find(u => `${u.first||''} ${u.last||''}`.trim().toLowerCase() === normalizedCurrent);
+  const legacyOption = currentName && !matchedUser
+    ? `<option value="" data-legacy-name="${escHtml(String(currentName || '').trim())}" selected>${escHtml(`${String(currentName || '').trim()} (inactive or not found)`)}</option>`
+    : `<option value="" ${matchedUser ? '' : 'selected'}>— Select reporting manager —</option>`;
+
+  select.innerHTML = legacyOption + activeUsers.map(u => {
+    const fullName = `${u.first||''} ${u.last||''}`.trim();
+    return `<option value="${escHtml(fullName)}" ${matchedUser?.id===u.id ? 'selected' : ''}>${escHtml(fullName)}${u.dept ? ` — ${escHtml(u.dept)}` : ''}</option>`;
+  }).join('');
 }
 
 // ── App Access helpers ────────────────────────────────────────────────────────
@@ -2058,11 +2280,13 @@ async function saveUser(){
   const email=document.getElementById('userEmail').value.trim();
   if(!first||!email){ showToast('First name and email are required','danger'); return; }
   const id=document.getElementById('userId').value;
+  const reportingManagerSelect = document.getElementById('userReportingManager');
+  const reportingManagerOption = reportingManagerSelect?.options?.[reportingManagerSelect.selectedIndex];
   const data={ first,last:document.getElementById('userLast').value.trim(),email,
     role:document.getElementById('userRole').value,
     location:document.getElementById('userLocation').value,status:document.getElementById('userStatus').value,
     jobTitle:document.getElementById('userJobTitle').value.trim(),
-    reportingManager:document.getElementById('userReportingManager').value.trim(),
+    reportingManager:(reportingManagerSelect?.value || reportingManagerOption?.dataset?.legacyName || '').trim(),
     phone:document.getElementById('userPhone').value.trim() };
   try {
     const res = id
@@ -2099,7 +2323,9 @@ function openAssetModal(a=null){
   document.getElementById('assetType').value=a?.type||'Laptop';
   document.getElementById('assetStatus').value=a?.status||'Available';
   document.getElementById('assetSerial').value=a?.serial||'';
-  document.getElementById('assetBrand').value=a?.brand||'';
+  const brandEl = document.getElementById('assetBrand');
+  brandEl.value = a?.brand||'';
+  brandEl.dataset.autoFilled = '';   // reset auto-fill tracking
   document.getElementById('assetDesc').value=a?.desc||'';
   document.getElementById('assetLocation').value=a?.location||'Chennai';
   document.getElementById('assetVendor').value=a?.vendor||'';
@@ -2116,6 +2342,38 @@ function deleteCurrentAsset(){
 }
 
 function editAsset(id){ openAssetModal(assets.find(a=>a.id===id)); }
+
+// ── Auto-fill brand from asset name ──────────────────────────────────────────
+const ASSET_BRAND_RULES = [
+  { pattern: /macbook/i,  brand: 'Apple' },
+  { pattern: /ipad/i,     brand: 'Apple' },
+  { pattern: /iphone/i,   brand: 'Apple' },
+  { pattern: /\bdell\b/i, brand: 'Dell' },
+  { pattern: /thinkpad|lenovo/i, brand: 'Lenovo' },
+  { pattern: /\bhp\b|hewlett/i,  brand: 'HP' },
+  { pattern: /surface/i,  brand: 'Microsoft' },
+  { pattern: /samsung/i,  brand: 'Samsung' },
+  { pattern: /lg\b/i,     brand: 'LG' },
+];
+function autoFillAssetBrand() {
+  const nameEl  = document.getElementById('assetName');
+  const brandEl = document.getElementById('assetBrand');
+  if (!nameEl || !brandEl) return;
+  const name = nameEl.value;
+  // Only auto-fill when brand field is empty or was previously auto-filled
+  if (brandEl.dataset.autoFilled && brandEl.value !== brandEl.dataset.autoFilled) return;
+  const match = ASSET_BRAND_RULES.find(r => r.pattern.test(name));
+  if (match) {
+    brandEl.value = match.brand;
+    brandEl.dataset.autoFilled = match.brand;
+  } else {
+    // Clear auto-fill if name no longer matches
+    if (brandEl.dataset.autoFilled && brandEl.value === brandEl.dataset.autoFilled) {
+      brandEl.value = '';
+      brandEl.dataset.autoFilled = '';
+    }
+  }
+}
 
 async function saveAsset(){
   const name=document.getElementById('assetName').value.trim();
@@ -2262,7 +2520,7 @@ async function renderLogs(page=1){
       return `<tr>
         <td style="white-space:nowrap;font-size:11.5px;color:var(--gray-400)">${fmtLogDate(log.createdAt)}</td>
         <td><span class="log-event-badge ${log.eventType}">${eventLabel}</span></td>
-        <td style="font-size:12px">${entityIcon} <span style="color:var(--gray-300)">${log.entityLabel||log.entityId}</span></td>
+        <td style="font-size:12px">${entityIcon} <span style="color:var(--gray-600)">${log.entityLabel||log.entityId}</span></td>
         <td>${detail}</td>
         <td style="font-size:11.5px;color:var(--gray-400);white-space:nowrap">${log.actorName||'—'}</td>
       </tr>`;
@@ -2316,7 +2574,7 @@ function clearAdvSearch(page){
   const ids = {
     users:    ['advUserName','advUserEmail','advUserJobTitle','advUserManager'],
     assets:   ['advAssetName','advAssetSerial','advAssetBrand','advAssetUser'],
-    software: ['advSwName','advSwDept','advSwOwner','advSwAdmin','advSwCostFrom','advSwCostTo'],
+    software: ['advSwName','advSwDept','advSwOwner','advSwAdmin'],
   };
   (ids[page]||[]).forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   if(page==='users') renderUsers();
@@ -2435,25 +2693,16 @@ function renderSoftware(){
   const advSwDept    = (document.getElementById('advSwDept')?.value||'').toLowerCase();
   const advSwOwner   = (document.getElementById('advSwOwner')?.value||'').toLowerCase();
   const advSwAdmin   = (document.getElementById('advSwAdmin')?.value||'').toLowerCase();
-  const advSwCostFrom= parseFloat(document.getElementById('advSwCostFrom')?.value)||0;
-  const advSwCostTo  = parseFloat(document.getElementById('advSwCostTo')?.value)||Infinity;
-
   let list = software.filter(s => {
     const departmentText = formatSoftwareDepartmentLabel(s.department).toLowerCase();
     if(typeF   && s.deploymentType !== typeF)  return false;
     if(renewF  && s.renewalPeriod  !== renewF) return false;
     if(statusF && s.status         !== statusF)return false;
-    if(q && ![s.name, departmentText, s.owner, s.csvId, s.purpose].join(' ').toLowerCase().includes(q)) return false;
+    if(q && ![s.name, departmentText, s.owner, s.csvId, s.purpose, s.provisioningMethod, s.connectorType, s.provisioningNotes].join(' ').toLowerCase().includes(q)) return false;
     if(advSwName  && !(s.name||'').toLowerCase().includes(advSwName))         return false;
     if(advSwDept  && !departmentText.includes(advSwDept))                     return false;
     if(advSwOwner && !(s.owner||'').toLowerCase().includes(advSwOwner))       return false;
     if(advSwAdmin && !(s.admins||'').toLowerCase().includes(advSwAdmin))      return false;
-    const annualCost = (s.purchasedLicenses||0) * (s.licensePricePerUserMonth||0) * 12
-      + (s.services||[]).filter(sv=>sv.status==='Active').reduce((a,sv)=>{
-          return a + (sv.purchasedLicenses||0)*(sv.licensePricePerUserMonth||0)*12;
-        }, 0);
-    if(annualCost < advSwCostFrom) return false;
-    if(advSwCostTo < Infinity && annualCost > advSwCostTo) return false;
     return true;
   });
 
@@ -2662,6 +2911,10 @@ function openSoftwareModal(s=null){
   document.getElementById('swRenewal').value  = s?.renewalPeriod||'';
   setSelectedSoftwareDepartments('swDept', s?.department||'');
   document.getElementById('swPurpose').value  = s?.purpose||'';
+  document.getElementById('swProvisioningMethod').value = s?.provisioningMethod||'Manual';
+  document.getElementById('swConnectorType').value = s?.connectorType||'';
+  document.getElementById('swSupportsDeprovision').checked = !!s?.supportsDeprovision;
+  document.getElementById('swProvisioningNotes').value = s?.provisioningNotes||'';
   document.getElementById('swLicPrice').value = s?.licensePricePerUserMonth||0;
   document.getElementById('swCost').value     = s?.annualCost||0;
   document.getElementById('swPlan').value     = s?.subscriptionPlan||'';
@@ -2699,6 +2952,10 @@ async function saveSoftware(){
   const data = {
     csvId, name,
     deploymentType: document.getElementById('swType').value,
+    provisioningMethod: document.getElementById('swProvisioningMethod').value,
+    connectorType:  document.getElementById('swConnectorType').value.trim(),
+    supportsDeprovision: document.getElementById('swSupportsDeprovision').checked,
+    provisioningNotes: document.getElementById('swProvisioningNotes').value.trim(),
     renewalPeriod:  document.getElementById('swRenewal').value,
     purpose:        document.getElementById('swPurpose').value.trim(),
     licensePricePerUserMonth: parseFloat(document.getElementById('swLicPrice').value)||0,
@@ -2797,24 +3054,16 @@ function filteredSoftware(){
   const advSwDept    = (document.getElementById('advSwDept')?.value||'').toLowerCase();
   const advSwOwner   = (document.getElementById('advSwOwner')?.value||'').toLowerCase();
   const advSwAdmin   = (document.getElementById('advSwAdmin')?.value||'').toLowerCase();
-  const advSwCostFrom= parseFloat(document.getElementById('advSwCostFrom')?.value)||0;
-  const advSwCostTo  = parseFloat(document.getElementById('advSwCostTo')?.value)||Infinity;
   let list = software.filter(s=>{
     const departmentText = formatSoftwareDepartmentLabel(s.department).toLowerCase();
     if(typeF   && s.deploymentType !== typeF)  return false;
     if(renewF  && s.renewalPeriod  !== renewF) return false;
     if(statusF && s.status         !== statusF)return false;
-    if(q && ![s.name, departmentText, s.owner, s.csvId, s.purpose].join(' ').toLowerCase().includes(q)) return false;
+    if(q && ![s.name, departmentText, s.owner, s.csvId, s.purpose, s.provisioningMethod, s.connectorType, s.provisioningNotes].join(' ').toLowerCase().includes(q)) return false;
     if(advSwName  && !(s.name||'').toLowerCase().includes(advSwName))         return false;
     if(advSwDept  && !departmentText.includes(advSwDept))                     return false;
     if(advSwOwner && !(s.owner||'').toLowerCase().includes(advSwOwner))       return false;
     if(advSwAdmin && !(s.admins||'').toLowerCase().includes(advSwAdmin))      return false;
-    const annualCost = (s.purchasedLicenses||0) * (s.licensePricePerUserMonth||0) * 12
-      + (s.services||[]).filter(sv=>sv.status==='Active').reduce((a,sv)=>{
-          return a + (sv.purchasedLicenses||0)*(sv.licensePricePerUserMonth||0)*12;
-        }, 0);
-    if(annualCost < advSwCostFrom) return false;
-    if(advSwCostTo < Infinity && annualCost > advSwCostTo) return false;
     return true;
   });
   if(swBudgetFilter === 'paid') list = list.filter(s=>swTotalCost(s)>0);
@@ -2824,11 +3073,12 @@ function filteredSoftware(){
 
 function exportSwCSV(){
   const list = filteredSoftware();
-  const headers = ['ID','Name','Type','Department','Purpose','Subscription Plan','Renewal','License $/mo','Purchased Licenses','Used Licenses','Base Annual Cost','Add-on Services','Total Annual Cost','Owner','Admins','Billed To','Status','USA','CAN','IND'];
+  const headers = ['ID','Name','Type','Department','Purpose','Provisioning Method','Connector Type','Auto Deprovision','Provisioning Notes','Subscription Plan','Renewal','License $/mo','Purchased Licenses','Used Licenses','Base Annual Cost','Add-on Services','Total Annual Cost','Owner','Admins','Billed To','Status','USA','CAN','IND'];
   const rows = list.map(s=>{
     const svcCount = (s.services||[]).filter(sv=>sv.status!=='Inactive').length;
     return [
       s.csvId, s.name, s.deploymentType, formatSoftwareDepartmentLabel(s.department), s.purpose||'',
+      s.provisioningMethod||'Manual', s.connectorType||'', s.supportsDeprovision ? 'Yes' : 'No', s.provisioningNotes||'',
       s.subscriptionPlan||'', s.renewalPeriod||'',
       s.licensePricePerUserMonth||0, s.purchasedLicenses||0, s.usedLicenses||0,
       (s.annualCost||0) > 0 ? s.annualCost : (s.renewalPeriod==='Pay-as-you-go' ? 'Variable' : 0),
@@ -3185,12 +3435,18 @@ function openSwDm(id){
     ['Billed To',  s.billedTo||'—'],
     ['Department', getSoftwareMappedDepts(s)],
     ['Type',       s.deploymentType||'—'],
+    ['Provisioning', s.provisioningMethod||'Manual'],
+    ['Connector',  s.connectorType||'—'],
+    ['Auto Deprovision', s.supportsDeprovision ? 'Yes' : 'No'],
     ['Status',     s.status||'Active'],
     ['Sites',      [s.siteUSA&&'🇺🇸 USA',s.siteCAN&&'🇨🇦 CAN',s.siteIND&&'🇮🇳 IND'].filter(Boolean).join('  ')||'—'],
   ];
   document.getElementById('swDrInfoBody').innerHTML = infoFields.map(([l,v])=>
     `<div class="sw-info-item"><label>${l}</label><span>${v}</span></div>`
   ).join('');
+  if(s.provisioningNotes){
+    document.getElementById('swDrInfoBody').innerHTML += `<div class="sw-info-item" style="grid-column:1/-1"><label>Provisioning Notes</label><span>${s.provisioningNotes}</span></div>`;
+  }
 
   /* ─ Open overlay ─ */
   document.getElementById('swDmOverlay').classList.add('open');
@@ -3228,6 +3484,10 @@ function swdePopulateForm(){
   const deptReadOnly = document.getElementById('swdeDeptReadOnly');
   if (deptReadOnly) deptReadOnly.textContent = getSoftwareMappedDepts(s);
   document.getElementById('swdePurpose').value  = s.purpose||'';
+  document.getElementById('swdeProvisioningMethod').value = s.provisioningMethod||'Manual';
+  document.getElementById('swdeConnectorType').value = s.connectorType||'';
+  document.getElementById('swdeSupportsDeprovision').checked = !!s.supportsDeprovision;
+  document.getElementById('swdeProvisioningNotes').value = s.provisioningNotes||'';
   document.getElementById('swdePlan').value     = s.subscriptionPlan||'';
   document.getElementById('swdeStatus').value   = s.status||'Active';
   document.getElementById('swdeLicPrice').value = s.licensePricePerUserMonth||0;
@@ -3348,6 +3608,10 @@ async function swdeSave(){
   const data = {
     csvId, name,
     deploymentType: document.getElementById('swdeType').value,
+    provisioningMethod: document.getElementById('swdeProvisioningMethod').value,
+    connectorType: document.getElementById('swdeConnectorType').value.trim(),
+    supportsDeprovision: document.getElementById('swdeSupportsDeprovision').checked,
+    provisioningNotes: document.getElementById('swdeProvisioningNotes').value.trim(),
     renewalPeriod:  document.getElementById('swdeRenewal').value,
     purpose:        document.getElementById('swdePurpose').value.trim(),
     subscriptionPlan: document.getElementById('swdePlan').value.trim(),
@@ -3460,6 +3724,10 @@ const EXPORT_DEFS = {
       { key:'type',     label:'Type',              def:true,  get: s => s.deploymentType||'' },
       { key:'dept',     label:'Department',        def:true,  get: s => formatSoftwareDepartmentLabel(s.department) },
       { key:'purpose',  label:'Purpose',           def:false, get: s => s.purpose||'' },
+      { key:'provisioningMethod', label:'Provisioning Method', def:true,  get: s => s.provisioningMethod||'Manual' },
+      { key:'connectorType', label:'Connector Type', def:false, get: s => s.connectorType||'' },
+      { key:'supportsDeprovision', label:'Auto Deprovision', def:false, get: s => s.supportsDeprovision ? 'Yes' : 'No' },
+      { key:'provisioningNotes', label:'Provisioning Notes', def:false, get: s => s.provisioningNotes||'' },
       { key:'plan',     label:'Subscription Plan', def:true,  get: s => s.subscriptionPlan||'' },
       { key:'renewal',  label:'Renewal',           def:true,  get: s => s.renewalPeriod||'' },
       { key:'licPrice', label:'License $/mo',      def:true,  get: s => s.licensePricePerUserMonth||0 },
@@ -3847,6 +4115,27 @@ async function saveDeptSoftwareMapping() {
     const sw   = software.find(s => s.id === swId);
     if (!sw) continue;
 
+    // Check if this software is already mapped to All Departments
+    const isAllDepts = parseSoftwareDepartments(sw.department)
+      .some(v => v.toLowerCase() === ALL_DEPARTMENT_LABEL.toLowerCase()
+              || v.toLowerCase() === 'all department');
+
+    if (isAllDepts) {
+      // If still checked, leave "All Departments" intact — do not overwrite
+      if (cb.checked) continue;
+      // User explicitly unchecked an "All Depts" software → clear it entirely
+      try {
+        const resp = await authFetch(`${API}/software/${swId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ department: '' }),
+        });
+        if (resp.ok) { sw.department = ''; saved++; }
+        else { failed++; }
+      } catch(e) { failed++; }
+      continue;
+    }
+
     // Current dept list for this software (excluding "All Departments")
     let depts = parseSoftwareDepartments(sw.department)
       .filter(v => v.toLowerCase() !== ALL_DEPARTMENT_LABEL.toLowerCase()
@@ -3954,6 +4243,10 @@ function renderDeptUserGrid(query) {
             !(u.email || '').toLowerCase().includes(q) &&
             !(u.jobTitle || '').toLowerCase().includes(q)) return false;
     return true;
+  }).sort((a, b) => {
+    const aM = (a.dept || '').toLowerCase() === dept.name.toLowerCase() ? 0 : 1;
+    const bM = (b.dept || '').toLowerCase() === dept.name.toLowerCase() ? 0 : 1;
+    return aM - bM;
   });
 
   if (!list.length) {
@@ -4474,22 +4767,22 @@ function renderScimAuditRows(){
   const totalDelta = rows.filter(r=>r.annualDelta!==null).reduce((a,r)=>a+r.annualDelta,0);
 
   document.getElementById('scimAuditSummary').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;flex:1;min-width:160px">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.28);border-radius:12px;flex:1;min-width:160px">
       <span style="font-size:20px">✅</span>
-      <div><div style="font-size:22px;font-weight:800;color:#16a34a;line-height:1">${ready}</div><div style="font-size:11px;color:#15803d;font-weight:600">SCIM Ready</div></div>
+      <div><div style="font-size:22px;font-weight:800;color:#a3ffd3;line-height:1">${ready}</div><div style="font-size:11px;color:#6ee7b7;font-weight:600">SCIM Ready</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;flex:1;min-width:160px">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.28);border-radius:12px;flex:1;min-width:160px">
       <span style="font-size:20px">🔶</span>
-      <div><div style="font-size:22px;font-weight:800;color:#d97706;line-height:1">${upgrade}</div><div style="font-size:11px;color:#b45309;font-weight:600">Needs Upgrade</div></div>
+      <div><div style="font-size:22px;font-weight:800;color:#fcd34d;line-height:1">${upgrade}</div><div style="font-size:11px;color:#fbbf24;font-weight:600">Needs Upgrade</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--gray-100);border:1px solid var(--gray-200);border-radius:10px;flex:1;min-width:160px">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(130,96,185,.12);border:1px solid rgba(130,96,185,.28);border-radius:12px;flex:1;min-width:160px">
       <span style="font-size:20px">⚪</span>
-      <div><div style="font-size:22px;font-weight:800;color:var(--gray-600);line-height:1">${unknown}</div><div style="font-size:11px;color:var(--gray-500);font-weight:600">Plan Unknown</div></div>
+      <div><div style="font-size:22px;font-weight:800;color:#d8ccec;line-height:1">${unknown}</div><div style="font-size:11px;color:#b8a9cf;font-weight:600">Plan Unknown</div></div>
     </div>
     ${totalDelta>0?`
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;flex:1;min-width:180px">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.28);border-radius:12px;flex:1;min-width:180px">
       <span style="font-size:20px">💸</span>
-      <div><div style="font-size:18px;font-weight:800;color:#dc2626;line-height:1">$${totalDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}/yr</div><div style="font-size:11px;color:#b91c1c;font-weight:600">Total Upgrade Cost Delta</div></div>
+      <div><div style="font-size:18px;font-weight:800;color:#ffb6b6;line-height:1">$${totalDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}/yr</div><div style="font-size:11px;color:#fca5a5;font-weight:600">Total Upgrade Cost Delta</div></div>
     </div>`:''}
   `;
 
@@ -4503,55 +4796,55 @@ function renderScimAuditRows(){
   }
 
   body.innerHTML = visible.map(({ s, status, statusLabel, statusColor, statusBg, curPlan, reqPlan, curPpu, reqPpu, licenses, annualDelta, dbEntry }) => {
-    const curPpuStr  = curPpu  !== null && curPpu  !== undefined ? `$${curPpu.toFixed(2)}` : '<span style="color:var(--gray-400)">—</span>';
-    const reqPpuStr  = reqPpu  !== null && reqPpu  !== undefined ? `$${reqPpu.toFixed(2)}`  : (reqPlan ? '<span style="color:var(--gray-400)">Custom</span>' : '<span style="color:var(--gray-400)">—</span>');
+    const curPpuStr  = curPpu  !== null && curPpu  !== undefined ? `$${curPpu.toFixed(2)}` : '<span style="color:#9b8ab9">—</span>';
+    const reqPpuStr  = reqPpu  !== null && reqPpu  !== undefined ? `$${reqPpu.toFixed(2)}`  : (reqPlan ? '<span style="color:#9b8ab9">Custom</span>' : '<span style="color:#9b8ab9">—</span>');
     const deltaStr   = annualDelta !== null
-      ? `<span style="font-weight:700;color:#dc2626">+$${annualDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</span>`
-      : (status==='ready' ? '<span style="color:#16a34a;font-weight:600">No cost</span>' : '<span style="color:var(--gray-400)">—</span>');
+      ? `<span style="font-weight:700;color:#ffb6b6">+$${annualDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</span>`
+      : (status==='ready' ? '<span style="color:#a3ffd3;font-weight:600">No cost</span>' : '<span style="color:#9b8ab9">—</span>');
     const reqPlanStr = reqPlan
-      ? `<span style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">${reqPlan}</span>`
-      : (status==='ready' ? '<span style="color:var(--gray-400);font-size:12px">Already on SCIM plan</span>' : '<span style="color:var(--gray-400)">—</span>');
+      ? `<span style="background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">${reqPlan}</span>`
+      : (status==='ready' ? '<span style="color:#9b8ab9;font-size:12px">Already on SCIM plan</span>' : '<span style="color:#9b8ab9">—</span>');
     const curPlanStr = s.subscriptionPlan
-      ? `<span style="background:#eff6ff;color:var(--primary);border:1px solid #bfdbfe;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">${s.subscriptionPlan}</span>`
-      : '<span style="color:var(--gray-400);font-size:12px;font-style:italic">Not set</span>';
+      ? `<span style="background:rgba(124,92,255,.18);color:#c4b5fd;border:1px solid rgba(124,92,255,.35);padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">${s.subscriptionPlan}</span>`
+      : '<span style="color:#9b8ab9;font-size:12px;font-style:italic">Not set</span>';
 
     // Connector cell — only shown for SCIM-ready apps that have a connector def
     const connKey = scimConnectorKey(s.name);
     const connDef = connKey ? SCIM_CONNECTOR_DEFS[connKey] : null;
-    let connCell = `<td style="padding:10px 16px;text-align:center;background:#f8faff"></td>`;
+    let connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(49,83,216,.07)"></td>`;
     if(status === 'ready' && connDef){
       const existing = appConnectors.find(c => c.appName === connDef.appName);
       if(existing && existing.enabled){
-        connCell = `<td style="padding:10px 16px;text-align:center;background:#f8faff">
+        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(49,83,216,.07)">
           <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-            <span style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:3px 10px;border-radius:9999px;font-size:11.5px;font-weight:700;white-space:nowrap">✓ Connected</span>
-            <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" style="background:none;border:none;color:var(--primary-light);font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Edit</button>
+            <span style="background:rgba(52,211,153,.14);color:#a3ffd3;border:1px solid rgba(52,211,153,.3);padding:3px 10px;border-radius:9999px;font-size:11.5px;font-weight:700;white-space:nowrap">✓ Connected</span>
+            <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" style="background:none;border:none;color:#93c5fd;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Edit</button>
           </div>
         </td>`;
       } else {
-        connCell = `<td style="padding:10px 16px;text-align:center;background:#f8faff">
+        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(49,83,216,.07)">
           <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')"
-            style="background:var(--primary);color:#fff;border:none;padding:5px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">
+            style="background:linear-gradient(135deg,#3757e6,#7c5cff);color:#fff;border:none;padding:5px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(124,92,255,.35)">
             🔌 Set Up
           </button>
         </td>`;
       }
     }
 
-    return `<tr style="border-top:1px solid var(--gray-100)">
+    return `<tr style="border-top:1px solid rgba(130,96,185,.18);transition:background .12s" onmouseover="this.style.background='rgba(124,92,255,.07)'" onmouseout="this.style.background=''">
       <td style="padding:12px 16px">
-        <div style="font-weight:700;font-size:13px;color:var(--gray-800)">${s.name}</div>
-        <div style="font-size:11px;color:var(--gray-400)">${dbEntry ? dbEntry.vendor : s.deploymentType}</div>
+        <div style="font-weight:700;font-size:13px;color:#f5efff">${s.name}</div>
+        <div style="font-size:11px;color:#9b8ab9">${dbEntry ? dbEntry.vendor : s.deploymentType}</div>
       </td>
       <td style="padding:12px 16px">${curPlanStr}</td>
-      <td style="padding:12px 16px;font-size:12px;color:var(--gray-600)">${licenses > 0 ? `<span class="tag">${licenses}</span>` : '<span style="color:var(--gray-400)">—</span>'}</td>
+      <td style="padding:12px 16px;font-size:12px;color:#d8ccec">${licenses > 0 ? `<span style="background:rgba(124,92,255,.18);color:#c4b5fd;border:1px solid rgba(124,92,255,.3);padding:2px 9px;border-radius:9999px;font-size:11.5px;font-weight:700">${licenses}</span>` : '<span style="color:#9b8ab9">—</span>'}</td>
       <td style="padding:12px 16px">
         <span style="background:${statusBg};color:${statusColor};padding:3px 9px;border-radius:9999px;font-size:12px;font-weight:600;white-space:nowrap">${statusLabel}</span>
       </td>
       <td style="padding:12px 16px">${reqPlanStr}</td>
-      <td style="padding:12px 16px;text-align:right;font-size:12.5px;color:var(--gray-700)">${curPpuStr}</td>
-      <td style="padding:12px 16px;text-align:right;font-size:12.5px;color:var(--gray-700)">${reqPpuStr}</td>
-      <td style="padding:12px 16px;text-align:right;background:#fefce8">${deltaStr}</td>
+      <td style="padding:12px 16px;text-align:right;font-size:12.5px;color:#d8ccec">${curPpuStr}</td>
+      <td style="padding:12px 16px;text-align:right;font-size:12.5px;color:#d8ccec">${reqPpuStr}</td>
+      <td style="padding:12px 16px;text-align:right;background:rgba(245,158,11,.07)">${deltaStr}</td>
       ${connCell}
     </tr>`;
   }).join('');
@@ -4745,6 +5038,321 @@ function showDeptUsers(dept) {
 function closeDeptModal() {
   document.getElementById('deptModal').classList.remove('open');
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ALERT NOTIFICATION ENGINE
+   Reads alert rules from localStorage("tcAlerts"), evaluates them against
+   live data (software / users / assets), and renders per-entity notifications
+   in the topbar bell dropdown.
+═══════════════════════════════════════════════════════════════════════════ */
+
+// dismissed notification IDs are stored so they don't reappear this session
+let _dismissedNotifIds = new Set(
+  JSON.parse(localStorage.getItem('tcNotifDismissed') || '[]')
+);
+
+function _saveDismissed() {
+  localStorage.setItem('tcNotifDismissed', JSON.stringify([..._dismissedNotifIds]));
+}
+
+// Active evaluated notifications (regenerated on every data load)
+let _activeNotifs = [];
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function _fmtPct(used, purchased) {
+  if (!purchased) return '—';
+  return Math.round((used / purchased) * 100) + '%';
+}
+function _fmtCost(n) {
+  if (!n) return '$0';
+  return n >= 1000 ? '$' + (n / 1000).toFixed(1) + 'K' : '$' + n.toLocaleString('en-US');
+}
+function _daysSince(dateStr) {
+  if (!dateStr) return Infinity;
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
+}
+function _notifId(alertId, entityId) {
+  return alertId + '::' + entityId;
+}
+function _swTotalCost(s) {
+  const base = s.annualCost || 0;
+  const svc  = (s.services || []).filter(sv => sv.status !== 'Inactive')
+                  .reduce((sum, sv) => sum + (sv.annualCost || 0), 0);
+  return base + svc;
+}
+
+// ── Main evaluation ───────────────────────────────────────────────────────────
+function evaluateAlerts() {
+  const rules = JSON.parse(localStorage.getItem('tcAlerts') || '[]')
+                  .filter(a => a.enabled);
+  const results = [];
+  const now = new Date().toISOString();
+
+  rules.forEach(rule => {
+    const cat   = rule.category;
+    const cond  = rule.condition;
+    const thr   = parseFloat(rule.threshold) || 0;
+
+    // ── SOFTWARE conditions ──────────────────────────────────────────────────
+    if (cat === 'software') {
+      software.forEach(s => {
+        const used      = s.usedLicenses      || 0;
+        const purchased = s.purchasedLicenses || 0;
+        const cost      = _swTotalCost(s);
+        const pct       = purchased > 0 ? (used / purchased) * 100 : 0;
+        let triggered   = false;
+        let severity    = 'warning';
+        let title       = rule.name;
+        let message     = '';
+
+        if (cond === 'license_over_pct' && purchased > 0 && pct >= thr) {
+          triggered = true;
+          severity  = pct >= 100 ? 'critical' : 'warning';
+          message   = `${s.name} license utilization is ${Math.round(pct)}% — ${used} used out of ${purchased} purchased licenses.`;
+        } else if (cond === 'license_overused' && used > purchased && purchased > 0) {
+          triggered = true;
+          severity  = 'critical';
+          message   = `${s.name} is over-provisioned: ${used} licenses used but only ${purchased} purchased.`;
+        } else if (cond === 'cost_exceeds' && cost >= thr) {
+          triggered = true;
+          severity  = 'warning';
+          message   = `${s.name} annual cost is ${_fmtCost(cost)}, exceeding the threshold of ${_fmtCost(thr)}.`;
+        } else if (cond === 'software_inactive' && (s.status || '').toLowerCase() === 'inactive') {
+          triggered = true;
+          severity  = 'info';
+          message   = `${s.name} is currently marked as Inactive in the software inventory.`;
+        } else if (cond === 'zero_used_licenses' && purchased > 0 && used === 0) {
+          triggered = true;
+          severity  = 'warning';
+          message   = `${s.name} has 0 used licenses out of ${purchased} purchased — possible waste.`;
+        } else if (cond === 'software_added') {
+          // event-based — skip static evaluation
+        }
+
+        if (triggered) {
+          results.push({ id: _notifId(rule.id, s.id || s.csvId), alertId: rule.id,
+            alertName: rule.name, category: cat, severity, title, message,
+            entityName: s.name, timestamp: now });
+        }
+      });
+    }
+
+    // ── USER conditions ──────────────────────────────────────────────────────
+    else if (cat === 'users') {
+      users.forEach(u => {
+        let triggered = false;
+        let severity  = 'info';
+        let message   = '';
+
+        if (cond === 'user_deactivated' && (u.status || '').toLowerCase() === 'inactive') {
+          triggered = true;
+          severity  = 'warning';
+          message   = `${u.name} (${u.email}) account is currently Inactive.`;
+        } else if (cond === 'inactive_user') {
+          const days = _daysSince(u.lastLogin || u.updatedAt);
+          if (days >= thr) {
+            triggered = true;
+            severity  = days >= thr * 2 ? 'critical' : 'warning';
+            message   = `${u.name} has not logged in for ${days === Infinity ? 'an unknown number of' : days} days (threshold: ${thr} days).`;
+          }
+        } else if (cond === 'role_changed') {
+          // event-based — skip static evaluation
+        }
+
+        if (triggered) {
+          results.push({ id: _notifId(rule.id, u.id || u.email), alertId: rule.id,
+            alertName: rule.name, category: cat, severity, title: rule.name, message,
+            entityName: u.name, timestamp: now });
+        }
+      });
+    }
+
+    // ── ASSET conditions ─────────────────────────────────────────────────────
+    else if (cat === 'assets') {
+      if (cond === 'asset_count_exceeds') {
+        const count = assets.length;
+        if (count >= thr) {
+          results.push({ id: _notifId(rule.id, 'total'), alertId: rule.id,
+            alertName: rule.name, category: cat, severity: 'warning', title: rule.name,
+            message: `Total asset count is ${count}, exceeding the threshold of ${thr}.`,
+            entityName: 'All Assets', timestamp: now });
+        }
+      } else {
+        assets.forEach(a => {
+          let triggered = false;
+          let severity  = 'info';
+          let message   = '';
+          const status  = (a.status || '').toLowerCase();
+
+          if (cond === 'asset_under_repair' && status === 'under repair') {
+            triggered = true; severity = 'warning';
+            message   = `${a.assetName || a.type || 'Asset'} (S/N: ${a.serialNumber || '—'}) is currently Under Repair.`;
+          } else if (cond === 'asset_retired' && status === 'retired') {
+            triggered = true; severity = 'info';
+            message   = `${a.assetName || a.type || 'Asset'} (S/N: ${a.serialNumber || '—'}) has been Retired.`;
+          } else if (cond === 'asset_unassigned' && (!a.assignedTo || a.assignedTo === '')) {
+            triggered = true; severity = 'info';
+            message   = `${a.assetName || a.type || 'Asset'} (S/N: ${a.serialNumber || '—'}) is currently unassigned.`;
+          } else if (cond === 'unassigned_days') {
+            const days = _daysSince(a.updatedAt);
+            if ((!a.assignedTo || a.assignedTo === '') && days >= thr) {
+              triggered = true; severity = 'warning';
+              message   = `${a.assetName || a.type || 'Asset'} (S/N: ${a.serialNumber || '—'}) has been unassigned for ${days} days.`;
+            }
+          }
+
+          if (triggered) {
+            results.push({ id: _notifId(rule.id, a.id || a.serialNumber), alertId: rule.id,
+              alertName: rule.name, category: cat, severity, title: rule.name, message,
+              entityName: a.assetName || a.type || a.serialNumber || 'Asset', timestamp: now });
+          }
+        });
+      }
+    }
+  });
+
+  // Filter out dismissed notifications
+  _activeNotifs = results.filter(n => !_dismissedNotifIds.has(n.id));
+  renderNotifPanel();
+}
+
+// ── Render notification panel (inline dashboard section) ──────────────────────
+let _notifCollapsed = false;
+
+function renderNotifPanel() {
+  const section  = document.getElementById('notifSection');
+  const grid     = document.getElementById('notifGrid');
+  const badge    = document.getElementById('notifBadge');
+  const sub      = document.getElementById('notifSectionSub');
+  const title    = document.getElementById('notifSectionTitle');
+  const icon     = document.getElementById('notifSectionIcon');
+  const clearBtn = document.getElementById('notifClearAllBtn');
+  if (!section || !grid) return;
+
+  const count    = _activeNotifs.length;
+  const critical = _activeNotifs.filter(n => n.severity === 'critical').length;
+  const warning  = _activeNotifs.filter(n => n.severity === 'warning').length;
+
+  // Bell badge in topbar
+  const badgeEl = document.getElementById('notifBadge');
+  if (badgeEl) { badgeEl.textContent = count > 99 ? '99+' : count; badgeEl.classList.toggle('show', count > 0); }
+
+  // Alert stat tile on dashboard
+  const alertTile = document.getElementById('alertStatTile');
+  const alertNum  = document.getElementById('alertStatNum');
+  const alertIcon = document.getElementById('alertStatIcon');
+  if (alertTile) {
+    alertTile.style.display = count > 0 ? '' : 'none';
+    if (alertNum) alertNum.textContent = count;
+    if (alertIcon) {
+      alertIcon.style.background = critical > 0 ? '#fef2f2' : '#fffbeb';
+      alertIcon.style.color      = critical > 0 ? '#ef4444' : '#f59e0b';
+    }
+    alertTile.style.borderTopColor = critical > 0 ? '#ef4444' : '#f59e0b';
+    if (alertNum) alertNum.style.color = critical > 0 ? '#ef4444' : '#f59e0b';
+  }
+
+  // Show/hide the whole section
+  section.classList.toggle('visible', count > 0);
+  if (count === 0) return;
+
+  // Header text
+  if (title) title.textContent = `🔔 Active Notifications (${count})`;
+  if (sub) {
+    const parts = [];
+    if (critical) parts.push(`${critical} critical`);
+    if (warning)  parts.push(`${warning} warning`);
+    const rest = count - critical - warning;
+    if (rest)     parts.push(`${rest} info`);
+    sub.textContent = parts.join(' · ');
+  }
+  // Icon colour — red if any critical, amber if only warnings
+  if (icon) {
+    icon.className = critical ? 'notif-section-icon' : 'notif-section-icon';
+    icon.style.background = critical ? '#fef2f2' : '#fffbeb';
+    icon.querySelector('svg').style.stroke = critical ? '#ef4444' : '#d97706';
+  }
+  if (clearBtn) clearBtn.style.display = '';
+
+  // Sort: critical → warning → info
+  const sorted = [..._activeNotifs].sort((a, b) => {
+    const rank = { critical: 0, warning: 1, info: 2 };
+    return (rank[a.severity] ?? 3) - (rank[b.severity] ?? 3);
+  });
+
+  const catLabel = { users: 'Users', software: 'Software', assets: 'Assets' };
+  const sevLabel = { critical: 'Critical', warning: 'Warning', info: 'Info' };
+
+  grid.innerHTML = sorted.map(n => `
+    <div class="notif-item" id="notif-${CSS.escape(n.id)}">
+      <span class="notif-item-dot ${n.severity}"></span>
+      <div class="notif-item-body">
+        <div class="notif-item-title">${_escHtml(n.entityName)}</div>
+        <div class="notif-item-msg">${_escHtml(n.message)}</div>
+        <div class="notif-item-meta">
+          <span class="notif-cat-badge ${n.category}">${catLabel[n.category] || n.category}</span>
+          <span class="notif-sev-badge ${n.severity}">${sevLabel[n.severity] || n.severity}</span>
+        </div>
+      </div>
+      <button class="notif-dismiss" onclick="dismissNotif('${n.id.replace(/'/g,"\\'")}',event)" title="Dismiss">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>`).join('');
+
+  // Apply collapse state
+  grid.classList.toggle('collapsed', _notifCollapsed);
+}
+
+function _escHtml(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Dismiss ───────────────────────────────────────────────────────────────────
+function dismissNotif(id, event) {
+  if (event) event.stopPropagation();
+  _dismissedNotifIds.add(id);
+  _saveDismissed();
+  _activeNotifs = _activeNotifs.filter(n => n.id !== id);
+  renderNotifPanel();
+}
+
+function dismissAllNotifs() {
+  _activeNotifs.forEach(n => _dismissedNotifIds.add(n.id));
+  _saveDismissed();
+  _activeNotifs = [];
+  renderNotifPanel();
+}
+
+// ── Navigate to dashboard notifications section ───────────────────────────────
+function goToNotifications() {
+  // Navigate to dashboard (first nav-item is the Dashboard link)
+  var dashNav = document.querySelector('.nav-item[onclick*="dashboard"]');
+  navigate('dashboard', dashNav);
+  setTimeout(function() {
+    var sec = document.getElementById('notifSection');
+    if (sec) {
+      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // If collapsed, expand it
+      if (_notifCollapsed) toggleNotifCollapse();
+    }
+  }, 100);
+}
+
+// ── Collapse / expand inline notification section ────────────────────────────
+function toggleNotifCollapse() {
+  _notifCollapsed = !_notifCollapsed;
+  var grid = document.getElementById('notifGrid');
+  var btn  = document.getElementById('notifCollapseBtn');
+  if (!grid || !btn) return;
+  if (_notifCollapsed) {
+    grid.style.display = 'none';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg> Expand';
+  } else {
+    grid.style.display = '';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg> Collapse';
+  }
+}
+
 </script>
 
 <!-- SOFTWARE APP DETAIL MODAL -->
@@ -4868,6 +5476,24 @@ function closeDeptModal() {
             </div>
             <div class="form-group"><label>Purpose</label><input type="text" id="swdePurpose" placeholder="e.g. CI/CD"></div>
 
+            <div class="form-group"><label>Provisioning Method</label>
+              <select id="swdeProvisioningMethod">
+                <option>Manual</option>
+                <option>SCIM</option>
+                <option>API</option>
+                <option>SSO Only</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Connector Type</label><input type="text" id="swdeConnectorType" placeholder="e.g. Google Workspace, Slack, Custom API"></div>
+
+            <div class="form-group" style="display:flex;align-items:flex-end">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:500">
+                <input type="checkbox" id="swdeSupportsDeprovision">
+                Supports automatic deprovision
+              </label>
+            </div>
+            <div class="form-group"><label>Provisioning Notes</label><input type="text" id="swdeProvisioningNotes" placeholder="e.g. Managed through Entra SCIM connector"></div>
+
             <div class="form-group"><label>Subscription Plan</label><input type="text" id="swdePlan" placeholder="e.g. Business Pro"></div>
             <div class="form-group"><label>Status</label>
               <select id="swdeStatus"><option>Active</option><option>Inactive</option></select>
@@ -4949,53 +5575,53 @@ function closeDeptModal() {
 
 <!-- DEPT USERS MODAL -->
 <!-- ══ SCIM AUDIT MODAL ══ -->
-<div id="scimAuditModal" onclick="if(event.target===this)closeScimAudit()" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;backdrop-filter:blur(3px)">
-  <div style="background:#fff;border-radius:16px;width:min(1100px,100%);box-shadow:0 24px 80px rgba(0,0,0,.22);margin:auto">
+<div id="scimAuditModal" onclick="if(event.target===this)closeScimAudit()" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,4,16,.72);align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;backdrop-filter:blur(6px)">
+  <div style="background:rgba(22,14,34,.97);border:1px solid rgba(130,96,185,.3);border-radius:18px;width:min(1100px,100%);box-shadow:0 32px 90px rgba(0,0,0,.6),0 0 0 1px rgba(124,92,255,.12);margin:auto">
     <!-- Header -->
-    <div style="padding:20px 26px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between">
+    <div style="padding:20px 26px 16px;border-bottom:1px solid rgba(130,96,185,.2);display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#eff6ff,#f0fdf4);display:flex;align-items:center;justify-content:center">
-          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#1e40af;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(49,83,216,.35),rgba(124,92,255,.35));border:1px solid rgba(124,92,255,.4);display:flex;align-items:center;justify-content:center">
+          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#a78bfa;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
         </div>
         <div>
-          <div style="font-size:15px;font-weight:700;color:var(--gray-800)">SCIM Readiness Audit</div>
-          <div style="font-size:11.5px;color:var(--gray-400)">Which SAAS apps can use SCIM and what upgrades are needed</div>
+          <div style="font-size:15px;font-weight:700;color:#f5efff">SCIM Readiness Audit</div>
+          <div style="font-size:11.5px;color:#9b8ab9">Which SAAS apps can use SCIM and what upgrades are needed</div>
         </div>
       </div>
-      <button onclick="closeScimAudit()" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:22px;line-height:1;padding:4px 8px;border-radius:8px" title="Close">&times;</button>
+      <button onclick="closeScimAudit()" style="background:rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.22);cursor:pointer;color:#b8a9cf;font-size:22px;line-height:1;padding:4px 10px;border-radius:8px;transition:all .14s" onmouseover="this.style.background='rgba(124,92,255,.22)'" onmouseout="this.style.background='rgba(124,92,255,.12)'" title="Close">&times;</button>
     </div>
     <!-- Summary chips -->
-    <div id="scimAuditSummary" style="display:flex;gap:12px;padding:16px 26px;border-bottom:1px solid var(--gray-100);flex-wrap:wrap"></div>
+    <div id="scimAuditSummary" style="display:flex;gap:12px;padding:16px 26px;border-bottom:1px solid rgba(130,96,185,.2);flex-wrap:wrap"></div>
     <!-- Filters -->
-    <div style="padding:10px 26px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span style="font-size:12px;color:var(--gray-400);font-weight:600">Filter:</span>
-      <button class="btn btn-sm" id="scimFilterAll"    onclick="setScimFilter('all')"     style="background:var(--primary);color:#fff;border:none">All</button>
-      <button class="btn btn-secondary btn-sm" id="scimFilterReady"   onclick="setScimFilter('ready')"   >✅ SCIM Ready</button>
-      <button class="btn btn-secondary btn-sm" id="scimFilterUpgrade" onclick="setScimFilter('upgrade')" >🔶 Needs Upgrade</button>
-      <button class="btn btn-secondary btn-sm" id="scimFilterUnknown" onclick="setScimFilter('unknown')" >⚪ Unknown Plan</button>
+    <div style="padding:10px 26px;border-bottom:1px solid rgba(130,96,185,.2);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#9b8ab9;font-weight:600">Filter:</span>
+      <button class="btn btn-sm" id="scimFilterAll"    onclick="setScimFilter('all')"     style="background:linear-gradient(135deg,#3757e6,#7c5cff);color:#fff;border:none;box-shadow:0 4px 14px rgba(124,92,255,.35)">All</button>
+      <button class="btn btn-sm" id="scimFilterReady"   onclick="setScimFilter('ready')"   style="background:rgba(52,211,153,.12);color:#a3ffd3;border:1px solid rgba(52,211,153,.3)">✅ SCIM Ready</button>
+      <button class="btn btn-sm" id="scimFilterUpgrade" onclick="setScimFilter('upgrade')" style="background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.3)">🔶 Needs Upgrade</button>
+      <button class="btn btn-sm" id="scimFilterUnknown" onclick="setScimFilter('unknown')" style="background:rgba(148,163,184,.1);color:#d8ccec;border:1px solid rgba(130,96,185,.28)">⚪ Unknown Plan</button>
     </div>
     <!-- Table -->
     <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:13px">
         <thead>
-          <tr style="background:var(--gray-50)">
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">App</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Current Plan</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Licenses</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">SCIM Status</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Required Plan</th>
-            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Current Cost/user/mo</th>
-            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap">Upgrade Cost/user/mo</th>
-            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;background:#fefce8">Annual Cost Delta</th>
-            <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#1e40af;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;background:#eff6ff">Connector</th>
+          <tr style="background:rgba(31,20,46,.9)">
+            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">App</th>
+            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Current Plan</th>
+            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Licenses</th>
+            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">SCIM Status</th>
+            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Required Plan</th>
+            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Current Cost/user/mo</th>
+            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Upgrade Cost/user/mo</th>
+            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#fcd34d;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(245,158,11,.08)">Annual Cost Delta</th>
+            <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:#93c5fd;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(49,83,216,.12)">Connector</th>
           </tr>
         </thead>
         <tbody id="scimAuditBody"></tbody>
       </table>
     </div>
     <!-- Footer note -->
-    <div style="padding:14px 26px;border-top:1px solid var(--gray-100);font-size:11px;color:var(--gray-400);display:flex;align-items:center;gap:8px">
-      <svg viewBox="0 0 24 24" style="width:13px;height:13px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <div style="padding:14px 26px;border-top:1px solid rgba(130,96,185,.2);font-size:11px;color:#9b8ab9;display:flex;align-items:center;gap:8px;background:rgba(31,20,46,.5);border-radius:0 0 18px 18px">
+      <svg viewBox="0 0 24 24" style="width:13px;height:13px;flex-shrink:0;stroke:#a78bfa;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
       Plan pricing shown is per-user/month (billed annually) based on publicly available rates as of early 2025. Actual pricing may vary — confirm with each vendor.
     </div>
   </div>

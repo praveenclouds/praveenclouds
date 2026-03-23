@@ -9,6 +9,7 @@
  *   scimBodyToUser()  — converts a SCIM POST/PUT body to User model fields
  *   requireSCIM()     — Express middleware: validates SCIM Bearer token
  */
+const bcrypt      = require('bcryptjs');
 const { SCIMConfig } = require('../db');
 
 // ── Department name normalisation map ─────────────────────────────────────────
@@ -105,7 +106,9 @@ async function requireSCIM(req, res, next) {
     });
   }
   const cfg = await SCIMConfig.findOne();
-  if (!cfg || !cfg.enabled || cfg.bearerToken !== token) {
+  // Use bcrypt.compare so the stored hash is never compared in plain text.
+  const tokenValid = cfg && cfg.bearerToken && await bcrypt.compare(token, cfg.bearerToken);
+  if (!cfg || !cfg.enabled || !tokenValid) {
     return res.status(401).json({
       schemas: ['urn:ietf:params:scim:api:messages:2.0:Error'],
       status: '401', detail: 'Invalid or inactive SCIM bearer token.',

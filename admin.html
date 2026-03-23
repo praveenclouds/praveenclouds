@@ -214,6 +214,36 @@
     .all-depts-btn:hover { background:rgba(251,191,36,.18);border-color:rgba(251,191,36,.6); }
     .all-depts-btn.active { background:rgba(251,191,36,.22);border-color:rgba(251,191,36,.7);color:#fde68a; }
     .map-card.all-mapped { border-color:rgba(251,191,36,.45);background:rgba(251,191,36,.07); }
+
+    /* ── ALERTS PAGE ── */
+    .alert-category-header { display:flex;align-items:center;gap:12px;margin:0 0 14px; }
+    .alert-category-icon { width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+    .alert-category-icon svg { width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2; }
+    .alert-category-icon.users    { background:rgba(147,51,234,.15); color:#c084fc; }
+    .alert-category-icon.software { background:rgba(14,165,233,.13);  color:#38bdf8; }
+    .alert-category-icon.assets   { background:rgba(22,163,74,.13);   color:#4ade80; }
+    .alert-category-title { font-size:15px;font-weight:700;color:var(--text); }
+    .alert-category-sub   { font-size:11.5px;color:var(--text-muted);margin-top:2px; }
+    .alert-card { display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:11px;transition:border-color .15s;margin-bottom:9px; }
+    .alert-card:last-child { margin-bottom:0; }
+    .alert-card:hover { border-color:rgba(153,102,255,.35); }
+    .alert-card.alert-enabled { border-left:3px solid rgba(99,66,255,.65); }
+    .alert-card-body { flex:1;min-width:0; }
+    .alert-card-name { font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:3px; }
+    .alert-card-desc { font-size:12px;color:var(--text-muted);line-height:1.5; }
+    .alert-card-meta { display:flex;align-items:center;gap:7px;margin-top:9px;flex-wrap:wrap; }
+    .alert-tag { display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600; }
+    .alert-tag.cond      { background:rgba(99,66,255,.12);color:#a78bfa;border:1px solid rgba(99,66,255,.2); }
+    .alert-tag.ch        { background:rgba(14,165,233,.1); color:#38bdf8;border:1px solid rgba(14,165,233,.2); }
+    .alert-tag.thr       { background:rgba(251,191,36,.1); color:#fbbf24;border:1px solid rgba(251,191,36,.2); }
+    .alert-card-actions { display:flex;align-items:center;gap:8px;flex-shrink:0; }
+    .alert-empty { text-align:center;padding:36px 20px;background:rgba(153,102,255,.03);border:1px dashed rgba(153,102,255,.18);border-radius:12px;color:rgba(153,102,255,.45);font-size:13px;margin-bottom:9px; }
+    .modal-box.wide { width:580px; }
+    .channel-pills { display:flex;gap:8px;flex-wrap:wrap; }
+    .channel-pill { display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(153,102,255,.06);color:var(--text-muted);transition:all .14s;user-select:none; }
+    .channel-pill:hover { border-color:rgba(99,66,255,.4);color:var(--text); }
+    .channel-pill.ch-active { background:rgba(99,66,255,.18);border-color:rgba(99,66,255,.5);color:#c4b5fd; }
+    .channel-pill svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
@@ -262,6 +292,13 @@
       <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
       Departments
     </div>
+    <div class="nav-item" id="nav-alerts" onclick="showPage('alerts',this)" style="justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alerts
+      </div>
+      <span id="navAlertCount" style="display:none;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;background:rgba(248,113,113,0.18);color:#f87171;border:1px solid rgba(248,113,113,0.3)"></span>
+    </div>
     <div class="nav-item" onclick="location.href='/support'">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Support Center
@@ -274,17 +311,17 @@
   </nav>
   <div class="sidebar-footer">
     <!-- Learning Portal link -->
-    <a href="scim-learning-portal.html" target="_blank"
+    <a href="scim-learning-portal.html" target="_blank" class="learning-link-card"
       style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;margin-bottom:10px;background:linear-gradient(135deg,rgba(99,66,255,0.12),rgba(124,58,237,0.18));border:1px solid rgba(167,139,250,0.35);text-decoration:none;transition:box-shadow .15s"
       onmouseover="this.style.boxShadow='0 2px 12px rgba(124,58,237,.3)'" onmouseout="this.style.boxShadow='none'">
-      <div style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <div class="learning-link-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
       </div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap">SCIM Setup Guide</div>
-        <div style="font-size:10.5px;color:rgba(167,139,250,0.7);white-space:nowrap">Learning Portal →</div>
+        <div class="learning-link-title" style="font-size:12px;font-weight:700;color:#c4b5fd;white-space:nowrap">Learning Portal</div>
+        <div class="learning-link-sub" style="font-size:10.5px;color:rgba(167,139,250,0.7);white-space:nowrap">Admin guides &amp; how-tos →</div>
       </div>
-      <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:#a78bfa;fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      <svg viewBox="0 0 24 24" class="learning-link-arrow" style="width:13px;height:13px;stroke:#a78bfa;fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     </a>
     <div class="user-chip">
       <div class="avatar" id="sidebarAvatar">?</div>
@@ -303,6 +340,11 @@
 <div class="main">
   <div class="topbar">
     <h1 id="pageTitle">Portal Users</h1>
+    <!-- Alert Bell Button -->
+    <button id="alertBellBtn" onclick="showPage('alerts', document.getElementById('nav-alerts'))" title="Alerts" style="position:relative;background:rgba(153,102,255,0.1);border:1px solid var(--border);border-radius:9px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text-muted)" onmouseover="this.style.background='rgba(153,102,255,0.22)';this.style.color='#c4b5fd'" onmouseout="this.style.background='rgba(153,102,255,0.1)';this.style.color='var(--text-muted)'">
+      <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span id="alertBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#f87171;border-radius:50%;border:1.5px solid var(--surface)"></span>
+    </button>
     <button class="btn btn-back" onclick="location.href='/'">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Back to Portal
@@ -703,6 +745,83 @@
       </div>
     </div>
 
+    <!-- ── ALERTS PAGE ── -->
+    <div class="page" id="page-alerts">
+
+      <!-- Summary stats row -->
+      <div class="stat-grid" style="margin-bottom:24px">
+        <div class="stat-card"><div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><div><div class="stat-num" id="alertStatTotal">0</div><div class="stat-label">Total Alerts</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div><div class="stat-num" id="alertStatEnabled">0</div><div class="stat-label">Active Alerts</div></div></div>
+        <div class="stat-card"><div class="stat-icon sky"><svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4"/><path d="M16 11h6M19 8v6"/></svg></div><div><div class="stat-num" id="alertStatUsers">0</div><div class="stat-label">User Alerts</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><div class="stat-num" id="alertStatSoftware">0</div><div class="stat-label">Software Alerts</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple" style="background:rgba(22,163,74,.13);color:#4ade80"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div><div class="stat-num" id="alertStatAssets">0</div><div class="stat-label">Asset Alerts</div></div></div>
+      </div>
+
+      <!-- Header bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text)">Alert Rules</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Create and manage custom alerts for Users, Software, and Assets</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openAlertModal()">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          Create Alert
+        </button>
+      </div>
+
+      <!-- ── Users alerts section ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-header">
+          <div class="alert-category-icon users"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+          <div style="flex:1">
+            <div class="alert-category-title">User Alerts</div>
+            <div class="alert-category-sub">Notify on user account changes, logins, role updates</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openAlertModal('users')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
+          </button>
+        </div>
+        <div style="padding:16px" id="alertList-users">
+          <div class="alert-empty">No user alerts configured yet. Click <strong>Add</strong> to create one.</div>
+        </div>
+      </div>
+
+      <!-- ── Software alerts section ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-header">
+          <div class="alert-category-icon software"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <div style="flex:1">
+            <div class="alert-category-title">Software Inventory Alerts</div>
+            <div class="alert-category-sub">License usage, renewals, cost thresholds, new apps</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openAlertModal('software')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
+          </button>
+        </div>
+        <div style="padding:16px" id="alertList-software">
+          <div class="alert-empty">No software alerts configured yet. Click <strong>Add</strong> to create one.</div>
+        </div>
+      </div>
+
+      <!-- ── Asset alerts section ── -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="card-header">
+          <div class="alert-category-icon assets"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <div style="flex:1">
+            <div class="alert-category-title">Asset Inventory Alerts</div>
+            <div class="alert-category-sub">Assignments, repairs, retirements, stock thresholds</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="openAlertModal('assets')">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
+          </button>
+        </div>
+        <div style="padding:16px" id="alertList-assets">
+          <div class="alert-empty">No asset alerts configured yet. Click <strong>Add</strong> to create one.</div>
+        </div>
+      </div>
+
+    </div><!-- /page-alerts -->
+
   </div><!-- /content -->
 </div><!-- /main -->
 
@@ -900,6 +1019,91 @@
   </div>
 </div>
 
+<!-- ══ ALERT CREATE / EDIT MODAL ══ -->
+<div class="modal-overlay" id="alertModal" onclick="if(event.target===this)closeAlertModal()">
+  <div class="modal-box wide" style="max-height:90vh;overflow-y:auto">
+    <div class="modal-head">
+      <h3 id="alertModalTitle">Create Alert</h3>
+      <button class="modal-close" onclick="closeAlertModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Alert Name -->
+      <div class="form-group">
+        <label>Alert Name *</label>
+        <input type="text" id="aName" placeholder="e.g. License over 90% used" maxlength="80"/>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label>Category *</label>
+        <select id="aCategory" onchange="onAlertCategoryChange()">
+          <option value="">— Select category —</option>
+          <option value="users">👤  Users</option>
+          <option value="software">💻  Software Inventory</option>
+          <option value="assets">🖥️  Asset Inventory</option>
+        </select>
+      </div>
+
+      <!-- Condition — changes based on category -->
+      <div class="form-group" id="aConditionGroup" style="display:none">
+        <label>Trigger Condition *</label>
+        <select id="aCondition" onchange="onAlertConditionChange()">
+          <option value="">— Select condition —</option>
+        </select>
+      </div>
+
+      <!-- Threshold (shown for conditions that need a number) -->
+      <div class="form-group" id="aThresholdGroup" style="display:none">
+        <label id="aThresholdLabel">Threshold Value</label>
+        <input type="number" id="aThreshold" placeholder="e.g. 90" min="0"/>
+        <span style="font-size:11px;color:var(--text-muted);margin-top:4px" id="aThresholdHint"></span>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description <span style="font-weight:400;text-transform:none;font-size:10px">(optional)</span></label>
+        <input type="text" id="aDesc" placeholder="Brief note about this alert" maxlength="140"/>
+      </div>
+
+      <!-- Notification Channels -->
+      <div class="form-group">
+        <label>Notification Channels</label>
+        <div class="channel-pills">
+          <div class="channel-pill ch-active" id="chInApp" onclick="toggleChannel('inApp')">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            In-App
+          </div>
+          <div class="channel-pill" id="chEmail" onclick="toggleChannel('email')">
+            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email
+          </div>
+          <div class="channel-pill" id="chSlack" onclick="toggleChannel('slack')">
+            <svg viewBox="0 0 24 24"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8H3.5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+            Slack
+          </div>
+        </div>
+        <span style="font-size:11px;color:var(--text-muted);margin-top:6px">Email and Slack require SMTP / Slack connector configured in Integrations.</span>
+      </div>
+
+      <!-- Enabled toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(153,102,255,.06);border:1px solid var(--border);border-radius:9px">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">Enable this alert</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Alert will be active and trigger notifications when conditions are met</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="aEnabled" checked><span class="toggle-slider"></span></label>
+      </div>
+
+      <div style="font-size:12px;color:#f87171" id="alertModalErr"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAlertModal()">Cancel</button>
+      <button class="btn btn-primary" id="alertSaveBtn" onclick="saveAlert()">Create Alert</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast-wrap" id="toastWrap"></div>
 
@@ -1012,7 +1216,7 @@ function updateSidebar(u) {
 }
 
 /* ── Page navigation ── */
-const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations', departments: 'Departments' };
+const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations', departments: 'Departments', alerts: 'Alerts' };
 function showPage(name, el) {
   if ((name === 'users' && !hasPermission('managePortalUsers'))
     || (name === 'permissions' && !hasPermission('manageRolePermissions'))
@@ -1029,6 +1233,7 @@ function showPage(name, el) {
   if (name === 'integrations') loadIntegrations();
   if (name === 'permissions') loadRolePermissions();
   if (name === 'departments') { loadDepartmentsMgmt(); renderAdminDepartments(); }
+  if (name === 'alerts') renderAlerts();
 }
 
 /* ── PORTAL USERS ── */
@@ -1365,7 +1570,7 @@ async function loadSystemStats() {
       authFetch('/api/software'),
     ]);
     const [users, assets, sw] = await Promise.all([ur.json(), ar.json(), sr.json()]);
-    document.getElementById('sysUsers').textContent     = Array.isArray(users)   ? users.length   : '—';
+    document.getElementById('sysUsers').textContent     = Array.isArray(users)   ? users.filter(u=>(u.status||'').toLowerCase()!=='inactive').length : '—';
     document.getElementById('sysAssets').textContent    = Array.isArray(assets)  ? assets.length  : '—';
     document.getElementById('sysSoftware').textContent  = Array.isArray(sw)      ? sw.length      : '—';
     document.getElementById('sysPortalUsers').textContent = adminUsers.length || '—';
@@ -2235,7 +2440,7 @@ function adminParseDepts(val) {
 }
 function adminGetUserCount(name) {
   const n = name.toLowerCase();
-  return adminEmployees.filter(u=>(u.dept||'').toLowerCase()===n).length;
+  return adminEmployees.filter(u=>(u.dept||'').toLowerCase()===n && (u.status||'').toLowerCase()!=='inactive').length;
 }
 function adminGetSwMapped(name) {
   const n = name.toLowerCase();
@@ -2410,6 +2615,7 @@ function renderAdminDeptUserGrid(query) {
   const empty = document.getElementById('adminDeptUserEmpty');
   const q = (query||'').toLowerCase().trim();
   const list = adminEmployees.filter(u=>{
+    if((u.status||'').toLowerCase()==='inactive') return false; // hide inactive users
     const name = ((u.first||'')+' '+(u.last||'')).trim();
     if(q && !name.toLowerCase().includes(q) && !(u.email||'').toLowerCase().includes(q)) return false;
     return true;
@@ -2584,6 +2790,304 @@ async function syncConnector(appName) {
   }
   finally { btn.disabled = false; btn.textContent = 'Sync Now'; }
 }
+
+/* ══════════════════════════════════════════════════════
+   ALERTS  —  full frontend implementation
+   Storage: localStorage key "tcAlerts"
+   Alert shape: { id, name, category, condition, threshold, description, channels[], enabled, createdAt }
+══════════════════════════════════════════════════════ */
+
+// ── Condition definitions per category ───────────────────────────────────────
+const ALERT_CONDITIONS = {
+  users: [
+    { value: 'user_created',         label: 'New user created',                  hasThreshold: false },
+    { value: 'user_deactivated',     label: 'User account deactivated',           hasThreshold: false },
+    { value: 'user_activated',       label: 'User account activated',             hasThreshold: false },
+    { value: 'role_changed',         label: 'User role changed',                  hasThreshold: false },
+    { value: 'login_failure',        label: 'Login failure (threshold: attempts)', hasThreshold: true, thresholdLabel: 'Failed login attempts before alert', thresholdHint: 'Alert fires when a single user hits this many consecutive failures', thresholdDefault: 5 },
+    { value: 'inactive_user',        label: 'User inactive for N days',            hasThreshold: true, thresholdLabel: 'Days without login', thresholdHint: 'Alert fires for users who have not logged in for this many days', thresholdDefault: 30 },
+    { value: 'scim_provisioned',     label: 'User provisioned via SCIM',          hasThreshold: false },
+    { value: 'scim_deprovisioned',   label: 'User deprovisioned via SCIM',        hasThreshold: false },
+  ],
+  software: [
+    { value: 'license_over_pct',     label: 'License utilization exceeds % threshold', hasThreshold: true, thresholdLabel: 'License utilization % (0–150)', thresholdHint: 'Alert when used ÷ purchased licenses × 100 exceeds this value', thresholdDefault: 90 },
+    { value: 'license_overused',     label: 'Licenses used > purchased (over-provisioned)', hasThreshold: false },
+    { value: 'renewal_approaching',  label: 'Renewal approaching within N days',  hasThreshold: true, thresholdLabel: 'Days before renewal', thresholdHint: 'Alert fires when a software renewal date is within this many days', thresholdDefault: 30 },
+    { value: 'cost_exceeds',         label: 'Annual cost exceeds $ threshold',     hasThreshold: true, thresholdLabel: 'Annual cost threshold ($)', thresholdHint: 'Alert when a software app\'s total annual cost exceeds this amount', thresholdDefault: 10000 },
+    { value: 'software_added',       label: 'New software app added',             hasThreshold: false },
+    { value: 'software_inactive',    label: 'Software marked Inactive',           hasThreshold: false },
+    { value: 'zero_used_licenses',   label: 'Software has 0 used licenses (unused seats)', hasThreshold: false },
+  ],
+  assets: [
+    { value: 'asset_assigned',       label: 'Asset assigned to a user',           hasThreshold: false },
+    { value: 'asset_unassigned',     label: 'Asset unassigned / returned',        hasThreshold: false },
+    { value: 'asset_under_repair',   label: 'Asset status changed to Under Repair', hasThreshold: false },
+    { value: 'asset_retired',        label: 'Asset status changed to Retired',    hasThreshold: false },
+    { value: 'asset_added',          label: 'New asset added to inventory',       hasThreshold: false },
+    { value: 'asset_count_exceeds',  label: 'Total assets exceed count threshold', hasThreshold: true, thresholdLabel: 'Asset count threshold', thresholdHint: 'Alert when total number of active assets exceeds this value', thresholdDefault: 100 },
+    { value: 'unassigned_days',      label: 'Asset unassigned for N days',         hasThreshold: true, thresholdLabel: 'Days unassigned', thresholdHint: 'Alert when an Available asset has had no assignment for this many days', thresholdDefault: 14 },
+  ],
+};
+
+const CONDITION_LABEL = {};
+Object.values(ALERT_CONDITIONS).forEach(arr => arr.forEach(c => { CONDITION_LABEL[c.value] = c.label; }));
+
+// ── Channel meta ─────────────────────────────────────────────────────────────
+const CHANNEL_META = {
+  inApp: { label: 'In-App',  icon: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>' },
+  email:  { label: 'Email',  icon: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>' },
+  slack:  { label: 'Slack',  icon: '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/></svg>' },
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let alertsList = JSON.parse(localStorage.getItem('tcAlerts') || '[]');
+let alertEditingId = null;
+let alertChannels = ['inApp'];
+
+function saveAlertsToStorage() {
+  localStorage.setItem('tcAlerts', JSON.stringify(alertsList));
+}
+
+// ── Render all alert lists ────────────────────────────────────────────────────
+function renderAlerts() {
+  ['users', 'software', 'assets'].forEach(cat => {
+    const container = document.getElementById('alertList-' + cat);
+    if (!container) return;
+    const items = alertsList.filter(a => a.category === cat);
+    if (!items.length) {
+      const label = cat === 'users' ? 'user' : cat === 'software' ? 'software' : 'asset';
+      container.innerHTML = `<div class="alert-empty">No ${label} alerts configured yet. Click <strong>Add</strong> to create one.</div>`;
+      return;
+    }
+    container.innerHTML = items.map(a => renderAlertCard(a)).join('');
+  });
+  updateAlertStats();
+}
+
+function renderAlertCard(a) {
+  const condDef = (ALERT_CONDITIONS[a.category] || []).find(c => c.value === a.condition) || {};
+  const channels = (a.channels || ['inApp']).map(ch => `<span class="alert-tag ch">${(CHANNEL_META[ch]?.icon || '')} ${CHANNEL_META[ch]?.label || ch}</span>`).join('');
+  const thrTag   = (condDef.hasThreshold && a.threshold != null)
+    ? `<span class="alert-tag thr">Threshold: ${a.threshold}${a.condition === 'license_over_pct' ? '%' : a.condition === 'cost_exceeds' ? ' $' : ''}</span>`
+    : '';
+  const enabledClass = a.enabled ? 'alert-enabled' : '';
+  const toggleChecked = a.enabled ? 'checked' : '';
+  return `
+    <div class="alert-card ${enabledClass}" id="alertCard-${a.id}">
+      <div style="display:flex;align-items:center;padding-top:2px">
+        <label class="toggle toggle-xs" title="${a.enabled ? 'Disable' : 'Enable'} alert">
+          <input type="checkbox" ${toggleChecked} onchange="toggleAlertEnabled('${a.id}',this.checked)">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="alert-card-body">
+        <div class="alert-card-name">${escapeHtml(a.name)}</div>
+        ${a.description ? `<div class="alert-card-desc">${escapeHtml(a.description)}</div>` : ''}
+        <div class="alert-card-meta">
+          <span class="alert-tag cond">${escapeHtml(CONDITION_LABEL[a.condition] || a.condition)}</span>
+          ${thrTag}
+          ${channels}
+        </div>
+      </div>
+      <div class="alert-card-actions">
+        <button class="btn btn-secondary btn-sm btn-icon" onclick="openAlertModal(null,'${a.id}')" title="Edit alert">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAlert('${a.id}')" title="Delete alert">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+}
+
+function updateAlertStats() {
+  const total   = alertsList.length;
+  const enabled = alertsList.filter(a => a.enabled).length;
+  const users   = alertsList.filter(a => a.category === 'users').length;
+  const soft    = alertsList.filter(a => a.category === 'software').length;
+  const assets  = alertsList.filter(a => a.category === 'assets').length;
+  const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  setEl('alertStatTotal',   total);
+  setEl('alertStatEnabled', enabled);
+  setEl('alertStatUsers',   users);
+  setEl('alertStatSoftware',soft);
+  setEl('alertStatAssets',  assets);
+  // Badge on bell + nav
+  const badge   = document.getElementById('alertBadge');
+  const navBadge = document.getElementById('navAlertCount');
+  if (badge)    { badge.style.display    = enabled > 0 ? 'block' : 'none'; }
+  if (navBadge) { navBadge.style.display = total   > 0 ? 'inline' : 'none'; navBadge.textContent = total; }
+}
+
+// ── Toggle enabled ────────────────────────────────────────────────────────────
+function toggleAlertEnabled(id, enabled) {
+  const alert = alertsList.find(a => a.id === id);
+  if (!alert) return;
+  alert.enabled = enabled;
+  saveAlertsToStorage();
+  // Update card border without full re-render
+  const card = document.getElementById('alertCard-' + id);
+  if (card) {
+    card.classList.toggle('alert-enabled', enabled);
+    card.title = '';
+  }
+  updateAlertStats();
+  showToast(enabled ? '🔔 Alert enabled' : '🔕 Alert disabled');
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+function deleteAlert(id) {
+  if (!confirm('Delete this alert? This cannot be undone.')) return;
+  alertsList = alertsList.filter(a => a.id !== id);
+  saveAlertsToStorage();
+  renderAlerts();
+  showToast('Alert deleted');
+}
+
+// ── Modal open/close ─────────────────────────────────────────────────────────
+function openAlertModal(presetCategory, editId) {
+  alertEditingId = editId || null;
+  alertChannels  = ['inApp'];
+
+  // Reset form
+  document.getElementById('aName').value        = '';
+  document.getElementById('aDesc').value        = '';
+  document.getElementById('aCategory').value    = '';
+  document.getElementById('aCondition').value   = '';
+  document.getElementById('aThreshold').value   = '';
+  document.getElementById('aEnabled').checked   = true;
+  document.getElementById('alertModalErr').textContent = '';
+  document.getElementById('aConditionGroup').style.display = 'none';
+  document.getElementById('aThresholdGroup').style.display = 'none';
+  document.getElementById('alertSaveBtn').textContent = editId ? 'Save Changes' : 'Create Alert';
+  document.getElementById('alertModalTitle').textContent  = editId ? 'Edit Alert' : 'Create Alert';
+
+  // If editing, pre-fill
+  if (editId) {
+    const a = alertsList.find(x => x.id === editId);
+    if (a) {
+      document.getElementById('aName').value     = a.name;
+      document.getElementById('aDesc').value     = a.description || '';
+      document.getElementById('aCategory').value = a.category;
+      document.getElementById('aEnabled').checked= a.enabled;
+      alertChannels = [...(a.channels || ['inApp'])];
+      onAlertCategoryChange();
+      document.getElementById('aCondition').value = a.condition;
+      onAlertConditionChange();
+      if (a.threshold != null) document.getElementById('aThreshold').value = a.threshold;
+    }
+  } else if (presetCategory) {
+    document.getElementById('aCategory').value = presetCategory;
+    onAlertCategoryChange();
+  }
+
+  syncChannelPills();
+  document.getElementById('alertModal').classList.add('open');
+}
+
+function closeAlertModal() {
+  document.getElementById('alertModal').classList.remove('open');
+  alertEditingId = null;
+}
+
+// ── Dynamic form — category change ───────────────────────────────────────────
+function onAlertCategoryChange() {
+  const cat = document.getElementById('aCategory').value;
+  const condGroup = document.getElementById('aConditionGroup');
+  const condSel   = document.getElementById('aCondition');
+  condSel.innerHTML = '<option value="">— Select condition —</option>';
+  document.getElementById('aThresholdGroup').style.display = 'none';
+
+  if (!cat) { condGroup.style.display = 'none'; return; }
+  condGroup.style.display = 'flex';
+  const conditions = ALERT_CONDITIONS[cat] || [];
+  conditions.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.value;
+    opt.textContent = c.label;
+    condSel.appendChild(opt);
+  });
+}
+
+function onAlertConditionChange() {
+  const cat  = document.getElementById('aCategory').value;
+  const cond = document.getElementById('aCondition').value;
+  const thrGroup = document.getElementById('aThresholdGroup');
+  const condDef  = (ALERT_CONDITIONS[cat] || []).find(c => c.value === cond);
+  if (condDef && condDef.hasThreshold) {
+    thrGroup.style.display = 'flex';
+    document.getElementById('aThresholdLabel').textContent = condDef.thresholdLabel || 'Threshold';
+    document.getElementById('aThresholdHint').textContent  = condDef.thresholdHint  || '';
+    const thrInput = document.getElementById('aThreshold');
+    if (!thrInput.value) thrInput.value = condDef.thresholdDefault ?? '';
+  } else {
+    thrGroup.style.display = 'none';
+    document.getElementById('aThreshold').value = '';
+  }
+}
+
+// ── Channel pill toggles ──────────────────────────────────────────────────────
+function toggleChannel(ch) {
+  const idx = alertChannels.indexOf(ch);
+  if (idx === -1) alertChannels.push(ch);
+  else if (alertChannels.length > 1) alertChannels.splice(idx, 1); // keep at least 1
+  syncChannelPills();
+}
+
+function syncChannelPills() {
+  ['inApp', 'email', 'slack'].forEach(ch => {
+    const el = document.getElementById('ch' + ch.charAt(0).toUpperCase() + ch.slice(1));
+    if (el) el.classList.toggle('ch-active', alertChannels.includes(ch));
+  });
+}
+
+// ── Save alert ────────────────────────────────────────────────────────────────
+function saveAlert() {
+  const name     = document.getElementById('aName').value.trim();
+  const category = document.getElementById('aCategory').value;
+  const condition= document.getElementById('aCondition').value;
+  const thrRaw   = document.getElementById('aThreshold').value;
+  const desc     = document.getElementById('aDesc').value.trim();
+  const enabled  = document.getElementById('aEnabled').checked;
+  const errEl    = document.getElementById('alertModalErr');
+  errEl.textContent = '';
+
+  if (!name)      { errEl.textContent = 'Alert name is required.'; return; }
+  if (!category)  { errEl.textContent = 'Please select a category.'; return; }
+  if (!condition) { errEl.textContent = 'Please select a trigger condition.'; return; }
+
+  const condDef = (ALERT_CONDITIONS[category] || []).find(c => c.value === condition);
+  let threshold = null;
+  if (condDef && condDef.hasThreshold) {
+    threshold = parseFloat(thrRaw);
+    if (isNaN(threshold) || threshold < 0) { errEl.textContent = 'Please enter a valid threshold value.'; return; }
+  }
+
+  if (alertEditingId) {
+    const idx = alertsList.findIndex(a => a.id === alertEditingId);
+    if (idx !== -1) {
+      alertsList[idx] = { ...alertsList[idx], name, category, condition, threshold, description: desc, channels: [...alertChannels], enabled };
+    }
+    showToast('Alert updated');
+  } else {
+    alertsList.push({
+      id: 'alrt_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      name, category, condition, threshold,
+      description: desc,
+      channels: [...alertChannels],
+      enabled,
+      createdAt: new Date().toISOString(),
+    });
+    showToast('🔔 Alert created');
+  }
+
+  saveAlertsToStorage();
+  closeAlertModal();
+  renderAlerts();
+}
+
+// Initialise alerts badge on page load
+updateAlertStats();
 
 </script>
 </body>

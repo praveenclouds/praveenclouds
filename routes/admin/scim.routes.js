@@ -7,6 +7,7 @@
  */
 const router  = require('express').Router();
 const crypto  = require('crypto');
+const bcrypt  = require('bcryptjs');
 const { SCIMConfig } = require('../../db');
 const { requireAuth, canManageIntegrations } = require('../../middleware/auth');
 
@@ -39,14 +40,16 @@ router.put('/', requireAuth, canManageIntegrations, async (req, res) => {
 // ── POST /api/admin/scim/regenerate-token ─────────────────────────────────────
 router.post('/regenerate-token', requireAuth, canManageIntegrations, async (req, res) => {
   try {
-    const token     = crypto.randomBytes(32).toString('hex'); // 64-char hex
-    const tokenHint = token.slice(-6);
+    const token      = crypto.randomBytes(32).toString('hex'); // 64-char hex — shown once to admin
+    const tokenHint  = token.slice(-6);
+    // Store a bcrypt hash so a DB dump never exposes the real token.
+    const tokenHash  = await bcrypt.hash(token, 10);
     await SCIMConfig.findOneAndUpdate(
       {},
-      { bearerToken: token, tokenHint },
+      { bearerToken: tokenHash, tokenHint },
       { upsert: true }
     );
-    // Return full token ONCE — never retrievable from the UI again
+    // Return the plain token ONCE — never retrievable from the UI or DB again.
     res.json({ token, tokenHint });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

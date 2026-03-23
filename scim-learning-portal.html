@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SCIM Learning Portal — TerzoCloud IT</title>
+  <title>Learning Portal — TerzoCloud IT</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -275,8 +275,8 @@
       <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
     </div>
     <div>
-      <div class="brand-text">SCIM Learning Portal</div>
-      <div class="brand-sub">TerzoCloud IT — Admin Guide</div>
+      <div class="brand-text">Learning Portal</div>
+      <div class="brand-sub">TerzoCloud IT — Admin Guides</div>
     </div>
   </div>
 
@@ -313,6 +313,18 @@
   </div>
 
   <div class="nav-section">
+    <div class="nav-label">Provisioning Paths</div>
+    <a class="nav-item" href="#connect-scim-apps">
+      <svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/><path d="M14 4 10 20"/></svg>
+      Connect SCIM Apps
+    </a>
+    <a class="nav-item" href="#connect-api-apps">
+      <svg viewBox="0 0 24 24"><path d="M8 9l3-3 3 3"/><path d="M8 15l3 3 3-3"/><path d="M3 12h18"/></svg>
+      Connect API Apps
+    </a>
+  </div>
+
+  <div class="nav-section">
     <div class="nav-label">App Connectors</div>
     <a class="nav-item" href="#connector-zoom">
       <span style="font-size:13px">📹</span> Zoom
@@ -341,7 +353,63 @@
   </div>
 
   <div class="nav-section">
-    <div class="nav-label">Operations</div>
+    <div class="nav-label">Email Automation</div>
+    <a class="nav-item" href="#email-automation">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      What Is Email Automation?
+    </a>
+    <a class="nav-item" href="#email-setup-steps">
+      <svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Step-by-Step Setup
+    </a>
+    <a class="nav-item" href="#email-providers">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      SMTP Providers
+    </a>
+    <a class="nav-item" href="#email-approval-flow">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Manager Approval Flow
+    </a>
+    <a class="nav-item" href="#email-troubleshoot">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Troubleshooting
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">Slack Integration</div>
+    <a class="nav-item" href="#slack-integration-overview">
+      <svg viewBox="0 0 24 24"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+      Overview
+    </a>
+    <a class="nav-item" href="#slack-app-setup">
+      <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Create Slack App
+    </a>
+    <a class="nav-item" href="#slack-bot-token">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Bot Token & Scopes
+    </a>
+    <a class="nav-item" href="#slack-terzocloud-config">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      Configure in Portal
+    </a>
+    <a class="nav-item" href="#slack-slash-command">
+      <svg viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+      Slash Command
+    </a>
+    <a class="nav-item" href="#slack-notifications">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Notifications
+    </a>
+    <a class="nav-item" href="#slack-troubleshoot">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+      Troubleshooting
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-label">SCIM Operations</div>
     <a class="nav-item" href="#troubleshooting">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
       Troubleshooting
@@ -360,6 +428,7 @@
     <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
     <div style="font-size:10.5px;color:var(--gray-400);margin-top:6px">Check off steps as you complete them</div>
   </div>
+
 </aside>
 
 <!-- ══ MAIN ══ -->
@@ -636,6 +705,83 @@
       <div class="callout warning">
         <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <div>API tokens for each app connector are stored encrypted in MongoDB. They are never returned in API responses — only the last 4 characters are shown as a hint.</div>
+      </div>
+    </section>
+
+    <!-- ══ CONNECT SCIM APPS ══ -->
+    <section class="section" id="connect-scim-apps">
+      <div class="section-header">
+        <div class="section-icon blue"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6"/><path d="M8 6l-6 6 6 6"/><path d="M14 4 10 20"/></svg></div>
+        <div><div class="section-title">How to Connect SCIM Apps</div><div class="section-desc">Best path for apps that support lifecycle provisioning</div></div>
+      </div>
+
+      <p>Use the <strong>SCIM</strong> provisioning method when the downstream app can create, update, and deactivate users automatically. In TerzoCloud, this is the highest-automation path and should be your default for identity-critical apps.</p>
+
+      <div class="callout success">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <div>Choose <strong>Provisioning Method = SCIM</strong> in Software Inventory when the app supports full lifecycle automation and you have the app’s SCIM endpoint or native provisioning connector ready.</div>
+      </div>
+
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Confirm the app and plan are SCIM-ready</div><div class="step-text">Use the SCIM Readiness Audit in Software Inventory to verify that the app and your subscription tier support provisioning. If the app is not SCIM-capable, use the API or Manual path instead.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Add or edit the software record</div><div class="step-text">Open Software Inventory and set <code>Provisioning Method</code> to <code>SCIM</code>. Optionally add the connector name in <code>Connector Type</code> and mark <code>Supports automatic deprovision</code> if the app can also disable users on exit.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Save the connector under Admin → SCIM</div><div class="step-text">If the app uses one of the supported connectors, open the connector card in Admin and paste the token, tenant, org, or SCIM endpoint details provided by the vendor.</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Test connection and sync</div><div class="step-text">Use <strong>Test Connection</strong> first, then <strong>Sync Now</strong>. This validates credentials before you rely on the app in onboarding or offboarding workflows.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Route checklist tasks to software admins</div><div class="step-text">Even when SCIM is automated, keep software admins assigned in TerzoCloud so each access step still has an accountable owner and visible audit trail in Support Center.</div></div></div>
+      </div>
+
+      <h3>Recommended Software Inventory values for SCIM apps</h3>
+      <table class="req-table">
+        <thead><tr><th>Field</th><th>Recommended Value</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td><code>Provisioning Method</code></td><td><span class="tag-req req">SCIM</span></td><td>Tells Support Center the app is automation-ready for lifecycle events.</td></tr>
+          <tr><td><code>Connector Type</code></td><td>Vendor or connector name</td><td>Shows which integration path is used, such as Google Workspace, Slack, or AWS IAM Identity Center.</td></tr>
+          <tr><td><code>Supports automatic deprovision</code></td><td>Enabled when supported</td><td>Helps the team understand if offboarding can be closed automatically or still needs manual review.</td></tr>
+          <tr><td><code>Provisioning Notes</code></td><td>Endpoint, role scope, or special plan caveat</td><td>Gives operators the exact runbook note when they open the request task later.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout info">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div>For Google Workspace-based identity, TerzoCloud works best when user lifecycle is centralized first and SCIM-capable downstream apps are automated second. Not every app needs to be SCIM-ready for the architecture to work.</div>
+      </div>
+    </section>
+
+    <!-- ══ CONNECT API APPS ══ -->
+    <section class="section" id="connect-api-apps">
+      <div class="section-header">
+        <div class="section-icon purple"><svg viewBox="0 0 24 24"><path d="M8 9l3-3 3 3"/><path d="M8 15l3 3 3-3"/><path d="M3 12h18"/></svg></div>
+        <div><div class="section-title">How to Connect API Apps</div><div class="section-desc">Best path when the app has an API but not full SCIM lifecycle support</div></div>
+      </div>
+
+      <p>Use the <strong>API</strong> provisioning method when the app offers a usable vendor API or connector, but does not expose full SCIM provisioning. This is common for usage sync, invitations, license assignment, and partial deprovision flows.</p>
+
+      <div class="callout warning">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>API-based automation is usually partial. It might support invite, license assignment, or seat-count sync without supporting full group lifecycle or true SCIM-style deactivate operations.</div>
+      </div>
+
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Set the software record to API</div><div class="step-text">In Software Inventory, choose <code>Provisioning Method = API</code>. Put the vendor or connector family in <code>Connector Type</code>, such as <code>Slack Web API</code>, <code>Google Admin SDK</code>, or <code>Microsoft Graph</code>.</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Store the connector credentials in Admin</div><div class="step-text">Use Admin → SCIM / App Connectors to save the vendor token, service account details, tenant ID, or org details. Keep the software admins mapped so the resulting tasks still route to the right owners.</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Document the automation boundary</div><div class="step-text">Use <code>Provisioning Notes</code> to describe what the API can and cannot do, for example: “Invites users automatically, but license removal is manual.”</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Keep Support Center tasks visible</div><div class="step-text">API apps should still generate onboarding or access tasks. The task metadata tells the team whether they should expect a connector to do the work or whether they need to finish part of it manually.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Use Manual if there is no reliable API path</div><div class="step-text">If the app only supports SSO or admin-console clicks, do not mark it as API. Use <code>Manual</code> or <code>SSO Only</code> instead to avoid false automation expectations.</div></div></div>
+      </div>
+
+      <h3>Examples of good API-app notes</h3>
+      <div class="card">
+        <div class="card-title">Suggested note patterns</div>
+        <ul class="checklist">
+          <li><strong>Slack:</strong> “Bot token saved in App Connectors. Supports workspace lookup and command flow; user lifecycle outside Enterprise Grid is partially manual.”</li>
+          <li><strong>Google Workspace:</strong> “Managed through Admin SDK sync worker. Create/suspend supported; reporting manager still maintained inside TerzoCloud.”</li>
+          <li><strong>Microsoft 365:</strong> “Uses Microsoft Graph for seat counts and tenant data; app-level access still reviewed by software admins.”</li>
+        </ul>
+      </div>
+
+      <div class="callout info">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div>The goal is not to force every app into SCIM. The goal is to make the provisioning method explicit in Software Inventory, then let Support Center route and track the right automation or manual follow-up for each app.</div>
       </div>
     </section>
 
@@ -1064,13 +1210,710 @@
         <div style="font-size:22px;margin-bottom:8px">🚀</div>
         <div style="font-size:15px;font-weight:700;color:var(--gray-800);margin-bottom:6px">Ready to configure SCIM?</div>
         <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Go to the TerzoCloud Admin panel to add your first connector.</div>
-        <a href="http://localhost:3000/admin.html" target="_blank"
+        <a href="http://localhost:3000/admin" target="_blank"
           style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:10px 22px;border-radius:10px;font-size:13.5px;font-weight:700;text-decoration:none;transition:background .14s"
           onmouseover="this.style.background='#1e3a8a'" onmouseout="this.style.background='var(--primary)'">
           <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           Open Admin Panel
         </a>
       </div>
+    </section>
+
+    <!-- ══ EMAIL AUTOMATION ══ -->
+    <section class="section" id="email-automation">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fef3c7">
+          <svg viewBox="0 0 24 24" style="stroke:#d97706"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Support Email Automation</div>
+          <div class="section-desc">Send assignment emails and manager approval links automatically via SMTP</div>
+        </div>
+      </div>
+
+      <p>Email Automation lets TerzoCloud automatically send emails when assets are assigned to users, and route manager approval requests so managers can approve or reject directly from their inbox — no login required.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0">
+        <div class="card" style="border-left:4px solid var(--success)">
+          <div class="card-title">✅ What It Does</div>
+          <ul style="font-size:12.5px;color:var(--gray-600);line-height:2.1;padding-left:16px">
+            <li>Sends assignment confirmation emails to employees</li>
+            <li>Delivers approve/reject links to managers</li>
+            <li>Uses your own SMTP server (Gmail, Outlook, SES, etc.)</li>
+            <li>No third-party email service required</li>
+          </ul>
+        </div>
+        <div class="card" style="border-left:4px solid var(--primary)">
+          <div class="card-title">📋 Fields Required</div>
+          <ul style="font-size:12.5px;color:var(--gray-600);line-height:2.1;padding-left:16px">
+            <li>SMTP Host, Port &amp; Security</li>
+            <li>SMTP Username &amp; Password</li>
+            <li>From Email &amp; From Name</li>
+            <li>Public App Base URL</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>Email automation requires a valid SMTP server. For Gmail, you must use an <strong>App Password</strong> (not your regular Google password) when 2-Step Verification is enabled. Go to Google Account → Security → 2-Step Verification → App Passwords.</div>
+      </div>
+    </section>
+
+    <!-- ══ EMAIL SETUP STEPS ══ -->
+    <section class="section" id="email-setup-steps">
+      <div class="section-header">
+        <div class="section-icon green"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+        <div>
+          <div class="section-title">Step-by-Step Setup</div>
+          <div class="section-desc">Configure email in Admin → Integrations → Support Email Automation</div>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Open Admin Console → Integrations</div>
+            <div class="step-text">Log in to the TerzoCloud Admin Console (<code>localhost:3000/admin</code>), click <strong>Integrations</strong> in the left sidebar, then scroll to the <strong>Support Email Automation</strong> card.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Enable the Toggle</div>
+            <div class="step-text">Click <strong>Enable support emails</strong> to turn on the feature. Without this, no emails are sent even if all other fields are filled in.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Enter SMTP Host &amp; Port</div>
+            <div class="step-text">
+              Enter your mail server's hostname and port. Common values:
+              <div class="code-block" style="margin-top:8px">
+                <span class="cmt"># Gmail</span><br>
+                SMTP Host: <span class="str">smtp.gmail.com</span>  &nbsp; Port: <span class="val">587</span><br><br>
+                <span class="cmt"># Outlook / Office 365</span><br>
+                SMTP Host: <span class="str">smtp.office365.com</span>  &nbsp; Port: <span class="val">587</span><br><br>
+                <span class="cmt"># Amazon SES (US East)</span><br>
+                SMTP Host: <span class="str">email-smtp.us-east-1.amazonaws.com</span>  &nbsp; Port: <span class="val">587</span><br><br>
+                <span class="cmt"># SendGrid</span><br>
+                SMTP Host: <span class="str">smtp.sendgrid.net</span>  &nbsp; Port: <span class="val">587</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Choose SMTP Security</div>
+            <div class="step-text">
+              Select the appropriate TLS mode:
+              <ul style="margin:8px 0 0 16px;line-height:2;font-size:13px;color:var(--gray-600)">
+                <li><strong>STARTTLS / Opportunistic TLS</strong> — used with port 587. Most common for Gmail, Outlook, SES.</li>
+                <li><strong>Implicit TLS</strong> — used with port 465. Fewer providers use this.</li>
+              </ul>
+              <div class="callout info" style="margin-top:10px">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                <div>When in doubt, use <strong>STARTTLS</strong> with port <strong>587</strong>. This works for Gmail, Outlook, and most business SMTP providers.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <div class="step-title">Enter SMTP Username &amp; Password</div>
+            <div class="step-text">
+              Use the credentials your SMTP provider gave you.
+              <ul style="margin:8px 0 0 16px;line-height:2;font-size:13px;color:var(--gray-600)">
+                <li><strong>Gmail:</strong> Username = your Gmail address. Password = 16-character <em>App Password</em> (not your Google account password).</li>
+                <li><strong>Outlook:</strong> Username = your Microsoft email. Password = your account password or app password.</li>
+                <li><strong>Amazon SES:</strong> Username = IAM SMTP credential Access Key ID. Password = IAM SMTP Secret Access Key.</li>
+                <li><strong>SendGrid:</strong> Username = <code>apikey</code> (literal text). Password = your SendGrid API key.</li>
+              </ul>
+              <div class="callout warning" style="margin-top:10px">
+                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div><strong>Gmail users:</strong> Go to <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a>, create an App Password for "Mail", and use that 16-character code here.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">6</div>
+          <div class="step-body">
+            <div class="step-title">Set From Email &amp; From Name</div>
+            <div class="step-text">
+              These appear in the recipient's inbox as the sender identity.
+              <div class="code-block" style="margin-top:8px">
+                From Email: <span class="str">support@yourcompany.com</span><br>
+                From Name:  <span class="str">TerzoCloud Support</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <p style="margin-top:8px">The From Email must be an address your SMTP provider is authorised to send from. For Gmail, it must match your Gmail account address.</p>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">7</div>
+          <div class="step-body">
+            <div class="step-title">Set Public App Base URL</div>
+            <div class="step-text">
+              This is the URL that will be embedded inside manager approval emails. It must be reachable from outside your machine.
+              <div class="code-block" style="margin-top:8px">
+                <span class="cmt"># Production</span><br>
+                <span class="str">https://portal.yourcompany.com</span><br><br>
+                <span class="cmt"># Local testing with ngrok</span><br>
+                <span class="str">https://abc123.ngrok-free.app</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <div class="callout danger" style="margin-top:10px">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <div><strong>Do not use <code>localhost</code> here.</strong> Manager approval links embedded in emails must point to a URL the manager can open from their device. Use <a href="https://ngrok.com" target="_blank">ngrok</a> for local testing: run <code>ngrok http 3000</code> and paste the generated URL.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">8</div>
+          <div class="step-body">
+            <div class="step-title">Save &amp; Verify</div>
+            <div class="step-text">Click <strong>Save Email Setup</strong>. The status dot in the Integrations card will turn green if all required fields are present. The system will attempt to verify the SMTP connection. If it stays red, check the error message shown below the save button and refer to the <a href="#email-troubleshoot">Troubleshooting</a> section.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ EMAIL PROVIDERS ══ -->
+    <section class="section" id="email-providers">
+      <div class="section-header">
+        <div class="section-icon blue"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+        <div>
+          <div class="section-title">SMTP Provider Reference</div>
+          <div class="section-desc">Quick-reference settings for common email providers</div>
+        </div>
+      </div>
+
+      <table class="req-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>SMTP Host</th>
+            <th>Port</th>
+            <th>Security</th>
+            <th>Username</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Gmail</strong></td>
+            <td><code>smtp.gmail.com</code></td>
+            <td><code>587</code></td>
+            <td>STARTTLS</td>
+            <td>your@gmail.com</td>
+            <td>Requires <strong>App Password</strong> (not regular password) when 2FA is on</td>
+          </tr>
+          <tr>
+            <td><strong>Google Workspace</strong></td>
+            <td><code>smtp.gmail.com</code></td>
+            <td><code>587</code></td>
+            <td>STARTTLS</td>
+            <td>you@yourdomain.com</td>
+            <td>Same as Gmail — needs App Password. Enable SMTP access in Google Admin console.</td>
+          </tr>
+          <tr>
+            <td><strong>Outlook / Office 365</strong></td>
+            <td><code>smtp.office365.com</code></td>
+            <td><code>587</code></td>
+            <td>STARTTLS</td>
+            <td>you@company.com</td>
+            <td>May need "SMTP AUTH" enabled in Microsoft 365 admin center</td>
+          </tr>
+          <tr>
+            <td><strong>Amazon SES</strong></td>
+            <td><code>email-smtp.us-east-1.amazonaws.com</code></td>
+            <td><code>587</code></td>
+            <td>STARTTLS</td>
+            <td>IAM SMTP Access Key ID</td>
+            <td>Create SMTP credentials in AWS SES console. Verify sender domain first.</td>
+          </tr>
+          <tr>
+            <td><strong>SendGrid</strong></td>
+            <td><code>smtp.sendgrid.net</code></td>
+            <td><code>587</code></td>
+            <td>STARTTLS</td>
+            <td><code>apikey</code> (literal)</td>
+            <td>Password = SendGrid API key. Verify sender identity in SendGrid dashboard.</td>
+          </tr>
+          <tr>
+            <td><strong>Mailgun</strong></td>
+            <td><code>smtp.mailgun.org</code></td>
+            <td><code>587</code></td>
+            <td>STARTTLS</td>
+            <td>postmaster@yourdomain.mailgun.org</td>
+            <td>Find credentials in Mailgun → Sending → Domain settings → SMTP</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ══ MANAGER APPROVAL FLOW ══ -->
+    <section class="section" id="email-approval-flow">
+      <div class="section-header">
+        <div class="section-icon purple"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div>
+          <div class="section-title">Manager Approval Flow</div>
+          <div class="section-desc">How approve/reject emails work end-to-end</div>
+        </div>
+      </div>
+
+      <p>When an asset assignment is created or software access is granted, TerzoCloud can notify the employee's reporting manager and ask for approval. The manager receives an email with inline Approve and Reject buttons — no login needed.</p>
+
+      <div class="arch-diagram">
+        <div class="arch-row">
+          <div class="arch-box">Admin assigns asset / grants app</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row">
+          <div class="arch-box green">TerzoCloud sends approval email to manager</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row">
+          <div class="arch-box purple">Manager clicks Approve or Reject in their inbox</div>
+        </div>
+        <div class="arch-row"><div class="arch-arrow">↓</div></div>
+        <div class="arch-row" style="gap:32px">
+          <div>
+            <div class="arch-box green">✅ Approved → Assignment confirmed, employee notified</div>
+          </div>
+          <div>
+            <div class="arch-box gray">❌ Rejected → Assignment cancelled, admin notified</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:16px">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div>The approve/reject links use <strong>one-time tokens</strong> and point to your <strong>Public App Base URL</strong>. The manager does not need a TerzoCloud account — clicking the link records their decision via a secure API call. Make sure the base URL is publicly accessible before enabling approvals.</div>
+      </div>
+
+      <h3>Required: Reporting Manager field on each user</h3>
+      <p>For approval emails to be sent, every user in the portal must have a <strong>Reporting Manager</strong> set. Go to <strong>User Management</strong>, open any user, and set the <em>Reporting Manager</em> field to the manager's name. The system looks up the manager's email by matching names in the user list.</p>
+    </section>
+
+    <!-- ══ EMAIL TROUBLESHOOTING ══ -->
+    <section class="section" id="email-troubleshoot">
+      <div class="section-header">
+        <div class="section-icon orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg></div>
+        <div>
+          <div class="section-title">Email Troubleshooting</div>
+          <div class="section-desc">Common errors and how to fix them</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚠️ Status dot stays red / "Email not configured"</div>
+        <p style="margin:0;font-size:13px;color:var(--gray-600)">All four required fields must be filled: <strong>SMTP Host</strong>, <strong>From Email</strong>, <strong>SMTP Password</strong>, and the <strong>Enable support emails</strong> toggle must be on. Check that none are empty and click Save again.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ "Invalid login" / authentication error (Gmail)</div>
+        <p style="margin:0;font-size:13px;color:var(--gray-600)">You are using your regular Google password instead of an App Password. Go to <a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a>, generate a new App Password for "Mail", and paste it into the SMTP Password field.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ "Connection timeout" / can't connect to SMTP server</div>
+        <p style="margin:0;font-size:13px;color:var(--gray-600)">Your server or firewall may be blocking outbound port 587. Try port 465 with Implicit TLS, or check your hosting provider's firewall rules. Some VPS providers (e.g. Google Cloud, AWS) block port 25/587 by default — use Amazon SES or SendGrid as a relay instead.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ Manager approval link doesn't work</div>
+        <p style="margin:0;font-size:13px;color:var(--gray-600)">The <strong>Public App Base URL</strong> is set to <code>localhost</code> or is unreachable from the manager's device. Update it to a publicly accessible URL. For local testing run <code>ngrok http 3000</code> and use the generated HTTPS URL.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ Emails arrive in spam</div>
+        <p style="margin:0;font-size:13px;color:var(--gray-600)">Set up <strong>SPF</strong>, <strong>DKIM</strong>, and <strong>DMARC</strong> DNS records for your sending domain. Using a reputable provider like Amazon SES or SendGrid with a verified domain dramatically reduces spam scoring.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⚠️ "Sender address rejected: not owned by auth user" (Outlook)</div>
+        <p style="margin:0;font-size:13px;color:var(--gray-600)">Outlook requires the From Email to match the authenticated SMTP username exactly. Set <strong>From Email</strong> to the same address you entered in <strong>SMTP Username</strong>.</p>
+      </div>
+
+      <div class="divider"></div>
+      <div style="text-align:center;padding:16px 0">
+        <div style="font-size:20px;margin-bottom:8px">✉️</div>
+        <div style="font-size:15px;font-weight:700;color:var(--gray-800);margin-bottom:6px">Ready to set up email automation?</div>
+        <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Go to Admin Console → Integrations → Support Email Automation.</div>
+        <a href="http://localhost:3000/admin" target="_blank"
+          style="display:inline-flex;align-items:center;gap:8px;background:#d97706;color:#fff;padding:10px 22px;border-radius:10px;font-size:13.5px;font-weight:700;text-decoration:none;transition:background .14s"
+          onmouseover="this.style.background='#b45309'" onmouseout="this.style.background='#d97706'">
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Configure Email Now
+        </a>
+      </div>
+    </section>
+
+    <!-- ══ SLACK INTEGRATION OVERVIEW ══ -->
+    <section class="section" id="slack-integration-overview">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fff0f5">
+          <span style="font-size:20px">💬</span>
+        </div>
+        <div>
+          <div class="section-title">Slack Integration Overview</div>
+          <div class="section-desc">Send notifications and create support requests directly from Slack</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+        <span class="pill green">✓ Built-in</span>
+        <span class="pill blue">Slash Command</span>
+        <span class="pill" style="background:#f3e8ff;color:#7c3aed;border:1px solid #d8b4fe">Interactivity</span>
+        <span class="pill" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74">Notifications</span>
+      </div>
+
+      <p>TerzoCloud has two distinct Slack integrations that work together. The <strong>Slack Connector</strong> (under SCIM → App Connectors) syncs user counts and plan details from your workspace. The <strong>Slack Integration</strong> covered here does two more powerful things: it lets employees raise IT support requests without leaving Slack, and it routes alert notifications from the Admin Console to any Slack channel.</p>
+
+      <h3>What you get</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px">
+        <div class="card" style="margin:0">
+          <div class="card-title">💬 Slash Command</div>
+          <p style="margin:0;font-size:13.5px">Users type <code>/it-support</code> in any Slack channel. A modal form opens right inside Slack where they pick a request type, fill in details, and submit — no portal login needed.</p>
+        </div>
+        <div class="card" style="margin:0">
+          <div class="card-title">🔔 Channel Notifications</div>
+          <p style="margin:0;font-size:13.5px">Alert rules configured in Admin Console (license over-usage, asset under repair, inactive users, etc.) can post real-time notifications directly to a Slack channel.</p>
+        </div>
+      </div>
+
+      <div class="callout info" style="margin-top:18px">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div>This integration requires a <strong>Slack App</strong> you create and own in your workspace. TerzoCloud never asks for your Slack admin password — it only uses a Bot Token and Signing Secret that you generate yourself.</div>
+      </div>
+    </section>
+
+    <!-- ══ SLACK APP SETUP ══ -->
+    <section class="section" id="slack-app-setup">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fff0f5">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#e01563;fill:none;stroke-width:2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Create a Slack App</div>
+          <div class="section-desc">Set up a new Slack app for your TerzoCloud workspace</div>
+        </div>
+      </div>
+
+      <p>All Slack integrations in TerzoCloud run through a single Slack App that you create and install in your workspace. This takes about 5 minutes.</p>
+
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="step-title">Open the Slack API Dashboard</div>
+          <div class="step-text">Go to <a href="https://api.slack.com/apps" target="_blank">api.slack.com/apps</a> and sign in with your Slack admin account.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="step-title">Create New App</div>
+          <div class="step-text">Click <strong>Create New App</strong> → choose <strong>From scratch</strong>. Give it a name (e.g. <em>TerzoCloud IT</em>) and select your workspace.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="step-title">Copy the Signing Secret</div>
+          <div class="step-text">On the <strong>Basic Information</strong> page, scroll to <em>App Credentials</em>. Copy the <strong>Signing Secret</strong> — you'll need this for the TerzoCloud Admin Console.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <div class="step-title">Add a Display Name and Icon (optional)</div>
+          <div class="step-text">Under <strong>Basic Information → Display Information</strong>, add a name and icon so employees recognise the bot in Slack.</div>
+        </div></div>
+      </div>
+
+      <div class="callout success">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <div>Keep this browser tab open — you'll come back to it several times during setup.</div>
+      </div>
+    </section>
+
+    <!-- ══ SLACK BOT TOKEN & SCOPES ══ -->
+    <section class="section" id="slack-bot-token">
+      <div class="section-header">
+        <div class="section-icon" style="background:#f0fdf4">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#16a34a;fill:none;stroke-width:2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Bot Token &amp; Scopes</div>
+          <div class="section-desc">Grant the right permissions and generate your Bot OAuth Token</div>
+        </div>
+      </div>
+
+      <p>The Bot Token is what TerzoCloud uses to call Slack's API — opening modals, reading user info, and posting messages. You control exactly what the bot is allowed to do through <strong>scopes</strong>.</p>
+
+      <h3>Required Bot Token Scopes</h3>
+      <table class="req-table">
+        <thead><tr><th>Scope</th><th>Why It's Needed</th></tr></thead>
+        <tbody>
+          <tr><td><code>chat:write</code></td><td>Post notification messages to channels</td></tr>
+          <tr><td><code>commands</code></td><td>Respond to the <code>/it-support</code> slash command</td></tr>
+          <tr><td><code>users:read</code></td><td>Look up user profiles by Slack user ID</td></tr>
+          <tr><td><code>users:read.email</code></td><td>Match Slack users to TerzoCloud employee records by email</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Add Scopes &amp; Install</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="step-title">Go to OAuth &amp; Permissions</div>
+          <div class="step-text">In your Slack app dashboard, click <strong>OAuth &amp; Permissions</strong> in the left sidebar.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="step-title">Add Bot Token Scopes</div>
+          <div class="step-text">Scroll to <strong>Scopes → Bot Token Scopes</strong>. Click <em>Add an OAuth Scope</em> and add all four scopes listed in the table above.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="step-title">Install to Workspace</div>
+          <div class="step-text">Scroll back to the top of the page and click <strong>Install to Workspace</strong>. Review the permissions and click <strong>Allow</strong>.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <div class="step-title">Copy the Bot User OAuth Token</div>
+          <div class="step-text">After installing, you'll see a <strong>Bot User OAuth Token</strong> starting with <code>xoxb-</code>. Copy it — this goes into TerzoCloud under SCIM → App Connectors → Slack.</div>
+        </div></div>
+      </div>
+
+      <div class="callout warning">
+        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div>Treat the Bot Token like a password. Don't commit it to source control. TerzoCloud stores it encrypted in the database.</div>
+      </div>
+    </section>
+
+    <!-- ══ CONFIGURE IN PORTAL ══ -->
+    <section class="section" id="slack-terzocloud-config">
+      <div class="section-header">
+        <div class="section-icon" style="background:#eff6ff">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#2563eb;fill:none;stroke-width:2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Configure in TerzoCloud</div>
+          <div class="section-desc">Save your Slack credentials in the Admin Console</div>
+        </div>
+      </div>
+
+      <p>TerzoCloud stores Slack credentials in two places — the <strong>Bot Token</strong> goes under SCIM App Connectors, and the <strong>Signing Secret</strong> goes under Integrations. Both are required.</p>
+
+      <h3>Save the Bot Token</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="step-title">Open Admin Console → SCIM → App Connectors</div>
+          <div class="step-text">Navigate to the <strong>Admin Console</strong> and go to the SCIM section. Click the <strong>App Connectors</strong> tab.</div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="step-title">Find the Slack Connector</div>
+          <div class="step-text">Locate the Slack entry. Click <strong>Configure</strong> or the edit icon.</div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="step-title">Paste the xoxb- Token</div>
+          <div class="step-text">Paste your <code>xoxb-</code> Bot Token into the <strong>Bot OAuth Token</strong> field. Enter your workspace domain (the part before <code>.slack.com</code>). Save.</div>
+        </div></div>
+      </div>
+
+      <h3>Save the Signing Secret</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="step-title">Open Admin Console → Integrations</div>
+          <div class="step-text">In the Admin Console sidebar, click <strong>Integrations</strong>.</div>
+        </div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="step-title">Find the Slack Support Requests Section</div>
+          <div class="step-text">Scroll to the <strong>Slack Support Requests</strong> card. You'll see fields for Signing Secret and read-only URLs for the slash command and interactivity endpoints.</div>
+        </div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="step-title">Paste the Signing Secret</div>
+          <div class="step-text">Paste the Signing Secret from your Slack App's <em>Basic Information → App Credentials</em>. Click <strong>Save Slack Setup</strong>.</div>
+        </div></div>
+      </div>
+
+      <div class="callout info">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div>After saving, the status indicator on the Integrations page will turn green. If it stays grey, check that both the Bot Token and the Signing Secret have been saved in their respective locations.</div>
+      </div>
+    </section>
+
+    <!-- ══ SLASH COMMAND ══ -->
+    <section class="section" id="slack-slash-command">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fdf4ff">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#9333ea;fill:none;stroke-width:2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Slash Command Setup</div>
+          <div class="section-desc">Let employees raise support requests directly from Slack</div>
+        </div>
+      </div>
+
+      <p>Once configured, any employee can type <code>/it-support</code> in any Slack channel to open a support request form — without opening the portal at all.</p>
+
+      <h3>Register the Slash Command in Slack</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="step-title">Go to Slash Commands</div>
+          <div class="step-text">In your Slack App dashboard, click <strong>Slash Commands</strong> in the left sidebar. Click <strong>Create New Command</strong>.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="step-title">Fill in the Command Details</div>
+          <div class="step-text">
+            Set the following values:<br>
+            <strong>Command:</strong> <code>/it-support</code><br>
+            <strong>Request URL:</strong> copy from Admin Console → Integrations → Slack section<br>
+            <strong>Short Description:</strong> <em>Raise an IT support request</em><br>
+            <strong>Usage Hint:</strong> <em>[request type]</em>
+          </div>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="step-title">Copy the Command URL from TerzoCloud</div>
+          <div class="step-text">The exact URL is shown in <strong>Admin Console → Integrations → Slack → Slack Command URL</strong>. It looks like: <code>https://yourportal.com/api/slack/support-command</code></div>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <div class="step-title">Enable Interactivity</div>
+          <div class="step-text">Go to <strong>Interactivity &amp; Shortcuts</strong>. Toggle it <strong>On</strong>. Paste the <strong>Interactivity URL</strong> from TerzoCloud: <code>https://yourportal.com/api/slack/interactivity</code>. Save changes.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">5</div><div class="step-body">
+          <div class="step-title">Reinstall the App</div>
+          <div class="step-text">Slack will prompt you to reinstall the app after adding a slash command. Click <strong>Reinstall to Workspace</strong> to apply the changes. The Bot Token stays the same.</div>
+        </div></div>
+      </div>
+
+      <h3>How it works for employees</h3>
+      <div class="card">
+        <div class="card-title">User Flow</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13.5px">
+          <span style="background:#f3e8ff;color:#7c3aed;padding:4px 10px;border-radius:6px;font-weight:600">1. Type /it-support</span>
+          <span style="color:var(--gray-400)">→</span>
+          <span style="background:#eff6ff;color:#2563eb;padding:4px 10px;border-radius:6px;font-weight:600">2. Modal opens in Slack</span>
+          <span style="color:var(--gray-400)">→</span>
+          <span style="background:#f0fdf4;color:#16a34a;padding:4px 10px;border-radius:6px;font-weight:600">3. Fill form &amp; submit</span>
+          <span style="color:var(--gray-400)">→</span>
+          <span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:6px;font-weight:600">4. Ticket created in portal</span>
+        </div>
+        <p style="margin-top:12px;margin-bottom:0;font-size:13px;color:var(--gray-500)">The form shows all available request types (Onboarding, Hardware Request, App Access, etc.) as a dropdown. TerzoCloud matches the Slack user's email to their employee record automatically.</p>
+      </div>
+
+      <div class="callout info">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <div>Your portal must be publicly reachable (or accessible from Slack's servers) for the slash command to work. If you're running locally on <code>localhost</code>, use a tunnel tool like <strong>ngrok</strong> during testing.</div>
+      </div>
+    </section>
+
+    <!-- ══ SLACK NOTIFICATIONS ══ -->
+    <section class="section" id="slack-notifications">
+      <div class="section-header">
+        <div class="section-icon" style="background:#fffbeb">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#d97706;fill:none;stroke-width:2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Alert Notifications via Slack</div>
+          <div class="section-desc">Route Admin Console alert rules to a Slack channel</div>
+        </div>
+      </div>
+
+      <p>Every alert rule you create in the Admin Console (under <strong>Alerts</strong>) can send a notification to a Slack channel when it triggers — for example, when a software license reaches 100% utilisation, or when an asset goes Under Repair.</p>
+
+      <h3>Enabling Slack as a Notification Channel</h3>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-body">
+          <div class="step-title">Make sure the Bot Token is saved</div>
+          <div class="step-text">Slack notifications use the same <code>xoxb-</code> Bot Token. Confirm it's saved under SCIM → App Connectors → Slack before continuing.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">2</div><div class="step-body">
+          <div class="step-title">Invite the bot to your target channel</div>
+          <div class="step-text">In Slack, open the channel you want to receive IT alerts (e.g. <code>#it-alerts</code>). Type <code>/invite @TerzoCloud IT</code> (or whatever you named your bot). This is required — bots can only post to channels they're a member of.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">3</div><div class="step-body">
+          <div class="step-title">Create or edit an Alert in Admin Console</div>
+          <div class="step-text">Go to <strong>Admin Console → Alerts</strong>. Create a new alert (or edit an existing one). In the <strong>Notify via</strong> section, click the <strong>Slack</strong> pill to enable it alongside In-App or Email.</div>
+        </div></div>
+
+        <div class="step"><div class="step-num">4</div><div class="step-body">
+          <div class="step-title">Save and test</div>
+          <div class="step-text">Save the alert. When the condition is met (e.g. license utilisation hits your threshold), a notification will be posted automatically to the configured channel.</div>
+        </div></div>
+      </div>
+
+      <h3>What the notification looks like</h3>
+      <div class="card">
+        <div class="card-title">Example Slack Message</div>
+        <div class="code-block" style="background:#1a1d27;border-radius:8px;padding:16px;font-size:13px;color:#e2e8f0;white-space:pre-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span style="color:#f59e0b;font-weight:700">🔔 TerzoCloud Alert — Software Inventory</span>
+<span style="color:#94a3b8">Severity: </span><span style="color:#ef4444">Critical</span>
+<span style="color:#94a3b8">App:      </span><span style="color:#e2e8f0">Datadog</span>
+<span style="color:#94a3b8">Message:  </span><span style="color:#e2e8f0">License utilisation has reached 100% (42/42 used)</span>
+<span style="color:#94a3b8">Time:     </span><span style="color:#e2e8f0">23 Mar 2026, 10:14 AM</span></div>
+      </div>
+
+      <div class="callout success">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <div>You can enable multiple channels per alert — for example, send critical alerts to both <strong>In-App</strong> and <strong>Slack</strong>, while informational alerts only go to In-App.</div>
+      </div>
+    </section>
+
+    <!-- ══ SLACK TROUBLESHOOTING ══ -->
+    <section class="section" id="slack-troubleshoot">
+      <div class="section-header">
+        <div class="section-icon orange">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+        </div>
+        <div>
+          <div class="section-title">Slack Troubleshooting</div>
+          <div class="section-desc">Common issues and how to fix them</div>
+        </div>
+      </div>
+
+      <table class="req-table">
+        <thead><tr><th>Problem</th><th>Likely Cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>/it-support</code> shows "dispatch failed"</td>
+            <td>Signing Secret is wrong or missing</td>
+            <td>Re-copy the Signing Secret from Slack App → Basic Information and re-save in Admin Console → Integrations → Slack</td>
+          </tr>
+          <tr>
+            <td>Modal opens but submitting does nothing</td>
+            <td>Interactivity URL not set or wrong</td>
+            <td>Check Admin Console → Integrations → Slack → Interactivity URL is pasted correctly in Slack App → Interactivity &amp; Shortcuts</td>
+          </tr>
+          <tr>
+            <td>Bot can't post to channel</td>
+            <td>Bot is not a member of the channel</td>
+            <td>In the target Slack channel, type <code>/invite @YourBotName</code></td>
+          </tr>
+          <tr>
+            <td>"Slack Bot Token is not configured"</td>
+            <td>Bot Token missing in App Connectors</td>
+            <td>Go to Admin Console → SCIM → App Connectors → Slack and paste the <code>xoxb-</code> token</td>
+          </tr>
+          <tr>
+            <td>Slash command works locally but not in production</td>
+            <td>Request URL points to localhost</td>
+            <td>Update the Slash Command Request URL in Slack App to your production domain. Use ngrok for local testing only.</td>
+          </tr>
+          <tr>
+            <td>Notifications not posting even though alert triggered</td>
+            <td>Slack channel not selected on alert rule</td>
+            <td>Edit the alert in Admin Console → Alerts, make sure the Slack pill is highlighted/active in the Notify via section</td>
+          </tr>
+          <tr>
+            <td>User submits form but no ticket appears</td>
+            <td>Slack user email doesn't match TerzoCloud employee record</td>
+            <td>Ensure the employee's email in TerzoCloud matches their Slack workspace email exactly</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
   </div>

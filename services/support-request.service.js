@@ -1,6 +1,6 @@
 const { SupportRequest, SupportRequestType, Software, SlackWorkflowImport, User } = require('../db');
 
-const ALL_DEPARTMENT_LABEL = 'All Department';
+const ALL_DEPARTMENT_LABEL = 'All Departments';
 const DEFAULT_REQUEST_TYPES = SupportRequestType.DEFAULT_REQUEST_TYPE_DEFINITIONS || [];
 const REQUEST_TYPE_CLASSNAMES = SupportRequestType.REQUEST_TYPE_CLASSNAMES || [];
 const REQUEST_FORM_FIELD_DEFINITIONS = SupportRequestType.REQUEST_FORM_FIELD_DEFINITIONS || [];
@@ -82,8 +82,18 @@ function parseSoftwareDepartments(value) {
   return [...new Set(rawValues.map(item => String(item || '').trim()).filter(Boolean))];
 }
 
+function normalizeSoftwareDepartmentList(values) {
+  const list = parseSoftwareDepartments(values);
+  return list.some(dept => {
+    const normalized = String(dept || '').trim().toLowerCase();
+    return normalized === ALL_DEPARTMENT_LABEL.toLowerCase() || normalized === 'all department';
+  })
+    ? [ALL_DEPARTMENT_LABEL]
+    : list;
+}
+
 function matchesSoftwareDepartment(value, department) {
-  const departments = parseSoftwareDepartments(value).map(item => item.toLowerCase());
+  const departments = normalizeSoftwareDepartmentList(value).map(item => item.toLowerCase());
   if (!departments.length) return false;
   if (departments.includes(ALL_DEPARTMENT_LABEL.toLowerCase())) return true;
   return departments.includes(String(department || '').trim().toLowerCase());
@@ -93,11 +103,11 @@ function softwareOwnerCandidates(software, userDirectory = null) {
   if (!software) return [];
 
   const rawCandidates = [
-    software.owner,
     ...String(software.admins || '')
       .split(/[,\n/;|]+/g)
       .map(value => value.trim())
       .filter(Boolean),
+    software.owner,
   ];
 
   const unique = new Map();
@@ -117,12 +127,108 @@ function softwareDefaultOwner(software, userDirectory = null) {
   return softwareOwnerCandidates(software, userDirectory)[0] || { userId: '', name: '', email: '' };
 }
 
+function extractEmailFromText(value) {
+  const match = String(value || '').match(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i);
+  return match ? match[0].trim().toLowerCase() : '';
+}
+
+function splitEmployeeName(name, fallbackEmail = '') {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length) {
+    return {
+      first: parts[0],
+      last: parts.slice(1).join(' '),
+    };
+  }
+
+  const localPart = String(fallbackEmail || '').split('@')[0] || 'Employee';
+  return {
+    first: localPart,
+    last: '',
+  };
+}
+
+function normalizePortalLocation(value, fallback = 'Remote') {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'chennai') return 'Chennai';
+  if (normalized === 'coimbatore') return 'Coimbatore';
+  if (normalized === 'remote') return 'Remote';
+  return fallback;
+}
+
+function parseJoinedDate(value) {
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
+function completedSoftwareAccessIds(request) {
+  return [...new Set((request.checklist || [])
+    .filter(item => item.softwareCsvId && item.status === 'done')
+    .map(item => item.softwareCsvId))];
+}
+
+function onboardingWorkspaceEmail(request) {
+  const step = (request.checklist || []).find(item => item.key === 'workspace_account')
+    || (request.checklist || []).find(item => /google workspace account provisioned/i.test(String(item.label || '')));
+  return extractEmailFromText(step?.notes || '');
+}
+
+function ensureCompletedOnboardingProvisioningReady(request) {
+  if (request.workflowType !== 'onboarding' || request.status !== 'completed') return '';
+  const email = onboardingWorkspaceEmail(request);
+  if (!email) {
+    throw new Error('Add the employee Google Workspace email to the "Google workspace account provisioned" step notes before completing onboarding.');
+  }
+  return email;
+}
+
+async function syncCompletedOnboardingUser(request) {
+  if (request.workflowType !== 'onboarding' || request.status !== 'completed') return null;
+
+  const workspaceEmail = ensureCompletedOnboardingProvisioningReady(request);
+  const { first, last } = splitEmployeeName(request.employeeName, workspaceEmail);
+  const appAccess = completedSoftwareAccessIds(request);
+  const existingUser = await User.findOne({ email: workspaceEmail });
+
+  if (existingUser) {
+    existingUser.first = first || existingUser.first;
+    existingUser.last = last;
+    existingUser.reportingManager = String(request.managerName || existingUser.reportingManager || '').trim();
+    existingUser.status = 'Active';
+    existingUser.jobTitle = String(request.jobTitle || existingUser.jobTitle || '').trim();
+    existingUser.dept = String(request.department || existingUser.dept || '').trim();
+    existingUser.location = normalizePortalLocation(request.location, existingUser.location || 'Remote');
+    existingUser.joined = parseJoinedDate(request.startDate || existingUser.joined);
+    existingUser.appAccess = [...new Set([...(existingUser.appAccess || []), ...appAccess])];
+    await existingUser.save();
+    return existingUser;
+  }
+
+  return User.create({
+    first,
+    last,
+    email: workspaceEmail,
+    role: 'Staff',
+    reportingManager: String(request.managerName || '').trim(),
+    status: 'Active',
+    jobTitle: String(request.jobTitle || '').trim(),
+    dept: String(request.department || '').trim(),
+    location: normalizePortalLocation(request.location),
+    joined: parseJoinedDate(request.startDate),
+    appAccess,
+  });
+}
+
 function sanitizeChecklist(input = []) {
   return input.map(item => ({
     key: String(item.key || '').trim(),
     label: String(item.label || '').trim(),
     area: String(item.area || '').trim(),
     softwareCsvId: String(item.softwareCsvId || '').trim(),
+    provisioningMethod: String(item.provisioningMethod || '').trim(),
+    connectorType: String(item.connectorType || '').trim(),
+    supportsDeprovision: !!item.supportsDeprovision,
+    provisioningNotes: String(item.provisioningNotes || '').trim(),
     dependsOn: String(item.dependsOn || '').trim(),
     status: item.status === 'done' ? 'done' : 'pending',
     owner: String(item.owner || '').trim(),
@@ -145,7 +251,7 @@ function sanitizeChecklist(input = []) {
 async function hydrateChecklistUsers(checklist = [], userDirectory = null) {
   const softwareIds = [...new Set(checklist.map(item => item.softwareCsvId).filter(Boolean))];
   const software = softwareIds.length
-    ? await Software.find({ csvId: { $in: softwareIds } }).select('csvId owner admins').lean()
+    ? await Software.find({ csvId: { $in: softwareIds } }).select('csvId owner admins provisioningMethod connectorType supportsDeprovision provisioningNotes').lean()
     : [];
   const softwareById = new Map(software.map(item => [item.csvId, item]));
 
@@ -163,8 +269,14 @@ async function hydrateChecklistUsers(checklist = [], userDirectory = null) {
       ownerRef = softwareDefaultOwner(softwareById.get(item.softwareCsvId), userDirectory);
     }
 
+    const softwareItem = item.softwareCsvId ? softwareById.get(item.softwareCsvId) : null;
+
     return {
       ...item,
+      provisioningMethod: item.provisioningMethod || String(softwareItem?.provisioningMethod || '').trim(),
+      connectorType: item.connectorType || String(softwareItem?.connectorType || '').trim(),
+      supportsDeprovision: item.supportsDeprovision !== undefined ? !!item.supportsDeprovision : !!softwareItem?.supportsDeprovision,
+      provisioningNotes: item.provisioningNotes || String(softwareItem?.provisioningNotes || '').trim(),
       owner: ownerRef.name || item.owner || '',
       ownerUserId: ownerRef.userId || '',
       ownerEmail: ownerRef.email || '',
@@ -562,7 +674,7 @@ async function buildChecklistForCreate(body = {}, workflow = null, userDirectory
 
   const apps = (await Software.find({ status: 'Active' })
     .sort({ name: 1 })
-    .select('csvId name owner admins department')
+    .select('csvId name owner admins department provisioningMethod connectorType supportsDeprovision provisioningNotes')
     .lean())
     .filter(app => matchesSoftwareDepartment(app.department, body.department));
 
@@ -577,6 +689,10 @@ async function buildChecklistForCreate(body = {}, workflow = null, userDirectory
         label: `${app.name} access granted`,
         area: 'Applications',
         softwareCsvId: app.csvId,
+        provisioningMethod: app.provisioningMethod || 'Manual',
+        connectorType: app.connectorType || '',
+        supportsDeprovision: !!app.supportsDeprovision,
+        provisioningNotes: app.provisioningNotes || '',
         dependsOn: dependencyKey,
         status: 'pending',
         owner: owner.name || '',
@@ -596,7 +712,7 @@ async function addRequestedApplicationTasks(checklist = [], applications = [], u
   if (!applications.length) return checklist;
 
   const software = await Software.find({ csvId: { $in: applications.map(app => app.csvId) } })
-    .select('csvId name owner admins')
+    .select('csvId name owner admins provisioningMethod connectorType supportsDeprovision provisioningNotes')
     .lean();
   const softwareById = new Map(software.map(item => [item.csvId, item]));
   const existingKeys = new Set(checklist.map(item => item.key));
@@ -613,6 +729,10 @@ async function addRequestedApplicationTasks(checklist = [], applications = [], u
         label: `${app.name} access granted`,
         area: 'Applications',
         softwareCsvId: app.csvId,
+        provisioningMethod: softwareItem?.provisioningMethod || 'Manual',
+        connectorType: softwareItem?.connectorType || '',
+        supportsDeprovision: !!softwareItem?.supportsDeprovision,
+        provisioningNotes: softwareItem?.provisioningNotes || '',
         dependsOn: dependencyKey,
         status: 'pending',
         owner: owner.name || '',
@@ -784,6 +904,8 @@ module.exports = {
   loadUserDirectory,
   resolveUserRef,
   sanitizeChecklist,
+  syncCompletedOnboardingUser,
+  ensureCompletedOnboardingProvisioningReady,
   softwareDefaultOwner,
   softwareOwnerCandidates,
   updateRequestTypeDefinition,

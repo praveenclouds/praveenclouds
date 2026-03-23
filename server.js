@@ -103,10 +103,37 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: IS_PROD ? 'Internal server error' : err.message });
 });
 
+// ── Global process-level safety nets ──────────────────────────────────────────
+// Catch synchronous throws that escaped all try/catch blocks.
+process.on('uncaughtException', (err) => {
+  console.error('💥  [uncaughtException]', err.stack || err.message);
+  // Give active requests ~3 s to drain then exit so the process manager can restart.
+  setTimeout(() => process.exit(1), 3000).unref();
+});
+
+// Catch unhandled promise rejections (missing .catch(), forgotten await, etc.).
+process.on('unhandledRejection', (reason) => {
+  console.error('💥  [unhandledRejection]', reason instanceof Error ? reason.stack : reason);
+  setTimeout(() => process.exit(1), 3000).unref();
+});
+
 // ── Graceful shutdown ──────────────────────────────────────────────────────────
+const { disconnect } = require('./db');
+
 function shutdown(signal) {
   console.log(`\n⚠️   ${signal} received — shutting down gracefully`);
-  process.exit(0);
+  // Stop accepting new connections, drain in-flight requests, then close DB.
+  if (global._httpServer) {
+    global._httpServer.close(async () => {
+      try { await disconnect(); } catch (_) { /* ignore */ }
+      console.log('👋  Server closed cleanly');
+      process.exit(0);
+    });
+    // Hard-exit fallback after 10 s if close() stalls.
+    setTimeout(() => { console.error('⚠️  Force-exit after timeout'); process.exit(1); }, 10_000).unref();
+  } else {
+    process.exit(0);
+  }
 }
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT',  () => shutdown('SIGINT'));
@@ -116,9 +143,23 @@ connect()
   .then(async () => {
     await seedSoftware();
     await seedAdminUser();
-    app.listen(PORT, () =>
+    const server = app.listen(PORT, () =>
       console.log(`🚀  Portal running → http://localhost:${PORT}  [${IS_PROD ? 'production' : 'development'}]`)
     );
+    // Store reference so graceful shutdown can call server.close().
+    global._httpServer = server;
+
+    // ── Atlas M0 keepalive ────────────────────────────────────────────────────
+    // Atlas free-tier clusters auto-pause after prolonged inactivity.
+    // Ping the DB every 5 minutes to keep the connection alive.
+    const mongoose = require('mongoose');
+    setInterval(async () => {
+      try {
+        await mongoose.connection.db.admin().ping();
+      } catch (e) {
+        console.warn('⚠️  [keepalive] DB ping failed:', e.message);
+      }
+    }, 5 * 60 * 1000); // every 5 minutes
   })
   .catch(err => {
     console.error('❌  Failed to start server:', err.message);

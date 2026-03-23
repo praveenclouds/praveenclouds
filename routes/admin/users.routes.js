@@ -61,11 +61,16 @@ router.put('/:id', requireAuth, canManagePortalUsers, async (req, res) => {
 });
 
 // ── PUT /api/admin/users/:id/reset-password ────────────────────────────────────
+// Minimum 10 chars; must include uppercase, lowercase, a digit, and a special char.
+const PASSWORD_RE = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{10,}$/;
+
 router.put('/:id/reset-password', requireAuth, canManagePortalUsers, async (req, res) => {
   try {
     const { password } = req.body;
-    if (!password || password.length < 6)
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    if (!password || !PASSWORD_RE.test(password))
+      return res.status(400).json({
+        error: 'Password must be at least 10 characters and include uppercase, lowercase, a number, and a special character',
+      });
 
     const user = await AdminUser.findById(req.params.id);
     if (!user) return res.status(404).json({ error: 'Portal user not found' });

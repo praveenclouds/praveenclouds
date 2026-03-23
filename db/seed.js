@@ -4,58 +4,114 @@
  * that currently live in user-asset-portal.html.
  *
  * Run:
- *   node db/seed.js
- *   MONGO_URI=mongodb://... node db/seed.js
+ *   node db/seed.js                          — seed users + assets
+ *   node db/seed.js --force-software         — seed users + assets AND force-sync software
+ *   MONGO_URI=mongodb://... node db/seed.js  — with custom DB URI
  *
- * The script is idempotent: it clears both collections before inserting, so it
- * is safe to run multiple times.
+ * The script clears users + assets before inserting. Software is only re-synced
+ * when --force-software is passed.
  */
 
 require('dotenv').config(); // optional – reads .env if present
 const { connect, disconnect, User, Asset } = require('./index');
+const { seedSoftware } = require('../seed/software.seed');
+const FORCE_SOFTWARE = process.argv.includes('--force-software');
 
 // ─── 1. USERS ──────────────────────────────────────────────────────────────────
 const USERS_RAW = [
-  {legacyId:'u1', first:'Ajay Christopher',last:'Hubert',   email:'ajay.christopher.hubert@terzocloud.com',role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u2', first:'Karthi',          last:'',         email:'karthi@terzocloud.com',                 role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u3', first:'Ahamad',          last:'Riyas',    email:'ahamad.riyas@terzocloud.com',           role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u4', first:'Kavipriya',       last:'',         email:'kavipriya@terzocloud.com',              role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u5', first:'Ananya',          last:'',         email:'ananya@terzocloud.com',                 role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u6', first:'Shunmugavel',     last:'',         email:'shunmugavel@terzocloud.com',            role:'Editor',  status:'Active',dept:'Engineering',      location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u7', first:'Prasanna',        last:'Kumar',    email:'prasanna.kumar@terzocloud.com',         role:'Viewer',  status:'Active',dept:'QA',               location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u8', first:'Hariharan',       last:'',         email:'hariharan@terzocloud.com',              role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u9', first:'Paventhan',       last:'',         email:'paventhan@terzocloud.com',              role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u10',first:'Vinotha',         last:'',         email:'vinotha@terzocloud.com',                role:'Editor',  status:'Active',dept:'Engineering',      location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u11',first:'Mythilipriya',    last:'',         email:'mythilipriya@terzocloud.com',           role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u12',first:'Divya',           last:'R',        email:'divya.r@terzocloud.com',                role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u13',first:'Dineshkumar',     last:'V',        email:'dineshkumar.v@terzocloud.com',          role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u14',first:'Dinesh',          last:'B',        email:'dinesh.b@terzocloud.com',               role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u15',first:'Vasanth',         last:'Pandian',  email:'vasanth.pandian@terzocloud.com',        role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u16',first:'Mohanamala',      last:'',         email:'mohanamala@terzocloud.com',             role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u17',first:'Divya',           last:'M',        email:'divya.m@terzocloud.com',                role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u18',first:'Gowtham',         last:'V',        email:'gowtham.v@terzocloud.com',              role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u19',first:'Iyyappan',        last:'',         email:'iyyappan@terzocloud.com',               role:'Editor',  status:'Active',dept:'Engineering',      location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u20',first:'Ragav',           last:'',         email:'ragav@terzocloud.com',                  role:'Editor',  status:'Active',dept:'Engineering',      location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u21',first:'Harshni',         last:'',         email:'harshni@terzocloud.com',                role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u22',first:'Priyadharshini',  last:'',         email:'priyadharshini@terzocloud.com',         role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u23',first:'Aswini',          last:'',         email:'aswini@terzocloud.com',                 role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u24',first:'Dharshini',       last:'',         email:'dharshini@terzocloud.com',              role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u25',first:'Kavimitraa',      last:'',         email:'kavimitraa@terzocloud.com',             role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u26',first:'Nivetha',         last:'',         email:'nivetha@terzocloud.com',                role:'Editor',  status:'Active',dept:'AI-Service',       location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u27',first:'Dhanusha',        last:'',         email:'dhanusha@terzocloud.com',               role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u28',first:'Sowmya',          last:'',         email:'sowmya@terzocloud.com',                 role:'Viewer',  status:'Active',dept:'QA',               location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u29',first:'Harish',          last:'',         email:'harish@terzocloud.com',                 role:'Viewer',  status:'Active',dept:'Customer Support', location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u30',first:'Praveen',         last:'M',        email:'praveen.m@terzocloud.com',              role:'Admin',   status:'Active',dept:'IT',               location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u31',first:'Karthick',        last:'R',        email:'karthick.r@terzocloud.com',             role:'Editor',  status:'Active',dept:'AI-Service',       location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u32',first:'Leo',             last:'Deepak',   email:'leo.deepak@terzocloud.com',             role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u33',first:'Gowtham',         last:'Manohar',  email:'gowtham.manohar@terzocloud.com',        role:'Manager', status:'Active',dept:'HR',               location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u34',first:'Himalaya',        last:'',         email:'himalaya@terzocloud.com',               role:'Manager', status:'Active',dept:'Product',          location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u35',first:'Yogesh',          last:'',         email:'yogesh@terzocloud.com',                 role:'Editor',  status:'Active',dept:'AI-Service',       location:'Coimbatore', phone:'',joined:'2023-01-01'},
-  {legacyId:'u36',first:'Mohanraja',       last:'',         email:'mohanraja@terzocloud.com',              role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u37',first:'Urvasi',          last:'',         email:'urvasi@terzocloud.com',                 role:'Viewer',  status:'Active',dept:'Accounts',         location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u38',first:'Pradeep',         last:'',         email:'pradeep@terzocloud.com',                role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u39',first:'Niranjan',        last:'',         email:'niranjan@terzocloud.com',               role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
-  {legacyId:'u40',first:'Revathi',         last:'',         email:'revathi@terzocloud.com',                role:'Editor',  status:'Active',dept:'Engineering',      location:'Chennai',    phone:'',joined:'2023-01-01'},
+  {legacyId:'u1', first:'Ajay Christopher', last:'Hubert', email:'ajay.christopher.hubert@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Staff Software Engineer', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u2', first:'Karthi', last:'', email:'karthi@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u3', first:'Ahamad', last:'Riyas', email:'ahamad.riyas@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Ragav R'},
+  {legacyId:'u4', first:'Kavipriya', last:'', email:'kavipriya@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u5', first:'Ananya', last:'', email:'ananya@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Ragav R'},
+  {legacyId:'u6', first:'Shunmugavel', last:'', email:'shunmugavel@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Ragav R'},
+  {legacyId:'u7', first:'Prasanna', last:'Kumar', email:'prasanna.kumar@terzocloud.com', role:'Viewer', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Senior Software Engineer', reportingManager:'Paventhan PKP'},
+  {legacyId:'u8', first:'Hariharan', last:'', email:'hariharan@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Lead Software Engineer', reportingManager:'Ragav R'},
+  {legacyId:'u9', first:'Paventhan', last:'', email:'paventhan@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Senior Manager', reportingManager:'Pradeep Thangavel'},
+  {legacyId:'u10', first:'Vinotha', last:'', email:'vinotha@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Senior Software Engineer', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u11', first:'Mythilipriya', last:'', email:'mythilipriya@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Ragav R'},
+  {legacyId:'u12', first:'Divya', last:'R', email:'divya.r@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u13', first:'Dineshkumar', last:'V', email:'dineshkumar.v@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u14', first:'Dinesh', last:'B', email:'dinesh.b@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Staff Software Engineer', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u15', first:'Vasanth', last:'Pandian', email:'vasanth.pandian@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Director of Engineering', reportingManager:'Luis Ocegueda'},
+  {legacyId:'u16', first:'Mohanamala', last:'', email:'mohanamala@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Staff Software Engineer', reportingManager:'Ragav R'},
+  {legacyId:'u17', first:'Divya', last:'M', email:'divya.m@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Senior Software Engineer', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u18', first:'Gowtham', last:'V', email:'gowtham.v@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Staff Software Engineer', reportingManager:'Ragav R'},
+  {legacyId:'u19', first:'Iyyappan', last:'', email:'iyyappan@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Staff Software Engineer', reportingManager:'Ragav R'},
+  {legacyId:'u20', first:'Ragav', last:'', email:'ragav@terzocloud.com', role:'Editor', status:'Active', dept:'Data Science - Engineering', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Director of Engineering', reportingManager:'Luis Ocegueda'},
+  {legacyId:'u21', first:'Harshni', last:'', email:'harshni@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u22', first:'Priyadharshini', last:'', email:'priyadharshini@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u23', first:'Aswini', last:'', email:'aswini@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u24', first:'Dharshini', last:'', email:'dharshini@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u25', first:'Kavimitraa', last:'', email:'kavimitraa@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u26', first:'Nivetha', last:'', email:'nivetha@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Senior Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u27', first:'Dhanusha', last:'', email:'dhanusha@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Lead Analyst (IN)', reportingManager:'Yogesh Selvakumaran'},
+  {legacyId:'u28', first:'Sowmya', last:'', email:'sowmya@terzocloud.com', role:'Viewer', status:'Active', dept:'Engineering', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Senior Software Engineer', reportingManager:'Paventhan PKP'},
+  {legacyId:'u29', first:'Harish', last:'', email:'harish@terzocloud.com', role:'Viewer', status:'Active', dept:'Operations', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'India, General Manager & Head of Customer Support', reportingManager:'Pradeep Thangavel'},
+  {legacyId:'u30', first:'Praveen', last:'M', email:'praveen.m@terzocloud.com', role:'Admin', status:'Active', dept:'IT', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'', reportingManager:''},
+  {legacyId:'u31', first:'Karthick', last:'R', email:'karthick.r@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u32', first:'Leo', last:'Deepak', email:'leo.deepak@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Senior Data Analyst (IN)', reportingManager:'Dhanusha Arumugam'},
+  {legacyId:'u33', first:'Gowtham', last:'Manohar', email:'gowtham.manohar@terzocloud.com', role:'Manager', status:'Active', dept:'AI Services', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'AI Operations Manager', reportingManager:'Kevin Character'},
+  {legacyId:'u34', first:'Himalaya', last:'', email:'himalaya@terzocloud.com', role:'Manager', status:'Active', dept:'Product', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Product Manager', reportingManager:'Zeyad Rajabi'},
+  {legacyId:'u35', first:'Yogesh', last:'', email:'yogesh@terzocloud.com', role:'Editor', status:'Active', dept:'AI Services', location:'Coimbatore', phone:'', joined:'2023-01-01', jobTitle:'Manager - AI Services, India Lead', reportingManager:'Griffin Rutstein'},
+  {legacyId:'u36', first:'Mohanraja', last:'', email:'mohanraja@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Senior Principal Engineer', reportingManager:'Luis Ocegueda'},
+  {legacyId:'u37', first:'Urvasi', last:'', email:'urvasi@terzocloud.com', role:'Viewer', status:'Active', dept:'Accounts', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'', reportingManager:''},
+  {legacyId:'u38', first:'Pradeep', last:'', email:'pradeep@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Executive Vice President (India)', reportingManager:'Zeyad Rajabi'},
+  {legacyId:'u39', first:'Niranjan', last:'', email:'niranjan@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Software Engineer III', reportingManager:'Vasanth Pandian'},
+  {legacyId:'u40', first:'Revathi', last:'', email:'revathi@terzocloud.com', role:'Editor', status:'Active', dept:'Engineering', location:'Chennai', phone:'', joined:'2023-01-01', jobTitle:'Staff Engineer', reportingManager:'Ragav R'},
+  {legacyId:'u41', first:'Brandon', last:'Card', email:'bcard@terzocloud.com', role:'Viewer', status:'Active', dept:'Executive', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Chief Executive Officer', reportingManager:'', employmentType:'Full Time'},
+  {legacyId:'u42', first:'Brad', last:'Grabowski', email:'bradg@terzocloud.com', role:'Viewer', status:'Active', dept:'Product', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director of Product Design', reportingManager:'Zeyad Rajabi', employmentType:'Full Time'},
+  {legacyId:'u43', first:'Eric', last:'Pritchett', email:'epritchett@terzocloud.com', role:'Viewer', status:'Active', dept:'Executive', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Chief Operations Officer', reportingManager:'', employmentType:'Full Time'},
+  {legacyId:'u44', first:'Spencer', last:'Ross', email:'sross@terzocloud.com', role:'Viewer', status:'Active', dept:'Sales', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director of Global Sales', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u45', first:'Michail', last:'Angarsky', email:'michael.angarsky@terzocloud.com', role:'Viewer', status:'Active', dept:'Legal', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'General Counsel and Head of HR', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u46', first:'Griffin', last:'Rutstein', email:'griffin@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Head of Global AI Services', reportingManager:'Kevin Character', employmentType:'Full Time'},
+  {legacyId:'u47', first:'Kevin', last:'Redwine', email:'kredwine@terzocloud.com', role:'Viewer', status:'Active', dept:'Executive', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Chief Data Science Officer', reportingManager:'', employmentType:'Full Time'},
+  {legacyId:'u48', first:'Vincent', last:'Halle', email:'vincent@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director of Development', reportingManager:'Luis Ocegueda', employmentType:'Full Time'},
+  {legacyId:'u49', first:'Kristen', last:'Pritchett', email:'kristenp@terzocloud.com', role:'Viewer', status:'Active', dept:'Human Resources', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Manager, Human Resources', reportingManager:'Michail Angarsky', employmentType:'Full Time'},
+  {legacyId:'u50', first:'Andrew', last:'Forbes', email:'andrew@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Manager, Data Strategy (CAN)', reportingManager:'Griffin Rutstein', employmentType:'Full Time'},
+  {legacyId:'u51', first:'Anna', last:'Gurvits', email:'anna@terzocloud.com', role:'Viewer', status:'Active', dept:'Marketing', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Integrated Marketing Manager', reportingManager:'Heather Silverman', employmentType:'Full Time'},
+  {legacyId:'u52', first:'Ashlee', last:'Vargas', email:'av@terzocloud.com', role:'Viewer', status:'Active', dept:'Executive Administration', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Executive Assistant to the CEO', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u53', first:'Brody', last:'Elkins', email:'belkins@terzocloud.com', role:'Viewer', status:'Active', dept:'Sales', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Account Executive', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u54', first:'Caelan', last:'Seto', email:'cseto@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Associate Software Developer', reportingManager:'Vasanth Pandian', employmentType:'Full Time'},
+  {legacyId:'u55', first:'Daniela', last:'Nash', email:'daniela@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst  (CAN)', reportingManager:'Stephanie Yaacoub', employmentType:'Full Time'},
+  {legacyId:'u56', first:'Feroz', last:'Mudupully', email:'ferozkhan@terzocloud.com', role:'Viewer', status:'Active', dept:'Customer Operations', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Engagement Director', reportingManager:'Kevin Character', employmentType:'Full Time'},
+  {legacyId:'u57', first:'Heather', last:'Silverman', email:'hsilverman@terzocloud.com', role:'Viewer', status:'Active', dept:'Marketing', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Vice President of Marketing and Communications', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u58', first:'Jason', last:'Anderman', email:'janderman@terzocloud.com', role:'Viewer', status:'Active', dept:'Legal', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Deputy General Counsel', reportingManager:'Michail Angarsky', employmentType:'Full Time'},
+  {legacyId:'u59', first:'JP', last:'Giraldo Ramirez', email:'juanpablo@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u60', first:'Justin', last:'Adams', email:'justin.a@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u61', first:'Kade', last:'Manuel', email:'kade@terzocloud.com', role:'Viewer', status:'Active', dept:'Customer Operations', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Customer Support Manager', reportingManager:'Kevin Character', employmentType:'Full Time'},
+  {legacyId:'u62', first:'Ken', last:'Calder', email:'kcalder@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Senior Full Stack Developer', reportingManager:'Luis Ocegueda', employmentType:'Full Time'},
+  {legacyId:'u63', first:'Kevin', last:'Character', email:'kcharacter@terzocloud.com', role:'Viewer', status:'Active', dept:'Customer Operations', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Vice President, Customer Operations', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u64', first:'Kieran', last:'Murphy', email:'kieran@terzocloud.com', role:'Viewer', status:'Active', dept:'Marketing', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Creative Director', reportingManager:'Heather Silverman', employmentType:'Full Time'},
+  {legacyId:'u65', first:'Kioaka', last:'Bynum', email:'kbynum@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Manager, AI Services (US)', reportingManager:'Griffin Rutstein', employmentType:'Full Time'},
+  {legacyId:'u66', first:'Lindsey', last:'Still', email:'lindsey@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst II', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u67', first:'Luc', last:'Belanger', email:'luc.belanger@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Principal Applied Science', reportingManager:'Philippe Grangier', employmentType:'Full Time'},
+  {legacyId:'u68', first:'Lucia', last:'Steiner', email:'lucia@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (CAN)', reportingManager:'Stephanie Yaacoub', employmentType:'Full Time'},
+  {legacyId:'u69', first:'Luis', last:'Ocegueda', email:'luis@terzocloud.com', role:'Viewer', status:'Active', dept:'Engineering', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director of Engineering', reportingManager:'Zeyad Rajabi', employmentType:'Full Time'},
+  {legacyId:'u70', first:'Luke', last:'Ashworth', email:'lashworth@terzocloud.com', role:'Viewer', status:'Active', dept:'Customer Operations', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Engagement Manager II', reportingManager:'Kevin Character', employmentType:'Full Time'},
+  {legacyId:'u71', first:'Matt', last:'Hines', email:'matt.hines@terzocloud.com', role:'Viewer', status:'Active', dept:'Accounting / Finance', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Corporate Controller', reportingManager:'', employmentType:'Full Time'},
+  {legacyId:'u72', first:'Max', last:'Ferguson', email:'maxferguson@terzocloud.com', role:'Viewer', status:'Active', dept:'Sales', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director of Strategic Partnerships', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u73', first:'Max', last:'Perlstein', email:'max@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Senior Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u74', first:'Maxime', last:'Jacques', email:'maxime@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Senior AI/ML Developer', reportingManager:'Ragav R', employmentType:'Full Time'},
+  {legacyId:'u75', first:'Melany', last:'Delgado', email:'melany@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Technical Program Manager', reportingManager:'Zeyad Rajabi', employmentType:'Full Time'},
+  {legacyId:'u76', first:'Miaoyin', last:'Li', email:'miaoyin@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (CAN)', reportingManager:'Stephanie Yaacoub', employmentType:'Full Time'},
+  {legacyId:'u77', first:'Michael', last:'Tran', email:'michael@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u78', first:'Natan', last:'Sakajiri', email:'natan@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (CAN)', reportingManager:'Stephanie Yaacoub', employmentType:'Full Time'},
+  {legacyId:'u79', first:'Nicholas', last:'McGaughey', email:'nicholas@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u80', first:'Nicholas', last:'Theodorakis', email:'nicktheo@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (CAN)', reportingManager:'Stephanie Yaacoub', employmentType:'Full Time'},
+  {legacyId:'u81', first:'Philippe', last:'Grangier', email:'philippe@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director, Applied Science', reportingManager:'Luis Ocegueda', employmentType:'Full Time'},
+  {legacyId:'u82', first:'Ritu', last:'Patel', email:'ritu@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u83', first:'Sena', last:'Onen Oz', email:'sena@terzocloud.com', role:'Viewer', status:'Active', dept:'Data Science', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Scientist', reportingManager:'Philippe Grangier', employmentType:'Full Time'},
+  {legacyId:'u84', first:'Stephanie', last:'Yaacoub', email:'stephanie@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Manager, AI Services (CAN LEAD)', reportingManager:'Griffin Rutstein', employmentType:'Full Time'},
+  {legacyId:'u85', first:'Stephen', last:'Horn', email:'stephen@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst II', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u86', first:'Tian', last:'Gao', email:'tian@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst (CAN)', reportingManager:'Stephanie Yaacoub', employmentType:'Full Time'},
+  {legacyId:'u87', first:'Zeyad', last:'Rajabi', email:'zeyad.r@terzocloud.com', role:'Viewer', status:'Active', dept:'Executive', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Chief Product Officer', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u88', first:'Ryan', last:'Tanner', email:'rtanner@terzocloud.com', role:'Viewer', status:'Active', dept:'Marketing', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Marketing-Designer', reportingManager:'', employmentType:'Contractor'},
+  {legacyId:'u89', first:'Sameer', last:'Sharma', email:'sameer@terzocloud.com', role:'Viewer', status:'Active', dept:'Customer Operations', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Engagement Director', reportingManager:'Kevin Character', employmentType:'Full Time'},
+  {legacyId:'u90', first:'Avinesh', last:'Bedi', email:'avinesh@terzocloud.com', role:'Viewer', status:'Active', dept:'Customer Operations', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Engagement Associate', reportingManager:'', employmentType:'Full Time'},
+  {legacyId:'u91', first:'Edward', last:'Warszycki', email:'edward@terzocloud.com', role:'Viewer', status:'Active', dept:'Sales', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Director of Sales, Northeast', reportingManager:'Brandon Card', employmentType:'Full Time'},
+  {legacyId:'u92', first:'Parker', last:'Walrod', email:'parker@terzocloud.com', role:'Viewer', status:'Active', dept:'AI Services', location:'Remote', phone:'', joined:'2023-01-01', jobTitle:'Data Analyst', reportingManager:'Kioaka Bynum', employmentType:'Full Time'},
+  {legacyId:'u93', first:'Michael', last:'Deal', email:'michael.deal@terzocloud.com', role:'Viewer', status:'Active', dept:'Accounting / Finance', location:'USA', phone:'', joined:'2023-01-01', jobTitle:'Head of Finance', reportingManager:'Brandon Card', employmentType:'Full Time'},
 ];
 
 // ─── 2. ASSETS (legacyAssignTo references user legacyId) ──────────────────────
@@ -112,9 +168,19 @@ async function seed() {
   console.log('🗑️   Clearing users…');
   await User.deleteMany({});
 
-  console.log('👤  Inserting 40 users…');
+  // Map legacy roles to valid User model enum values
+  const roleMap     = { Editor: 'Staff', Viewer: 'Staff', Admin: 'Admin', Manager: 'Manager', Staff: 'Staff' };
+  // Map legacy location values to valid enum values
+  const locationMap = { Remote: 'USA', Chennai: 'Chennai', Coimbatore: 'Coimbatore', USA: 'USA', Canada: 'Canada' };
+
+  console.log('👤  Inserting 93 users…');
   const insertedUsers = await User.insertMany(
-    USERS_RAW.map(u => ({ ...u, joined: new Date(u.joined) }))
+    USERS_RAW.map(u => ({
+      ...u,
+      joined:   new Date(u.joined),
+      role:     roleMap[u.role]     || 'Staff',
+      location: locationMap[u.location] || 'USA',
+    }))
   );
 
   // Build legacyId → ObjectId map for asset assignment
@@ -139,9 +205,16 @@ async function seed() {
   const inUse       = await Asset.countDocuments({ status: 'In-Use' });
   const available   = await Asset.countDocuments({ status: 'Available' });
 
+  // --- Software (optional force-resync) ---
+  if (FORCE_SOFTWARE) {
+    console.log('🔄  Force-syncing software catalogue…');
+    await seedSoftware(true);
+  }
+
   console.log('\n✅  Seed complete');
-  console.log(`   Users : ${totalUsers}`);
-  console.log(`   Assets: ${totalAssets}  (In-Use: ${inUse}, Available: ${available})`);
+  console.log(`   Users  : ${totalUsers}`);
+  console.log(`   Assets : ${totalAssets}  (In-Use: ${inUse}, Available: ${available})`);
+  if (FORCE_SOFTWARE) console.log('   Software: synced from seed file');
 
   await disconnect();
 }

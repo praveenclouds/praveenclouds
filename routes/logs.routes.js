@@ -7,6 +7,11 @@ const router = require('express').Router();
 const { Log }  = require('../db');
 const { requireAuth, canViewActivityLog } = require('../middleware/auth');
 
+// Escape special regex characters to prevent ReDoS from user-supplied search strings.
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 // ── GET /api/logs ──────────────────────────────────────────────────────────────
 router.get('/', requireAuth, canViewActivityLog, async (req, res) => {
   try {
@@ -16,7 +21,7 @@ router.get('/', requireAuth, canViewActivityLog, async (req, res) => {
     if (type)       filter.eventType  = type;
     if (entityType) filter.entityType = entityType;
     if (search) {
-      const re = new RegExp(search, 'i');
+      const re = new RegExp(escapeRegex(String(search).slice(0, 200)), 'i');
       filter.$or = [
         { summary:          re },
         { entityLabel:      re },

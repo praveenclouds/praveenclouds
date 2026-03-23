@@ -7,6 +7,7 @@
 const router = require('express').Router();
 const { IntegrationSettings } = require('../../db');
 const { requireAuth, canManageIntegrations } = require('../../middleware/auth');
+const { writeLog } = require('../../services/log.service');
 
 // ── GET /api/admin/integrations ────────────────────────────────────────────────
 router.get('/', requireAuth, canManageIntegrations, async (req, res) => {
@@ -106,6 +107,18 @@ router.put('/', requireAuth, canManageIntegrations, async (req, res) => {
     }
 
     await Promise.all(tasks);
+
+    // Audit-log which providers were updated (never log secret values).
+    const updatedProviders = ['google'];
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'slack'))  updatedProviders.push('slack');
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'email'))  updatedProviders.push('email');
+    await writeLog({
+      eventType:   'settings_updated',
+      entityType:  'integration',
+      entityLabel: 'Integration Settings',
+      summary:     `Integration settings updated by admin — providers: ${updatedProviders.join(', ')}`,
+    });
+
     res.json({ ok: true });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });

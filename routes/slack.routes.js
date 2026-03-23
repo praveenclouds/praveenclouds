@@ -298,6 +298,7 @@ router.post(
   '/support-command',
   express.urlencoded({
     extended: false,
+    limit: '1mb',
     verify: (req, res, buf) => {
       req.rawBody = buf.toString('utf8');
     },
@@ -327,6 +328,7 @@ router.post(
   '/interactivity',
   express.urlencoded({
     extended: false,
+    limit: '1mb',
     verify: (req, res, buf) => {
       req.rawBody = buf.toString('utf8');
     },

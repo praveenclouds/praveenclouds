@@ -13,12 +13,12 @@ const SOFTWARE_SEED = [
   { csvId:'A-03', name:'Asana', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Customer Success & AI Service', purpose:'Project Management', subscriptionPlan:'Business Starter Plan', renewalPeriod:'Annual', annualCost:6540, licensePricePerUserMonth:10.90, purchasedLicenses:50, usedLicenses:42, siteUSA:true, siteCAN:true, siteIND:true, costUSA:2861, costCAN:1635, costIND:2044 },
   { csvId:'A-04', name:'Jira (Atlassian)', owner:'Brandon Card', admins:'Praveen M / Mohanraja / Vasanth', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Engineering', purpose:'ITSM & Ticketing', subscriptionPlan:'', renewalPeriod:'Monthly', annualCost:28200, licensePricePerUserMonth:15, purchasedLicenses:48, usedLicenses:49, siteUSA:true, siteCAN:true, siteIND:true, costUSA:6600, costCAN:3000, costIND:18600 },
   { csvId:'A-05', name:'GitHub (Microsoft)', admins:'Vasanth', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Engineering', purpose:'Version Control', subscriptionPlan:'', renewalPeriod:'Monthly', annualCost:1584, licensePricePerUserMonth:4, purchasedLicenses:34, usedLicenses:29, siteUSA:true, siteCAN:false, siteIND:true, costUSA:170, costCAN:0, costIND:1414 },
-  { csvId:'A-06', name:'Google Workspace', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Management', purpose:'Gmail & Productivity Suite', subscriptionPlan:'Enterprise Standard', renewalPeriod:'Monthly', annualCost:36240, licensePricePerUserMonth:20, purchasedLicenses:154, usedLicenses:154, siteUSA:true, siteCAN:true, siteIND:true, costUSA:13030, costCAN:7329, costIND:15880 },
+  { csvId:'A-06', name:'Google Workspace', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'All Departments', purpose:'Gmail & Productivity Suite', subscriptionPlan:'Enterprise Standard', renewalPeriod:'Monthly', annualCost:36240, licensePricePerUserMonth:20, purchasedLicenses:154, usedLicenses:154, siteUSA:true, siteCAN:true, siteIND:true, costUSA:13030, costCAN:7329, costIND:15880 },
   { csvId:'A-07', name:'HubSpot', owner:'Brandon Card', admins:'Brandon Card', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Sales', purpose:'CRM', subscriptionPlan:'', renewalPeriod:'Annual', annualCost:18370, purchasedLicenses:23, usedLicenses:19, siteUSA:true, siteCAN:false, siteIND:true, costUSA:14503, costCAN:0, costIND:3867 },
   { csvId:'A-08', name:'IntelliJ IDEA (JetBrains)', owner:'Mohanraja', admins:'Praveen M / Mohanraja', billedTo:'Eric Pritchett', deploymentType:'On-premises', department:'Engineering', purpose:'Coding IDE', subscriptionPlan:'IntelliJ Ultimate', renewalPeriod:'Annual', annualCost:8292.90, licensePricePerUserMonth:17.10, purchasedLicenses:23, usedLicenses:19, siteUSA:false, siteCAN:false, siteIND:true, costUSA:0, costCAN:0, costIND:8293 },
   { csvId:'A-09', name:'Loom', owner:'Brandon Card', admins:'Praveen M / Ragav', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Sales & Customer Success', purpose:'Screen Recording & Presentations', subscriptionPlan:'Loom Business', renewalPeriod:'Monthly', annualCost:1728, licensePricePerUserMonth:8, purchasedLicenses:18, usedLicenses:18, siteUSA:true, siteCAN:false, siteIND:true, costUSA:1152, costCAN:0, costIND:576 },
   { csvId:'A-10', name:'Microsoft 365', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Management', purpose:'Office Suite', subscriptionPlan:'Business Premium', renewalPeriod:'Annual', annualCost:4488, licensePricePerUserMonth:22, purchasedLicenses:25, usedLicenses:26, siteUSA:true, siteCAN:false, siteIND:true, costUSA:3052, costCAN:0, costIND:1436 },
-  { csvId:'A-11', name:'Slack', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Management', purpose:'Team Communication', subscriptionPlan:'Slack Business+', renewalPeriod:'Annual', annualCost:16020, licensePricePerUserMonth:15, purchasedLicenses:89, usedLicenses:92, siteUSA:true, siteCAN:true, siteIND:true, costUSA:5760, costCAN:3240, costIND:7020 },
+  { csvId:'A-11', name:'Slack', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'All Departments', purpose:'Team Communication', subscriptionPlan:'Slack Business+', renewalPeriod:'Annual', annualCost:16020, licensePricePerUserMonth:15, purchasedLicenses:89, usedLicenses:92, siteUSA:true, siteCAN:true, siteIND:true, costUSA:5760, costCAN:3240, costIND:7020 },
   { csvId:'A-12', name:'Mosyle MDM', owner:'Praveen M', admins:'Praveen M', billedTo:'', deploymentType:'Freeware', department:'IT', purpose:'Device Management', subscriptionPlan:'Free', renewalPeriod:'Freeware', annualCost:0, purchasedLicenses:30, usedLicenses:25, siteUSA:false, siteCAN:false, siteIND:true, costUSA:0, costCAN:0, costIND:0 },
   { csvId:'A-13', name:'OpenVPN', owner:'Praveen M', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Engineering', purpose:'VPN / Private Network', subscriptionPlan:'', renewalPeriod:'Annual', annualCost:1680, licensePricePerUserMonth:6, purchasedLicenses:20, usedLicenses:20, siteUSA:true, siteCAN:true, siteIND:true, costUSA:84, costCAN:84, costIND:1512 },
   { csvId:'A-14', name:'Canva', owner:'Brandon Card', admins:'Praveen M', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Management', purpose:'Design & Presentations', subscriptionPlan:'Canva Teams', renewalPeriod:'Monthly', annualCost:1981, licensePricePerUserMonth:5.16, purchasedLicenses:32, usedLicenses:32, siteUSA:true, siteCAN:true, siteIND:true, costUSA:1424, costCAN:186, costIND:371 },
@@ -43,12 +43,24 @@ const SOFTWARE_SEED = [
   { csvId:'A-33', name:'Claude (Anthropic)', owner:'Luis', admins:'Luis', billedTo:'Eric Pritchett', deploymentType:'SAAS', department:'Engineering', purpose:'AI Assistant', subscriptionPlan:'Teams Plan', renewalPeriod:'Monthly', annualCost:0, purchasedLicenses:45, usedLicenses:45, siteUSA:false, siteCAN:false, siteIND:false },
 ];
 
-// ── Seed software catalogue on first run ──────────────────────────────────────
-async function seedSoftware() {
-  const count = await Software.countDocuments();
-  if (count > 0) return;
-  await Software.insertMany(SOFTWARE_SEED);
-  console.log(`✅  Software seeded: ${SOFTWARE_SEED.length} apps`);
+// ── Seed software catalogue ────────────────────────────────────────────────────
+// Normal mode  : skips if data already exists (safe for server restarts)
+// Force mode   : upserts every entry from SOFTWARE_SEED (run with --force-software)
+async function seedSoftware(force = false) {
+  if (!force) {
+    const count = await Software.countDocuments();
+    if (count > 0) return;
+  }
+  // Upsert each app by csvId so existing portal edits are preserved for unlisted fields
+  const ops = SOFTWARE_SEED.map(app => ({
+    updateOne: {
+      filter: { csvId: app.csvId },
+      update: { $set: app },
+      upsert: true,
+    },
+  }));
+  const result = await Software.bulkWrite(ops);
+  console.log(`✅  Software synced: ${result.upsertedCount} inserted, ${result.modifiedCount} updated (${SOFTWARE_SEED.length} total)`);
 }
 
 // ── Seed / migrate default super-admin account ────────────────────────────────

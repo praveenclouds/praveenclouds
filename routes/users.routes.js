@@ -20,9 +20,26 @@ const TRACKED_FIELDS = [
 ];
 
 // ── GET /api/users ─────────────────────────────────────────────────────────────
+// Supports optional ?page=1&limit=200&all=true query params.
+// Defaults to returning all records (limit=0) to preserve existing UI behaviour,
+// but callers can opt-in to pagination when needed.
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const users = await User.find().sort({ first: 1 });
+    const { status, all } = req.query;
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.max(0, parseInt(req.query.limit) || 0); // 0 = no limit (default)
+
+    const filter = {};
+    if (status) filter.status = status;
+
+    const query = User.find(filter).sort({ first: 1 });
+    if (limit > 0 && !all) {
+      const total = await User.countDocuments(filter);
+      const users = await query.skip((page - 1) * limit).limit(limit);
+      return res.json({ total, page, limit, users: users.map(fmt) });
+    }
+    // No pagination requested — return flat array (backward-compatible)
+    const users = await query;
     res.json(users.map(fmt));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

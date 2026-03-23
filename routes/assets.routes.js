@@ -15,9 +15,20 @@ const { writeLog } = require('../services/log.service');
 const TRACKED_ASSET_FIELDS = ['name', 'type', 'serial', 'brand', 'desc', 'status', 'location', 'vendor', 'notes'];
 
 // ── GET /api/assets ────────────────────────────────────────────────────────────
+// Supports optional ?page=1&limit=200 query params.
+// Defaults to returning all records (backward-compatible flat array).
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const assets = await Asset.find().sort({ csvId: 1 });
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.max(0, parseInt(req.query.limit) || 0); // 0 = no limit (default)
+
+    const query = Asset.find().sort({ csvId: 1 });
+    if (limit > 0) {
+      const total  = await Asset.countDocuments();
+      const assets = await query.skip((page - 1) * limit).limit(limit);
+      return res.json({ total, page, limit, assets: assets.map(fmt) });
+    }
+    const assets = await query;
     res.json(assets.map(fmt));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

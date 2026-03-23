@@ -717,6 +717,203 @@
       gap: 12px;
     }
     .workflow-step-grid .full { grid-column: 1 / -1; }
+    .mail-template-layout {
+      display:grid;
+      gap: 18px;
+    }
+    .mail-template-submenu {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .mail-template-subtab {
+      border: 1px solid rgba(130,96,185,.18);
+      background: rgba(24, 17, 38, 0.92);
+      color: var(--muted);
+      padding: 10px 16px;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .mail-template-subtab.active {
+      background: linear-gradient(135deg, rgba(87,114,255,.24), rgba(128,89,255,.22));
+      color: var(--text);
+      border-color: rgba(100,116,255,.42);
+      box-shadow: 0 10px 24px rgba(36, 31, 71, 0.26);
+    }
+    .mail-template-pane { display:none; }
+    .mail-template-pane.active { display:block; }
+    .mail-template-overview-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .mail-template-card {
+      border: 1px solid rgba(130,96,185,.16);
+      border-radius: 20px;
+      background: rgba(24, 18, 39, 0.92);
+      padding: 18px;
+      display:grid;
+      gap: 12px;
+    }
+    .mail-template-card h3 {
+      margin: 0;
+      font-size: 1.02rem;
+    }
+    .mail-template-card .meta {
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    .mail-template-preview {
+      border: 1px solid rgba(130,96,185,.14);
+      border-radius: 16px;
+      background: rgba(18, 13, 28, 0.94);
+      padding: 14px;
+      display:grid;
+      gap: 10px;
+    }
+    .mail-template-preview pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font: inherit;
+      color: var(--text);
+      line-height: 1.55;
+    }
+    .token-list {
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+    }
+    .token-chip {
+      display:inline-flex;
+      align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(124,92,255,.14);
+      border: 1px solid rgba(124,92,255,.24);
+      color: #ddd2ff;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .mail-template-edit-layout {
+      display:grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 18px;
+      align-items:start;
+    }
+    .mail-template-list {
+      border: 1px solid rgba(130,96,185,.18);
+      border-radius: 22px;
+      background: rgba(25, 18, 40, 0.96);
+      overflow:hidden;
+    }
+    .mail-template-list-body {
+      max-height: calc(100vh - 330px);
+      overflow:auto;
+      padding: 10px;
+      display:grid;
+      gap: 10px;
+    }
+    .mail-template-list-card {
+      border: 1px solid rgba(130,96,185,.16);
+      border-radius: 16px;
+      background: rgba(30, 22, 47, 0.92);
+      padding: 14px 16px;
+      cursor:pointer;
+      transition: .2s ease;
+    }
+    .mail-template-list-card.active {
+      border-color: rgba(100,116,255,.45);
+      box-shadow: 0 14px 28px rgba(40, 34, 73, 0.28);
+      transform: translateY(-1px);
+    }
+    .mail-template-list-card strong {
+      display:block;
+      margin-bottom:6px;
+    }
+    .mail-template-editor {
+      border: 1px solid rgba(130,96,185,.18);
+      border-radius: 22px;
+      background: rgba(25, 18, 40, 0.96);
+      overflow:hidden;
+    }
+    .mail-template-editor-body {
+      padding: 22px;
+      display:grid;
+      gap: 16px;
+    }
+
+    /* Align Support Center sizing with the Asset Management portal */
+    .shell { grid-template-columns: 240px 1fr; }
+    .sidebar { padding: 18px 18px 14px; }
+    .logo { gap: 10px; margin-bottom: 18px; }
+    .logo-icon { width: 34px; height: 34px; border-radius: 8px; }
+    .logo-icon svg { width: 18px; height: 18px; }
+    .logo-title { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .logo-sub { margin-top: 2px; font-size: 10px; }
+    .nav-title { font-size: 10px; font-weight: 600; letter-spacing: .08em; margin: 18px 0 8px; }
+    .nav-link { padding: 8px 11px; border-radius: 8px; margin-bottom: 1px; font-size: 13px; font-weight: 500; }
+    .nav-link svg { width: 17px; height: 17px; }
+    .sidebar-footer { padding: 14px; border-radius: 12px; }
+    .sidebar-footer strong { font-size: 12.5px; }
+    .sidebar-footer span { font-size: 11px; }
+    .main { padding: 22px 24px; }
+    .topbar { margin-bottom: 18px; }
+    .title h1 { font-size: 17px; font-weight: 700; }
+    .title p { margin-top: 4px; font-size: 13px; }
+    .btn { border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .panel { border-radius: 12px; }
+    .panel-head { padding: 14px 18px; }
+    .panel-title { font-size: 14px; font-weight: 700; }
+    .summary { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); margin-bottom: 22px; }
+    .summary-card { border-radius: 12px; padding: 16px 18px; }
+    .summary-card strong { font-size: 26px; margin-top: 2px; line-height: 1; }
+    .summary-card span { font-size: 11.5px; }
+    .filters { padding: 14px 18px 0; }
+    input, select, textarea { border-radius: 8px; padding: 8px 11px; font-size: 13px; font-family: inherit; }
+    th, td { padding: 11px 15px; font-size: 13px; }
+    th { font-size: 11px; letter-spacing: .05em; }
+    .pill { padding: 2px 8px; font-size: 11px; font-weight: 600; }
+    .detail { padding: 18px 22px; }
+    .drawer-head { padding: 14px 18px; }
+    .drawer-head .panel-title { font-size: 14px; font-weight: 700; }
+    .field label { margin-bottom: 4px; font-size: 12px; letter-spacing: .05em; font-weight: 600; }
+    .workflow-card { border-radius: 12px; padding: 12px 14px; }
+    .workflow-meta { font-size: 11px; }
+    .task { border-radius: 12px; padding: 12px; }
+    .task-area { font-size: 11.5px; }
+    .task-lock-note { font-size: 11px; }
+    .export-menu { border-radius: 10px; }
+    .export-menu-item { padding: 8px 11px; border-radius: 8px; font-size: 12px; }
+    .modal-box { border-radius: 14px 0 0 14px; }
+    .modal-head, .modal-foot { padding: 14px 18px; }
+    .modal-body { padding: 18px 22px; }
+    .muted-note { font-size: 13px; padding: 13px 16px; border-radius: 10px; }
+    .preview-card { border-radius: 12px; padding: 14px 16px; }
+    .preview-item { padding: 9px 12px; border-radius: 10px; font-size: 13px; }
+    .multi-picker-trigger { min-height: 42px; border-radius: 8px; padding: 8px 11px; font-size: 13px; }
+    .multi-picker-panel { border-radius: 12px; padding: 8px; }
+    .multi-picker-search { border-radius: 8px; padding: 8px 11px; font-size: 13px; }
+    .multi-picker-option { padding: 9px 12px; border-radius: 10px; font-size: 13px; }
+    .multi-picker-empty { border-radius: 10px; font-size: 12px; }
+    .toast { padding: 10px 16px; border-radius: 9px; font-size: 12.5px; }
+    .section-tab { padding: 8px 14px; font-size: 13px; font-weight: 600; }
+    .request-type-layout { grid-template-columns: 320px minmax(0, 1fr); }
+    .request-type-list, .request-type-editor, .mail-template-list, .mail-template-editor { border-radius: 12px; }
+    .request-type-card, .workflow-step-card, .mail-template-card, .mail-template-list-card { border-radius: 12px; padding: 12px 14px; }
+    .request-type-card strong, .mail-template-card h3 { font-size: 14px; }
+    .request-type-card .meta, .mail-template-card .meta { font-size: 12px; }
+    .builder-wrap, .mail-template-editor-body { padding: 18px 22px 22px; }
+    .builder-section-title { font-size: 12px; }
+    .toggle-row { padding: 12px 14px; border-radius: 12px; }
+    .mail-template-subtab { padding: 8px 14px; font-size: 13px; font-weight: 600; }
+    .mail-template-preview { border-radius: 10px; padding: 12px 14px; }
+    .token-chip { padding: 4px 9px; font-size: 11.5px; }
+    .mail-template-edit-layout { grid-template-columns: 300px minmax(0, 1fr); }
     @keyframes fadein {
       from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
@@ -728,6 +925,7 @@
       .summary { grid-template-columns: repeat(2, 1fr); }
       .modal-box { width: min(100vw, 720px); }
       .request-type-layout { grid-template-columns: 1fr; }
+      .mail-template-edit-layout { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
       .main { padding: 18px; }
@@ -801,11 +999,15 @@
           <button class="btn btn-secondary" onclick="loadRequestTypes()">Refresh Types</button>
           <button class="btn btn-primary" onclick="createRequestTypeDraft()">New Request Type</button>
         </div>
+        <div id="mailTemplateActions" style="display:none;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="loadMailTemplates()">Refresh Templates</button>
+        </div>
       </div>
 
       <div class="section-menu">
         <button class="section-tab active" id="requestsTab" onclick="setSupportView('requests')">Requests</button>
         <button class="section-tab" id="requestTypesTab" onclick="setSupportView('request-types')">Request Type</button>
+        <button class="section-tab" id="mailTemplatesTab" onclick="setSupportView('mail-templates')">Mail Template</button>
       </div>
 
       <div class="page-view active" id="requestsView">
@@ -871,6 +1073,48 @@
             </div>
           </section>
         </div>
+      </div>
+
+      <div class="page-view" id="mailTemplatesView">
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Mail Templates</div>
+              <div style="color:var(--muted);font-size:.88rem;margin-top:6px">Only Super Admin can review and edit the live Support Center email templates.</div>
+            </div>
+            <div style="color:var(--muted);font-size:.88rem" id="mailTemplateCountLabel">0 templates</div>
+          </div>
+          <div class="builder-wrap mail-template-layout">
+            <div class="mail-template-submenu">
+              <button class="mail-template-subtab active" id="mailTemplateOverviewTab" onclick="setMailTemplateMode('overview')">Predefined Template Overview</button>
+              <button class="mail-template-subtab" id="mailTemplateEditTab" onclick="setMailTemplateMode('edit')">Template Edit</button>
+            </div>
+
+            <div class="mail-template-pane active" id="mailTemplateOverviewPane"></div>
+
+            <div class="mail-template-pane" id="mailTemplateEditPane">
+              <div class="mail-template-edit-layout">
+                <section class="mail-template-list">
+                  <div class="panel-head">
+                    <div class="panel-title">Templates</div>
+                    <div style="color:var(--muted);font-size:.88rem" id="mailTemplateEditorCountLabel">0</div>
+                  </div>
+                  <div class="mail-template-list-body" id="mailTemplateList"></div>
+                </section>
+
+                <section class="mail-template-editor">
+                  <div class="panel-head">
+                    <div class="panel-title">Template Editor</div>
+                    <button class="btn btn-primary" id="saveMailTemplateBtn" type="button" onclick="saveMailTemplate()">Save Template</button>
+                  </div>
+                  <div class="mail-template-editor-body" id="mailTemplateEditor">
+                    <div class="empty">Select a template to update its live subject, message body, and action labels.</div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
   </div>
@@ -988,7 +1232,7 @@
   <script>
     const token = localStorage.getItem('tcToken');
     const API = '/api/support';
-    const ALL_DEPARTMENT_LABEL = 'All Department';
+    const ALL_DEPARTMENT_LABEL = 'All Departments';
     const BUILTIN_REQUEST_TYPE_META = {
       application_access: { label: 'Application Access Request', className: 'application-access' },
       new_app: { label: 'New App Request', className: 'new-app' },
@@ -1014,7 +1258,10 @@
     let requests = [];
     let selectedRequestId = null;
     let selectedRequestTypeId = null;
+    let mailTemplates = [];
+    let selectedMailTemplateId = null;
     let supportView = 'requests';
+    let mailTemplateMode = 'overview';
     let supportUsers = [];
     let createSelectedApplications = [];
     let detailSelectedApplications = [];
@@ -1083,6 +1330,10 @@
 
     function canEditRequestTypes() {
       return !!currentUser?.permissions?.manageRequestTypes;
+    }
+
+    function canManageMailTemplates() {
+      return currentUser?.role === 'super_admin';
     }
 
     function clone(value) {
@@ -1165,7 +1416,7 @@
       const selectedIds = new Set(selected.map(app => app.csvId));
       const options = normalizedApplicationOptions().filter(app => (
         !query
-        || `${app.name} ${app.csvId} ${app.department || ''}`.toLowerCase().includes(query)
+        || `${app.name} ${app.csvId} ${formatSoftwareDepartmentLabel(app.department)}`.toLowerCase().includes(query)
       ));
 
       if (!options.length) {
@@ -1176,7 +1427,7 @@
       list.innerHTML = options.map(app => `
         <label class="multi-picker-option">
           <input type="checkbox" ${selectedIds.has(app.csvId) ? 'checked' : ''} onchange="toggleApplicationSelection('${target}', '${escapeHtml(app.csvId)}', this.checked)" />
-          <span>${escapeHtml(app.name)}${app.department ? ` · ${escapeHtml(app.department)}` : ''}</span>
+          <span>${escapeHtml(app.name)}${formatSoftwareDepartmentLabel(app.department) ? ` · ${escapeHtml(formatSoftwareDepartmentLabel(app.department))}` : ''}</span>
         </label>
       `).join('');
     }
@@ -1200,8 +1451,9 @@
           email: String(user.email || '').trim().toLowerCase(),
           dept: user.dept || '',
           role: user.role || '',
+          status: String(user.status || '').trim(),
         }))
-        .filter(user => user.id && user.name)
+        .filter(user => user.id && user.name && user.status.toLowerCase() === 'active')
         .sort((a, b) => a.name.localeCompare(b.name));
     }
 
@@ -1209,10 +1461,28 @@
       return supportUsers.find(user => user.id === userId) || null;
     }
 
+    function supportUserByEmail(email) {
+      const normalized = String(email || '').trim().toLowerCase();
+      if (!normalized) return null;
+      return supportUsers.find(user => user.email === normalized) || null;
+    }
+
     function supportUserByName(name) {
       const normalized = String(name || '').trim().toLowerCase();
       if (!normalized) return null;
       return supportUsers.find(user => user.name.toLowerCase() === normalized || user.email === normalized) || null;
+    }
+
+    function resolveSupportUserRef(input = {}) {
+      const userId = String(input.userId || input.id || '').trim();
+      const email = String(input.email || '').trim().toLowerCase();
+      const name = String(input.name || input.label || input.value || '').trim();
+      return (
+        (userId && supportUserById(userId))
+        || (email && supportUserByEmail(email))
+        || (name && supportUserByName(name))
+        || null
+      );
     }
 
     function userOptionsMarkup({ selectedUserId = '', blankLabel = 'Select user', currentName = '', currentEmail = '' } = {}) {
@@ -1304,7 +1574,10 @@
 
         const users = await usersRes.json();
         supportUsers = normalizeSupportUsers(users);
-        softwareInventory = await softwareRes.json();
+        softwareInventory = (await softwareRes.json()).map(app => ({
+          ...app,
+          department: normalizeSoftwareDepartmentValue(app?.department),
+        }));
         requestTypeDefinitions = await requestTypeRes.json();
         workflowOptions = requestTypeDefinitions
           .filter(definition => definition.isActive !== false)
@@ -1315,7 +1588,7 @@
             autoAddDepartmentApps: !!definition.autoAddDepartmentApps,
             sourceSystem: definition.sourceSystem || 'portal',
           }));
-        departmentOptions = [...new Set((users || [])
+        departmentOptions = [...new Set((supportUsers || [])
           .map(user => user?.dept)
           .filter(Boolean))]
           .sort((a, b) => a.localeCompare(b));
@@ -1411,8 +1684,27 @@
       return [...new Set(rawValues.map(item => String(item || '').trim()).filter(Boolean))];
     }
 
+    function normalizeSoftwareDepartmentList(values) {
+      const list = parseSoftwareDepartments(values);
+      return list.some(dept => {
+        const normalized = String(dept || '').trim().toLowerCase();
+        return normalized === ALL_DEPARTMENT_LABEL.toLowerCase() || normalized === 'all department';
+      })
+        ? [ALL_DEPARTMENT_LABEL]
+        : list;
+    }
+
+    function normalizeSoftwareDepartmentValue(values) {
+      return normalizeSoftwareDepartmentList(values).join(', ');
+    }
+
+    function formatSoftwareDepartmentLabel(value) {
+      const departments = normalizeSoftwareDepartmentList(value);
+      return departments.length ? departments.join(', ') : '';
+    }
+
     function matchesSoftwareDepartment(value, department) {
-      const departments = parseSoftwareDepartments(value).map(item => item.toLowerCase());
+      const departments = normalizeSoftwareDepartmentList(value).map(item => item.toLowerCase());
       if (!departments.length) return false;
       if (departments.includes(ALL_DEPARTMENT_LABEL.toLowerCase())) return true;
       return departments.includes(String(department || '').trim().toLowerCase());
@@ -1420,20 +1712,62 @@
 
     function softwareOwnerCandidates(software) {
       if (!software) return [];
-      return [...new Set([
-        software.owner,
+      const rawCandidates = [
         ...(String(software.admins || '')
           .split(/[,\n/;|]+/g)
           .map(value => value.trim())
           .filter(Boolean)),
-      ].filter(Boolean))];
+        software.owner,
+      ];
+      const unique = new Map();
+      rawCandidates.forEach(value => {
+        const matchedUser = resolveSupportUserRef(/^\S+@\S+\.\S+$/.test(value) ? { email: value, name: value } : { name: value });
+        const candidate = matchedUser || {
+          id: '',
+          name: value,
+          email: /^\S+@\S+\.\S+$/.test(value) ? value.toLowerCase() : '',
+          dept: '',
+          role: '',
+        };
+        const key = candidate.id || candidate.email || candidate.name;
+        if (key) unique.set(key.toLowerCase(), candidate);
+      });
+      return [...unique.values()];
     }
 
     function softwareDefaultOwner(source) {
       const software = source?.softwareCsvId
         ? (softwareInventory || []).find(app => app?.csvId === source.softwareCsvId)
         : source;
-      return softwareOwnerCandidates(software)[0] || '';
+      return softwareOwnerCandidates(software)[0]?.name || '';
+    }
+
+    function userOptionsForCandidatesMarkup(candidates = [], { selectedUserId = '', blankLabel = 'Select user', currentName = '', currentEmail = '' } = {}) {
+      const resolvedCandidates = (candidates || []).filter(Boolean);
+      if (!resolvedCandidates.length) {
+        return userOptionsMarkup({ selectedUserId, blankLabel, currentName, currentEmail });
+      }
+
+      const selectedUser = supportUserById(selectedUserId);
+      const currentUser = selectedUser || resolveSupportUserRef({ name: currentName, email: currentEmail });
+      const legacyOption = !currentUser && currentName
+        ? `<option value="" data-legacy-name="${escapeHtml(currentName)}" data-legacy-email="${escapeHtml(currentEmail || '')}" selected>${escapeHtml(`${currentName} (not in User Management)`)}</option>`
+        : `<option value="" ${selectedUserId || currentUser ? '' : 'selected'}>${escapeHtml(blankLabel)}</option>`;
+
+      return [
+        legacyOption,
+        ...resolvedCandidates.map(candidate => {
+          const matched = resolveSupportUserRef(candidate);
+          const value = matched?.id || '';
+          const name = matched?.name || candidate.name || candidate.email || '';
+          const email = matched?.email || candidate.email || '';
+          const dept = matched?.dept || '';
+          const isSelected = (currentUser?.id && matched?.id && currentUser.id === matched.id)
+            || (!currentUser && !matched && String(currentName || '').trim() === name)
+            || (!currentUser && !matched && String(currentEmail || '').trim().toLowerCase() === email);
+          return `<option value="${escapeHtml(value)}" data-legacy-name="${escapeHtml(name)}" data-legacy-email="${escapeHtml(email)}" ${isSelected ? 'selected' : ''}>${escapeHtml(name)}${dept ? ` · ${escapeHtml(dept)}` : ''}</option>`;
+        }),
+      ].join('');
     }
 
     function requestTypeDefinitionByWorkflowType(workflowType) {
@@ -1589,14 +1923,264 @@
       `).join('');
     }
 
+    function currentMailTemplate() {
+      return mailTemplates.find(template => template.id === selectedMailTemplateId) || null;
+    }
+
+    function mailTemplateSampleContext() {
+      return {
+        requestId: 'SUP-208431',
+        workflowLabel: 'Employee Onboarding',
+        workflowType: 'onboarding',
+        employeeName: 'Jane Doe',
+        employeeEmail: 'jane.doe@company.com',
+        department: 'Engineering',
+        priority: 'high',
+        requestedByName: currentUser?.name || 'Praveen M.',
+        assignee: 'IT Operations',
+        managerName: 'Philippe Grangier',
+        applications: 'Slack, Zoom, Google Workspace',
+        stepLabel: 'Google workspace account provisioned',
+        detailUrl: `${location.origin}/support`,
+        approveUrl: `${location.origin}/api/support/approval-action?token=sample&decision=approve`,
+        rejectUrl: `${location.origin}/api/support/approval-action?token=sample&decision=reject`,
+      };
+    }
+
+    function interpolateMailTemplate(value, context = {}) {
+      return String(value || '').replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, token) => (
+        Object.prototype.hasOwnProperty.call(context, token) ? String(context[token] ?? '') : ''
+      ));
+    }
+
+    function renderTemplatePreviewText(value) {
+      return escapeHtml(value || '').replace(/\n/g, '<br>');
+    }
+
+    function renderMailTemplateOverview() {
+      const pane = document.getElementById('mailTemplateOverviewPane');
+      const countLabel = document.getElementById('mailTemplateCountLabel');
+      if (!pane || !countLabel) return;
+      countLabel.textContent = `${mailTemplates.length} template${mailTemplates.length === 1 ? '' : 's'}`;
+
+      if (!mailTemplates.length) {
+        pane.innerHTML = `<div class="empty">No mail templates are available yet.</div>`;
+        return;
+      }
+
+      const sample = mailTemplateSampleContext();
+      pane.innerHTML = `
+        <div class="mail-template-overview-grid">
+          ${mailTemplates.map(template => {
+            const subjectPreview = interpolateMailTemplate(template.subjectTemplate, sample);
+            const introPreview = interpolateMailTemplate(template.introTemplate, sample);
+            const bodyPreview = interpolateMailTemplate(template.bodyTemplate, sample);
+            const footerPreview = interpolateMailTemplate(template.footerNote, sample);
+            return `
+              <article class="mail-template-card">
+                <div>
+                  <h3>${escapeHtml(template.label)}</h3>
+                  <div class="meta">${escapeHtml(template.audience || 'Support Center')}</div>
+                </div>
+                <div class="meta">${escapeHtml(template.description || '')}</div>
+                <div class="mail-template-preview">
+                  <div style="font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800">Sample Subject</div>
+                  <pre>${escapeHtml(subjectPreview)}</pre>
+                </div>
+                <div class="mail-template-preview">
+                  <div style="font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800">Sample Message</div>
+                  <div>${introPreview ? `<div style="margin-bottom:10px">${renderTemplatePreviewText(introPreview)}</div>` : ''}${bodyPreview ? `<div>${renderTemplatePreviewText(bodyPreview)}</div>` : ''}${footerPreview ? `<div style="margin-top:10px;color:var(--muted)">${renderTemplatePreviewText(footerPreview)}</div>` : ''}</div>
+                </div>
+                <div>
+                  <div style="font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:8px">Available Placeholders</div>
+                  <div class="token-list">
+                    ${(template.tokens || []).map(token => `<span class="token-chip">{{${escapeHtml(token)}}}</span>`).join('') || '<span class="meta">No placeholders</span>'}
+                  </div>
+                </div>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderMailTemplateList() {
+      const list = document.getElementById('mailTemplateList');
+      const count = document.getElementById('mailTemplateEditorCountLabel');
+      if (!list || !count) return;
+      count.textContent = String(mailTemplates.length);
+
+      if (!mailTemplates.length) {
+        list.innerHTML = `<div class="empty">No mail templates are available yet.</div>`;
+        return;
+      }
+
+      list.innerHTML = mailTemplates.map(template => `
+        <div class="mail-template-list-card ${selectedMailTemplateId === template.id ? 'active' : ''}" onclick="selectMailTemplate('${template.id}')">
+          <strong>${escapeHtml(template.label)}</strong>
+          <div class="meta">${escapeHtml(template.audience || '')}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderMailTemplateEditor() {
+      const editor = document.getElementById('mailTemplateEditor');
+      const saveBtn = document.getElementById('saveMailTemplateBtn');
+      if (!editor || !saveBtn) return;
+
+      const template = currentMailTemplate();
+      const editable = canManageMailTemplates();
+      saveBtn.style.display = editable && template ? 'inline-flex' : 'none';
+
+      if (!template) {
+        editor.innerHTML = `<div class="empty">Select a template to update its live subject, message body, and action labels.</div>`;
+        return;
+      }
+
+      const sample = mailTemplateSampleContext();
+      editor.innerHTML = `
+        <div class="builder-grid">
+          <div>
+            <label>Template Name</label>
+            <input value="${escapeHtml(template.label || '')}" disabled />
+          </div>
+          <div>
+            <label>Audience</label>
+            <input value="${escapeHtml(template.audience || '')}" disabled />
+          </div>
+          <div class="full">
+            <label>Description</label>
+            <textarea rows="2" disabled>${escapeHtml(template.description || '')}</textarea>
+          </div>
+          <div class="full">
+            <label>Subject</label>
+            <input id="mailTemplateSubject" value="${escapeHtml(template.subjectTemplate || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="full">
+            <label>Intro Line</label>
+            <input id="mailTemplateIntro" value="${escapeHtml(template.introTemplate || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="full">
+            <label>Message Body</label>
+            <textarea id="mailTemplateBody" rows="8" ${editable ? '' : 'disabled'}>${escapeHtml(template.bodyTemplate || '')}</textarea>
+          </div>
+          <div>
+            <label>Primary Button Label</label>
+            <input id="mailTemplateCtaLabel" value="${escapeHtml(template.ctaLabel || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Secondary Button Label</label>
+            <input id="mailTemplateSecondaryCtaLabel" value="${escapeHtml(template.secondaryCtaLabel || '')}" ${editable ? '' : 'disabled'} />
+          </div>
+          <div class="full">
+            <label>Footer Note</label>
+            <textarea id="mailTemplateFooterNote" rows="3" ${editable ? '' : 'disabled'}>${escapeHtml(template.footerNote || '')}</textarea>
+          </div>
+        </div>
+
+        <div class="mail-template-preview">
+          <div style="font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800">Available Placeholders</div>
+          <div class="token-list">
+            ${(template.tokens || []).map(token => `<span class="token-chip">{{${escapeHtml(token)}}}</span>`).join('') || '<span class="meta">No placeholders</span>'}
+          </div>
+        </div>
+
+        <div class="mail-template-preview">
+          <div style="font-size:.76rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:800">Sample Preview</div>
+          <div style="font-weight:800">${escapeHtml(interpolateMailTemplate(template.subjectTemplate, sample))}</div>
+          ${template.introTemplate ? `<div>${renderTemplatePreviewText(interpolateMailTemplate(template.introTemplate, sample))}</div>` : ''}
+          <div>${renderTemplatePreviewText(interpolateMailTemplate(template.bodyTemplate, sample))}</div>
+          ${template.footerNote ? `<div style="color:var(--muted)">${renderTemplatePreviewText(interpolateMailTemplate(template.footerNote, sample))}</div>` : ''}
+        </div>
+      `;
+    }
+
+    function setMailTemplateMode(mode) {
+      mailTemplateMode = mode === 'edit' ? 'edit' : 'overview';
+      document.getElementById('mailTemplateOverviewTab')?.classList.toggle('active', mailTemplateMode === 'overview');
+      document.getElementById('mailTemplateEditTab')?.classList.toggle('active', mailTemplateMode === 'edit');
+      document.getElementById('mailTemplateOverviewPane')?.classList.toggle('active', mailTemplateMode === 'overview');
+      document.getElementById('mailTemplateEditPane')?.classList.toggle('active', mailTemplateMode === 'edit');
+    }
+
+    function selectMailTemplate(id) {
+      selectedMailTemplateId = id;
+      renderMailTemplateList();
+      renderMailTemplateEditor();
+    }
+
+    async function loadMailTemplates() {
+      if (!canManageMailTemplates()) return;
+      try {
+        const res = await authFetch('/api/support/mail-templates');
+        const data = await readApiResponse(res);
+        if (!res.ok) throw new Error(data.error || 'Failed to load mail templates');
+        mailTemplates = data;
+        if (!selectedMailTemplateId || !mailTemplates.some(template => template.id === selectedMailTemplateId)) {
+          selectedMailTemplateId = mailTemplates[0]?.id || null;
+        }
+        renderMailTemplateOverview();
+        renderMailTemplateList();
+        renderMailTemplateEditor();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      }
+    }
+
+    async function saveMailTemplate() {
+      if (!canManageMailTemplates()) return;
+      const template = currentMailTemplate();
+      if (!template) return;
+
+      const payload = {
+        subjectTemplate: document.getElementById('mailTemplateSubject')?.value.trim() || '',
+        introTemplate: document.getElementById('mailTemplateIntro')?.value.trim() || '',
+        bodyTemplate: document.getElementById('mailTemplateBody')?.value.trim() || '',
+        ctaLabel: document.getElementById('mailTemplateCtaLabel')?.value.trim() || '',
+        secondaryCtaLabel: document.getElementById('mailTemplateSecondaryCtaLabel')?.value.trim() || '',
+        footerNote: document.getElementById('mailTemplateFooterNote')?.value.trim() || '',
+      };
+
+      const btn = document.getElementById('saveMailTemplateBtn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const res = await authFetch(`/api/support/mail-templates/${template.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        });
+        const data = await readApiResponse(res);
+        if (!res.ok) {
+          showToast(data.error || 'Failed to save mail template', 'danger');
+          return;
+        }
+        showToast('Mail template saved');
+        selectedMailTemplateId = data.id;
+        await loadMailTemplates();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Template';
+      }
+    }
+
     function setSupportView(view) {
+      if (view === 'mail-templates' && !canManageMailTemplates()) {
+        showToast('Only Super Admin can access mail templates.', 'danger');
+        view = 'requests';
+      }
       supportView = view;
       document.getElementById('requestsTab').classList.toggle('active', view === 'requests');
       document.getElementById('requestTypesTab').classList.toggle('active', view === 'request-types');
+      document.getElementById('mailTemplatesTab').classList.toggle('active', view === 'mail-templates');
       document.getElementById('requestsView').classList.toggle('active', view === 'requests');
       document.getElementById('requestTypesView').classList.toggle('active', view === 'request-types');
+      document.getElementById('mailTemplatesView').classList.toggle('active', view === 'mail-templates');
       document.getElementById('requestActions').style.display = view === 'requests' ? 'flex' : 'none';
       document.getElementById('requestTypeActions').style.display = view === 'request-types' ? 'flex' : 'none';
+      document.getElementById('mailTemplateActions').style.display = view === 'mail-templates' && canManageMailTemplates() ? 'flex' : 'none';
     }
 
     function renderRequestTypeList() {
@@ -1621,9 +2205,48 @@
       `).join('');
     }
 
-    function renderRequestTypeEditor() {
+    function captureRequestTypeEditorState() {
+      const editor = document.getElementById('requestTypeEditor');
+      const activeElement = document.activeElement;
+      const state = {
+        pageScrollY: window.scrollY,
+        editorScrollTop: editor?.scrollTop || 0,
+        editorKey: '',
+        selectionStart: null,
+        selectionEnd: null,
+      };
+      if (!editor || !activeElement || !editor.contains(activeElement)) return state;
+      state.editorKey = activeElement.dataset?.editorKey || activeElement.id || '';
+      if (typeof activeElement.selectionStart === 'number') {
+        state.selectionStart = activeElement.selectionStart;
+        state.selectionEnd = activeElement.selectionEnd;
+      }
+      return state;
+    }
+
+    function restoreRequestTypeEditorState(state) {
+      if (!state) return;
+      const editor = document.getElementById('requestTypeEditor');
+      const selector = state.editorKey
+        ? (state.editorKey.startsWith('requestType')
+          ? `#${state.editorKey}`
+          : `[data-editor-key="${state.editorKey}"]`)
+        : '';
+      window.scrollTo({ top: state.pageScrollY });
+      if (editor) editor.scrollTop = state.editorScrollTop || 0;
+      if (!selector) return;
+      const field = document.querySelector(selector);
+      if (!field || typeof field.focus !== 'function') return;
+      field.focus({ preventScroll: true });
+      if (typeof state.selectionStart === 'number' && typeof field.setSelectionRange === 'function') {
+        field.setSelectionRange(state.selectionStart, state.selectionEnd ?? state.selectionStart);
+      }
+    }
+
+    function renderRequestTypeEditor(options = {}) {
       const editor = document.getElementById('requestTypeEditor');
       const saveBtn = document.getElementById('saveRequestTypeBtn');
+      const state = options.preserveState ? captureRequestTypeEditorState() : null;
       const definition = currentRequestTypeDefinition();
       if (!definition) {
         editor.innerHTML = `<div class="empty">Select a request type to edit its workflow, or create a new one.</div>`;
@@ -1704,18 +2327,18 @@
               <div class="workflow-step-grid">
                 <div class="full">
                   <label>Field Label</label>
-                  <input value="${escapeHtml(field.label || '')}" placeholder="${escapeHtml(field.key)}" oninput="updateRequestTypeFormField(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="form-${index}-label" value="${escapeHtml(field.label || '')}" placeholder="${escapeHtml(field.key)}" oninput="updateRequestTypeFormField(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
                   <label>Show On Request Form</label>
-                  <select onchange="updateRequestTypeFormField(${index}, 'enabled', this.value === 'true')" ${(editable && !(definition.autoAddDepartmentApps && field.key === 'department')) ? '' : 'disabled'}>
+                  <select data-editor-key="form-${index}-enabled" onchange="updateRequestTypeFormField(${index}, 'enabled', this.value === 'true')" ${(editable && !(definition.autoAddDepartmentApps && field.key === 'department')) ? '' : 'disabled'}>
                     <option value="true" ${field.enabled ? 'selected' : ''}>Visible</option>
                     <option value="false" ${field.enabled ? '' : 'selected'}>Hidden</option>
                   </select>
                 </div>
                 <div>
                   <label>Required</label>
-                  <select onchange="updateRequestTypeFormField(${index}, 'required', this.value === 'true')" ${(editable && !(definition.autoAddDepartmentApps && field.key === 'department')) ? '' : 'disabled'}>
+                  <select data-editor-key="form-${index}-required" onchange="updateRequestTypeFormField(${index}, 'required', this.value === 'true')" ${(editable && !(definition.autoAddDepartmentApps && field.key === 'department')) ? '' : 'disabled'}>
                     <option value="true" ${field.required ? 'selected' : ''}>Required</option>
                     <option value="false" ${field.required ? '' : 'selected'}>Optional</option>
                   </select>
@@ -1736,19 +2359,19 @@
               <div class="workflow-step-grid">
                 <div class="full">
                   <label>Step Label</label>
-                  <input value="${escapeHtml(step.label || '')}" placeholder="Create user account" oninput="updateRequestTypeStep(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="step-${index}-label" value="${escapeHtml(step.label || '')}" placeholder="Create user account" oninput="updateRequestTypeStep(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
                   <label>Area</label>
-                  <input value="${escapeHtml(step.area || '')}" placeholder="Identity" oninput="updateRequestTypeStep(${index}, 'area', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="step-${index}-area" value="${escapeHtml(step.area || '')}" placeholder="Identity" oninput="updateRequestTypeStep(${index}, 'area', this.value)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
                   <label>Step Key</label>
-                  <input value="${escapeHtml(step.key || '')}" placeholder="account_created" oninput="updateRequestTypeStep(${index}, 'key', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="step-${index}-key" value="${escapeHtml(step.key || '')}" placeholder="account_created" oninput="updateRequestTypeStep(${index}, 'key', this.value)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
                   <label>Default Step Assignee</label>
-                  <select onchange="updateRequestTypeStepOwner(${index}, this.value)" ${editable ? '' : 'disabled'}>
+                  <select data-editor-key="step-${index}-owner" onchange="updateRequestTypeStepOwner(${index}, this.value)" ${editable ? '' : 'disabled'}>
                     ${userOptionsMarkup({
                       selectedUserId: step.defaultOwnerUserId || '',
                       blankLabel: 'Select step assignee',
@@ -1759,7 +2382,7 @@
                 </div>
                 <div>
                   <label>Depends On</label>
-                  <select onchange="updateRequestTypeStep(${index}, 'dependsOn', this.value)" ${editable ? '' : 'disabled'}>
+                  <select data-editor-key="step-${index}-dependsOn" onchange="updateRequestTypeStep(${index}, 'dependsOn', this.value)" ${editable ? '' : 'disabled'}>
                     <option value="">No dependency</option>
                     ${checklist
                       .filter((candidate, candidateIndex) => candidateIndex !== index)
@@ -1769,7 +2392,7 @@
                 </div>
                 <div>
                   <label>Approval</label>
-                  <select onchange="updateRequestTypeStep(${index}, 'approvalMode', this.value)" ${editable ? '' : 'disabled'}>
+                  <select data-editor-key="step-${index}-approvalMode" onchange="updateRequestTypeStep(${index}, 'approvalMode', this.value)" ${editable ? '' : 'disabled'}>
                     <option value="none" ${step.approvalMode === 'manager' ? '' : 'selected'}>No approval link</option>
                     <option value="manager" ${step.approvalMode === 'manager' ? 'selected' : ''}>Manager approval required</option>
                   </select>
@@ -1779,6 +2402,9 @@
           `).join('')}
         </div>
       `;
+      if (state) {
+        requestAnimationFrame(() => restoreRequestTypeEditorState(state));
+      }
     }
 
     function selectRequestType(id) {
@@ -1804,7 +2430,7 @@
       if (field === 'label' && !definition.checklist[index].key) {
         definition.checklist[index].key = slugify(value) || `step_${index + 1}`;
       }
-      renderRequestTypeEditor();
+      renderRequestTypeEditor({ preserveState: true });
     }
 
     function updateRequestTypeStepOwner(index, userId) {
@@ -1814,7 +2440,7 @@
       definition.checklist[index].defaultOwner = user?.name || '';
       definition.checklist[index].defaultOwnerUserId = user?.id || '';
       definition.checklist[index].defaultOwnerEmail = user?.email || '';
-      renderRequestTypeEditor();
+      renderRequestTypeEditor({ preserveState: true });
     }
 
     function updateRequestTypeFormField(index, field, value) {
@@ -1824,7 +2450,7 @@
       if (field === 'enabled' && value === false) {
         definition.formFields[index].required = false;
       }
-      renderRequestTypeEditor();
+      renderRequestTypeEditor({ preserveState: true });
     }
 
     function addRequestTypeStep() {
@@ -1843,7 +2469,7 @@
         defaultOwnerEmail: '',
         approvalMode: 'none',
       });
-      renderRequestTypeEditor();
+      renderRequestTypeEditor({ preserveState: true });
     }
 
     function removeRequestTypeStep(index) {
@@ -1853,7 +2479,7 @@
       if (!definition.checklist.length) {
         definition.checklist.push({ key: 'step_1', label: '', area: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' });
       }
-      renderRequestTypeEditor();
+      renderRequestTypeEditor({ preserveState: true });
     }
 
     async function loadRequestTypes() {
@@ -1962,7 +2588,19 @@
         document.querySelector('#requestTypeActions .btn.btn-primary').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
         document.querySelector('#requestTypeActions .btn.btn-secondary').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
         document.getElementById('requestTypesTab').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
+        document.getElementById('mailTemplatesTab').style.display = canManageMailTemplates() ? '' : 'none';
+        document.getElementById('mailTemplateActions').style.display = 'none';
+        setMailTemplateMode('overview');
         await loadReferenceData();
+        if (canManageMailTemplates()) {
+          await loadMailTemplates();
+        } else {
+          mailTemplates = [];
+          selectedMailTemplateId = null;
+          renderMailTemplateOverview();
+          renderMailTemplateList();
+          renderMailTemplateEditor();
+        }
         await loadRequests();
         setSupportView('requests');
       } catch {
@@ -2041,14 +2679,35 @@
       return softwareOwnerCandidates(software);
     }
 
+    function taskAssignmentLabel(task) {
+      return task?.softwareCsvId ? 'Admin' : 'Owner';
+    }
+
+    function taskProvisioningSummary(task) {
+      if (!task?.softwareCsvId) return '';
+      const parts = [];
+      if (task.provisioningMethod) parts.push(task.provisioningMethod);
+      if (task.connectorType) parts.push(task.connectorType);
+      if (task.supportsDeprovision) parts.push('Deprovision ready');
+      return parts.join(' · ');
+    }
+
     function ownerFieldControl(task, index, editable) {
+      const candidates = softwareOwnerOptions(task);
       return `<select data-task-owner="${index}" ${editable ? '' : 'disabled'}>
-        ${userOptionsMarkup({
-          selectedUserId: task.ownerUserId || '',
-          blankLabel: 'Select owner',
-          currentName: task.owner || softwareDefaultOwner(task),
-          currentEmail: task.ownerEmail || '',
-        })}
+        ${task?.softwareCsvId
+          ? userOptionsForCandidatesMarkup(candidates, {
+            selectedUserId: task.ownerUserId || '',
+            blankLabel: 'Select admin',
+            currentName: task.owner || softwareDefaultOwner(task),
+            currentEmail: task.ownerEmail || '',
+          })
+          : userOptionsMarkup({
+            selectedUserId: task.ownerUserId || '',
+            blankLabel: 'Select owner',
+            currentName: task.owner || softwareDefaultOwner(task),
+            currentEmail: task.ownerEmail || '',
+          })}
       </select>`;
     }
 
@@ -2393,6 +3052,7 @@
                     <div class="task-title" data-task-title="${index}">${escapeHtml(task.label)}</div>
                     <div class="task-area">
                       ${escapeHtml(task.area || 'General')}
+                      ${taskProvisioningSummary(task) ? ` · ${escapeHtml(taskProvisioningSummary(task))}` : ''}
                       ${task.approvalMode === 'manager' ? ` · Manager approval: ${escapeHtml(task.approvalStatus || 'not_requested')}` : ''}
                     </div>
                   </div>
@@ -2403,7 +3063,7 @@
                 </div>
                 <div class="task-grid">
                   <div class="field">
-                    <label>Owner</label>
+                    <label>${taskAssignmentLabel(task)}</label>
                     ${ownerFieldControl(task, index, editable)}
                   </div>
                   <div class="field">
@@ -2411,6 +3071,7 @@
                     <input data-task-notes="${index}" data-editable="${editable ? 'true' : 'false'}" value="${escapeHtml(task.notes || '')}" ${editable ? '' : 'disabled'} />
                   </div>
                 </div>
+                ${task.provisioningNotes ? `<div style="margin-top:10px;color:var(--muted);font-size:.82rem;line-height:1.6">Automation note: ${escapeHtml(task.provisioningNotes)}</div>` : ''}
                 <div class="task-lock-note" style="display:none"></div>
               </div>
             `).join('')}
@@ -2589,6 +3250,10 @@
           };
         })(),
         notes: document.querySelector(`[data-task-notes="${index}"]`)?.value.trim() || '',
+        provisioningMethod: task.provisioningMethod || '',
+        connectorType: task.connectorType || '',
+        supportsDeprovision: !!task.supportsDeprovision,
+        provisioningNotes: task.provisioningNotes || '',
       }));
 
       const manager = resolveUserSelection('detailManagerName');
@@ -2668,7 +3333,7 @@
       }
     }
 
-    /* Purple is the permanent theme */
+    /* Keep the support portal shell classes intact. */
     document.body.className = 'support-theme support-theme-support';
 
     init();

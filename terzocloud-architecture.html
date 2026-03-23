@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TerzoCloud Enterprise Architecture — Software Landscape</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #16162a;
+    --surface2: #1e1e38;
+    --border: rgba(130,96,185,0.25);
+    --accent: #7c5cff;
+    --accent2: #3757e6;
+    --text: #e2e0ff;
+    --text-muted: rgba(196,181,253,0.6);
+    --scim: #22c55e;
+    --api: #3b82f6;
+    --sso: #f59e0b;
+    --manual: #6b7280;
+    --saas: #7c5cff;
+    --onprem: #0ea5e9;
+    --freeware: #10b981;
+    --oss: #f97316;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    padding: 32px 24px;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .header-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, rgba(49,83,216,.2), rgba(124,92,255,.2));
+    border: 1px solid rgba(130,96,185,.4);
+    border-radius: 16px;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+  }
+  .header-logo svg { width:28px; height:28px; }
+  .header-logo span { font-size:16px; font-weight:700; color:#c4b5fd; }
+  h1 { font-size: 28px; font-weight: 800; background: linear-gradient(135deg,#a78bfa,#7c5cff,#3757e6); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom: 8px; }
+  .subtitle { color: var(--text-muted); font-size:14px; }
+
+  /* ── Summary Stats ── */
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 800; }
+  .stat-card .lbl { font-size: 11px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .05em; }
+
+  /* ── Legend ── */
+  .legends {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+  }
+  .legend-group { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .legend-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-badge { padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+
+  /* ── View Toggle ── */
+  .view-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+  .toggle-btn {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all .2s;
+  }
+  .toggle-btn.active {
+    background: linear-gradient(135deg, #3757e6, #7c5cff);
+    border-color: transparent;
+    color: #fff;
+  }
+
+  /* ── Domain View ── */
+  .domains-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .domain-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .domain-header {
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .domain-icon { font-size: 18px; }
+  .domain-name { font-size: 14px; font-weight: 700; }
+  .domain-count { margin-left: auto; font-size: 12px; color: var(--text-muted); background: rgba(255,255,255,.06); padding: 2px 8px; border-radius: 10px; }
+
+  .apps-list { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .app-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: border-color .15s;
+    cursor: default;
+  }
+  .app-row:hover { border-color: rgba(130,96,185,.4); }
+  .app-id { font-size: 10px; color: var(--text-muted); min-width: 34px; font-family: monospace; }
+  .app-name { font-size: 13px; font-weight: 600; flex: 1; }
+  .app-purpose { font-size: 11px; color: var(--text-muted); flex: 1.2; }
+  .prov-badge {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    min-width: 52px;
+    text-align: center;
+  }
+  .prov-scim   { background: rgba(34,197,94,.15);  color: #22c55e; }
+  .prov-api    { background: rgba(59,130,246,.15);  color: #60a5fa; }
+  .prov-sso    { background: rgba(245,158,11,.15);  color: #fbbf24; }
+  .prov-manual { background: rgba(107,114,128,.15); color: #9ca3af; }
+  .type-badge {
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 48px;
+    text-align: center;
+  }
+  .type-saas    { background: rgba(124,92,255,.15); color: #a78bfa; }
+  .type-onprem  { background: rgba(14,165,233,.15); color: #38bdf8; }
+  .type-free    { background: rgba(16,185,129,.15); color: #34d399; }
+  .type-oss     { background: rgba(249,115,22,.15); color: #fb923c; }
+
+  /* ── Provisioning View ── */
+  .prov-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .prov-card {
+    background: var(--surface);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .prov-card-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .prov-card-header .big-badge {
+    padding: 4px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .04em;
+  }
+  .prov-card-header .desc { font-size: 12px; color: var(--text-muted); flex: 1; }
+  .prov-card-header .cnt { font-size: 24px; font-weight: 800; margin-left: auto; }
+
+  /* ── Type / Category View ── */
+  .type-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .type-card {
+    background: var(--surface);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .type-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ── Architecture Diagram ── */
+  #arch-view {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .arch-layers {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .arch-layer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .arch-layer-header {
+    padding: 12px 20px;
+    background: linear-gradient(90deg, rgba(55,87,230,.15), rgba(124,92,255,.15));
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .arch-layer-header h3 { font-size: 14px; font-weight: 700; }
+  .arch-layer-header span { font-size: 12px; color: var(--text-muted); }
+  .arch-apps-row {
+    padding: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .arch-app-chip {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: transform .15s;
+    cursor: default;
+  }
+  .arch-app-chip:hover { transform: translateY(-1px); }
+  .chip-id { font-size: 10px; color: var(--text-muted); font-family: monospace; }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <rect width="28" height="28" rx="8" fill="url(#lg)"/>
+      <path d="M7 14l4 4 10-10" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <defs><linearGradient id="lg" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#3757e6"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs>
+    </svg>
+    <span>TerzoCloud IT Asset Portal</span>
+  </div>
+  <h1>Enterprise Software Architecture</h1>
+  <p class="subtitle">Complete SaaS &amp; software landscape — 33 applications across all departments &amp; provisioning models</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card"><div class="num" style="color:#a78bfa">33</div><div class="lbl">Total Apps</div></div>
+  <div class="stat-card"><div class="num" style="color:#7c5cff">27</div><div class="lbl">SaaS</div></div>
+  <div class="stat-card"><div class="num" style="color:#38bdf8">2</div><div class="lbl">On-premises</div></div>
+  <div class="stat-card"><div class="num" style="color:#34d399">3</div><div class="lbl">Freeware</div></div>
+  <div class="stat-card"><div class="num" style="color:#fb923c">1</div><div class="lbl">Open Source</div></div>
+  <div class="stat-card"><div class="num" style="color:#22c55e">5</div><div class="lbl">SCIM Apps</div></div>
+  <div class="stat-card"><div class="num" style="color:#60a5fa">2</div><div class="lbl">API Apps</div></div>
+  <div class="stat-card"><div class="num" style="color:#fbbf24">2</div><div class="lbl">SSO Only</div></div>
+  <div class="stat-card"><div class="num" style="color:#9ca3af">24</div><div class="lbl">Manual</div></div>
+</div>
+
+<!-- Legend -->
+<div class="legends">
+  <div class="legend-group">
+    <div class="legend-title">Provisioning</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div>SCIM</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#60a5fa"></div>API</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>SSO Only</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#6b7280"></div>Manual</div>
+  </div>
+  <div class="legend-group">
+    <div class="legend-title">Type</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#7c5cff"></div>SaaS</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0ea5e9"></div>On-premises</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>Freeware</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#f97316"></div>Open Source</div>
+  </div>
+</div>
+
+<!-- View Toggle -->
+<div class="view-toggle">
+  <button class="toggle-btn active" onclick="setView('domain')">By Domain</button>
+  <button class="toggle-btn" onclick="setView('provisioning')">By Provisioning</button>
+  <button class="toggle-btn" onclick="setView('type')">By Category</button>
+  <button class="toggle-btn" onclick="setView('arch')">Architecture Map</button>
+</div>
+
+<!-- ══ DOMAIN VIEW ══ -->
+<div id="domain-view">
+<div class="domains-grid">
+
+  <!-- Communication & Collaboration -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(124,92,255,.12),transparent)">
+      <span class="domain-icon">💬</span>
+      <span class="domain-name">Communication &amp; Collaboration</span>
+      <span class="domain-count">6 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-01</span><span class="app-name">Zoom</span><span class="app-purpose">Video Conferencing</span><span class="prov-badge prov-sso">SSO Only</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-06</span><span class="app-name">Google Workspace</span><span class="app-purpose">Email &amp; Productivity</span><span class="prov-badge prov-scim">SCIM</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-09</span><span class="app-name">Loom</span><span class="app-purpose">Screen Recording</span><span class="prov-badge prov-sso">SSO Only</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-10</span><span class="app-name">Microsoft 365</span><span class="app-purpose">Office Suite</span><span class="prov-badge prov-scim">SCIM</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-11</span><span class="app-name">Slack</span><span class="app-purpose">Team Messaging</span><span class="prov-badge prov-scim">SCIM</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-32</span><span class="app-name">Miro</span><span class="app-purpose">Digital Whiteboard</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+  <!-- Developer Tools -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(59,130,246,.12),transparent)">
+      <span class="domain-icon">⚙️</span>
+      <span class="domain-name">Developer Tools &amp; Infrastructure</span>
+      <span class="domain-count">10 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-05</span><span class="app-name">GitHub</span><span class="app-purpose">Version Control</span><span class="prov-badge prov-api">API</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-08</span><span class="app-name">IntelliJ IDEA</span><span class="app-purpose">Coding IDE</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-onprem">On-prem</span></div>
+      <div class="app-row"><span class="app-id">A-13</span><span class="app-name">OpenVPN</span><span class="app-purpose">VPN / Private Network</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-15</span><span class="app-name">Postman</span><span class="app-purpose">API Testing</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-free">Free</span></div>
+      <div class="app-row"><span class="app-id">A-17</span><span class="app-name">Windsurf</span><span class="app-purpose">AI Coding IDE</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-onprem">On-prem</span></div>
+      <div class="app-row"><span class="app-id">A-18</span><span class="app-name">Plaid</span><span class="app-purpose">Banking API Integration</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-21</span><span class="app-name">Vercel</span><span class="app-purpose">Frontend Deployment</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-22</span><span class="app-name">Twilio SendGrid</span><span class="app-purpose">Transactional Email</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-27</span><span class="app-name">Jenkins</span><span class="app-purpose">CI/CD Pipeline</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-oss">OSS</span></div>
+      <div class="app-row"><span class="app-id">A-31</span><span class="app-name">AWS</span><span class="app-purpose">Cloud Infrastructure</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+  <!-- Project & Product Management -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(245,158,11,.12),transparent)">
+      <span class="domain-icon">📋</span>
+      <span class="domain-name">Project &amp; Product Management</span>
+      <span class="domain-count">5 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-03</span><span class="app-name">Asana</span><span class="app-purpose">Project Management</span><span class="prov-badge prov-scim">SCIM</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-04</span><span class="app-name">Jira (Atlassian)</span><span class="app-purpose">ITSM &amp; Ticketing</span><span class="prov-badge prov-scim">SCIM</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-19</span><span class="app-name">ProductBoard</span><span class="app-purpose">Roadmapping</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-25</span><span class="app-name">Figma</span><span class="app-purpose">UI/UX Design</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-30</span><span class="app-name">ChatPRD</span><span class="app-purpose">AI Product Reqs</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+  <!-- Sales & Marketing -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(34,197,94,.12),transparent)">
+      <span class="domain-icon">📈</span>
+      <span class="domain-name">Sales &amp; Marketing</span>
+      <span class="domain-count">5 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-07</span><span class="app-name">HubSpot</span><span class="app-purpose">CRM</span><span class="prov-badge prov-api">API</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-14</span><span class="app-name">Canva</span><span class="app-purpose">Design &amp; Presentations</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-20</span><span class="app-name">DocuSign</span><span class="app-purpose">Digital Signatures</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-24</span><span class="app-name">Gong</span><span class="app-purpose">Sales Call Analytics</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-28</span><span class="app-name">Orum</span><span class="app-purpose">Sales Calling Platform</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+  <!-- Monitoring & Observability -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(249,115,22,.12),transparent)">
+      <span class="domain-icon">🔍</span>
+      <span class="domain-name">Monitoring &amp; Observability</span>
+      <span class="domain-count">2 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-23</span><span class="app-name">Datadog</span><span class="app-purpose">Monitoring &amp; Observability</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-16</span><span class="app-name">Freshworks</span><span class="app-purpose">Employee Onboarding</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+  <!-- AI Tools -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(168,85,247,.12),transparent)">
+      <span class="domain-icon">🤖</span>
+      <span class="domain-name">AI &amp; Intelligent Tools</span>
+      <span class="domain-count">2 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-26</span><span class="app-name">ChatGPT (OpenAI)</span><span class="app-purpose">AI Assistant</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-33</span><span class="app-name">Claude (Anthropic)</span><span class="app-purpose">AI Assistant</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+  <!-- IT & Device Management -->
+  <div class="domain-card">
+    <div class="domain-header" style="background:linear-gradient(90deg,rgba(14,165,233,.12),transparent)">
+      <span class="domain-icon">🖥️</span>
+      <span class="domain-name">IT &amp; Device Management</span>
+      <span class="domain-count">3 apps</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-02</span><span class="app-name">Adobe Acrobat</span><span class="app-purpose">PDF Editor</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-12</span><span class="app-name">Mosyle MDM</span><span class="app-purpose">Device Management</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-free">Free</span></div>
+      <div class="app-row"><span class="app-id">A-29</span><span class="app-name">Apple Business Mgr</span><span class="app-purpose">Apple ID &amp; Devices</span><span class="prov-badge prov-manual">Manual</span><span class="type-badge type-free">Free</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ PROVISIONING VIEW ══ -->
+<div id="provisioning-view" class="hidden">
+<div class="prov-grid">
+
+  <div class="prov-card" style="border:1px solid rgba(34,197,94,.3)">
+    <div class="prov-card-header">
+      <span class="big-badge prov-scim">SCIM</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">Automated Provisioning</div>
+        <div class="desc">SCIM 2.0 — auto create/deprovision via IdP</div>
+      </div>
+      <span class="cnt" style="color:#22c55e">5</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-06</span><span class="app-name">Google Workspace</span><span class="app-purpose">Connector: Google Workspace SCIM (Entra ID)</span><span style="font-size:10px;color:#22c55e;white-space:nowrap">✓ Deprovision</span></div>
+      <div class="app-row"><span class="app-id">A-11</span><span class="app-name">Slack</span><span class="app-purpose">Connector: Slack SCIM API (Okta)</span><span style="font-size:10px;color:#22c55e;white-space:nowrap">✓ Deprovision</span></div>
+      <div class="app-row"><span class="app-id">A-03</span><span class="app-name">Asana</span><span class="app-purpose">Connector: Asana SCIM (Okta)</span><span style="font-size:10px;color:#22c55e;white-space:nowrap">✓ Deprovision</span></div>
+      <div class="app-row"><span class="app-id">A-04</span><span class="app-name">Jira (Atlassian)</span><span class="app-purpose">Connector: Atlassian SCIM (Entra ID)</span><span style="font-size:10px;color:#22c55e;white-space:nowrap">✓ Deprovision</span></div>
+      <div class="app-row"><span class="app-id">A-10</span><span class="app-name">Microsoft 365</span><span class="app-purpose">Connector: Microsoft 365 SCIM (Entra ID)</span><span style="font-size:10px;color:#22c55e;white-space:nowrap">✓ Deprovision</span></div>
+    </div>
+  </div>
+
+  <div class="prov-card" style="border:1px solid rgba(59,130,246,.3)">
+    <div class="prov-card-header">
+      <span class="big-badge prov-api">API</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">API-Managed Access</div>
+        <div class="desc">Programmatic user management via REST API</div>
+      </div>
+      <span class="cnt" style="color:#60a5fa">2</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-05</span><span class="app-name">GitHub</span><span class="app-purpose">Connector: GitHub Enterprise API</span><span style="font-size:10px;color:#9ca3af;white-space:nowrap">✗ Manual offboard</span></div>
+      <div class="app-row"><span class="app-id">A-07</span><span class="app-name">HubSpot</span><span class="app-purpose">Connector: HubSpot CRM API v3</span><span style="font-size:10px;color:#9ca3af;white-space:nowrap">✗ Manual offboard</span></div>
+    </div>
+  </div>
+
+  <div class="prov-card" style="border:1px solid rgba(245,158,11,.3)">
+    <div class="prov-card-header">
+      <span class="big-badge prov-sso">SSO Only</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">SSO-Gated Access</div>
+        <div class="desc">Access via SAML 2.0 — no SCIM provisioning</div>
+      </div>
+      <span class="cnt" style="color:#fbbf24">2</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-01</span><span class="app-name">Zoom</span><span class="app-purpose">Connector: Zoom SSO (SAML 2.0)</span><span style="font-size:10px;color:#9ca3af;white-space:nowrap">✗ Revoking SSO blocks</span></div>
+      <div class="app-row"><span class="app-id">A-09</span><span class="app-name">Loom</span><span class="app-purpose">Connector: Loom SSO (SAML 2.0)</span><span style="font-size:10px;color:#9ca3af;white-space:nowrap">✗ Revoking SSO blocks</span></div>
+    </div>
+  </div>
+
+  <div class="prov-card" style="border:1px solid rgba(107,114,128,.25)">
+    <div class="prov-card-header">
+      <span class="big-badge prov-manual">Manual</span>
+      <div>
+        <div style="font-size:13px;font-weight:700">Manual Provisioning</div>
+        <div class="desc">No automation — IT admin action required</div>
+      </div>
+      <span class="cnt" style="color:#9ca3af">24</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-02</span><span class="app-name">Adobe Acrobat</span><span class="app-purpose">PDF Editor</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-08</span><span class="app-name">IntelliJ IDEA</span><span class="app-purpose">Coding IDE</span><span class="type-badge type-onprem">On-prem</span></div>
+      <div class="app-row"><span class="app-id">A-12</span><span class="app-name">Mosyle MDM</span><span class="app-purpose">Device Management</span><span class="type-badge type-free">Free</span></div>
+      <div class="app-row"><span class="app-id">A-13</span><span class="app-name">OpenVPN</span><span class="app-purpose">VPN / Network</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-14</span><span class="app-name">Canva</span><span class="app-purpose">Design</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-15</span><span class="app-name">Postman</span><span class="app-purpose">API Testing</span><span class="type-badge type-free">Free</span></div>
+      <div class="app-row"><span class="app-id">A-16</span><span class="app-name">Freshworks</span><span class="app-purpose">HR Onboarding</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-17</span><span class="app-name">Windsurf</span><span class="app-purpose">AI Coding IDE</span><span class="type-badge type-onprem">On-prem</span></div>
+      <div class="app-row"><span class="app-id">A-18</span><span class="app-name">Plaid</span><span class="app-purpose">Banking API</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-19</span><span class="app-name">ProductBoard</span><span class="app-purpose">Roadmapping</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-20</span><span class="app-name">DocuSign</span><span class="app-purpose">Digital Signatures</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-21</span><span class="app-name">Vercel</span><span class="app-purpose">Frontend Deployment</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-22</span><span class="app-name">Twilio SendGrid</span><span class="app-purpose">Transactional Email</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-23</span><span class="app-name">Datadog</span><span class="app-purpose">Monitoring</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-24</span><span class="app-name">Gong</span><span class="app-purpose">Sales Analytics</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-25</span><span class="app-name">Figma</span><span class="app-purpose">UI/UX Design</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-26</span><span class="app-name">ChatGPT (OpenAI)</span><span class="app-purpose">AI Assistant</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-27</span><span class="app-name">Jenkins</span><span class="app-purpose">CI/CD Pipeline</span><span class="type-badge type-oss">OSS</span></div>
+      <div class="app-row"><span class="app-id">A-28</span><span class="app-name">Orum</span><span class="app-purpose">Sales Calling</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-29</span><span class="app-name">Apple Business Mgr</span><span class="app-purpose">Apple Devices</span><span class="type-badge type-free">Free</span></div>
+      <div class="app-row"><span class="app-id">A-30</span><span class="app-name">ChatPRD</span><span class="app-purpose">AI Product Reqs</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-31</span><span class="app-name">AWS</span><span class="app-purpose">Cloud Infrastructure</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-32</span><span class="app-name">Miro</span><span class="app-purpose">Digital Whiteboard</span><span class="type-badge type-saas">SaaS</span></div>
+      <div class="app-row"><span class="app-id">A-33</span><span class="app-name">Claude (Anthropic)</span><span class="app-purpose">AI Assistant</span><span class="type-badge type-saas">SaaS</span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ CATEGORY VIEW ══ -->
+<div id="type-view" class="hidden">
+<div class="type-view">
+
+  <div class="type-card" style="border:1px solid rgba(124,92,255,.35)">
+    <div class="type-card-header" style="background:linear-gradient(90deg,rgba(124,92,255,.15),transparent)">
+      <span class="type-badge type-saas" style="font-size:13px;padding:4px 12px">SaaS</span>
+      <span style="font-size:14px;font-weight:700">Cloud Software-as-a-Service</span>
+      <span style="margin-left:auto;font-size:22px;font-weight:800;color:#a78bfa">27</span>
+    </div>
+    <div class="apps-list">
+      <div class="app-row"><span class="app-id">A-01</span><span class="app-name">Zoom</span><span class="app-purpose">Communication</span><span class="prov-badge prov-sso">SSO Only</span></div>
+      <div class="app-row"><span class="app-id">A-02</span><span class="app-name">Adobe Acrobat</span><span class="app-purpose">PDF Editor</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-03</span><span class="app-name">Asana</span><span class="app-purpose">Project Mgmt</span><span class="prov-badge prov-scim">SCIM</span></div>
+      <div class="app-row"><span class="app-id">A-04</span><span class="app-name">Jira (Atlassian)</span><span class="app-purpose">ITSM &amp; Ticketing</span><span class="prov-badge prov-scim">SCIM</span></div>
+      <div class="app-row"><span class="app-id">A-05</span><span class="app-name">GitHub</span><span class="app-purpose">Version Control</span><span class="prov-badge prov-api">API</span></div>
+      <div class="app-row"><span class="app-id">A-06</span><span class="app-name">Google Workspace</span><span class="app-purpose">Email &amp; Productivity</span><span class="prov-badge prov-scim">SCIM</span></div>
+      <div class="app-row"><span class="app-id">A-07</span><span class="app-name">HubSpot</span><span class="app-purpose">CRM</span><span class="prov-badge prov-api">API</span></div>
+      <div class="app-row"><span class="app-id">A-09</span><span class="app-name">Loom</span><span class="app-purpose">Screen Recording</span><span class="prov-badge prov-sso">SSO Only</span></div>
+      <div class="app-row"><span class="app-id">A-10</span><span class="app-name">Microsoft 365</span><span class="app-purpose">Office Suite</span><span class="prov-badge prov-scim">SCIM</span></div>
+      <div class="app-row"><span class="app-id">A-11</span><span class="app-name">Slack</span><span class="app-purpose">Team Communication</span><span class="prov-badge prov-scim">SCIM</span></div>
+      <div class="app-row"><span class="app-id">A-13</span><span class="app-name">OpenVPN</span><span class="app-purpose">VPN / Network</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-14</span><span class="app-name">Canva</span><span class="app-purpose">Design</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-16</span><span class="app-name">Freshworks</span><span class="app-purpose">HR Onboarding</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-18</span><span class="app-name">Plaid</span><span class="app-purpose">Banking API</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-19</span><span class="app-name">ProductBoard</span><span class="app-purpose">Roadmapping</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-20</span><span class="app-name">DocuSign</span><span class="app-purpose">Digital Signatures</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-21</span><span class="app-name">Vercel</span><span class="app-purpose">Frontend Deploy</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-22</span><span class="app-name">Twilio SendGrid</span><span class="app-purpose">Email Service</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-23</span><span class="app-name">Datadog</span><span class="app-purpose">Monitoring</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-24</span><span class="app-name">Gong</span><span class="app-purpose">Sales Analytics</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-25</span><span class="app-name">Figma</span><span class="app-purpose">UI/UX Design</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-26</span><span class="app-name">ChatGPT (OpenAI)</span><span class="app-purpose">AI Assistant</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-28</span><span class="app-name">Orum</span><span class="app-purpose">Sales Calling</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-30</span><span class="app-name">ChatPRD</span><span class="app-purpose">AI Product Reqs</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-31</span><span class="app-name">AWS</span><span class="app-purpose">Cloud Infra</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-32</span><span class="app-name">Miro</span><span class="app-purpose">Digital Whiteboard</span><span class="prov-badge prov-manual">Manual</span></div>
+      <div class="app-row"><span class="app-id">A-33</span><span class="app-name">Claude (Anthropic)</span><span class="app-purpose">AI Assistant</span><span class="prov-badge prov-manual">Manual</span></div>
+    </div>
+  </div>
+
+  <div style="display:grid;gap:24px">
+    <div class="type-card" style="border:1px solid rgba(14,165,233,.35)">
+      <div class="type-card-header" style="background:linear-gradient(90deg,rgba(14,165,233,.15),transparent)">
+        <span class="type-badge type-onprem" style="font-size:13px;padding:4px 12px">On-premises</span>
+        <span style="font-size:14px;font-weight:700">Self-hosted software</span>
+        <span style="margin-left:auto;font-size:22px;font-weight:800;color:#38bdf8">2</span>
+      </div>
+      <div class="apps-list">
+        <div class="app-row"><span class="app-id">A-08</span><span class="app-name">IntelliJ IDEA (JetBrains)</span><span class="app-purpose">Coding IDE — Engineering</span><span class="prov-badge prov-manual">Manual</span></div>
+        <div class="app-row"><span class="app-id">A-17</span><span class="app-name">Windsurf (Codeium)</span><span class="app-purpose">AI Coding IDE — Engineering</span><span class="prov-badge prov-manual">Manual</span></div>
+      </div>
+    </div>
+
+    <div class="type-card" style="border:1px solid rgba(16,185,129,.35)">
+      <div class="type-card-header" style="background:linear-gradient(90deg,rgba(16,185,129,.15),transparent)">
+        <span class="type-badge type-free" style="font-size:13px;padding:4px 12px">Freeware</span>
+        <span style="font-size:14px;font-weight:700">No-cost software</span>
+        <span style="margin-left:auto;font-size:22px;font-weight:800;color:#34d399">3</span>
+      </div>
+      <div class="apps-list">
+        <div class="app-row"><span class="app-id">A-12</span><span class="app-name">Mosyle MDM</span><span class="app-purpose">Device Management — IT</span><span class="prov-badge prov-manual">Manual</span></div>
+        <div class="app-row"><span class="app-id">A-15</span><span class="app-name">Postman</span><span class="app-purpose">API Testing — Engineering</span><span class="prov-badge prov-manual">Manual</span></div>
+        <div class="app-row"><span class="app-id">A-29</span><span class="app-name">Apple Business Manager</span><span class="app-purpose">Apple Devices — Marketing</span><span class="prov-badge prov-manual">Manual</span></div>
+      </div>
+    </div>
+
+    <div class="type-card" style="border:1px solid rgba(249,115,22,.35)">
+      <div class="type-card-header" style="background:linear-gradient(90deg,rgba(249,115,22,.15),transparent)">
+        <span class="type-badge type-oss" style="font-size:13px;padding:4px 12px">Open Source</span>
+        <span style="font-size:14px;font-weight:700">Community software</span>
+        <span style="margin-left:auto;font-size:22px;font-weight:800;color:#fb923c">1</span>
+      </div>
+      <div class="apps-list">
+        <div class="app-row"><span class="app-id">A-27</span><span class="app-name">Jenkins</span><span class="app-purpose">CI/CD Build Pipeline — Engineering</span><span class="prov-badge prov-manual">Manual</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ══ ARCHITECTURE MAP ══ -->
+<div id="arch-view" class="hidden">
+  <div class="arch-layers">
+
+    <div class="arch-layer">
+      <div class="arch-layer-header">
+        <span style="font-size:18px">🏢</span>
+        <h3>Identity &amp; Access Layer</h3>
+        <span>HR system + IdP → governs all provisioning events</span>
+      </div>
+      <div class="arch-apps-row">
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06)">
+          <span class="chip-id">IdP</span><span>Microsoft Entra ID</span>
+          <span style="font-size:10px;color:#22c55e">SCIM Server</span>
+        </div>
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.06)">
+          <span class="chip-id">IdP</span><span>Okta</span>
+          <span style="font-size:10px;color:#22c55e">SCIM Server</span>
+        </div>
+        <div class="arch-app-chip" style="border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.06)">
+          <span class="chip-id">A-16</span><span>Freshworks</span>
+          <span style="font-size:10px;color:#fbbf24">HR Source</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-header">
+        <span style="font-size:18px">✅</span>
+        <h3>SCIM-Automated Apps</h3>
+        <span>Auto-provisioned on hire · Auto-deprovisioned on exit</span>
+      </div>
+      <div class="arch-apps-row">
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4)"><span class="chip-id">A-06</span><span>Google Workspace</span></div>
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4)"><span class="chip-id">A-11</span><span>Slack</span></div>
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4)"><span class="chip-id">A-03</span><span>Asana</span></div>
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4)"><span class="chip-id">A-04</span><span>Jira</span></div>
+        <div class="arch-app-chip" style="border-color:rgba(34,197,94,.4)"><span class="chip-id">A-10</span><span>Microsoft 365</span></div>
+      </div>
+    </div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-header">
+        <span style="font-size:18px">🔌</span>
+        <h3>API-Managed Apps</h3>
+        <span>Programmatic access control · Manual offboarding step required</span>
+      </div>
+      <div class="arch-apps-row">
+        <div class="arch-app-chip" style="border-color:rgba(59,130,246,.4)"><span class="chip-id">A-05</span><span>GitHub</span></div>
+        <div class="arch-app-chip" style="border-color:rgba(59,130,246,.4)"><span class="chip-id">A-07</span><span>HubSpot</span></div>
+      </div>
+    </div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-header">
+        <span style="font-size:18px">🔐</span>
+        <h3>SSO-Only Apps</h3>
+        <span>Access gated via SAML 2.0 · Revoking SSO blocks access</span>
+      </div>
+      <div class="arch-apps-row">
+        <div class="arch-app-chip" style="border-color:rgba(245,158,11,.4)"><span class="chip-id">A-01</span><span>Zoom</span></div>
+        <div class="arch-app-chip" style="border-color:rgba(245,158,11,.4)"><span class="chip-id">A-09</span><span>Loom</span></div>
+      </div>
+    </div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-header">
+        <span style="font-size:18px">🖐️</span>
+        <h3>Manual-Provisioned Apps</h3>
+        <span>No automation — IT ticket required on hire/exit</span>
+      </div>
+      <div class="arch-apps-row">
+        <div class="arch-app-chip"><span class="chip-id">A-02</span><span>Adobe Acrobat</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-08</span><span>IntelliJ IDEA</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-12</span><span>Mosyle MDM</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-13</span><span>OpenVPN</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-14</span><span>Canva</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-15</span><span>Postman</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-17</span><span>Windsurf</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-18</span><span>Plaid</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-19</span><span>ProductBoard</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-20</span><span>DocuSign</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-21</span><span>Vercel</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-22</span><span>Twilio SendGrid</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-23</span><span>Datadog</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-24</span><span>Gong</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-25</span><span>Figma</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-26</span><span>ChatGPT</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-27</span><span>Jenkins</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-28</span><span>Orum</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-29</span><span>Apple Biz Mgr</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-30</span><span>ChatPRD</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-31</span><span>AWS</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-32</span><span>Miro</span></div>
+        <div class="arch-app-chip"><span class="chip-id">A-33</span><span>Claude</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--border);color:var(--text-muted);font-size:12px">
+  TerzoCloud IT Asset Portal · v2.0.0 · 33 software applications · Generated March 2026
+</div>
+
+<script>
+function setView(v) {
+  ['domain','provisioning','type','arch'].forEach(id => {
+    document.getElementById(id + '-view').classList.add('hidden');
+  });
+  document.getElementById(v + '-view').classList.remove('hidden');
+  document.querySelectorAll('.toggle-btn').forEach((btn,i) => {
+    btn.classList.toggle('active', ['domain','provisioning','type','arch'][i] === v);
+  });
+}
+</script>
+</body>
+</html>

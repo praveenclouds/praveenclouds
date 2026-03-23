@@ -27,7 +27,8 @@ function fmtSw(s) {
 
 function diffSoftware(before, after) {
   const fields = [
-    'csvId', 'name', 'deploymentType', 'renewalPeriod', 'department', 'purpose',
+    'csvId', 'name', 'deploymentType', 'provisioningMethod', 'connectorType', 'supportsDeprovision',
+    'provisioningNotes', 'renewalPeriod', 'department', 'purpose',
     'licensePricePerUserMonth', 'annualCost', 'subscriptionPlan', 'purchasedLicenses',
     'usedLicenses', 'owner', 'admins', 'billedTo', 'status', 'siteUSA', 'siteCAN', 'siteIND',
   ];
@@ -55,9 +56,20 @@ function diffSoftware(before, after) {
 }
 
 // ── GET /api/software ──────────────────────────────────────────────────────────
+// Supports optional ?page=1&limit=50 query params.
+// Defaults to returning all records (backward-compatible flat array).
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const list = await Software.find().sort({ csvId: 1 });
+    const page  = Math.max(1, parseInt(req.query.page)  || 1);
+    const limit = Math.max(0, parseInt(req.query.limit) || 0); // 0 = no limit (default)
+
+    const query = Software.find().sort({ csvId: 1 });
+    if (limit > 0) {
+      const total = await Software.countDocuments();
+      const list  = await query.skip((page - 1) * limit).limit(limit);
+      return res.json({ total, page, limit, software: list.map(fmtSw) });
+    }
+    const list = await query;
     res.json(list.map(fmtSw));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -111,7 +123,8 @@ router.put('/:id', requireAuth, canWriteSoftware, async (req, res) => {
     const before = fmtSw(sw);
 
     const allowed = [
-      'csvId', 'name', 'deploymentType', 'renewalPeriod', 'department', 'purpose',
+      'csvId', 'name', 'deploymentType', 'provisioningMethod', 'connectorType', 'supportsDeprovision',
+      'provisioningNotes', 'renewalPeriod', 'department', 'purpose',
       'licensePricePerUserMonth', 'annualCost', 'subscriptionPlan', 'purchasedLicenses',
       'usedLicenses', 'owner', 'admins', 'billedTo', 'status',
       'siteUSA', 'siteCAN', 'siteIND', 'services',

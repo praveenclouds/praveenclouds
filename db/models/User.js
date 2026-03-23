@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      enum: ['Chennai', 'Coimbatore', 'Remote'],
+      enum: ['Chennai', 'Coimbatore', 'USA', 'Canada'],
       default: 'Chennai',
     },
     employmentType: {

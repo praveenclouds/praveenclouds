@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TerzoCloud — Full Application Validation Report</title>
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #16162a;
+    --surface2: #1e1e38;
+    --border: rgba(130,96,185,0.22);
+    --accent: #7c5cff;
+    --text: #e2e0ff;
+    --text-muted: rgba(196,181,253,0.6);
+    --pass: #22c55e;
+    --warn: #f59e0b;
+    --fail: #ef4444;
+    --info: #60a5fa;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; padding: 32px 24px; line-height: 1.6; }
+
+  .header { text-align: center; margin-bottom: 40px; }
+  .header-logo { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(135deg,rgba(49,83,216,.18),rgba(124,92,255,.18)); border: 1px solid rgba(130,96,185,.35); border-radius: 14px; padding: 8px 18px; margin-bottom: 18px; }
+  .header-logo span { font-size: 15px; font-weight: 700; color: #c4b5fd; }
+  h1 { font-size: 26px; font-weight: 800; background: linear-gradient(135deg,#a78bfa,#7c5cff,#3757e6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
+  .meta { color: var(--text-muted); font-size: 13px; }
+
+  /* Summary bar */
+  .summary-bar { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 40px; }
+  .sum-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 22px; text-align: center; min-width: 110px; }
+  .sum-card .num { font-size: 26px; font-weight: 800; }
+  .sum-card .lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin-top: 3px; }
+
+  /* Sections */
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 24px; overflow: hidden; }
+  .section-header { padding: 14px 22px; background: linear-gradient(90deg,rgba(55,87,230,.13),rgba(124,92,255,.13)); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .section-header h2 { font-size: 15px; font-weight: 700; }
+  .section-header .status-pill { margin-left: auto; padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+  .pill-pass { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+  .pill-warn { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+  .pill-fail { background: rgba(239,68,68,.15); color: #f87171; border: 1px solid rgba(239,68,68,.3); }
+
+  .section-body { padding: 20px 22px; }
+
+  /* Check rows */
+  .check-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; background: var(--surface2); border-radius: 10px; margin-bottom: 8px; border: 1px solid transparent; }
+  .check-row:hover { border-color: rgba(130,96,185,.3); }
+  .check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+  .icon-pass { background: rgba(34,197,94,.2); color: #22c55e; }
+  .icon-warn { background: rgba(245,158,11,.2); color: #fbbf24; }
+  .icon-fail { background: rgba(239,68,68,.2); color: #f87171; }
+  .icon-info { background: rgba(96,165,250,.2); color: #60a5fa; }
+  .check-content { flex: 1; }
+  .check-title { font-size: 13px; font-weight: 600; }
+  .check-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+  /* Data table */
+  .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 12px; }
+  .data-table th { text-align: left; padding: 7px 12px; background: rgba(55,87,230,.12); color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+  .data-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(255,255,255,.03); }
+
+  .badge { padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; }
+  .badge-scim   { background: rgba(34,197,94,.15);  color: #22c55e; }
+  .badge-api    { background: rgba(59,130,246,.15);  color: #60a5fa; }
+  .badge-sso    { background: rgba(245,158,11,.15);  color: #fbbf24; }
+  .badge-manual { background: rgba(107,114,128,.15); color: #9ca3af; }
+  .badge-pass   { background: rgba(34,197,94,.15);   color: #22c55e; }
+  .badge-warn   { background: rgba(245,158,11,.15);  color: #fbbf24; }
+
+  .note { background: rgba(96,165,250,.08); border: 1px solid rgba(96,165,250,.2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #93c5fd; margin-top: 12px; }
+
+  .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="6" fill="url(#lg2)"/><path d="M5 10l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="lg2" x1="0" y1="0" x2="20" y2="20"><stop stop-color="#3757e6"/><stop offset="1" stop-color="#7c5cff"/></linearGradient></defs></svg>
+    <span>TerzoCloud IT Asset Portal — v2.0.0</span>
+  </div>
+  <h1>Full Application Validation Report</h1>
+  <p class="meta">Validated by: Praveen M. (Super Admin) &nbsp;·&nbsp; Date: March 20, 2026 &nbsp;·&nbsp; Environment: localhost:3000</p>
+</div>
+
+<!-- Summary -->
+<div class="summary-bar">
+  <div class="sum-card"><div class="num" style="color:#22c55e">34</div><div class="lbl">Checks Passed</div></div>
+  <div class="sum-card"><div class="num" style="color:#fbbf24">3</div><div class="lbl">Warnings</div></div>
+  <div class="sum-card"><div class="num" style="color:#ef4444">0</div><div class="lbl">Failures</div></div>
+  <div class="sum-card"><div class="num" style="color:#a78bfa">90</div><div class="lbl">Active Users</div></div>
+  <div class="sum-card"><div class="num" style="color:#a78bfa">33</div><div class="lbl">Software Apps</div></div>
+  <div class="sum-card"><div class="num" style="color:#a78bfa">42</div><div class="lbl">Assets</div></div>
+</div>
+
+<!-- 1. Authentication & Access Control -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">🔐</span>
+    <h2>1. Authentication &amp; Access Control</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">JWT Authentication — Login redirects unauthenticated requests</div><div class="check-detail">Navigating to any protected route without a session cookie redirects to /login. Login succeeds with praveen.m@terzocloud.com (Super Admin).</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">RBAC — Super Admin has full access to all pages</div><div class="check-detail">Dashboard, Users, Assets, Software, Activity Log, Admin Console all accessible without restriction.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Session persistence — authFetch sends credentials correctly</div><div class="check-detail">All authenticated API calls (PUT /api/software, GET /api/users, etc.) return HTTP 200 with valid session. Plain fetch() correctly returns 401 when credentials option is absent.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Sign Out — session invalidated on logout</div><div class="check-detail">Clicking "Sign Out" in sidebar clears session and returns user to /login page.</div></div></div>
+  </div>
+</div>
+
+<!-- 2. Dashboard -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">📊</span>
+    <h2>2. Dashboard</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Active user count — shows 90 (excludes 3 inactive users)</div><div class="check-detail">Eric Pritchett, Kevin Redwine, Matt Hines are inactive and correctly excluded. Total Users stat = 90, Active Users stat = 90.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Department breakdown — all 13 departments shown with correct member counts</div><div class="check-detail">AI-Service: 29, Engineering: 25, Data Science: 9, Marketing: 5, Customer Support: 4, Executive: 3, Other: 3, Sales: 3, HR: 3, Product: 2, Legal: 2, Operations: 1, IT: 1. Total = 90.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Asset stats — 42 total assets, 38 in-use, 4 available</div><div class="check-detail">License Utilization shows 788/801 = 98% across 33 apps.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Budget breakdown — $292.2K total annual spend across all deployment types</div><div class="check-detail">SaaS: $279.6K, On-premises: $12.6K, Freeware: $0, Open Source: $0. Top spends: Datadog $56.1K, Claude $50.4K, Google Workspace $49.9K.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">27 Paid apps, 6 Free/Open Source apps</div><div class="check-detail">Budget cards render correctly with correct category totals.</div></div></div>
+  </div>
+</div>
+
+<!-- 3. User Management -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">👥</span>
+    <h2>3. User Management</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">User list — 90 active users shown by default</div><div class="check-detail">Nav badge shows 90. Default view hides inactive users. Inactive filter reveals 3 additional users (Eric Pritchett, Kevin Redwine, Matt Hines).</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Inactive filter toggle — correctly reveals/hides inactive users</div><div class="check-detail">Switching to "Inactive" filter shows the 3 inactive users. "Active" filter restores the default 90-user view.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Asset assign-to dropdown — shows 91 options (1 blank + 90 active users)</div><div class="check-detail">Inactive users are excluded from the assignment dropdown, preventing erroneous asset assignment.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Admin Map Users modal — active users only</div><div class="check-detail">Software user mapping modal shows only active users in its selection list.</div></div></div>
+  </div>
+</div>
+
+<!-- 4. Asset Inventory -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">🖥️</span>
+    <h2>4. Asset Inventory</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">42 assets displayed — status badges, assignment and condition data accurate</div><div class="check-detail">38 In-Use, 4 Available shown in nav badge and dashboard stat card.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Asset detail modal — renders all fields (serial, model, owner, condition)</div><div class="check-detail">Clicking any asset opens the detail view with correct owner name, assignment history, and asset status.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Assignments page — shows all active asset assignments</div><div class="check-detail">Assignment records link assets to active users with correct timestamps.</div></div></div>
+  </div>
+</div>
+
+<!-- 5. Software Inventory & Provisioning Model -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">📦</span>
+    <h2>5. Software Inventory — Provisioning Status Model</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">33 software apps across 3 pages — all render correctly</div><div class="check-detail">Type badges (SaaS, On-premises, Freeware, Open Source), department, plan, renewal, license utilization bars all display correctly.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Provisioning model fields — persisted and displayed correctly in all 4 types</div><div class="check-detail">PUT /api/software/:id correctly updates provisioningMethod, connectorType, supportsDeprovision, provisioningNotes. Fields are in the allowed list in software.routes.js.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">SCIM provisioning — 5 apps confirmed (Google Workspace, Slack, Asana, Jira, Microsoft 365)</div><div class="check-detail">Each shows: PROVISIONING: SCIM · CONNECTOR: [specific connector] · AUTO DEPROVISION: Yes · PROVISIONING NOTES: full detail.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">API provisioning — 2 apps confirmed (GitHub, HubSpot)</div><div class="check-detail">GitHub: GitHub Enterprise API · HubSpot: HubSpot CRM API v3. Both show AUTO DEPROVISION: No (manual Org removal required).</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">SSO Only provisioning — 2 apps confirmed (Zoom, Loom)</div><div class="check-detail">Both show SAML 2.0 connectors. Revoking SSO session blocks access; no SCIM provisioning. AUTO DEPROVISION: No.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Manual provisioning — 24 apps (e.g. Adobe Acrobat)</div><div class="check-detail">CONNECTOR: — (none). No auto-deprovision. IT admin must take action on hire/exit.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Activity Log — 18 software_updated events captured for provisioning changes</div><div class="check-detail">Each update produced before/after field diffs for provisioningMethod, connectorType, supportsDeprovision, provisioningNotes — confirming full audit trail.</div></div></div>
+
+    <table class="data-table" style="margin-top:16px">
+      <thead><tr><th>App (ID)</th><th>Provisioning</th><th>Connector</th><th>Auto Deprovision</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Google Workspace (A-06)</td><td><span class="badge badge-scim">SCIM</span></td><td>Google Workspace SCIM (Entra ID)</td><td>Yes</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Slack (A-11)</td><td><span class="badge badge-scim">SCIM</span></td><td>Slack SCIM API (Okta)</td><td>Yes</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Asana (A-03)</td><td><span class="badge badge-scim">SCIM</span></td><td>Asana SCIM (Okta)</td><td>Yes</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Jira / Atlassian (A-04)</td><td><span class="badge badge-scim">SCIM</span></td><td>Atlassian SCIM (Entra ID)</td><td>Yes</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Microsoft 365 (A-10)</td><td><span class="badge badge-scim">SCIM</span></td><td>Microsoft 365 SCIM (Entra ID)</td><td>Yes</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>GitHub (A-05)</td><td><span class="badge badge-api">API</span></td><td>GitHub Enterprise API</td><td>No</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>HubSpot (A-07)</td><td><span class="badge badge-api">API</span></td><td>HubSpot CRM API v3</td><td>No</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Zoom (A-01)</td><td><span class="badge badge-sso">SSO Only</span></td><td>Zoom SSO (SAML 2.0)</td><td>No</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Loom (A-09)</td><td><span class="badge badge-sso">SSO Only</span></td><td>Loom SSO (SAML 2.0)</td><td>No</td><td><span class="badge badge-pass">PASS</span></td></tr>
+        <tr><td>Adobe Acrobat (A-02)</td><td><span class="badge badge-manual">Manual</span></td><td>—</td><td>No</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 6. SCIM Audit Modal -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">🛡️</span>
+    <h2>6. SCIM Readiness Audit Modal</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Summary stats — 6 SCIM Ready, 16 Needs Upgrade, 5 Plan Unknown</div><div class="check-detail">Total upgrade cost delta correctly calculated at $15,696/yr.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Filter tabs — All / SCIM Ready / Needs Upgrade / Unknown Plan all function correctly</div><div class="check-detail">Each filter shows the correct subset of apps from the 33-app inventory.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">CONNECTOR column — visible, shows "Set Up" links for SCIM-ready apps</div><div class="check-detail">Zoom, GitHub, Google Workspace show "Set Up" connector links. Non-SCIM apps show —.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Dark purple theme — modal matches overall app design system</div><div class="check-detail">Background, badge colors, table rows all use the correct purple gradient palette.</div></div></div>
+  </div>
+</div>
+
+<!-- 7. Learning Portal -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">📚</span>
+    <h2>7. Learning Portal (scim-learning-portal.html)</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Sidebar button — "Learning Portal" label with dark purple theme (admin.html and user-asset-portal.html)</div><div class="check-detail">Old "SCIM Setup Guide" text and blue gradient replaced with "Learning Portal / Admin guides &amp; how-tos →" in purple rgba gradient on both files.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Page loads — dark purple theme renders correctly</div><div class="check-detail">Header: "SCIM Server &amp; App Connector Configuration Guide". Stats: 6 App Connectors, SCIM 2.0 Protocol, Auto Provisioning, JWT Auth Required.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Getting Started section — What is SCIM?, How It Works, Prerequisites all render</div><div class="check-detail">Data flow architecture diagram shows HR System → TerzoCloud SCIM Server → App Connectors (Zoom, GitHub, Google WS, Slack, M365, AWS IAM).</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">App Connectors — all 6 connectors listed with "Ready" badges in sidebar</div><div class="check-detail">Zoom, GitHub, Google Workspace, Slack, Microsoft 365, AWS IAM Identity Center all show Ready status.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Email Automation section — renders fully</div><div class="check-detail">"Support Email Automation" section shows What It Does, Fields Required (SMTP Host/Port, Username/Password, From Email, Public App Base URL) and Step-by-Step Setup instructions. SMTP App Password warning note visible.</div></div></div>
+  </div>
+</div>
+
+<!-- 8. Admin Console -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">⚙️</span>
+    <h2>8. Admin Console</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Admin Console page accessible at /admin.html — all sections render</div><div class="check-detail">System Health, User Management, Integrations, Support Email Automation, SCIM setup cards all present.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Learning Portal button in Admin Console sidebar — dark purple theme matches design system</div><div class="check-detail">Gradient: rgba(49,83,216,.18) to rgba(124,92,255,.18). Border: rgba(130,96,185,.35). Text: #c4b5fd.</div></div></div>
+  </div>
+</div>
+
+<!-- 9. Activity Log -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">📋</span>
+    <h2>9. Activity Log</h2>
+    <span class="status-pill pill-pass">ALL PASS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Activity Log renders all event types — software_updated, user events, asset events</div><div class="check-detail">18 software_updated events captured from provisioning bulk update, each with full before/after field diffs.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Audit trail — all field changes logged with actor, timestamp, before/after values</div><div class="check-detail">provisioningMethod: "Manual" → "SCIM", connectorType: "" → "Google Workspace SCIM (Entra ID)", supportsDeprovision: false → true all captured.</div></div></div>
+  </div>
+</div>
+
+<!-- 10. Warnings -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">⚠️</span>
+    <h2>10. Observations &amp; Recommendations</h2>
+    <span class="status-pill pill-warn">3 WARNINGS</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-warn">!</div><div class="check-content"><div class="check-title">24 of 33 apps still on Manual provisioning</div><div class="check-detail">Apps like Datadog, Figma, Canva, AWS, OpenVPN, DocuSign etc. have no automation. Recommend evaluating SCIM/SSO connectors for high-license-count apps (Datadog 35, Canva 32) to reduce offboarding risk.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-warn">!</div><div class="check-content"><div class="check-title">Jenkins (A-27) at 0/20 license utilization</div><div class="check-detail">Jenkins has 20 licensed seats but 0 used. CI/CD pipeline may be unused or users access it without license assignment. Recommend auditing active usage.</div></div></div>
+    <div class="check-row"><div class="check-icon icon-warn">!</div><div class="check-content"><div class="check-title">In-memory MongoDB — data resets on server restart</div><div class="check-detail">The app uses mongodb-memory-server so all provisioning updates (SCIM connectors, etc.) will be lost if the server is restarted. For production, migrate to a persistent MongoDB instance.</div></div></div>
+    <div class="note">ℹ️ All warnings are data/infrastructure observations. No functional defects were found in the application. All 34 checks PASS.</div>
+  </div>
+</div>
+
+<!-- 11. Architecture Diagram -->
+<div class="section">
+  <div class="section-header">
+    <span style="font-size:18px">🗺️</span>
+    <h2>11. Enterprise Architecture Diagram</h2>
+    <span class="status-pill pill-pass">CREATED</span>
+  </div>
+  <div class="section-body">
+    <div class="check-row"><div class="check-icon icon-pass">✓</div><div class="check-content"><div class="check-title">Interactive HTML diagram — terzocloud-architecture.html (46KB)</div><div class="check-detail">All 33 apps mapped across 4 interactive views: By Domain (7 functional categories), By Provisioning (SCIM / API / SSO / Manual), By Category (SaaS / On-prem / Freeware / OSS), and Architecture Map (identity layer → automated → API → SSO → manual layers).</div></div></div>
+    <div class="check-row"><div class="check-icon icon-info">i</div><div class="check-content"><div class="check-title">Breakdown by deployment type</div><div class="check-detail">SaaS: 27 apps · On-premises: 2 (IntelliJ IDEA, Windsurf) · Freeware: 3 (Mosyle MDM, Postman, Apple Business Manager) · Open Source: 1 (Jenkins)</div></div></div>
+    <div class="check-row"><div class="check-icon icon-info">i</div><div class="check-content"><div class="check-title">Breakdown by provisioning method</div><div class="check-detail">SCIM: 5 apps · API: 2 apps · SSO Only: 2 apps · Manual: 24 apps</div></div></div>
+  </div>
+</div>
+
+<div class="footer">
+  TerzoCloud IT Asset Portal · v2.0.0 · Full Application Validation · March 20, 2026<br>
+  Validated by Praveen M. (Super Admin) · praveen.m@terzocloud.com
+</div>
+
+</body>
+</html>

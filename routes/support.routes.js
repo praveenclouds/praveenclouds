@@ -1,18 +1,39 @@
 const router = require('express').Router();
 const jwt = require('jsonwebtoken');
+
+// Escape special regex characters to prevent ReDoS from user-supplied search strings.
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 const { SupportRequest } = require('../db');
-const { requireAuth, canWrite, requirePermission } = require('../middleware/auth');
+const { requireAuth, canWrite, requirePermission, onlySuperAdmin } = require('../middleware/auth');
 const { JWT_SECRET } = require('../config');
 const {
   applySupportRequestUpdates,
   createRequestTypeDefinition,
   createSupportRequest,
+  ensureCompletedOnboardingProvisioningReady,
   formatWorkflowTypeLabel,
   listRequestTypeDefinitions,
   listWorkflowOptions,
+  syncCompletedOnboardingUser,
   updateRequestTypeDefinition,
 } = require('../services/support-request.service');
+const {
+  listSupportMailTemplates,
+  updateSupportMailTemplate,
+} = require('../services/support-mail-template.service');
 const { hashToken, notifySupportRequestChanges } = require('../services/support-notification.service');
+const rateLimit = require('express-rate-limit');
+
+// Prevent brute-force guessing of approval tokens: max 10 attempts per 15 min per IP.
+const approvalRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many approval attempts from this IP, please try again later.' },
+});
 
 function fmtSupportRequest(doc) {
   const o = doc.toObject ? doc.toObject() : { ...doc };
@@ -76,7 +97,7 @@ function approvalPage(title, body, tone = '#111827') {
   </html>`;
 }
 
-router.get('/approval-action', async (req, res) => {
+router.get('/approval-action', approvalRateLimiter, async (req, res) => {
   try {
     const token = String(req.query.token || '').trim();
     const decision = String(req.query.decision || '').trim().toLowerCase();
@@ -182,6 +203,56 @@ router.put('/request-types/:id', requireAuth, requirePermission('manageRequestTy
   }
 });
 
+router.get('/mail-templates', requireAuth, onlySuperAdmin, async (req, res) => {
+  try {
+    const templates = await listSupportMailTemplates();
+    res.json(templates.map(template => ({
+      id: template._id?.toString?.() || template.id,
+      key: template.key,
+      label: template.label,
+      audience: template.audience || '',
+      description: template.description || '',
+      tokens: Array.isArray(template.tokens) ? template.tokens : [],
+      subjectTemplate: template.subjectTemplate || '',
+      introTemplate: template.introTemplate || '',
+      bodyTemplate: template.bodyTemplate || '',
+      ctaLabel: template.ctaLabel || '',
+      secondaryCtaLabel: template.secondaryCtaLabel || '',
+      footerNote: template.footerNote || '',
+      sortOrder: template.sortOrder || 0,
+      isSystem: template.isSystem !== false,
+      updatedAt: template.updatedAt || null,
+    })));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.put('/mail-templates/:id', requireAuth, onlySuperAdmin, async (req, res) => {
+  try {
+    const template = await updateSupportMailTemplate(req.params.id, req.body || {});
+    res.json({
+      id: template._id?.toString?.() || template.id,
+      key: template.key,
+      label: template.label,
+      audience: template.audience || '',
+      description: template.description || '',
+      tokens: Array.isArray(template.tokens) ? template.tokens : [],
+      subjectTemplate: template.subjectTemplate || '',
+      introTemplate: template.introTemplate || '',
+      bodyTemplate: template.bodyTemplate || '',
+      ctaLabel: template.ctaLabel || '',
+      secondaryCtaLabel: template.secondaryCtaLabel || '',
+      footerNote: template.footerNote || '',
+      sortOrder: template.sortOrder || 0,
+      isSystem: template.isSystem !== false,
+      updatedAt: template.updatedAt || null,
+    });
+  } catch (e) {
+    res.status(e.message === 'Mail template not found.' ? 404 : 400).json({ error: e.message });
+  }
+});
+
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { workflowType, status, search } = req.query;
@@ -189,7 +260,7 @@ router.get('/', requireAuth, async (req, res) => {
     if (workflowType) filter.workflowType = workflowType;
     if (status) filter.status = status;
     if (search) {
-      const re = new RegExp(search, 'i');
+      const re = new RegExp(escapeRegex(String(search).slice(0, 200)), 'i');
       filter.$or = [
         { requestId: re },
         { employeeName: re },
@@ -218,8 +289,10 @@ router.post('/', requireAuth, async (req, res) => {
     }, {
       requestedVia: 'portal',
     });
+    ensureCompletedOnboardingProvisioningReady(supportRequest);
     await notifySupportRequestChanges(null, supportRequest);
     if (supportRequest.isModified()) await supportRequest.save();
+    await syncCompletedOnboardingUser(supportRequest);
 
     res.status(201).json(fmtSupportRequest(supportRequest));
   } catch (e) {
@@ -239,10 +312,12 @@ router.put('/:id', requireAuth, canWrite, async (req, res) => {
       if (body[field] !== undefined) request[field] = body[field];
     }
     await applySupportRequestUpdates(request, body);
+    ensureCompletedOnboardingProvisioningReady(request);
 
     await request.save();
     await notifySupportRequestChanges(previousRequest, request);
     if (request.isModified()) await request.save();
+    await syncCompletedOnboardingUser(request);
     res.json(fmtSupportRequest(request));
   } catch (e) {
     res.status(400).json({ error: e.message });

@@ -1,7 +1,10 @@
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const { Software } = require('../db');
 const { JWT_SECRET } = require('../config');
 const { loadEmailSettings, sendMail } = require('./email.service');
+const { renderSupportMailTemplate } = require('./support-mail-template.service');
+const { loadUserDirectory, softwareOwnerCandidates } = require('./support-request.service');
 
 function hashToken(token) {
   return crypto.createHash('sha256').update(String(token || '')).digest('hex');
@@ -28,38 +31,85 @@ function taskMap(checklist = []) {
   return new Map((checklist || []).map(item => [item.key, item]));
 }
 
-function requestSummary(request = {}) {
-  return [
-    `Request ID: ${request.requestId}`,
-    `Request Type: ${request.workflowLabel || request.workflowType}`,
-    `Employee: ${request.employeeName} <${request.employeeEmail}>`,
-    request.department ? `Department: ${request.department}` : '',
-    request.priority ? `Priority: ${request.priority}` : '',
-  ].filter(Boolean).join('\n');
+function fallbackValue(value, fallback = '—') {
+  const normalized = String(value || '').trim();
+  return normalized || fallback;
 }
 
-async function sendAssignmentEmail({ to, subject, intro, request, stepLabel = '' }) {
-  if (!to) return;
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function bodyToHtml(body) {
+  return String(body || '')
+    .split(/\n{2,}/)
+    .map(block => block.trim())
+    .filter(Boolean)
+    .map(block => `<p>${escapeHtml(block).replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+
+function templateContext(request = {}, extra = {}) {
+  return {
+    requestId: fallbackValue(request.requestId, ''),
+    workflowLabel: fallbackValue(request.workflowLabel || request.workflowType, 'Support Request'),
+    workflowType: fallbackValue(request.workflowType, ''),
+    employeeName: fallbackValue(request.employeeName, 'Employee'),
+    employeeEmail: fallbackValue(request.employeeEmail),
+    department: fallbackValue(request.department),
+    priority: fallbackValue(request.priority),
+    requestedByName: fallbackValue(request.requestedByName, 'Unknown requester'),
+    assignee: fallbackValue(request.assignee),
+    managerName: fallbackValue(request.managerName),
+    applications: (request.applications || []).map(app => app?.name).filter(Boolean).join(', ') || '—',
+    stepLabel: fallbackValue(extra.stepLabel, ''),
+    detailUrl: extra.detailUrl || '',
+    approveUrl: extra.approveUrl || '',
+    rejectUrl: extra.rejectUrl || '',
+  };
+}
+
+async function sendAssignmentEmail({ to, templateKey, request, stepLabel = '' }) {
+  const recipients = Array.isArray(to) ? to.filter(Boolean) : [to].filter(Boolean);
+  if (!recipients.length) return;
   const settings = await loadEmailSettings();
   const detailUrl = requestDetailUrl(settings.appBaseUrl);
-  const stepLine = stepLabel ? `Task: ${stepLabel}\n` : '';
+  const rendered = await renderSupportMailTemplate(templateKey, templateContext(request, { stepLabel, detailUrl }));
+  const actionLabel = rendered.ctaLabel || 'Open Support Center';
   await sendMail({
-    to,
-    subject,
-    text: `${intro}\n\n${stepLine}${requestSummary(request)}\n\nOpen Support Center: ${detailUrl}`,
+    to: recipients,
+    subject: rendered.subject,
+    text: [
+      rendered.intro,
+      rendered.body,
+      detailUrl ? `${actionLabel}: ${detailUrl}` : '',
+      rendered.footerNote,
+    ].filter(Boolean).join('\n\n'),
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
-        <p>${intro}</p>
-        ${stepLabel ? `<p><strong>Task:</strong> ${stepLabel}</p>` : ''}
-        <p><strong>Request ID:</strong> ${request.requestId}<br>
-        <strong>Request Type:</strong> ${request.workflowLabel || request.workflowType}<br>
-        <strong>Employee:</strong> ${request.employeeName} (${request.employeeEmail})<br>
-        ${request.department ? `<strong>Department:</strong> ${request.department}<br>` : ''}
-        ${request.priority ? `<strong>Priority:</strong> ${request.priority}</p>` : '</p>'}
-        <p><a href="${detailUrl}" style="display:inline-block;padding:10px 16px;background:#3757e6;color:#fff;text-decoration:none;border-radius:8px">Open Support Center</a></p>
+        ${rendered.intro ? `<p>${escapeHtml(rendered.intro)}</p>` : ''}
+        ${bodyToHtml(rendered.body)}
+        ${detailUrl ? `<p><a href="${escapeHtml(detailUrl)}" style="display:inline-block;padding:10px 16px;background:#3757e6;color:#fff;text-decoration:none;border-radius:8px">${escapeHtml(actionLabel)}</a></p>` : ''}
+        ${rendered.footerNote ? `<p style="font-size:12px;color:#6b7280">${escapeHtml(rendered.footerNote)}</p>` : ''}
       </div>
     `,
   });
+}
+
+function uniqueEmails(people = []) {
+  const seen = new Set();
+  return (people || [])
+    .map(person => String(person?.email || '').trim().toLowerCase())
+    .filter(Boolean)
+    .filter(email => {
+      if (seen.has(email)) return false;
+      seen.add(email);
+      return true;
+    });
 }
 
 async function sendManagerApprovalEmail(request, step, token) {
@@ -67,32 +117,33 @@ async function sendManagerApprovalEmail(request, step, token) {
   const settings = await loadEmailSettings();
   const approveUrl = approvalActionUrl(settings.appBaseUrl, token, 'approve');
   const rejectUrl = approvalActionUrl(settings.appBaseUrl, token, 'reject');
+  const rendered = await renderSupportMailTemplate('manager_approval', templateContext(request, {
+    stepLabel: step.label,
+    approveUrl,
+    rejectUrl,
+  }));
+  const approveLabel = rendered.ctaLabel || 'Approve';
+  const rejectLabel = rendered.secondaryCtaLabel || 'Reject';
 
   const result = await sendMail({
     to: request.managerEmail,
-    subject: `Approval needed: ${step.label} for ${request.employeeName}`,
+    subject: rendered.subject,
     text: [
-      `Approval is needed for support request ${request.requestId}.`,
-      '',
-      `Task: ${step.label}`,
-      requestSummary(request),
-      '',
-      `Approve: ${approveUrl}`,
-      `Reject: ${rejectUrl}`,
+      rendered.intro,
+      rendered.body,
+      `${approveLabel}: ${approveUrl}`,
+      `${rejectLabel}: ${rejectUrl}`,
+      rendered.footerNote,
     ].join('\n'),
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
-        <p>Approval is needed for support request <strong>${request.requestId}</strong>.</p>
-        <p><strong>Task:</strong> ${step.label}<br>
-        <strong>Request Type:</strong> ${request.workflowLabel || request.workflowType}<br>
-        <strong>Employee:</strong> ${request.employeeName} (${request.employeeEmail})<br>
-        ${request.department ? `<strong>Department:</strong> ${request.department}<br>` : ''}
-        ${request.priority ? `<strong>Priority:</strong> ${request.priority}</p>` : '</p>'}
+        ${rendered.intro ? `<p>${escapeHtml(rendered.intro)}</p>` : ''}
+        ${bodyToHtml(rendered.body)}
         <p style="display:flex;gap:12px;flex-wrap:wrap">
-          <a href="${approveUrl}" style="display:inline-block;padding:10px 16px;background:#16a34a;color:#fff;text-decoration:none;border-radius:8px">Approve</a>
-          <a href="${rejectUrl}" style="display:inline-block;padding:10px 16px;background:#dc2626;color:#fff;text-decoration:none;border-radius:8px">Reject</a>
+          <a href="${escapeHtml(approveUrl)}" style="display:inline-block;padding:10px 16px;background:#16a34a;color:#fff;text-decoration:none;border-radius:8px">${escapeHtml(approveLabel)}</a>
+          <a href="${escapeHtml(rejectUrl)}" style="display:inline-block;padding:10px 16px;background:#dc2626;color:#fff;text-decoration:none;border-radius:8px">${escapeHtml(rejectLabel)}</a>
         </p>
-        <p style="font-size:12px;color:#6b7280">These links expire in 48 hours.</p>
+        ${rendered.footerNote ? `<p style="font-size:12px;color:#6b7280">${escapeHtml(rendered.footerNote)}</p>` : ''}
       </div>
     `,
   });
@@ -124,6 +175,14 @@ function buildApprovalToken(request, step, managerEmail) {
 async function notifySupportRequestChanges(previousRequest, currentRequest) {
   try {
     const previousChecklist = taskMap(previousRequest?.checklist || []);
+    const softwareIds = [...new Set((currentRequest?.checklist || []).map(item => item.softwareCsvId).filter(Boolean))];
+    const [userDirectory, softwareList] = await Promise.all([
+      softwareIds.length ? loadUserDirectory() : Promise.resolve(null),
+      softwareIds.length
+        ? Software.find({ csvId: { $in: softwareIds } }).select('csvId owner admins').lean()
+        : Promise.resolve([]),
+    ]);
+    const softwareById = new Map((softwareList || []).map(item => [item.csvId, item]));
 
     const previousAssignee = {
       userId: previousRequest?.assigneeUserId,
@@ -139,8 +198,7 @@ async function notifySupportRequestChanges(previousRequest, currentRequest) {
     if (currentAssignee.email && (!previousRequest || personChanged(previousAssignee, currentAssignee))) {
       await sendAssignmentEmail({
         to: currentAssignee.email,
-        subject: `Support request assigned: ${currentRequest.requestId}`,
-        intro: `A support request has been assigned to you.`,
+        templateKey: 'request_assignee',
         request: currentRequest,
       });
     }
@@ -157,12 +215,17 @@ async function notifySupportRequestChanges(previousRequest, currentRequest) {
         email: step.ownerEmail,
         name: step.owner,
       };
+      const stepRecipients = step.softwareCsvId
+        ? uniqueEmails([
+          ...softwareOwnerCandidates(softwareById.get(step.softwareCsvId), userDirectory),
+          currentOwner,
+        ])
+        : uniqueEmails([currentOwner]);
 
-      if (currentOwner.email && (!previousStep || personChanged(previousOwner, currentOwner))) {
+      if (stepRecipients.length && (!previousStep || personChanged(previousOwner, currentOwner))) {
         await sendAssignmentEmail({
-          to: currentOwner.email,
-          subject: `Task assigned: ${step.label}`,
-          intro: `A workflow task has been assigned to you.`,
+          to: stepRecipients,
+          templateKey: 'task_assignment',
           request: currentRequest,
           stepLabel: step.label,
         });
