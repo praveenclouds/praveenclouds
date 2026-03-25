@@ -107,10 +107,10 @@ router.delete('/:id', requireAuth, canWriteUsers, async (req, res) => {
 });
 
 // ── PUT /api/users/:id/app-access ─────────────────────────────────────────────
-// Body: { appAccess: ['A-01', 'A-11', ...] }
+// Body: { appAccess: ['A-01', 'A-11', ...], appRoles: { 'A-01': 'Admin' } }
 router.put('/:id/app-access', requireAuth, canWriteUsers, async (req, res) => {
   try {
-    const { appAccess } = req.body;
+    const { appAccess, appRoles } = req.body;
     if (!Array.isArray(appAccess))
       return res.status(400).json({ error: 'appAccess must be an array of software IDs' });
 
@@ -121,6 +121,10 @@ router.put('/:id/app-access', requireAuth, canWriteUsers, async (req, res) => {
     const newlyAdded = appAccess.filter(id => !oldAccess.includes(id));
 
     user.appAccess = appAccess;
+    if (appRoles && typeof appRoles === 'object') {
+      user.appRoles = appRoles;
+      user.markModified('appRoles');
+    }
     await user.save();
 
     // Fire invites for newly added apps

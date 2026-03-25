@@ -5,6 +5,14 @@ const DEFAULT_REQUEST_TYPES = SupportRequestType.DEFAULT_REQUEST_TYPE_DEFINITION
 const REQUEST_TYPE_CLASSNAMES = SupportRequestType.REQUEST_TYPE_CLASSNAMES || [];
 const REQUEST_FORM_FIELD_DEFINITIONS = SupportRequestType.REQUEST_FORM_FIELD_DEFINITIONS || [];
 const normalizeWorkflowType = SupportRequestType.normalizeWorkflowType;
+const DEFAULT_ASSIGNEE_WORKFLOW_TYPES = new Set(['app_hardware_issue', 'app_hardware_support']);
+const REQUESTOR_ASSIGNEE_USER_ID = '__requestor__';
+const REQUESTOR_ASSIGNEE_LABEL = 'Requestor';
+const OFFBOARDING_APP_TASK_OPTIONS = {
+  keyPrefix: 'app_revoke_',
+  labelSuffix: 'access revoked',
+  dependencyKeys: ['app_revoke', 'account_disable', 'manager_confirmation'],
+};
 
 const BUILTIN_WORKFLOW_META = Object.fromEntries(
   DEFAULT_REQUEST_TYPES.map(definition => [
@@ -21,6 +29,42 @@ function fullName(user = {}) {
   return `${String(user.first || '').trim()} ${String(user.last || '').trim()}`.trim();
 }
 
+function supportsRequestTypeDefaultAssignee({ workflowType = '', workflowLabel = '' } = {}) {
+  const normalizedType = normalizeWorkflowType(workflowType);
+  if (DEFAULT_ASSIGNEE_WORKFLOW_TYPES.has(normalizedType)) return true;
+  return String(workflowLabel || '').trim().toLowerCase() === 'application and hardware support';
+}
+
+function isRequestorAssigneeRef(input = {}) {
+  const userId = String(input.userId || input.id || '').trim();
+  const name = String(input.name || input.label || input.value || '').trim().toLowerCase();
+  if (userId === REQUESTOR_ASSIGNEE_USER_ID) return true;
+  return name === REQUESTOR_ASSIGNEE_LABEL.toLowerCase();
+}
+
+function resolveRequestorRef(input = {}, userDirectory = null) {
+  return resolveUserRef(
+    {
+      userId: input.userId || input.id || '',
+      email: input.email || '',
+      name: input.name || '',
+    },
+    userDirectory
+  );
+}
+
+function applyRequestorChecklistOwners(checklist = [], requestorRef = {}) {
+  return (Array.isArray(checklist) ? checklist : []).map(item => {
+    if (!isRequestorAssigneeRef({ userId: item?.ownerUserId, name: item?.owner })) return item;
+    return {
+      ...item,
+      owner: requestorRef.name || item.owner || '',
+      ownerUserId: requestorRef.userId || '',
+      ownerEmail: requestorRef.email || '',
+    };
+  });
+}
+
 function looksLikeEmail(value) {
   return /^\S+@\S+\.\S+$/.test(String(value || '').trim());
 }
@@ -32,7 +76,13 @@ function normalizeUserSummary(user = {}) {
     name,
     email: String(user.email || '').trim().toLowerCase(),
     department: String(user.dept || '').trim(),
+    location: String(user.location || '').trim(),
+    jobTitle: String(user.jobTitle || '').trim(),
     role: String(user.role || '').trim(),
+    reportingManager: String(user.reportingManager || '').trim(),
+    appAccess: Array.isArray(user.appAccess)
+      ? [...new Set(user.appAccess.map(value => String(value || '').trim()).filter(Boolean))]
+      : [],
   };
 }
 
@@ -57,6 +107,18 @@ function resolveUserRef(input = {}, userDirectory = null) {
   const email = String(input.email || '').trim().toLowerCase();
   const name = String(input.name || input.label || input.value || '').trim();
 
+  if (isRequestorAssigneeRef({ userId, name })) {
+    return {
+      userId: REQUESTOR_ASSIGNEE_USER_ID,
+      name: REQUESTOR_ASSIGNEE_LABEL,
+      email: '',
+      location: '',
+      jobTitle: '',
+      reportingManager: '',
+      appAccess: [],
+    };
+  }
+
   if (userDirectory) {
     const matchedUser = (
       (userId && userDirectory.byId.get(userId))
@@ -67,13 +129,17 @@ function resolveUserRef(input = {}, userDirectory = null) {
   }
 
   if (!name && email) {
-    return { userId: '', name: email, email };
+    return { userId: '', name: email, email, location: '', jobTitle: '', reportingManager: '', appAccess: [] };
   }
 
   return {
     userId: userId || '',
     name,
     email,
+    location: '',
+    jobTitle: '',
+    reportingManager: '',
+    appAccess: [],
   };
 }
 
@@ -148,12 +214,20 @@ function splitEmployeeName(name, fallbackEmail = '') {
   };
 }
 
-function normalizePortalLocation(value, fallback = 'Remote') {
-  const normalized = String(value || '').trim().toLowerCase();
-  if (normalized === 'chennai') return 'Chennai';
-  if (normalized === 'coimbatore') return 'Coimbatore';
-  if (normalized === 'remote') return 'Remote';
-  return fallback;
+function normalizePortalLocation(value, fallback = 'USA') {
+  const mapLocation = (raw) => {
+    const normalized = String(raw || '').trim().toLowerCase();
+    if (!normalized) return '';
+
+    if (['chennai', 'india/chennai', 'india - chennai'].includes(normalized)) return 'Chennai';
+    if (['coimbatore', 'india/coimbatore', 'india - coimbatore'].includes(normalized)) return 'Coimbatore';
+    if (['usa', 'us', 'united states', 'remote', 'wfh'].includes(normalized)) return 'USA';
+    if (['canada', 'can'].includes(normalized)) return 'Canada';
+
+    return '';
+  };
+
+  return mapLocation(value) || mapLocation(fallback) || 'USA';
 }
 
 function parseJoinedDate(value) {
@@ -197,7 +271,7 @@ async function syncCompletedOnboardingUser(request) {
     existingUser.status = 'Active';
     existingUser.jobTitle = String(request.jobTitle || existingUser.jobTitle || '').trim();
     existingUser.dept = String(request.department || existingUser.dept || '').trim();
-    existingUser.location = normalizePortalLocation(request.location, existingUser.location || 'Remote');
+    existingUser.location = normalizePortalLocation(request.location, existingUser.location || 'USA');
     existingUser.joined = parseJoinedDate(request.startDate || existingUser.joined);
     existingUser.appAccess = [...new Set([...(existingUser.appAccess || []), ...appAccess])];
     await existingUser.save();
@@ -398,6 +472,14 @@ async function resolveRequestTypePeople(input = {}, userDirectory = null) {
 
 function formatRequestTypeDefinition(doc) {
   const source = doc.toObject ? doc.toObject() : { ...doc };
+  const allowDefaultAssignee = supportsRequestTypeDefaultAssignee({
+    workflowType: source.workflowType,
+    workflowLabel: source.workflowLabel,
+  });
+  const hasRequestorDefaultAssignee = isRequestorAssigneeRef({
+    userId: source.defaultAssigneeUserId,
+    name: source.defaultAssignee,
+  });
   return {
     id: source._id?.toString?.() || source.id || '',
     workflowType: source.workflowType,
@@ -409,9 +491,9 @@ function formatRequestTypeDefinition(doc) {
     sourceWorkflowKey: source.sourceWorkflowKey || source.workflowType,
     sortOrder: Number(source.sortOrder || 0),
     isActive: source.isActive !== false,
-    defaultAssignee: source.defaultAssignee || '',
-    defaultAssigneeUserId: source.defaultAssigneeUserId || '',
-    defaultAssigneeEmail: source.defaultAssigneeEmail || '',
+    defaultAssignee: allowDefaultAssignee && !hasRequestorDefaultAssignee ? (source.defaultAssignee || '') : '',
+    defaultAssigneeUserId: allowDefaultAssignee && !hasRequestorDefaultAssignee ? (source.defaultAssigneeUserId || '') : '',
+    defaultAssigneeEmail: allowDefaultAssignee && !hasRequestorDefaultAssignee ? (source.defaultAssigneeEmail || '') : '',
     autoAddDepartmentApps: !!source.autoAddDepartmentApps,
     isSystem: !!source.isSystem,
     formFields: normalizeRequestTypeFormFields(source.formFields || []),
@@ -470,6 +552,14 @@ async function ensureDefaultRequestTypes() {
           field.required = true;
         }
       });
+    } else if (item.workflowType === 'offboarding') {
+      nextFormFields.forEach(field => {
+        if (field.key === 'applications') {
+          if (!field.enabled || field.required) changed = true;
+          field.enabled = true;
+          field.required = false;
+        }
+      });
     }
 
     if (nextFormFields.length !== existingFormFields.length) changed = true;
@@ -503,6 +593,14 @@ async function createRequestTypeDefinition(input = {}) {
   const userDirectory = await loadUserDirectory();
   const people = await resolveRequestTypePeople(input, userDirectory);
   const autoAddDepartmentApps = !!input.autoAddDepartmentApps;
+  const allowDefaultAssignee = supportsRequestTypeDefaultAssignee({
+    workflowType,
+    workflowLabel: input.workflowLabel,
+  });
+  const hasRequestorDefaultAssignee = isRequestorAssigneeRef({
+    userId: people.defaultAssigneeUserId,
+    name: people.defaultAssignee,
+  });
   const formFields = normalizeRequestTypeFormFields(input.formFields || []).map(field => (
     field.key === 'department' && autoAddDepartmentApps
       ? { ...field, enabled: true, required: true }
@@ -520,9 +618,9 @@ async function createRequestTypeDefinition(input = {}) {
     sourceWorkflowKey: workflowType,
     sortOrder: Number(input.sortOrder || 0),
     isActive: input.isActive !== false,
-    defaultAssignee: people.defaultAssignee,
-    defaultAssigneeUserId: people.defaultAssigneeUserId,
-    defaultAssigneeEmail: people.defaultAssigneeEmail,
+    defaultAssignee: allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssignee : '',
+    defaultAssigneeUserId: allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeUserId : '',
+    defaultAssigneeEmail: allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeEmail : '',
     autoAddDepartmentApps,
     formFields,
     checklist: people.checklist,
@@ -539,15 +637,23 @@ async function updateRequestTypeDefinition(id, input = {}) {
   const userDirectory = await loadUserDirectory();
   const people = await resolveRequestTypePeople(input, userDirectory);
   if (!people.checklist.length) throw new Error('Add at least one workflow step.');
+  const allowDefaultAssignee = supportsRequestTypeDefaultAssignee({
+    workflowType: requestType.workflowType,
+    workflowLabel: input.workflowLabel || requestType.workflowLabel,
+  });
+  const hasRequestorDefaultAssignee = isRequestorAssigneeRef({
+    userId: people.defaultAssigneeUserId,
+    name: people.defaultAssignee,
+  });
 
   if (String(input.workflowLabel || '').trim()) requestType.workflowLabel = String(input.workflowLabel).trim();
   requestType.description = String(input.description || '').trim();
   requestType.className = REQUEST_TYPE_CLASSNAMES.includes(input.className) ? input.className : requestType.className;
   requestType.sortOrder = Number(input.sortOrder || 0);
   requestType.isActive = input.isActive !== false;
-  requestType.defaultAssignee = people.defaultAssignee;
-  requestType.defaultAssigneeUserId = people.defaultAssigneeUserId;
-  requestType.defaultAssigneeEmail = people.defaultAssigneeEmail;
+  requestType.defaultAssignee = allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssignee : '';
+  requestType.defaultAssigneeUserId = allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeUserId : '';
+  requestType.defaultAssigneeEmail = allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeEmail : '';
   requestType.autoAddDepartmentApps = !!input.autoAddDepartmentApps;
   requestType.formFields = normalizeRequestTypeFormFields(input.formFields || []).map(field => (
     field.key === 'department' && requestType.autoAddDepartmentApps
@@ -558,6 +664,22 @@ async function updateRequestTypeDefinition(id, input = {}) {
 
   await requestType.save();
   return formatRequestTypeDefinition(requestType);
+}
+
+async function deleteRequestTypeDefinition(id) {
+  await ensureDefaultRequestTypes();
+  const requestType = await SupportRequestType.findById(id);
+  if (!requestType) throw new Error('Request type not found.');
+  if (requestType.isSystem) {
+    throw new Error('System request types cannot be deleted. Disable this request type instead.');
+  }
+
+  await requestType.deleteOne();
+  return {
+    id: requestType._id?.toString?.() || String(id),
+    workflowType: requestType.workflowType,
+    workflowLabel: requestType.workflowLabel,
+  };
 }
 
 function buildSlackChecklist(workflow) {
@@ -708,25 +830,31 @@ async function buildChecklistForCreate(body = {}, workflow = null, userDirectory
   return [...checklist, ...appTasks];
 }
 
-async function addRequestedApplicationTasks(checklist = [], applications = [], userDirectory = null) {
+async function addRequestedApplicationTasks(checklist = [], applications = [], userDirectory = null, options = {}) {
   if (!applications.length) return checklist;
+
+  const keyPrefix = String(options.keyPrefix || 'app_access_');
+  const labelSuffix = String(options.labelSuffix || 'access granted').trim() || 'access granted';
+  const dependencyKeys = Array.isArray(options.dependencyKeys) && options.dependencyKeys.length
+    ? options.dependencyKeys
+    : ['approval_recorded', 'access_review'];
 
   const software = await Software.find({ csvId: { $in: applications.map(app => app.csvId) } })
     .select('csvId name owner admins provisioningMethod connectorType supportsDeprovision provisioningNotes')
     .lean();
   const softwareById = new Map(software.map(item => [item.csvId, item]));
   const existingKeys = new Set(checklist.map(item => item.key));
-  const dependencyKey = checklist.find(item => item.key === 'approval_recorded')?.key
-    || checklist.find(item => item.key === 'access_review')?.key
-    || '';
+  const dependencyKey = dependencyKeys
+    .map(key => checklist.find(item => item.key === key)?.key || '')
+    .find(Boolean) || '';
 
   const appTasks = applications
     .map(app => {
       const softwareItem = softwareById.get(app.csvId);
       const owner = softwareDefaultOwner(softwareItem, userDirectory);
       return {
-        key: `app_access_${String(app.csvId).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
-        label: `${app.name} access granted`,
+        key: `${keyPrefix}${String(app.csvId).toLowerCase().replace(/[^a-z0-9]+/g, '_')}`,
+        label: `${app.name} ${labelSuffix}`,
         area: 'Applications',
         softwareCsvId: app.csvId,
         provisioningMethod: softwareItem?.provisioningMethod || 'Manual',
@@ -747,15 +875,16 @@ async function addRequestedApplicationTasks(checklist = [], applications = [], u
   return [...checklist, ...appTasks];
 }
 
-async function syncRequestedApplicationTasks(checklist = [], applications = [], userDirectory = null) {
-  const preservedSteps = checklist.filter(item => !(item.softwareCsvId && item.key.startsWith('app_access_')));
+async function syncRequestedApplicationTasks(checklist = [], applications = [], userDirectory = null, options = {}) {
+  const keyPrefix = String(options.keyPrefix || 'app_access_');
+  const preservedSteps = checklist.filter(item => !(item.softwareCsvId && item.key.startsWith(keyPrefix)));
   const existingAppSteps = new Map(
     checklist
-      .filter(item => item.softwareCsvId && item.key.startsWith('app_access_'))
+      .filter(item => item.softwareCsvId && item.key.startsWith(keyPrefix))
       .map(item => [item.softwareCsvId, item])
   );
 
-  const withRequestedApps = await addRequestedApplicationTasks(preservedSteps, applications, userDirectory);
+  const withRequestedApps = await addRequestedApplicationTasks(preservedSteps, applications, userDirectory, options);
   return withRequestedApps.map(item => {
     if (!item.softwareCsvId || !existingAppSteps.has(item.softwareCsvId)) return item;
     const existing = existingAppSteps.get(item.softwareCsvId);
@@ -771,28 +900,137 @@ async function syncRequestedApplicationTasks(checklist = [], applications = [], 
   });
 }
 
+function hasExplicitAssigneeInput(body = {}) {
+  return ['assignee', 'assigneeUserId', 'assigneeEmail']
+    .some(key => String(body[key] || '').trim().length > 0);
+}
+
+function resolveReportingManagerRef(userRef = {}, userDirectory = null) {
+  const managerName = String(userRef?.reportingManager || '').trim();
+  if (!managerName) return null;
+
+  const resolved = resolveUserRef({ name: managerName }, userDirectory);
+  if (resolved.userId || resolved.email || resolved.name) return resolved;
+
+  return {
+    userId: '',
+    name: managerName,
+    email: '',
+    reportingManager: '',
+  };
+}
+
+function resolveManagerApprovalDefaultAssignee({
+  body = {},
+  actor = {},
+  manager = {},
+  requiresManagerApproval = false,
+  userDirectory = null,
+} = {}) {
+  if (!requiresManagerApproval) return null;
+  if (hasExplicitAssigneeInput(body)) return null;
+
+  const requesterRef = resolveUserRef(
+    {
+      userId: actor.id,
+      email: actor.email,
+      name: actor.name,
+    },
+    userDirectory
+  );
+  const employeeRef = resolveUserRef(
+    {
+      email: body.employeeEmail,
+      name: body.employeeName,
+    },
+    userDirectory
+  );
+
+  const candidates = [
+    resolveReportingManagerRef(requesterRef, userDirectory),
+    resolveReportingManagerRef(employeeRef, userDirectory),
+    (manager.userId || manager.email || manager.name) ? manager : null,
+  ].filter(Boolean);
+
+  return candidates[0] || null;
+}
+
+function resolveConfiguredWorkflowAssignee(workflow = {}, userDirectory = null) {
+  const workflowAssigneeRef = {
+    userId: workflow.defaultAssigneeUserId,
+    email: workflow.defaultAssigneeEmail,
+    name: workflow.defaultAssignee,
+  };
+  if (isRequestorAssigneeRef(workflowAssigneeRef)) {
+    return { userId: '', name: '', email: '', reportingManager: '', appAccess: [], department: '', location: '', jobTitle: '' };
+  }
+  return resolveUserRef(workflowAssigneeRef, userDirectory);
+}
+
+function resolveEmployeeProfile(body = {}, userDirectory = null) {
+  return resolveUserRef(
+    {
+      email: body.employeeEmail,
+      name: body.employeeName,
+    },
+    userDirectory
+  );
+}
+
+async function resolveSupportRequestApplications(body = {}, workflow = {}, userDirectory = null, employeeProfile = null) {
+  const requestedApplications = await normalizeRequestedApplications(body.applications || []);
+  if (requestedApplications.length) return requestedApplications;
+  if (workflow.workflowType !== 'offboarding') return requestedApplications;
+
+  const employee = employeeProfile || resolveEmployeeProfile(body, userDirectory);
+  const employeeAppAccess = Array.isArray(employee.appAccess) ? employee.appAccess : [];
+  if (!employeeAppAccess.length) return requestedApplications;
+
+  return normalizeRequestedApplications(employeeAppAccess);
+}
+
 async function createSupportRequest(body = {}, actor = {}, options = {}) {
   const userDirectory = await loadUserDirectory();
   const workflow = await resolveWorkflowDefinition(body.workflowType);
-  const applications = await normalizeRequestedApplications(body.applications || []);
+  const slackContext = options.slackContext || {};
+  const requestorRef = resolveRequestorRef(actor, userDirectory);
+  const employeeProfile = resolveEmployeeProfile(body, userDirectory);
+  const applications = await resolveSupportRequestApplications(body, workflow, userDirectory, employeeProfile);
+  const employeeName = String(body.employeeName || '').trim() || employeeProfile.name || '';
+  const employeeEmail = String(body.employeeEmail || '').trim().toLowerCase() || employeeProfile.email || '';
+  const department = String(body.department || '').trim() || employeeProfile.department || '';
+  const jobTitle = String(body.jobTitle || '').trim() || employeeProfile.jobTitle || '';
+  const location = String(body.location || '').trim() || employeeProfile.location || '';
   let checklist = await buildChecklistForCreate(body, workflow, userDirectory);
   if (workflow.workflowType === 'application_access') {
     checklist = await addRequestedApplicationTasks(checklist, applications, userDirectory);
+  } else if (workflow.workflowType === 'offboarding') {
+    checklist = await addRequestedApplicationTasks(checklist, applications, userDirectory, OFFBOARDING_APP_TASK_OPTIONS);
   }
+  checklist = applyRequestorChecklistOwners(checklist, requestorRef);
+  const requiresManagerApproval = checklist.some(item => item?.approvalMode === 'manager');
 
   const manager = resolveUserRef(
     {
       userId: body.managerUserId,
       email: body.managerEmail,
-      name: body.managerName,
+      name: body.managerName || employeeProfile.reportingManager,
     },
     userDirectory
   );
+  const defaultAssignee = resolveManagerApprovalDefaultAssignee({
+    body,
+    actor,
+    manager,
+    requiresManagerApproval,
+    userDirectory,
+  });
+  const workflowAssignee = resolveConfiguredWorkflowAssignee(workflow, userDirectory);
   const assignee = resolveUserRef(
     {
-      userId: body.assigneeUserId || workflow.defaultAssigneeUserId,
-      email: body.assigneeEmail || workflow.defaultAssigneeEmail,
-      name: body.assignee || workflow.defaultAssignee,
+      userId: body.assigneeUserId || workflowAssignee.userId || defaultAssignee?.userId,
+      email: body.assigneeEmail || workflowAssignee.email || defaultAssignee?.email,
+      name: body.assignee || workflowAssignee.name || defaultAssignee?.name,
     },
     userDirectory
   );
@@ -804,13 +1042,18 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
     sourceWorkflowSourceId: workflow.sourceWorkflowSourceId || '',
     sourceWorkflowKey: workflow.sourceWorkflowKey || '',
     requestedVia: options.requestedVia || 'portal',
+    slackChannelId: String(slackContext.channelId || body.slackChannelId || '').trim(),
+    slackMessageTs: String(slackContext.messageTs || body.slackMessageTs || '').trim(),
+    slackThreadTs: String(slackContext.threadTs || body.slackThreadTs || '').trim(),
+    slackTeamId: String(slackContext.teamId || body.slackTeamId || '').trim(),
+    slackCommandUserId: String(slackContext.commandUserId || actor.id || '').trim(),
     priority: body.priority || 'medium',
-    employeeName: body.employeeName,
-    employeeEmail: body.employeeEmail,
-    department: body.department || '',
-    jobTitle: body.jobTitle || '',
-    location: body.location || '',
-    managerName: manager.name || String(body.managerName || '').trim(),
+    employeeName: employeeName,
+    employeeEmail: employeeEmail,
+    department: department,
+    jobTitle: jobTitle,
+    location: location,
+    managerName: manager.name || String(body.managerName || employeeProfile.reportingManager || '').trim(),
     managerUserId: manager.userId || '',
     managerEmail: manager.email || String(body.managerEmail || '').trim().toLowerCase(),
     startDate: body.startDate || '',
@@ -829,6 +1072,14 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
 
 async function applySupportRequestUpdates(request, body = {}) {
   const userDirectory = await loadUserDirectory();
+  const requestorRef = resolveRequestorRef(
+    {
+      userId: request.requestedById,
+      email: request.requestedByEmail,
+      name: request.requestedByName,
+    },
+    userDirectory
+  );
 
   const manager = resolveUserRef(
     {
@@ -850,9 +1101,15 @@ async function applySupportRequestUpdates(request, body = {}) {
     },
     userDirectory
   );
-  request.assignee = assignee.name || '';
-  request.assigneeUserId = assignee.userId || '';
-  request.assigneeEmail = assignee.email || '';
+  if (isRequestorAssigneeRef(assignee)) {
+    request.assignee = String(request.requestedByName || '').trim();
+    request.assigneeUserId = String(request.requestedById || '').trim();
+    request.assigneeEmail = String(request.requestedByEmail || '').trim().toLowerCase();
+  } else {
+    request.assignee = assignee.name || '';
+    request.assigneeUserId = assignee.userId || '';
+    request.assigneeEmail = assignee.email || '';
+  }
 
   if (body.applications !== undefined) {
     request.applications = await normalizeRequestedApplications(body.applications || []);
@@ -860,10 +1117,18 @@ async function applySupportRequestUpdates(request, body = {}) {
 
   if (Array.isArray(body.checklist)) {
     request.checklist = await hydrateChecklistUsers(sanitizeChecklist(body.checklist), userDirectory);
+    request.checklist = applyRequestorChecklistOwners(request.checklist, requestorRef);
   }
 
   if (body.applications !== undefined && request.workflowType === 'application_access') {
     request.checklist = await syncRequestedApplicationTasks(request.checklist || [], request.applications, userDirectory);
+  } else if (body.applications !== undefined && request.workflowType === 'offboarding') {
+    request.checklist = await syncRequestedApplicationTasks(
+      request.checklist || [],
+      request.applications,
+      userDirectory,
+      OFFBOARDING_APP_TASK_OPTIONS
+    );
   }
 
   return request;
@@ -896,6 +1161,7 @@ module.exports = {
   buildChecklistForCreate,
   createRequestTypeDefinition,
   createSupportRequest,
+  deleteRequestTypeDefinition,
   formatRequestTypeDefinition,
   formatWorkflowTypeLabel,
   getRequestTypeDefinition,

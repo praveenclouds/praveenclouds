@@ -38,6 +38,7 @@ const adminScimRoutes        = require('./routes/admin/scim.routes');
 const adminConnectorRoutes   = require('./routes/admin/connectors.routes');
 const adminRolePermissionRoutes = require('./routes/admin/role-permissions.routes');
 const adminSlackWorkflowRoutes = require('./routes/admin/slack-workflows.routes');
+const sheetSyncRoutes          = require('./routes/sheet-sync.routes');
 
 // ── App setup ──────────────────────────────────────────────────────────────────
 const app = express();
@@ -89,6 +90,88 @@ app.use('/api/admin/scim',         adminScimRoutes);
 app.use('/api/admin/connectors',   adminConnectorRoutes);
 app.use('/api/admin/role-permissions', adminRolePermissionRoutes);
 app.use('/api/admin/slack-workflows', adminSlackWorkflowRoutes);
+app.use('/api/sheet-sync',           sheetSyncRoutes);
+
+// ── Inline sheet-sync /run endpoint (reads tmp-sheet-data.json, runs sync) ──
+app.get('/api/sheet-sync/run', async (req, res) => {
+  const fs   = require('fs');
+  const path = require('path');
+  const User     = require('./db/models/User');
+  const Software = require('./db/models/Software');
+  const SW_ALIASES = {
+    'Canva':'canva','Slack':'slack','Asana':'asana','Zoom':'zoom',
+    'Adobe':'adobe','Microsoft365':'microsoft','Loom':'loom','OpenVPN':'openvpn',
+    'Gsuite':'google','Hubspot':'hubspot','AWS':'aws','intellij':'intellij',
+    'Gong':'gong','vercel':'vercel','Chatgpt':'chatgpt','Freshteam':'freshteam',
+    'Plaid':'plaid','Github':'github','Productboard':'productboard','Jira':'jira',
+    'Datadog':'datadog','Docusign':'docusign','Sendgrid':'sendgrid',
+    'Windsurf':'windsurf','Jenkins':'jenkins','ChatPRD':'chatprd','Miro':'miro',
+  };
+  const norm = s => (s||'').toLowerCase().trim();
+  try {
+    const filePath = path.join(__dirname, 'tmp-sheet-data.json');
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'tmp-sheet-data.json not found' });
+    const sheetData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const [allUsers, allSoftware] = await Promise.all([User.find({}).lean(), Software.find({}).lean()]);
+    function getSw(sheetName) {
+      const kw = SW_ALIASES[sheetName] || norm(sheetName);
+      return allSoftware.find(s => norm(s.name).includes(kw) || kw.includes(norm(s.name).split(' ')[0])) || null;
+    }
+    const accessMap = new Map();
+    const rolesMap  = new Map();
+    allUsers.forEach(u => {
+      accessMap.set(u._id.toString(), new Set(Array.isArray(u.appAccess) ? u.appAccess : []));
+      rolesMap.set(u._id.toString(), { ...(u.appRoles || {}) });
+    });
+    const report = {}, notInPortal = {};
+    for (const [sheetName, shUsers] of Object.entries(sheetData)) {
+      const sw = getSw(sheetName);
+      report[sheetName] = { csvId: sw?.csvId || '?', total: shUsers.length, matched: 0, missing: [] };
+      if (!sw || !shUsers.length) continue;
+      for (const zu of shUsers) {
+        const u = allUsers.find(x => x.email.toLowerCase() === (zu.email||'').toLowerCase());
+        if (!u) { report[sheetName].missing.push(zu.email); (notInPortal[zu.email] = notInPortal[zu.email]||[]).push(sheetName); continue; }
+        const uid = u._id.toString();
+        accessMap.get(uid).add(sw.csvId);
+        rolesMap.get(uid)[sw.csvId] = zu.role || 'Member';
+        report[sheetName].matched++;
+      }
+    }
+    let updated = 0, errors = 0;
+    for (const u of allUsers) {
+      const uid = u._id.toString();
+      const newAccess = Array.from(accessMap.get(uid)||[]);
+      const newRoles  = rolesMap.get(uid)||{};
+      const oldAccess = Array.isArray(u.appAccess) ? u.appAccess : [];
+      const changed = newAccess.some(id=>!oldAccess.includes(id)) || oldAccess.some(id=>!newAccess.includes(id)) || JSON.stringify(u.appRoles||{}) !== JSON.stringify(newRoles);
+      if (!changed) continue;
+      try { await User.findByIdAndUpdate(u._id, { appAccess: newAccess, appRoles: newRoles, $set: { appRoles: newRoles } }); updated++; } catch(e) { errors++; }
+    }
+    try { fs.unlinkSync(filePath); } catch(_) {}
+    res.json({ ok: true, report, notInPortal, updated, errors });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── ONE-TIME migration: fix all legacy location values ─────────────────────────
+app.get('/api/migrate-location', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const col = mongoose.connection.db.collection('users');
+    const r1 = await col.updateMany(
+      { location: { $in: ['Chennai', 'Coimbatore'] } },
+      { $set: { location: 'India' } }
+    );
+    const r2 = await col.updateMany(
+      { location: 'Remote' },
+      { $set: { location: 'USA' } }
+    );
+    res.json({
+      ok: true,
+      india: { matched: r1.matchedCount, updated: r1.modifiedCount },
+      usa:   { matched: r2.matchedCount, updated: r2.modifiedCount },
+    });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
 
 // ── SCIM 2.0 — force application/scim+json content-type ───────────────────────
 app.use('/scim/v2', (req, res, next) => {

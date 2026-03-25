@@ -73,7 +73,7 @@ const assetSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      enum: ['Chennai', 'Coimbatore', 'USA', 'Canada'],
+      enum: ['India', 'USA', 'Canada'],
       required: true,
     },
     dept: {

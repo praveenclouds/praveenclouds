@@ -57,8 +57,8 @@ const userSchema = new mongoose.Schema(
     },
     location: {
       type: String,
-      enum: ['Chennai', 'Coimbatore', 'USA', 'Canada'],
-      default: 'Chennai',
+      enum: ['India', 'USA', 'Canada'],
+      default: 'India',
     },
     employmentType: {
       type: String,
@@ -85,6 +85,11 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
       comment: 'Array of Software csvIds this user has been granted access to',
+    },
+    appRoles: {
+      type: Object,
+      default: {},
+      comment: 'Map of Software csvId → role (e.g. { "A-01": "Admin", "A-03": "Member" })',
     },
   },
   {

@@ -1065,6 +1065,7 @@
               <div class="panel-title">Workflow Builder</div>
               <div style="display:flex;gap:10px;align-items:center">
                 <button class="btn btn-secondary" type="button" onclick="addRequestTypeStep()">Add Step</button>
+                <button class="btn btn-danger" type="button" id="deleteRequestTypeBtn" onclick="deleteRequestType()" style="display:none">Delete Request Type</button>
                 <button class="btn btn-primary" type="button" id="saveRequestTypeBtn" onclick="saveRequestType()">Save Request Type</button>
               </div>
             </div>
@@ -1249,6 +1250,9 @@
       { value: 'onboarding', label: 'Onboarding' },
       { value: 'offboarding', label: 'Offboarding' },
     ];
+    const DEFAULT_ASSIGNEE_REQUEST_TYPES = new Set(['app_hardware_issue', 'app_hardware_support']);
+    const REQUESTOR_ASSIGNMENT_USER_ID = '__requestor__';
+    const REQUESTOR_ASSIGNMENT_LABEL = 'Requestor';
     let REQUEST_TYPE_META = { ...BUILTIN_REQUEST_TYPE_META };
     let SUMMARY_REQUEST_TYPES = Object.keys(BUILTIN_REQUEST_TYPE_META);
     let workflowOptions = [];
@@ -1347,6 +1351,17 @@
         .replace(/[^a-z0-9]+/g, '_')
         .replace(/^_+|_+$/g, '')
         .slice(0, 80);
+    }
+
+    function requestTypeSupportsDefaultAssignee(definition = {}) {
+      const workflowType = slugify(definition.workflowType || '');
+      if (DEFAULT_ASSIGNEE_REQUEST_TYPES.has(workflowType)) return true;
+      return String(definition.workflowLabel || '').trim().toLowerCase() === 'application and hardware support';
+    }
+
+    function isRequestorAssignmentSelection({ userId = '', name = '' } = {}) {
+      if (String(userId || '').trim() === REQUESTOR_ASSIGNMENT_USER_ID) return true;
+      return String(name || '').trim().toLowerCase() === REQUESTOR_ASSIGNMENT_LABEL.toLowerCase();
     }
 
     function userFullName(user) {
@@ -1452,6 +1467,12 @@
           dept: user.dept || '',
           role: user.role || '',
           status: String(user.status || '').trim(),
+          reportingManager: String(user.reportingManager || '').trim(),
+          location: String(user.location || '').trim(),
+          jobTitle: String(user.jobTitle || '').trim(),
+          appAccess: Array.isArray(user.appAccess)
+            ? [...new Set(user.appAccess.map(value => String(value || '').trim()).filter(Boolean))]
+            : [],
         }))
         .filter(user => user.id && user.name && user.status.toLowerCase() === 'active')
         .sort((a, b) => a.name.localeCompare(b.name));
@@ -1485,18 +1506,105 @@
       );
     }
 
-    function userOptionsMarkup({ selectedUserId = '', blankLabel = 'Select user', currentName = '', currentEmail = '' } = {}) {
+    function supportUserByIdentity({ email = '', name = '' } = {}) {
+      const normalizedEmail = String(email || '').trim().toLowerCase();
+      const normalizedName = String(name || '').trim();
+      if (normalizedEmail) {
+        const byEmail = supportUserByEmail(normalizedEmail);
+        if (byEmail) return byEmail;
+      }
+      if (normalizedName) {
+        const byName = supportUserByName(normalizedName);
+        if (byName) return byName;
+      }
+      return null;
+    }
+
+    function applicationsForAccessIds(accessIds = []) {
+      if (!accessIds.length) return [];
+
+      const softwareById = new Map(
+        (softwareInventory || [])
+          .filter(app => app?.csvId && app?.name)
+          .map(app => [app.csvId, app])
+      );
+
+      return accessIds
+        .map(csvId => softwareById.get(csvId))
+        .filter(Boolean)
+        .map(app => ({ csvId: app.csvId, name: app.name }));
+    }
+
+    function offboardingApplicationsForEmployee({ email = '', name = '', user = null } = {}) {
+      const matchedUser = user || supportUserByIdentity({ email, name });
+      const accessIds = Array.isArray(matchedUser?.appAccess)
+        ? matchedUser.appAccess
+        : [];
+      return applicationsForAccessIds(accessIds);
+    }
+
+    function syncCreateOffboardingApplications() {
+      const requestType = document.getElementById('newWorkflowType')?.value || '';
+      if (requestType !== 'offboarding') return;
+
+      const definition = currentCreateDefinition();
+      const formFields = normalizedFormFields(definition);
+      const fieldEnabled = (key) => !!formFields.find(field => field.key === key)?.enabled;
+
+      const emailInput = document.getElementById('newEmployeeEmail');
+      const nameInput = document.getElementById('newEmployeeName');
+      const departmentInput = document.getElementById('newDepartment');
+      const locationInput = document.getElementById('newLocation');
+      const jobTitleInput = document.getElementById('newJobTitle');
+      const managerSelect = document.getElementById('newManagerName');
+
+      if (!emailInput || !nameInput) return;
+      const user = supportUserByIdentity({
+        email: emailInput.value,
+        name: nameInput.value,
+      });
+
+      if (user) {
+        if (fieldEnabled('employeeName') && user.name) nameInput.value = user.name;
+        if (fieldEnabled('employeeEmail') && user.email) emailInput.value = user.email;
+        if (fieldEnabled('department') && departmentInput && user.dept) departmentInput.value = user.dept;
+        if (fieldEnabled('location') && locationInput && user.location) locationInput.value = user.location;
+        if (fieldEnabled('jobTitle') && jobTitleInput && user.jobTitle) jobTitleInput.value = user.jobTitle;
+
+        if (fieldEnabled('managerName') && managerSelect && user.reportingManager) {
+          const managerUser = resolveSupportUserRef({ name: user.reportingManager });
+          managerSelect.innerHTML = userOptionsMarkup({
+            selectedUserId: managerUser?.id || '',
+            blankLabel: 'Select manager',
+            currentName: user.reportingManager || '',
+            currentEmail: managerUser?.email || '',
+          });
+        }
+      }
+
+      if (fieldEnabled('applications')) {
+        setSelectedApplications('create', offboardingApplicationsForEmployee({ user }));
+      }
+      updateDepartmentChecklistPreview();
+    }
+
+    function userOptionsMarkup({ selectedUserId = '', blankLabel = 'Select user', currentName = '', currentEmail = '', includeRequestor = false } = {}) {
       const selectedUser = supportUserById(selectedUserId);
-      const currentUser = selectedUser || supportUserByName(currentName) || supportUserByName(currentEmail);
-      const legacyLabel = !currentUser && currentName
+      const requestorSelected = includeRequestor && isRequestorAssignmentSelection({ userId: selectedUserId, name: currentName });
+      const currentUser = requestorSelected ? null : (selectedUser || supportUserByName(currentName) || supportUserByName(currentEmail));
+      const legacyLabel = !requestorSelected && !currentUser && currentName
         ? `${currentName} (not in User Management)`
         : blankLabel;
-      const legacyOption = !currentUser && currentName
+      const legacyOption = !requestorSelected && !currentUser && currentName
         ? `<option value="" data-legacy-name="${escapeHtml(currentName)}" data-legacy-email="${escapeHtml(currentEmail || '')}" selected>${escapeHtml(legacyLabel)}</option>`
-        : `<option value="" ${selectedUserId || currentUser ? '' : 'selected'}>${escapeHtml(blankLabel)}</option>`;
+        : `<option value="" ${selectedUserId || currentUser || requestorSelected ? '' : 'selected'}>${escapeHtml(blankLabel)}</option>`;
+      const requestorOption = includeRequestor
+        ? `<option value="${REQUESTOR_ASSIGNMENT_USER_ID}" data-special-assignee="requestor" data-legacy-name="${escapeHtml(REQUESTOR_ASSIGNMENT_LABEL)}" data-legacy-email="" ${requestorSelected ? 'selected' : ''}>${escapeHtml(REQUESTOR_ASSIGNMENT_LABEL)}</option>`
+        : '';
 
       return [
         legacyOption,
+        requestorOption,
         ...supportUsers.map(user => `<option value="${escapeHtml(user.id)}" data-user-name="${escapeHtml(user.name)}" data-user-email="${escapeHtml(user.email)}" ${(currentUser?.id || selectedUserId) === user.id ? 'selected' : ''}>${escapeHtml(user.name)}${user.dept ? ` · ${escapeHtml(user.dept)}` : ''}</option>`),
       ].join('');
     }
@@ -1506,6 +1614,9 @@
       if (!select) return { name: '', userId: '', email: '' };
       const option = select.options[select.selectedIndex];
       const userId = select.value;
+      if (userId === REQUESTOR_ASSIGNMENT_USER_ID || option?.dataset?.specialAssignee === 'requestor') {
+        return { name: REQUESTOR_ASSIGNMENT_LABEL, userId: REQUESTOR_ASSIGNMENT_USER_ID, email: '' };
+      }
       const user = supportUserById(userId);
       if (user) {
         return { name: user.name, userId: user.id, email: user.email };
@@ -1894,6 +2005,28 @@
         return;
       }
 
+      if (requestType === 'offboarding') {
+        preview.hidden = false;
+        const employeeName = document.getElementById('newEmployeeName')?.value || '';
+        const employeeEmail = document.getElementById('newEmployeeEmail')?.value || '';
+        const user = supportUserByIdentity({ email: employeeEmail, name: employeeName });
+        if (!selectedApps.length) {
+          note.textContent = user
+            ? 'No app access found for this employee in User Management.'
+            : 'Enter employee name or email to auto-load current app access for revocation.';
+          list.innerHTML = '';
+          return;
+        }
+        note.textContent = `${selectedApps.length} application revocation task${selectedApps.length === 1 ? '' : 's'} will be added to this request.`;
+        list.innerHTML = selectedApps.map(app => `
+          <label class="preview-item">
+            <input type="checkbox" checked disabled />
+            <span>${escapeHtml(app.name)} access revoked</span>
+          </label>
+        `).join('');
+        return;
+      }
+
       if (!definition.autoAddDepartmentApps) {
         preview.hidden = true;
         list.innerHTML = '';
@@ -2246,16 +2379,21 @@
     function renderRequestTypeEditor(options = {}) {
       const editor = document.getElementById('requestTypeEditor');
       const saveBtn = document.getElementById('saveRequestTypeBtn');
+      const deleteBtn = document.getElementById('deleteRequestTypeBtn');
       const state = options.preserveState ? captureRequestTypeEditorState() : null;
       const definition = currentRequestTypeDefinition();
       if (!definition) {
         editor.innerHTML = `<div class="empty">Select a request type to edit its workflow, or create a new one.</div>`;
         saveBtn.style.display = 'none';
+        if (deleteBtn) deleteBtn.style.display = 'none';
         return;
       }
 
       const editable = canEditRequestTypes();
       saveBtn.style.display = editable ? 'inline-flex' : 'none';
+      const canDelete = editable && !!definition.id && !definition.isSystem;
+      if (deleteBtn) deleteBtn.style.display = canDelete ? 'inline-flex' : 'none';
+      const showDefaultAssignee = requestTypeSupportsDefaultAssignee(definition);
       const checklist = Array.isArray(definition.checklist) ? definition.checklist : [];
       const formFields = normalizedFormFields(definition).map(field => (
         field.key === 'department' && definition.autoAddDepartmentApps
@@ -2288,17 +2426,19 @@
             <label>Sort Order</label>
             <input id="requestTypeSortOrder" type="number" value="${escapeHtml(definition.sortOrder || 0)}" ${editable ? '' : 'disabled'} />
           </div>
-          <div class="full">
-            <label>Default Request Assignee</label>
-            <select id="requestTypeDefaultAssignee" ${editable ? '' : 'disabled'}>
-              ${userOptionsMarkup({
-                selectedUserId: definition.defaultAssigneeUserId || '',
-                blankLabel: 'Select default assignee',
-                currentName: definition.defaultAssignee || '',
-                currentEmail: definition.defaultAssigneeEmail || '',
-              })}
-            </select>
-          </div>
+          ${showDefaultAssignee ? `
+            <div class="full">
+              <label>Default Request Assignee</label>
+              <select id="requestTypeDefaultAssignee" ${editable ? '' : 'disabled'}>
+                ${userOptionsMarkup({
+                  selectedUserId: definition.defaultAssigneeUserId || '',
+                  blankLabel: 'Select default assignee',
+                  currentName: definition.defaultAssignee || '',
+                  currentEmail: definition.defaultAssigneeEmail || '',
+                })}
+              </select>
+            </div>
+          ` : ''}
         </div>
 
         <div class="toggle-row">
@@ -2377,6 +2517,7 @@
                       blankLabel: 'Select step assignee',
                       currentName: step.defaultOwner || '',
                       currentEmail: step.defaultOwnerEmail || '',
+                      includeRequestor: true,
                     })}
                   </select>
                 </div>
@@ -2436,6 +2577,15 @@
     function updateRequestTypeStepOwner(index, userId) {
       const definition = currentRequestTypeDefinition();
       if (!definition?.checklist?.[index]) return;
+      const select = document.querySelector(`[data-editor-key="step-${index}-owner"]`);
+      const option = select?.options?.[select.selectedIndex];
+      if (userId === REQUESTOR_ASSIGNMENT_USER_ID || option?.dataset?.specialAssignee === 'requestor') {
+        definition.checklist[index].defaultOwner = REQUESTOR_ASSIGNMENT_LABEL;
+        definition.checklist[index].defaultOwnerUserId = REQUESTOR_ASSIGNMENT_USER_ID;
+        definition.checklist[index].defaultOwnerEmail = '';
+        renderRequestTypeEditor({ preserveState: true });
+        return;
+      }
       const user = supportUserById(userId);
       definition.checklist[index].defaultOwner = user?.name || '';
       definition.checklist[index].defaultOwnerUserId = user?.id || '';
@@ -2522,7 +2672,13 @@
         sortOrder: Number(document.getElementById('requestTypeSortOrder').value || 0),
         isActive: document.getElementById('requestTypeActive').checked,
         ...(() => {
-          const assignee = resolveUserSelection('requestTypeDefaultAssignee');
+          const shouldIncludeDefaultAssignee = requestTypeSupportsDefaultAssignee({
+            workflowType: document.getElementById('requestTypeWorkflowType').value.trim(),
+            workflowLabel: document.getElementById('requestTypeWorkflowLabel').value.trim(),
+          });
+          const assignee = shouldIncludeDefaultAssignee
+            ? resolveUserSelection('requestTypeDefaultAssignee')
+            : { name: '', userId: '', email: '' };
           return {
             defaultAssignee: assignee.name,
             defaultAssigneeUserId: assignee.userId,
@@ -2574,6 +2730,43 @@
       }
     }
 
+    async function deleteRequestType() {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.id || !canEditRequestTypes()) return;
+      if (definition.isSystem) {
+        showToast('System request types cannot be deleted. Disable this request type instead.', 'danger');
+        return;
+      }
+      if (!window.confirm(`Delete request type "${definition.workflowLabel || definition.workflowType}"? This cannot be undone.`)) return;
+
+      const btn = document.getElementById('deleteRequestTypeBtn');
+      const originalLabel = btn?.textContent || 'Delete Request Type';
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Deleting…';
+      }
+
+      try {
+        const res = await authFetch(`${API}/request-types/${definition.id}`, { method: 'DELETE' });
+        const data = await readApiResponse(res);
+        if (!res.ok) {
+          showToast(data.error || 'Failed to delete request type', 'danger');
+          return;
+        }
+        showToast('Request type deleted');
+        selectedRequestTypeId = null;
+        requestTypeDraft = null;
+        await loadRequestTypes();
+      } catch (e) {
+        showToast(e.message, 'danger');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = originalLabel;
+        }
+      }
+    }
+
     async function init() {
       if (!token) { location.href = '/login'; return; }
       try {
@@ -2592,6 +2785,8 @@
         document.getElementById('mailTemplateActions').style.display = 'none';
         setMailTemplateMode('overview');
         await loadReferenceData();
+        document.getElementById('newEmployeeEmail')?.addEventListener('input', syncCreateOffboardingApplications);
+        document.getElementById('newEmployeeName')?.addEventListener('input', syncCreateOffboardingApplications);
         if (canManageMailTemplates()) {
           await loadMailTemplates();
         } else {
@@ -3129,6 +3324,7 @@
       const definition = currentCreateDefinition();
       const hasRequestType = !!requestType && !!definition;
       renderCreateFormLayout();
+      syncCreateOffboardingApplications();
 
       Object.entries(CREATE_FORM_FIELD_CONFIG).forEach(([key, config]) => {
         const fieldDefinition = normalizedFormFields(definition).find(field => field.key === key);

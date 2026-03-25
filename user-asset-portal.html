@@ -254,9 +254,7 @@
     /* swDmViewMode must be a flex column so the body can grow and scroll */
     #swDmViewMode { display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden; }
     .sw-dm-head { padding:18px 24px 14px;border-bottom:1px solid var(--gray-200);flex-shrink:0; }
-    .sw-dm-tabs { display:flex;gap:2px;padding:0 24px;border-bottom:1px solid var(--gray-200);flex-shrink:0;background:#fff; }
-    .sw-dm-tab { padding:10px 18px;border:none;background:none;font-size:13px;font-weight:600;color:var(--gray-400);cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;transition:all .15s;border-radius:0; }
-    .sw-dm-tab.active { color:var(--primary);border-bottom-color:var(--primary); }
+    .sw-dm-tabs { display:flex;justify-content:space-between;align-items:center;padding:0 24px;border-bottom:1px solid var(--gray-200);flex-shrink:0;background:#fff; }
     .sw-dm-body { flex:1;overflow-y:auto;padding:22px 28px;min-height:0; }
     .sw-dm-panel { display:none; }
     .sw-dm-panel.active { display:block; }
@@ -280,6 +278,31 @@
     .sw-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 16px; }
     .sw-info-item label { font-size:10.5px; font-weight:700; color:var(--gray-400); display:block; margin-bottom:2px; text-transform:uppercase; letter-spacing:.04em; }
     .sw-info-item span { font-size:12.5px; color:var(--gray-700); }
+    /* ── Users with Access table ── */
+    .sw-users-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .sw-users-subhead { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:var(--gray-400); padding:6px 0 4px; border-bottom:1px solid var(--gray-100); margin-bottom:4px; }
+    .sw-user-row { display:grid; grid-template-columns:28px 1fr auto auto auto; align-items:center; gap:8px; padding:6px 4px; border-bottom:1px solid var(--gray-100); }
+    .sw-user-row:last-child { border-bottom:none; }
+    .sw-user-avatar { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
+    .sw-user-info { min-width:0; }
+    .sw-user-name { font-size:12.5px; font-weight:600; color:var(--gray-800); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sw-user-email { font-size:11px; color:var(--gray-400); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .sw-role-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; white-space:nowrap; }
+    .sw-role-admin  { background:#fef3c7; color:#92400e; }
+    .sw-role-owner  { background:#ede9fe; color:#5b21b6; }
+    .sw-role-super  { background:#fee2e2; color:#991b1b; }
+    .sw-role-member { background:var(--gray-100); color:var(--gray-500); }
+    .sw-lic-badge   { font-size:10px; font-weight:600; padding:2px 7px; border-radius:20px; white-space:nowrap; }
+    .sw-lic-yes  { background:#d1fae5; color:#065f46; }
+    .sw-lic-no   { background:#fee2e2; color:#991b1b; }
+    .sw-lic-na   { background:var(--gray-100); color:var(--gray-400); }
+    .sw-user-remove { background:none; border:none; cursor:pointer; color:var(--gray-300); font-size:16px; padding:0 2px; line-height:1; transition:color .15s; }
+    .sw-user-remove:hover { color:#ef4444; }
+    .sw-users-add-row { display:flex; gap:6px; margin-top:10px; align-items:center; }
+    .sw-users-add-row input { flex:1; font-size:12.5px; padding:6px 10px; border:1px solid var(--gray-200); border-radius:7px; }
+    .sw-users-footer { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+    .sw-lic-summary { font-size:11.5px; color:var(--gray-500); }
+    .sw-lic-over { color:#ef4444; font-weight:600; }
     .sw-svc-table { width:100%; border-collapse:collapse; font-size:12.5px; }
     .sw-svc-table th { padding:9px 12px; text-align:left; font-size:10.5px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--gray-200); white-space:nowrap; background:var(--gray-50); }
     .sw-svc-table td { padding:10px 12px; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
@@ -797,7 +820,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <option>Admin</option><option>Manager</option><option>Staff</option>
             </select>
             <select class="filter-select" id="userLocFilter" onchange="renderUsers()">
-              <option value="">All Locations</option><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option>
+              <option value="">All Locations</option><option>India</option><option>USA</option><option>Canada</option>
             </select>
             <select class="filter-select" id="userStatusFilter" onchange="renderUsers()">
               <option value="">All Status</option><option>Active</option><option>Inactive</option>
@@ -823,6 +846,12 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <div class="adv-field"><label>Email</label><input type="text" id="advUserEmail" placeholder="email@…" oninput="renderUsers()"></div>
           <div class="adv-field"><label>Job Title</label><input type="text" id="advUserJobTitle" placeholder="Job title…" oninput="renderUsers()"></div>
           <div class="adv-field"><label>Reporting Manager</label><input type="text" id="advUserManager" placeholder="Manager name…" oninput="renderUsers()"></div>
+          <div class="adv-field">
+            <label>App Access</label>
+            <select id="advUserApp" onchange="renderUsers()" style="min-width:160px">
+              <option value="">All Apps</option>
+            </select>
+          </div>
           <button class="btn btn-secondary btn-sm" onclick="clearAdvSearch('users')" style="align-self:flex-end">✕ Clear</button>
         </div>
         <div class="user-table-scroll">
@@ -848,7 +877,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <option>Customer Support</option><option>Accounts</option>
             </select>
             <select class="filter-select" id="assetLocFilter" onchange="renderAssets()">
-              <option value="">All Locations</option><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option>
+              <option value="">All Locations</option><option>India</option><option>USA</option><option>Canada</option>
             </select>
             <select class="filter-select" id="assetTypeFilter" onchange="renderAssets()">
               <option value="">All Types</option><option>Laptop</option><option>Monitor</option><option>Phone</option><option>Tablet</option><option>Other</option>
@@ -1071,7 +1100,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <select id="userRole"><option>Admin</option><option>Manager</option><option>Staff</option></select>
         </div>
         <div class="form-group"><label>Location</label>
-          <select id="userLocation"><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option></select>
+          <select id="userLocation"><option>India</option><option>USA</option><option>Canada</option></select>
         </div>
         <div class="form-group"><label>Status</label>
           <select id="userStatus"><option>Active</option><option>Inactive</option></select>
@@ -1138,7 +1167,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         <div class="form-group"><label>Brand / Chip</label><input type="text" id="assetBrand" placeholder="Apple / M2 Pro"></div>
         <div class="form-group" style="grid-column:1/-1"><label>Specification</label><input type="text" id="assetDesc" placeholder="16GB RAM - 512GB SSD M2-PRO CHIP"></div>
         <div class="form-group"><label>Location</label>
-          <select id="assetLocation"><option>Chennai</option><option>Coimbatore</option><option>USA</option><option>Canada</option></select>
+          <select id="assetLocation"><option>India</option><option>USA</option><option>Canada</option></select>
         </div>
         <div class="form-group"><label>Vendor</label><input type="text" id="assetVendor" placeholder="Sniper Systems"></div>
         <div class="form-group"><label>Purchase Date</label><input type="date" id="assetPurchaseDate"></div>
@@ -1152,10 +1181,16 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       </div>
     </div>
     <div class="modal-footer" style="justify-content:space-between;">
-      <button class="btn btn-danger" id="assetDeleteBtn" style="display:none" onclick="deleteCurrentAsset()">
-        <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        Delete Asset
-      </button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-danger" id="assetDeleteBtn" style="display:none" onclick="deleteCurrentAsset()">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          Delete Asset
+        </button>
+        <button class="btn btn-secondary" id="assetClearHistoryBtn" style="display:none" onclick="clearAssetHistory()">
+          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+          Clear History
+        </button>
+      </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="btn btn-primary" onclick="saveAsset()">Save Asset</button>
@@ -1562,7 +1597,7 @@ let users = [];
 let assets = [];
 let software = [];
 let appConnectors = [];   // SCIM app connector configs from /api/admin/connectors
-const API = 'http://localhost:3000/api';
+const API = window.location.origin + '/api';
 
 async function loadData(){
   try {
@@ -1629,7 +1664,6 @@ const swColVis = {
   subscriptionPlan:{ label:'Plan',         locked:false, visible:true  },
   renewalPeriod:   { label:'Renewal',      locked:false, visible:true  },
   licenses:        { label:'Licenses',     locked:false, visible:true  },
-  sites:           { label:'Sites',        locked:false, visible:true  },
   owner:           { label:'Owner',        locked:false, visible:false },
   annualCost:      { label:'Annual Cost',  locked:false, visible:false },
 };
@@ -1734,6 +1768,16 @@ function populateSwAdvDropdowns(){
   fill('dlSwDept',   software.flatMap(s=>parseSoftwareDepartments(s.department)));
   fill('dlSwOwner',  software.map(s=>s.owner));
   fill('dlSwAdmin',  software.flatMap(s=>(s.admins||'').split(',').map(a=>a.trim()).filter(Boolean)));
+
+  // Populate App Access filter in user advanced search
+  const appSel = document.getElementById('advUserApp');
+  if(appSel){
+    const current = appSel.value;
+    appSel.innerHTML = '<option value="">All Apps</option>' +
+      [...software].sort((a,b)=>(a.name||'').localeCompare(b.name||''))
+        .map(s=>`<option value="${s.csvId}"${s.csvId===current?' selected':''}>${s.name}</option>`)
+        .join('');
+  }
 }
 
 function updateBadges(){
@@ -1831,6 +1875,7 @@ function filteredUsers(){
   const advEmail   = (document.getElementById('advUserEmail')?.value||'').toLowerCase();
   const advJobTitle= (document.getElementById('advUserJobTitle')?.value||'').toLowerCase();
   const advManager = (document.getElementById('advUserManager')?.value||'').toLowerCase();
+  const advApp     = document.getElementById('advUserApp')?.value||'';
   let list=users.filter(u=>{
     // Hide inactive users unless explicitly filtering for them or "All Status"
     if(!sf && (u.status||'').toLowerCase()==='inactive') return false;
@@ -1843,6 +1888,7 @@ function filteredUsers(){
     if(advEmail   && !(u.email||'').toLowerCase().includes(advEmail))             return false;
     if(advJobTitle&& !(u.jobTitle||'').toLowerCase().includes(advJobTitle))       return false;
     if(advManager && !(u.reportingManager||'').toLowerCase().includes(advManager))return false;
+    if(advApp     && !(u.appAccess||[]).includes(advApp))                         return false;
     return true;
   });
   if(userSort.col){
@@ -2103,7 +2149,7 @@ function openUserModal(u=null){
   const uDeptRO = document.getElementById('userDeptReadOnly');
   if (uDeptRO) uDeptRO.textContent = u ? getUserMappedDept(u) : '—';
   document.getElementById('userRole').value=u?.role||'Staff';
-  document.getElementById('userLocation').value=u?.location||'Chennai';
+  document.getElementById('userLocation').value=u?.location||'India';
   document.getElementById('userStatus').value=u?.status||'Active';
   document.getElementById('userJobTitle').value=u?.jobTitle||'';
   populateReportingManagerSelect(u?.reportingManager||'');
@@ -2327,18 +2373,36 @@ function openAssetModal(a=null){
   brandEl.value = a?.brand||'';
   brandEl.dataset.autoFilled = '';   // reset auto-fill tracking
   document.getElementById('assetDesc').value=a?.desc||'';
-  document.getElementById('assetLocation').value=a?.location||'Chennai';
+  document.getElementById('assetLocation').value=a?.location||'India';
   document.getElementById('assetVendor').value=a?.vendor||'';
   document.getElementById('assetPurchaseDate').value=a?.purchaseDate||'';
   document.getElementById('assetWarrantyEnd').value=a?.warrantyEnd||'';
   document.getElementById('assetNotes').value=a?.notes||'';
   document.getElementById('assetDeleteBtn').style.display=a?'inline-flex':'none';
+  document.getElementById('assetClearHistoryBtn').style.display=a?'inline-flex':'none';
   showOverlay('assetModal');
 }
 
 function deleteCurrentAsset(){
   const id=document.getElementById('assetId').value;
   if(id){ closeModal(); deleteAsset(id); }
+}
+
+function clearAssetHistory(){
+  const csvId=document.getElementById('assetCsvId').value.trim();
+  if(!csvId){ showToast('Asset ID not found','danger'); return; }
+  openConfirm(
+    'Clear Asset History',
+    `This will permanently delete all activity log entries for asset ${csvId}. This cannot be undone.`,
+    async ()=>{
+      try {
+        const res = await authFetch(`${API}/logs/asset/${encodeURIComponent(csvId)}`, { method:'DELETE' });
+        if(!res.ok){ const e=await res.json(); throw new Error(e.error||'Server error'); }
+        const data = await res.json();
+        showToast(`History cleared — ${data.deleted} record(s) removed`, 'success');
+      } catch(e){ showToast('Failed to clear history: '+e.message, 'danger'); }
+    }
+  );
 }
 
 function editAsset(id){ openAssetModal(assets.find(a=>a.id===id)); }
@@ -2391,7 +2455,7 @@ async function saveAsset(){
     brand:document.getElementById('assetBrand').value.trim(),
     desc:document.getElementById('assetDesc').value.trim(),
     location:document.getElementById('assetLocation').value,
-    dept:u?.dept||'',
+    dept:u?.dept||null,
     vendor:document.getElementById('assetVendor').value.trim(),
     purchaseDate:document.getElementById('assetPurchaseDate').value||null,
     warrantyEnd:document.getElementById('assetWarrantyEnd').value||null,
@@ -2577,6 +2641,11 @@ function clearAdvSearch(page){
     software: ['advSwName','advSwDept','advSwOwner','advSwAdmin'],
   };
   (ids[page]||[]).forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  // Reset select fields for users
+  if(page==='users'){
+    const appSel = document.getElementById('advUserApp');
+    if(appSel) appSel.value = '';
+  }
   if(page==='users') renderUsers();
   else if(page==='assets') renderAssets();
   else renderSoftware();
@@ -2736,7 +2805,6 @@ function renderSoftware(){
     subscriptionPlan:{ label:'Plan',         sortable:true,  w:130 },
     renewalPeriod:   { label:'Renewal',      sortable:true,  w:90  },
     licenses:        { label:'Licenses',     sortable:false, w:90  },
-    sites:           { label:'Sites',        sortable:false, w:72  },
     owner:           { label:'Owner',        sortable:true,  w:120 },
     annualCost:      { label:'Annual Cost',  sortable:true,  w:120 },
   };
@@ -3252,12 +3320,22 @@ async function exportAssetPDF(){
 let _swDmCurrentId = null;
 
 function swDmTab(tab){
-  const panels = { overview:'swDmPanelOverview', services:'swDmPanelServices', edit:'swDmPanelEdit' };
-  const btns   = { overview:'swDmTabOvBtn',      services:'swDmTabSvcBtn',     edit:'swDmTabEditBtn' };
+  /* 'services' is now merged into overview */
+  if(tab === 'services') tab = 'overview';
+  const panels = { overview:'swDmPanelOverview', edit:'swDmPanelEdit' };
   Object.keys(panels).forEach(t=>{
     document.getElementById(panels[t])?.classList.toggle('active', t===tab);
-    document.getElementById(btns[t])?.classList.toggle('active', t===tab);
   });
+  const editBtn = document.getElementById('swDmTabEditBtn');
+  if(editBtn){
+    if(tab === 'edit'){
+      editBtn.textContent = '← Overview';
+      editBtn.onclick = () => swDmTab('overview');
+    } else {
+      editBtn.textContent = '✏️ Edit';
+      editBtn.onclick = () => swDmTab('edit');
+    }
+  }
   if(tab==='edit') swdePopulateForm();
 }
 
@@ -3448,6 +3526,9 @@ function openSwDm(id){
     document.getElementById('swDrInfoBody').innerHTML += `<div class="sw-info-item" style="grid-column:1/-1"><label>Provisioning Notes</label><span>${s.provisioningNotes}</span></div>`;
   }
 
+  /* ─ Users with Access ─ */
+  swRenderUsersSection(s);
+
   /* ─ Open overlay ─ */
   document.getElementById('swDmOverlay').classList.add('open');
 }
@@ -3458,9 +3539,167 @@ function openSwDrawer(id){ openSwDm(id); }
 function closeSwDm(){
   document.getElementById('swDmOverlay').classList.remove('open');
   _swDmCurrentId = null;
+  _swUsersEditMode = false;
 }
 /* backward-compat */
 function closeSwDrawer(){ closeSwDm(); }
+
+/* ══════════════════════════════════════════
+   USERS WITH ACCESS — render + edit
+══════════════════════════════════════════ */
+let _swUsersEditMode = false;
+
+function swRenderUsersSection(s){
+  const el = document.getElementById('swDrUsersBody');
+  if(!el) return;
+
+  const csvId   = s.csvId;
+  const swUsers = (users||[]).filter(u => Array.isArray(u.appAccess) && u.appAccess.includes(csvId));
+  const purchased = s.purchasedLicenses || 0;
+
+  /* Determine privileged users:
+     1. Name appears in software.admins field  OR
+     2. appRoles[csvId] contains admin/owner/super */
+  const adminNames = (s.admins||'').split(',').map(n=>n.trim().toLowerCase()).filter(Boolean);
+  const PRIV_ROLES = ['admin','super admin','owner','superadmin','administrator'];
+  function isPriv(u){
+    const fullName = `${u.first||''} ${u.last||''}`.trim().toLowerCase();
+    if(adminNames.some(a => fullName.includes(a) || a.includes(fullName.split(' ')[0]))) return true;
+    const role = (u.appRoles||{})[csvId] || '';
+    return PRIV_ROLES.some(p => role.toLowerCase().includes(p));
+  }
+  function getRoleBadge(u){
+    const role = (u.appRoles||{})[csvId] || '';
+    const r = role.toLowerCase();
+    if(r.includes('super')) return `<span class="sw-role-badge sw-role-super">${role}</span>`;
+    if(r.includes('owner')) return `<span class="sw-role-badge sw-role-owner">${role}</span>`;
+    if(r.includes('admin')) return `<span class="sw-role-badge sw-role-admin">${role}</span>`;
+    if(role && role !== 'Member') return `<span class="sw-role-badge sw-role-member">${role}</span>`;
+    return `<span class="sw-role-badge sw-role-member">Member</span>`;
+  }
+  function getAvatar(u){
+    const colors = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#14b8a6'];
+    const i = (u.first||'?').charCodeAt(0) % colors.length;
+    return `<div class="sw-user-avatar" style="background:${colors[i]}">${(u.first||'?')[0].toUpperCase()}</div>`;
+  }
+
+  const privUsers   = swUsers.filter(u=>isPriv(u));
+  const memberUsers = swUsers.filter(u=>!isPriv(u));
+
+  /* License logic: privileged first, then members, up to purchasedLicenses */
+  const orderedUsers = [...privUsers, ...memberUsers];
+  function getLicBadge(idx){
+    if(!purchased) return `<span class="sw-lic-badge sw-lic-na">—</span>`;
+    return idx < purchased
+      ? `<span class="sw-lic-badge sw-lic-yes">Licensed</span>`
+      : `<span class="sw-lic-badge sw-lic-no">No License</span>`;
+  }
+
+  const editMode = _swUsersEditMode;
+
+  function userRow(u, idx){
+    return `<div class="sw-user-row" data-uid="${u._id||u.id}">
+      ${getAvatar(u)}
+      <div class="sw-user-info">
+        <div class="sw-user-name">${u.first||''} ${u.last||''}</div>
+        <div class="sw-user-email">${u.email||''}</div>
+      </div>
+      ${getRoleBadge(u)}
+      ${getLicBadge(idx)}
+      ${editMode ? `<button class="sw-user-remove rbac-write" title="Remove access" onclick="swRemoveUserAccess('${u._id||u.id}')">×</button>` : '<span></span>'}
+    </div>`;
+  }
+
+  const licensed   = Math.min(purchased, orderedUsers.length);
+  const unlicensed = Math.max(0, orderedUsers.length - purchased);
+  const over       = purchased > 0 && orderedUsers.length > purchased;
+
+  el.innerHTML = `
+    <div class="sw-users-header">
+      <span style="font-size:12px;color:var(--gray-500)">${orderedUsers.length} user${orderedUsers.length!==1?'s':''} with access</span>
+      <button class="btn btn-secondary btn-sm rbac-write" onclick="swToggleUsersEdit()" id="swUsersEditBtn">
+        ${editMode ? '✅ Done' : '✏️ Edit'}
+      </button>
+    </div>
+
+    ${privUsers.length ? `
+      <div class="sw-users-subhead">🔑 Privileged Access (${privUsers.length})</div>
+      ${privUsers.map((u,i)=>userRow(u,i)).join('')}
+    ` : ''}
+
+    ${memberUsers.length ? `
+      <div class="sw-users-subhead" style="margin-top:${privUsers.length?'12px':'0'}">👤 Members (${memberUsers.length})</div>
+      ${memberUsers.map((u,i)=>userRow(u, privUsers.length+i)).join('')}
+    ` : ''}
+
+    ${!orderedUsers.length ? `<div style="font-size:13px;color:var(--gray-400);padding:8px 0">No users assigned to this software.</div>` : ''}
+
+    ${editMode ? `
+      <div class="sw-users-add-row">
+        <input id="swUsersAddInput" list="swUsersAddDl" placeholder="Type name or email to add user…" autocomplete="off">
+        <datalist id="swUsersAddDl">
+          ${(users||[]).filter(u=>!u.appAccess?.includes(csvId)).map(u=>`<option value="${u.email}">${u.first} ${u.last}</option>`).join('')}
+        </datalist>
+        <button class="btn btn-primary btn-sm" onclick="swAddUserAccess()">+ Add</button>
+      </div>
+    ` : ''}
+
+    <div class="sw-users-footer">
+      <div class="sw-lic-summary">
+        ${purchased ? `${licensed} licensed · <span class="${over?'sw-lic-over':''}">${unlicensed} without license</span>` : 'No license data'}
+      </div>
+      ${over ? `<span style="font-size:11px;font-weight:600;color:#ef4444">⚠️ Over capacity by ${unlicensed}</span>` : ''}
+    </div>
+  `;
+}
+
+function swToggleUsersEdit(){
+  _swUsersEditMode = !_swUsersEditMode;
+  const s = software.find(x=>x.id===_swDmCurrentId);
+  if(s) swRenderUsersSection(s);
+}
+
+async function swRemoveUserAccess(uid){
+  const s = software.find(x=>x.id===_swDmCurrentId);
+  if(!s) return;
+  const u = (users||[]).find(x=>(x._id||x.id)===uid);
+  if(!u) return;
+  const newAccess = (u.appAccess||[]).filter(id=>id!==s.csvId);
+  const newRoles  = {...(u.appRoles||{})};
+  delete newRoles[s.csvId];
+  try {
+    await authFetch(`/api/users/${uid}/app-access`,{
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ appAccess:newAccess, appRoles:newRoles })
+    });
+    u.appAccess = newAccess;
+    u.appRoles  = newRoles;
+    swRenderUsersSection(s);
+    showToast(`${u.first} ${u.last} removed from ${s.name}`);
+  } catch(e){ showToast('Failed to remove user','danger'); }
+}
+
+async function swAddUserAccess(){
+  const s = software.find(x=>x.id===_swDmCurrentId);
+  if(!s) return;
+  const val = (document.getElementById('swUsersAddInput')?.value||'').trim().toLowerCase();
+  if(!val) return;
+  const u = (users||[]).find(x=> x.email.toLowerCase()===val ||
+    `${x.first} ${x.last}`.toLowerCase().includes(val));
+  if(!u){ showToast('User not found','danger'); return; }
+  if((u.appAccess||[]).includes(s.csvId)){ showToast('User already has access'); return; }
+  const newAccess = [...(u.appAccess||[]), s.csvId];
+  try {
+    await authFetch(`/api/users/${u._id||u.id}/app-access`,{
+      method:'PUT', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ appAccess:newAccess, appRoles:(u.appRoles||{}) })
+    });
+    u.appAccess = newAccess;
+    document.getElementById('swUsersAddInput').value = '';
+    swRenderUsersSection(s);
+    showToast(`${u.first} ${u.last} added to ${s.name}`);
+  } catch(e){ showToast('Failed to add user','danger'); }
+}
 
 function swDmBackToView(){
   if(_swDmCurrentId) openSwDm(_swDmCurrentId);
@@ -3740,7 +3979,8 @@ const EXPORT_DEFS = {
       { key:'admins',   label:'Admins',            def:false, get: s => s.admins||'' },
       { key:'billedTo', label:'Billed To',         def:false, get: s => s.billedTo||'' },
       { key:'status',   label:'Status',            def:true,  get: s => s.status||'' },
-      { key:'sites',    label:'Sites',             def:false, get: s => [s.siteUSA&&'USA',s.siteCAN&&'CAN',s.siteIND&&'IND'].filter(Boolean).join(', ') },
+      { key:'userCount',label:'User Count',        def:false, get: s => users.filter(u=>(u.appAccess||[]).includes(s.csvId)).length },
+      { key:'userList', label:'Users with Access', def:false, get: s => users.filter(u=>(u.appAccess||[]).includes(s.csvId)).map(u=>`${u.first} ${u.last} <${u.email}>`).join('; ') || '—' },
     ],
   },
 };
@@ -3854,6 +4094,57 @@ async function _excDoPDF(section, activeCols, list, def){
     doc.save(def.filename()+'.pdf');
     showToast(`${def.title} PDF exported (${list.length} rows)`);
   } catch(e){ showToast('PDF export failed: '+e.message,'danger'); console.error(e); }
+}
+
+/* ══ EXPORT: Users by App ══
+   Flat CSV — one row per user-app pair.
+   Columns: App ID | App Name | Dept | User Name | Email | Job Title | App Role | Has License
+════════════════════════════════════════════════════════════════ */
+function exportUsersByApp(){
+  const swList = filteredSoftware();  // respects current software filters
+  const rows = [];
+  const headers = ['App ID','App Name','App Department','User Name','Email','Job Title','Department','App Role','Has License'];
+
+  swList.forEach(s => {
+    const appUsers = users.filter(u => (u.appAccess||[]).includes(s.csvId));
+    if(!appUsers.length){
+      // Still include app row so you can see apps with 0 users
+      rows.push([s.csvId, s.name, formatSoftwareDepartmentLabel(s.department)||'—', '—','—','—','—','—','—']);
+    } else {
+      appUsers.forEach(u => {
+        const appRole = (u.appRoles||{})[s.csvId] || 'Member';
+        // License: app has purchasedLicenses tracked; we compare usedLicenses count as a rough proxy
+        // A user "has a license" if purchased > 0 (licensed app) — exact per-user license tracking
+        // is not in the model, so we mark "Yes" if the app is licensed at all, "No" if freeware/unlimited
+        const hasLic = s.purchasedLicenses > 0 ? 'Yes' : (s.renewalPeriod === 'Freeware' ? 'Free' : 'Unlimited');
+        rows.push([
+          s.csvId,
+          s.name,
+          formatSoftwareDepartmentLabel(s.department)||'—',
+          `${u.first||''} ${u.last||''}`.trim(),
+          u.email||'',
+          u.jobTitle||'',
+          u.dept||'',
+          appRole,
+          hasLic,
+        ]);
+      });
+    }
+  });
+
+  if(!rows.length){ showToast('No data to export','danger'); return; }
+
+  const csv = [headers, ...rows]
+    .map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(','))
+    .join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `users-by-app-${new Date().toISOString().slice(0,10)}.csv`;
+  a.style.display = 'none';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  const totalUsers = rows.filter(r=>r[3]!=='—').length;
+  showToast(`Exported ${swList.length} apps · ${totalUsers} user-app rows`);
 }
 
 /* ══ THEME ══ */
@@ -5379,11 +5670,10 @@ function toggleNotifCollapse() {
           <div id="swDrCsvId" style="font-size:11px;font-weight:700;color:var(--gray-400);white-space:nowrap;padding-top:3px"></div>
         </div>
       </div>
-      <!-- Tabs -->
+      <!-- Single Tab Header -->
       <div class="sw-dm-tabs">
-        <button class="sw-dm-tab active" id="swDmTabOvBtn"   onclick="swDmTab('overview')">ℹ️ Overview</button>
-        <button class="sw-dm-tab"        id="swDmTabSvcBtn"  onclick="swDmTab('services')">🔧 Services &amp; Costs</button>
-        <button class="sw-dm-tab rbac-write" id="swDmTabEditBtn" onclick="swDmTab('edit')">✏️ Edit</button>
+        <span style="font-size:13px;font-weight:700;color:var(--primary);padding:10px 0;">ℹ️ Overview</span>
+        <button class="btn btn-secondary btn-sm rbac-write" id="swDmTabEditBtn" onclick="swDmTab('edit')" style="margin:4px 0;">✏️ Edit</button>
       </div>
       <!-- Body -->
       <div class="sw-dm-body">
@@ -5440,17 +5730,23 @@ function toggleNotifCollapse() {
           </div>
 
           <!-- App Information -->
-          <div>
+          <div style="margin-bottom:22px">
             <div class="sw-section-title">ℹ️ APP INFORMATION</div>
             <div class="sw-info-grid" id="swDrInfoBody" style="margin-top:10px"></div>
           </div>
 
-        </div><!-- /overview panel -->
+          <!-- Services & Costs (merged) -->
+          <div style="margin-bottom:22px">
+            <div id="swDrServicesCostBody"></div>
+          </div>
 
-        <!-- ══ SERVICES & COSTS PANEL ══ -->
-        <div class="sw-dm-panel" id="swDmPanelServices">
-          <div id="swDrServicesCostBody"></div>
-        </div><!-- /services panel -->
+          <!-- Users with Access -->
+          <div>
+            <div class="sw-section-title">👥 USERS WITH ACCESS</div>
+            <div id="swDrUsersBody" style="margin-top:10px"></div>
+          </div>
+
+        </div><!-- /overview panel -->
 
         <!-- ══ EDIT PANEL ══ -->
         <div class="sw-dm-panel" id="swDmPanelEdit">

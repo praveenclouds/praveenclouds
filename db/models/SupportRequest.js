@@ -88,6 +88,11 @@ const supportRequestSchema = new mongoose.Schema(
     sourceWorkflowSourceId: { type: String, default: '', trim: true },
     sourceWorkflowKey: { type: String, default: '', trim: true },
     requestedVia: { type: String, enum: ['portal', 'slack_command'], default: 'portal' },
+    slackChannelId: { type: String, default: '', trim: true },
+    slackMessageTs: { type: String, default: '', trim: true },
+    slackThreadTs: { type: String, default: '', trim: true },
+    slackTeamId: { type: String, default: '', trim: true },
+    slackCommandUserId: { type: String, default: '', trim: true },
     status: {
       type: String,
       enum: ['open', 'in_progress', 'blocked', 'completed', 'cancelled'],

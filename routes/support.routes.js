@@ -12,6 +12,7 @@ const {
   applySupportRequestUpdates,
   createRequestTypeDefinition,
   createSupportRequest,
+  deleteRequestTypeDefinition,
   ensureCompletedOnboardingProvisioningReady,
   formatWorkflowTypeLabel,
   listRequestTypeDefinitions,
@@ -24,6 +25,7 @@ const {
   updateSupportMailTemplate,
 } = require('../services/support-mail-template.service');
 const { hashToken, notifySupportRequestChanges } = require('../services/support-notification.service');
+const { postSupportRequestUpdateMessage } = require('../services/support-slack-thread.service');
 const rateLimit = require('express-rate-limit');
 
 // Prevent brute-force guessing of approval tokens: max 10 attempts per 15 min per IP.
@@ -49,6 +51,11 @@ function fmtSupportRequest(doc) {
     sourceWorkflowSourceId: o.sourceWorkflowSourceId || '',
     sourceWorkflowKey: o.sourceWorkflowKey || '',
     requestedVia: o.requestedVia || 'portal',
+    slackChannelId: o.slackChannelId || '',
+    slackMessageTs: o.slackMessageTs || '',
+    slackThreadTs: o.slackThreadTs || '',
+    slackTeamId: o.slackTeamId || '',
+    slackCommandUserId: o.slackCommandUserId || '',
     status: o.status,
     priority: o.priority,
     employeeName: o.employeeName,
@@ -97,6 +104,14 @@ function approvalPage(title, body, tone = '#111827') {
   </html>`;
 }
 
+async function persistSlackThreadContext(request, slackPost = {}) {
+  if (!request || !slackPost?.posted) return;
+  if (!request.slackChannelId && slackPost.channelId) request.slackChannelId = slackPost.channelId;
+  if (!request.slackMessageTs && slackPost.messageTs) request.slackMessageTs = slackPost.messageTs;
+  if (!request.slackThreadTs && slackPost.threadTs) request.slackThreadTs = slackPost.threadTs;
+  if (request.isModified()) await request.save();
+}
+
 router.get('/approval-action', approvalRateLimiter, async (req, res) => {
   try {
     const token = String(req.query.token || '').trim();
@@ -114,6 +129,7 @@ router.get('/approval-action', approvalRateLimiter, async (req, res) => {
     if (!request) {
       return res.status(404).send(approvalPage('Request not found', 'The support request for this approval link could not be found.', '#f87171'));
     }
+    const previousRequest = request.toObject();
 
     const step = (request.checklist || []).find(item => item.key === payload.requestItemKey);
     if (!step || step.approvalMode !== 'manager') {
@@ -136,7 +152,9 @@ router.get('/approval-action', approvalRateLimiter, async (req, res) => {
       step.status = 'done';
       step.approvalStatus = 'approved';
       step.approvalDecision = 'approve';
-      request.status = request.status === 'blocked' ? 'in_progress' : request.status;
+      if (!['completed', 'cancelled'].includes(String(request.status || '').toLowerCase())) {
+        request.status = 'in_progress';
+      }
     } else {
       step.status = 'pending';
       step.approvalStatus = 'rejected';
@@ -152,6 +170,11 @@ router.get('/approval-action', approvalRateLimiter, async (req, res) => {
     step.notes = `${step.notes ? `${step.notes}\n` : ''}Manager ${decision === 'approve' ? 'approved' : 'rejected'} on ${new Date().toLocaleString('en-IN')}`.trim();
 
     await request.save();
+    const slackPost = await postSupportRequestUpdateMessage(previousRequest, request, {
+      source: 'manager_approval',
+      actor: request.managerName || 'Manager',
+    });
+    await persistSlackThreadContext(request, slackPost);
 
     return res.send(
       approvalPage(
@@ -198,6 +221,15 @@ router.put('/request-types/:id', requireAuth, requirePermission('manageRequestTy
   try {
     const requestType = await updateRequestTypeDefinition(req.params.id, req.body || {});
     res.json(requestType);
+  } catch (e) {
+    res.status(e.message === 'Request type not found.' ? 404 : 400).json({ error: e.message });
+  }
+});
+
+router.delete('/request-types/:id', requireAuth, requirePermission('manageRequestTypes'), async (req, res) => {
+  try {
+    const deleted = await deleteRequestTypeDefinition(req.params.id);
+    res.json({ ok: true, ...deleted });
   } catch (e) {
     res.status(e.message === 'Request type not found.' ? 404 : 400).json({ error: e.message });
   }
@@ -317,6 +349,11 @@ router.put('/:id', requireAuth, canWrite, async (req, res) => {
     await request.save();
     await notifySupportRequestChanges(previousRequest, request);
     if (request.isModified()) await request.save();
+    const slackPost = await postSupportRequestUpdateMessage(previousRequest, request, {
+      source: 'support_center',
+      actor: req.user?.name || req.user?.email || 'Support Admin',
+    });
+    await persistSlackThreadContext(request, slackPost);
     await syncCompletedOnboardingUser(request);
     res.json(fmtSupportRequest(request));
   } catch (e) {

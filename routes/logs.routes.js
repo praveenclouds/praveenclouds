@@ -12,6 +12,18 @@ function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// ── DELETE /api/logs/asset/:deviceId ──────────────────────────────────────────
+// Clears all history log entries for a specific asset (matched by deviceId / csvId).
+const { canWriteAssets } = require('../middleware/auth');
+router.delete('/asset/:deviceId', requireAuth, canWriteAssets, async (req, res) => {
+  try {
+    const { deviceId } = req.params;
+    if (!deviceId) return res.status(400).json({ error: 'deviceId is required' });
+    const result = await Log.deleteMany({ deviceId: deviceId.toUpperCase() });
+    res.json({ ok: true, deleted: result.deletedCount });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 // ── GET /api/logs ──────────────────────────────────────────────────────────────
 router.get('/', requireAuth, canViewActivityLog, async (req, res) => {
   try {

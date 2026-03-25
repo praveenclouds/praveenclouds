@@ -149,7 +149,9 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 60,
     defaultAssignee: '',
     autoAddDepartmentApps: false,
-    formFields: buildDefaultFormFields(),
+    formFields: buildDefaultFormFields({
+      applications: { enabled: true, required: false },
+    }),
     checklist: [
       { key: 'manager_confirmation', label: 'Manager offboarding confirmation received', area: 'People Ops', approvalMode: 'manager' },
       { key: 'account_disable', label: 'SSO and workspace account disabled', area: 'Identity' },
