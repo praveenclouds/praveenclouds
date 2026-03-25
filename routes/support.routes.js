@@ -18,6 +18,7 @@ const {
   listRequestTypeDefinitions,
   listWorkflowOptions,
   syncCompletedOnboardingUser,
+  syncCompletedOffboardingUser,
   updateRequestTypeDefinition,
 } = require('../services/support-request.service');
 const {
@@ -76,6 +77,7 @@ function fmtSupportRequest(doc) {
     assigneeEmail: o.assigneeEmail || '',
     applications: Array.isArray(o.applications) ? o.applications : [],
     notes: o.notes,
+    customFieldValues: Array.isArray(o.customFieldValues) ? o.customFieldValues : [],
     checklist,
     progressPercent: checklist.length ? Math.round((completedCount / checklist.length) * 100) : 0,
     completedCount,
@@ -355,6 +357,7 @@ router.put('/:id', requireAuth, canWrite, async (req, res) => {
     });
     await persistSlackThreadContext(request, slackPost);
     await syncCompletedOnboardingUser(request);
+    await syncCompletedOffboardingUser(request);
     res.json(fmtSupportRequest(request));
   } catch (e) {
     res.status(400).json({ error: e.message });

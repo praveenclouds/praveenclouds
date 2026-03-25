@@ -6,7 +6,15 @@
   "scripts": {
     "start": "NODE_ENV=production node server.js",
     "dev": "nodemon server.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "seed": "node db/seed.js",
+    "seed:software": "node db/seed.js --force-software",
+    "seed:safe": "node db/seed.js --safe",
+    "seed:safe:software": "node db/seed.js --safe --force-software",
+    "seed:docker": "docker compose exec app node db/seed.js",
+    "seed:docker:safe": "docker compose exec app node db/seed.js --safe",
+    "db:backup": "./scripts/db-backup.sh",
+    "db:restore": "./scripts/db-restore.sh"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

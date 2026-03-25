@@ -74,6 +74,11 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    lastWorkingDate: {
+      type: Date,
+      default: null,
+      comment: 'Last working day for offboarded employees',
+    },
     scimExternalId: {
       type: String,
       default: '',

@@ -75,6 +75,15 @@ const requestApplicationSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const customFieldValueSchema = new mongoose.Schema(
+  {
+    key:   { type: String, required: true, trim: true },
+    label: { type: String, default: '', trim: true },
+    value: { type: String, default: '', trim: true },
+  },
+  { _id: false }
+);
+
 const supportRequestSchema = new mongoose.Schema(
   {
     requestId: { type: String, unique: true, index: true },
@@ -129,6 +138,7 @@ const supportRequestSchema = new mongoose.Schema(
     assigneeEmail: { type: String, default: '', trim: true, lowercase: true },
     applications: { type: [requestApplicationSchema], default: [] },
     notes: { type: String, default: '', trim: true },
+    customFieldValues: { type: [customFieldValueSchema], default: [] },
     checklist: { type: [checklistItemSchema], default: [] },
   },
   { timestamps: true }

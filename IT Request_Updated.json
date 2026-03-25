@@ -1,0 +1,3522 @@
+{
+  "workflow": {
+    "id": "Wf0AD3JCSEB0",
+    "title": "IT Request ",
+    "description": "Collect and manage IT team requests",
+    "icon": "",
+    "input_parameters": {
+      "Ft0AD3JNGH7Y__interactivity": {
+        "type": "slack#/types/interactivity",
+        "name": "Ft0AD3JNGH7Y__interactivity",
+        "description": "Interactivity context",
+        "title": "Interactivity context",
+        "is_hidden": true
+      },
+      "Ft0AD3JNGH7Y__channel_id": {
+        "type": "slack#/types/channel_id",
+        "name": "Ft0AD3JNGH7Y__channel_id",
+        "description": "Channel where the workflow was used, if available",
+        "title": "Channel where the workflow was used"
+      },
+      "Ft0AD3JNGH7Y__user_id": {
+        "type": "slack#/types/user_id",
+        "name": "Ft0AD3JNGH7Y__user_id",
+        "description": "Person who used this workflow",
+        "title": "Person who used this workflow"
+      },
+      "Ft0AD3JNGH7Y__event_timestamp": {
+        "type": "slack#/types/timestamp",
+        "name": "Ft0AD3JNGH7Y__event_timestamp",
+        "description": "Time when workflow started",
+        "title": "Time when workflow started"
+      }
+    },
+    "steps": [
+      {
+        "id": "4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5",
+        "function_id": "Fn010N",
+        "inputs": {
+          "title": {
+            "hidden": false,
+            "locked": false,
+            "value": "IT-Support-Raise Ticket"
+          },
+          "fields": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "elements": [
+                {
+                  "enum": [
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Hardware Request",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Software / Access",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ],
+                    [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "IT Support / Bug",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  ],
+                  "name": "21bb79fe-5ed8-4764-acea-426e326b2793",
+                  "type": "slack#/types/limited_rich_text",
+                  "title": "Request Type",
+                  "choices": [
+                    {
+                      "id": "3c3524a4-8423-4b26-b498-97adc3c655b9",
+                      "title": "Hardware Request",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Hardware Request",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Hardware Request"
+                    },
+                    {
+                      "id": "c8d4cbfc-dff8-40ce-a05a-c2296c885e17",
+                      "title": "Software / Access",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "Software / Access",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "Software / Access"
+                    },
+                    {
+                      "id": "40e82739-a89d-4e23-8d45-f5156b3c3dc9",
+                      "title": "IT Support / Bug",
+                      "value": [
+                        {
+                          "type": "rich_text",
+                          "elements": [
+                            {
+                              "type": "rich_text_section",
+                              "elements": [
+                                {
+                                  "text": "IT Support / Bug",
+                                  "type": "text"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "description": "IT Support / Bug"
+                    }
+                  ],
+                  "default": "",
+                  "description": ""
+                }
+              ],
+              "required": [
+                "21bb79fe-5ed8-4764-acea-426e326b2793"
+              ]
+            }
+          },
+          "interactivity": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{inputs.Ft0AD3JNGH7Y__interactivity}}"
+          }
+        }
+      },
+      {
+        "id": "b1388375-b659-4c2b-b588-dde99e8fac83",
+        "function_id": "Fn010M",
+        "inputs": {
+          "message": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "rich_text",
+                "elements": [
+                  {
+                    "type": "rich_text_section",
+                    "elements": [
+                      {
+                        "id": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.fields.21bb79fe-5ed8-4764-acea-426e326b2793}}",
+                        "type": "workflowtoken",
+                        "property": "",
+                        "data_type": "slack#/types/limited_rich_text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "user_id": {
+            "hidden": false,
+            "locked": false,
+            "value": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.submit_user}}"
+          },
+          "interactive_blocks": {
+            "hidden": false,
+            "locked": false,
+            "value": [
+              {
+                "type": "actions",
+                "elements": [
+                  {
+                    "text": {
+                      "text": "Continue",
+                      "type": "plain_text",
+                      "emoji": true
+                    },
+                    "type": "button",
+                    "style": "primary",
+                    "value": "button",
+                    "action_id": "2516944e-efa6-4da8-8a89-25da71014981"
+                  }
+                ]
+              }
+            ]
+          },
+          "interactivity_configuration": {
+            "hidden": false,
+            "locked": false,
+            "value": {
+              "actions": {
+                "2516944e-efa6-4da8-8a89-25da71014981": {
+                  "is_button_multi_click": false,
+                  "is_mutually_exclusive": false
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "id": "2e467027-e6d6-4ee7-9fe4-10b247c4c4d5",
+        "function_id": "Fn0201",
+        "inputs": {},
+        "type": "switch",
+        "steps": [
+          {
+            "id": "44759902-7544-4f7f-ba02-fa2194974655",
+            "function_id": "Fn0202",
+            "inputs": {},
+            "type": "case",
+            "expression": {
+              "version": 1,
+              "root": {
+                "statement": {
+                  "target": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.3c3524a4-8423-4b26-b498-97adc3c655b9}}"
+                }
+              }
+            },
+            "display_config": {
+              "color": "gray",
+              "is_branch_collapsed": false
+            },
+            "steps": [
+              {
+                "id": "4dd1dee8-aa75-4e6d-a319-20d5e23765cd",
+                "function_id": "Fn010N",
+                "inputs": {
+                  "title": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "Hardware Request"
+                  },
+                  "fields": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": {
+                      "elements": [
+                        {
+                          "name": "a6cc7c67-1067-44e0-a14d-b56e6d3c5a10",
+                          "type": "string",
+                          "title": "Request Title",
+                          "description": ""
+                        },
+                        {
+                          "name": "0b718a74-c47a-4bd0-92a6-1a2f26cc353b",
+                          "type": "string",
+                          "title": "Details ",
+                          "description": ""
+                        },
+                        {
+                          "enum": [
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "High",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ],
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Medium",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ],
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Low",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          ],
+                          "name": "6ecde882-8aed-41d3-a21d-3eb807c14b4f",
+                          "type": "slack#/types/limited_rich_text",
+                          "title": "Priority",
+                          "choices": [
+                            {
+                              "id": "ab17307b-9a45-44fd-8b96-d596a71e5ec5",
+                              "title": "High",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "High",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "High"
+                            },
+                            {
+                              "id": "1e443677-feca-437b-a2df-5b42f394843d",
+                              "title": "Medium",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "Medium",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "Medium"
+                            },
+                            {
+                              "id": "7418aeb9-c177-40a7-9bc8-8b037b29dd46",
+                              "title": "Low",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "Low",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "Low"
+                            }
+                          ],
+                          "default": "",
+                          "description": ""
+                        },
+                        {
+                          "name": "ce381340-394a-4e64-830f-1d5b8fac2b84",
+                          "type": "slack#/types/user_id",
+                          "title": "Manager",
+                          "description": ""
+                        }
+                      ],
+                      "required": [
+                        "a6cc7c67-1067-44e0-a14d-b56e6d3c5a10",
+                        "0b718a74-c47a-4bd0-92a6-1a2f26cc353b",
+                        "6ecde882-8aed-41d3-a21d-3eb807c14b4f",
+                        "ce381340-394a-4e64-830f-1d5b8fac2b84"
+                      ]
+                    }
+                  },
+                  "interactivity": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.b1388375-b659-4c2b-b588-dde99e8fac83.interactivity}}"
+                  }
+                }
+              },
+              {
+                "id": "501d6968-c9bf-4515-8cfe-ee39e5c7ec06",
+                "function_id": "Fn0102",
+                "inputs": {
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Details ",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.0b718a74-c47a-4bd0-92a6-1a2f26cc353b}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Manager",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Priority",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.6ecde882-8aed-41d3-a21d-3eb807c14b4f}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Request Title",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.a6cc7c67-1067-44e0-a14d-b56e6d3c5a10}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "channel_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{inputs.Ft0AD3JNGH7Y__channel_id}}"
+                  }
+                }
+              },
+              {
+                "id": "844aa076-0da3-4fa3-bb1c-e4e22a2a60fa",
+                "function_id": "Fn010M",
+                "inputs": {
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.submit_user}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": " Submitted the Request ",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.fields.21bb79fe-5ed8-4764-acea-426e326b2793}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "\n\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Request Title",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.a6cc7c67-1067-44e0-a14d-b56e6d3c5a10}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Details ",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.0b718a74-c47a-4bd0-92a6-1a2f26cc353b}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Priority",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.6ecde882-8aed-41d3-a21d-3eb807c14b4f}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Manager",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "user_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}"
+                  },
+                  "interactive_blocks": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "actions",
+                        "elements": [
+                          {
+                            "text": {
+                              "text": "Approve",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "primary",
+                            "value": "button",
+                            "action_id": "22509140-b858-4564-811f-372892b1d34a"
+                          },
+                          {
+                            "text": {
+                              "text": "Deny",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "danger",
+                            "value": "button",
+                            "action_id": "d1b90d15-da81-488e-8c03-b7a51b6242d1"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "interactivity_configuration": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": {
+                      "actions": {
+                        "22509140-b858-4564-811f-372892b1d34a": {
+                          "is_button_multi_click": false,
+                          "is_mutually_exclusive": false
+                        },
+                        "d1b90d15-da81-488e-8c03-b7a51b6242d1": {
+                          "is_button_multi_click": false,
+                          "is_mutually_exclusive": false
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "537ae25c-cb43-410e-ad75-3b69134a0a61",
+                "function_id": "Fn0201",
+                "inputs": {},
+                "type": "switch",
+                "steps": [
+                  {
+                    "id": "4542bcec-25a4-46bf-8d2f-e2dbb16081cd",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.844aa076-0da3-4fa3-bb1c-e4e22a2a60fa.22509140-b858-4564-811f-372892b1d34a}}"
+                        }
+                      }
+                    },
+                    "steps": [
+                      {
+                        "id": "3deb158d-fc0d-45c8-b89e-46c878343ef6",
+                        "function_id": "Fn010N",
+                        "inputs": {
+                          "title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Request Assigned to "
+                          },
+                          "fields": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "elements": [
+                                {
+                                  "name": "fe000a9e-d82a-4b37-a2e2-114c5462c433",
+                                  "type": "slack#/types/user_id",
+                                  "title": "Assignee",
+                                  "description": ""
+                                },
+                                {
+                                  "long": true,
+                                  "name": "728bce00-a440-472a-9c0d-914aa4000089",
+                                  "type": "string",
+                                  "title": "Message",
+                                  "description": ""
+                                }
+                              ],
+                              "required": [
+                                "fe000a9e-d82a-4b37-a2e2-114c5462c433",
+                                "728bce00-a440-472a-9c0d-914aa4000089"
+                              ]
+                            }
+                          },
+                          "interactivity": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.844aa076-0da3-4fa3-bb1c-e4e22a2a60fa.interactivity}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "b9af335a-2269-497b-9d71-c8146e7e1acc",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "The Request has Approved by ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": "  and Assigned to ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{slack.user_display_name(user_id={{steps.3deb158d-fc0d-45c8-b89e-46c878343ef6.fields.fe000a9e-d82a-4b37-a2e2-114c5462c433}})}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.submit_user}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "7d9783de-e909-4fdc-a826-df2a0463e19b",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.a6cc7c67-1067-44e0-a14d-b56e6d3c5a10}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " Has been Approved by ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Submitted by ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": ". Please proceed to get the Details of Requested Asset Details",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.3deb158d-fc0d-45c8-b89e-46c878343ef6.fields.fe000a9e-d82a-4b37-a2e2-114c5462c433}}"
+                          },
+                          "interactive_blocks": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "actions",
+                                "elements": [
+                                  {
+                                    "text": {
+                                      "text": "Continue",
+                                      "type": "plain_text",
+                                      "emoji": true
+                                    },
+                                    "type": "button",
+                                    "style": "primary",
+                                    "value": "button",
+                                    "action_id": "7c646b88-a9b1-40d0-bac1-37eede9eaab5"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "interactivity_configuration": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "actions": {
+                                "7c646b88-a9b1-40d0-bac1-37eede9eaab5": {
+                                  "is_button_multi_click": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "406514b5-2fb2-4b3c-9c65-41bbf7625844",
+                        "function_id": "Fn010N",
+                        "inputs": {
+                          "title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Asset Details "
+                          },
+                          "fields": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "elements": [
+                                {
+                                  "name": "5ecdccf0-dcfa-4d08-bc5c-68055267e7c1",
+                                  "type": "string",
+                                  "title": "Asset Quote ",
+                                  "description": ""
+                                },
+                                {
+                                  "name": "c4e9f7a0-25f8-4e8d-8b1b-876bf3dca66c",
+                                  "type": "slack#/types/date",
+                                  "title": "Due Date",
+                                  "description": ""
+                                }
+                              ],
+                              "required": [
+                                "5ecdccf0-dcfa-4d08-bc5c-68055267e7c1",
+                                "c4e9f7a0-25f8-4e8d-8b1b-876bf3dca66c"
+                              ]
+                            }
+                          },
+                          "interactivity": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.7d9783de-e909-4fdc-a826-df2a0463e19b.interactivity}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "2f081fed-5f80-4493-9f6f-344766c1412b",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Please Review the Asset Details\n\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.406514b5-2fb2-4b3c-9c65-41bbf7625844.fields.5ecdccf0-dcfa-4d08-bc5c-68055267e7c1}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.406514b5-2fb2-4b3c-9c65-41bbf7625844.fields.c4e9f7a0-25f8-4e8d-8b1b-876bf3dca66c}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/date"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}"
+                          },
+                          "interactive_blocks": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "actions",
+                                "elements": [
+                                  {
+                                    "text": {
+                                      "text": "Proceed",
+                                      "type": "plain_text",
+                                      "emoji": true
+                                    },
+                                    "type": "button",
+                                    "style": "primary",
+                                    "value": "button",
+                                    "action_id": "2aaffb24-edb8-4148-86e7-85e11f9c13a1"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "interactivity_configuration": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "actions": {
+                                "2aaffb24-edb8-4148-86e7-85e11f9c13a1": {
+                                  "is_button_multi_click": false,
+                                  "is_mutually_exclusive": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "72ecd5cf-24c6-4f8d-a049-a312692e9101",
+                        "function_id": "Fn010N",
+                        "inputs": {
+                          "title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Details"
+                          },
+                          "fields": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "elements": [
+                                {
+                                  "long": true,
+                                  "name": "0327047d-c986-4854-aa62-4aaa2656bb17",
+                                  "type": "string",
+                                  "title": "Message",
+                                  "description": ""
+                                }
+                              ],
+                              "required": []
+                            }
+                          },
+                          "interactivity": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.2f081fed-5f80-4493-9f6f-344766c1412b.interactivity}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "22f1324f-78e7-4f5a-b60f-6ca5968ed3c8",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Details ",
+                                        "type": "text",
+                                        "style": {
+                                          "bold": true
+                                        }
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.0b718a74-c47a-4bd0-92a6-1a2f26cc353b}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "text": "Manager",
+                                        "type": "text",
+                                        "style": {
+                                          "bold": true
+                                        }
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "text": "Priority",
+                                        "type": "text",
+                                        "style": {
+                                          "bold": true
+                                        }
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.6ecde882-8aed-41d3-a21d-3eb807c14b4f}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/limited_rich_text"
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "text": "Request Title",
+                                        "type": "text",
+                                        "style": {
+                                          "bold": true
+                                        }
+                                      },
+                                      {
+                                        "text": "\n",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.a6cc7c67-1067-44e0-a14d-b56e6d3c5a10}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": "\n\nThe Quote ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.406514b5-2fb2-4b3c-9c65-41bbf7625844.fields.5ecdccf0-dcfa-4d08-bc5c-68055267e7c1}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " is Approved , Please Proceed",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.3deb158d-fc0d-45c8-b89e-46c878343ef6.fields.fe000a9e-d82a-4b37-a2e2-114c5462c433}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "9d22a2d2-2dfc-470c-bd47-594c70f369b5",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Your Request Status : In-progress",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.501d6968-c9bf-4515-8cfe-ee39e5c7ec06.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "true"
+                          }
+                        }
+                      },
+                      {
+                        "id": "071e9a54-592c-4ae5-aa6c-ec13349b4210",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Request Completed",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.3deb158d-fc0d-45c8-b89e-46c878343ef6.fields.fe000a9e-d82a-4b37-a2e2-114c5462c433}}"
+                          },
+                          "interactive_blocks": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "actions",
+                                "elements": [
+                                  {
+                                    "text": {
+                                      "text": "Done",
+                                      "type": "plain_text",
+                                      "emoji": true
+                                    },
+                                    "type": "button",
+                                    "style": "primary",
+                                    "value": "button",
+                                    "action_id": "e78cc7bd-df29-4364-98f9-d2675871380a"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "interactivity_configuration": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "actions": {
+                                "e78cc7bd-df29-4364-98f9-d2675871380a": {
+                                  "is_button_multi_click": false,
+                                  "is_mutually_exclusive": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "6672bb6d-98c5-4397-ad3a-688814b05599",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "id": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.fields.21bb79fe-5ed8-4764-acea-426e326b2793}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/limited_rich_text"
+                                      },
+                                      {
+                                        "text": " is ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " has been Completed",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.501d6968-c9bf-4515-8cfe-ee39e5c7ec06.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "false"
+                          }
+                        }
+                      },
+                      {
+                        "id": "23fa5a6e-b46c-4ba1-858b-514122bfde02",
+                        "function_id": "Fn0592NZAAP4",
+                        "inputs": {
+                          "columns": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "0": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.a6cc7c67-1067-44e0-a14d-b56e6d3c5a10}}",
+                              "1": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.0b718a74-c47a-4bd0-92a6-1a2f26cc353b}}",
+                              "2": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.6ecde882-8aed-41d3-a21d-3eb807c14b4f}}",
+                              "3": "{slack.user_mention_name(user_id={{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}})}",
+                              "4": "{slack.user_full_name(user_id={{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.submit_user}})}",
+                              "5": "{time.format(seconds={{inputs.Ft0AD3JNGH7Y__event_timestamp}}, locale=en-US, dateType=DATE_MEDIUM_TIME_MEDIUM)}"
+                            }
+                          },
+                          "sheet_title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Form Responses"
+                          },
+                          "spreadsheet_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "1GKV5xR_9U7RgvVd8XepuNYlKf2YFKEsOLZ7C20CNSSc"
+                          },
+                          "google_access_token": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": null
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "47e05166-5210-44db-b4d2-faef1956b29d",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.844aa076-0da3-4fa3-bb1c-e4e22a2a60fa.d1b90d15-da81-488e-8c03-b7a51b6242d1}}"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "ac54d2a6-5ec9-4de2-a1e6-730a64ba1f47",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "The Request was denied by ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4dd1dee8-aa75-4e6d-a319-20d5e23765cd.fields.ce381340-394a-4e64-830f-1d5b8fac2b84}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.501d6968-c9bf-4515-8cfe-ee39e5c7ec06.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "false"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "e7dbd1de-1336-44be-a6c6-23b9fc456119",
+            "function_id": "Fn0202",
+            "inputs": {},
+            "type": "case",
+            "expression": {
+              "version": 1,
+              "root": {
+                "statement": {
+                  "target": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.c8d4cbfc-dff8-40ce-a05a-c2296c885e17}}"
+                }
+              }
+            },
+            "display_config": {
+              "color": "gray",
+              "is_branch_collapsed": false
+            },
+            "steps": [
+              {
+                "id": "cf5922bb-a33f-49d5-bf2f-f59ed2d46212",
+                "function_id": "Fn010M",
+                "inputs": {
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Please Submit the Request details",
+                                "type": "text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "user_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.b1388375-b659-4c2b-b588-dde99e8fac83.interactivity.interactor.id}}"
+                  },
+                  "interactive_blocks": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "actions",
+                        "elements": [
+                          {
+                            "text": {
+                              "text": "Continue",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "primary",
+                            "value": "button",
+                            "action_id": "1eda86e8-a539-435d-899e-f8d29ad88e35"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": "76d69871-1921-46e4-a334-a04809cb25e7",
+                "function_id": "Fn010N",
+                "inputs": {
+                  "title": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "Software / Access Request"
+                  },
+                  "fields": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": {
+                      "elements": [
+                        {
+                          "name": "ba533dc0-5516-4b60-bfe6-e2795185d753",
+                          "type": "string",
+                          "title": "Request Title",
+                          "description": ""
+                        },
+                        {
+                          "long": true,
+                          "name": "48336d05-7464-4560-9f65-1fc22fe2818b",
+                          "type": "string",
+                          "title": "Details",
+                          "description": ""
+                        },
+                        {
+                          "name": "b09236db-a977-448f-9df8-1c46c52fc29f",
+                          "type": "slack#/types/user_id",
+                          "title": "Manager",
+                          "description": ""
+                        },
+                        {
+                          "enum": [
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "High",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ],
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Medium",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ],
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Low",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          ],
+                          "name": "8cd55926-02c3-4f5f-99fc-aaa3570d0438",
+                          "type": "slack#/types/limited_rich_text",
+                          "title": "Priority",
+                          "choices": [
+                            {
+                              "id": "ee8ff743-b45c-496f-8003-e6b4a8f9fb42",
+                              "title": "High",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "High",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "High"
+                            },
+                            {
+                              "id": "9cb90836-9cb5-4ddb-a2c1-5ef1cad56090",
+                              "title": "Medium",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "Medium",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "Medium"
+                            },
+                            {
+                              "id": "06c80d60-4371-4288-bb0f-4002e762f5c9",
+                              "title": "Low",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "Low",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "Low"
+                            }
+                          ],
+                          "default": "",
+                          "description": ""
+                        },
+                        {
+                          "name": "043f36d7-0453-4881-90f2-6aa3eb8f42b6",
+                          "type": "slack#/types/timestamp",
+                          "title": "Due Date",
+                          "description": ""
+                        }
+                      ],
+                      "required": [
+                        "ba533dc0-5516-4b60-bfe6-e2795185d753",
+                        "48336d05-7464-4560-9f65-1fc22fe2818b",
+                        "b09236db-a977-448f-9df8-1c46c52fc29f",
+                        "8cd55926-02c3-4f5f-99fc-aaa3570d0438",
+                        "043f36d7-0453-4881-90f2-6aa3eb8f42b6"
+                      ]
+                    }
+                  },
+                  "interactivity": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.cf5922bb-a33f-49d5-bf2f-f59ed2d46212.interactivity}}"
+                  }
+                }
+              },
+              {
+                "id": "b98b0ea0-3903-495a-9121-0334f3134f4b",
+                "function_id": "Fn0102",
+                "inputs": {
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": "Request Submitted\n\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Details",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.48336d05-7464-4560-9f65-1fc22fe2818b}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Manager",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Priority",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.8cd55926-02c3-4f5f-99fc-aaa3570d0438}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Request Title",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.ba533dc0-5516-4b60-bfe6-e2795185d753}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "channel_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{inputs.Ft0AD3JNGH7Y__channel_id}}"
+                  }
+                }
+              },
+              {
+                "id": "0c92188d-5b44-426b-8f2f-cd03e033756e",
+                "function_id": "Fn010M",
+                "inputs": {
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "text": "Hi ",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": " Please Review the Request Submitted By ",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": "\n\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Details",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.48336d05-7464-4560-9f65-1fc22fe2818b}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Manager",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Priority",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.8cd55926-02c3-4f5f-99fc-aaa3570d0438}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Request Title",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.ba533dc0-5516-4b60-bfe6-e2795185d753}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "user_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}"
+                  },
+                  "interactive_blocks": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "actions",
+                        "elements": [
+                          {
+                            "text": {
+                              "text": "Approve ",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "primary",
+                            "value": "button",
+                            "action_id": "db90dc0b-a5ca-4267-9f32-34c961baa691"
+                          },
+                          {
+                            "text": {
+                              "text": "Deny",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "danger",
+                            "value": "button",
+                            "action_id": "89fe3059-5d84-49f5-8aa0-dab5090ac1bd"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "interactivity_configuration": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": {
+                      "actions": {
+                        "89fe3059-5d84-49f5-8aa0-dab5090ac1bd": {
+                          "is_button_multi_click": false,
+                          "is_mutually_exclusive": true
+                        },
+                        "db90dc0b-a5ca-4267-9f32-34c961baa691": {
+                          "is_button_multi_click": false,
+                          "is_mutually_exclusive": true
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "faaa71ac-d3d6-4654-80fc-c1e234789264",
+                "function_id": "Fn0201",
+                "inputs": {},
+                "type": "switch",
+                "steps": [
+                  {
+                    "id": "7d35a039-5258-4213-9626-ab1972df596f",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.0c92188d-5b44-426b-8f2f-cd03e033756e.db90dc0b-a5ca-4267-9f32-34c961baa691}}"
+                        }
+                      }
+                    },
+                    "steps": [
+                      {
+                        "id": "7e5c630e-b6e5-4cd0-92d9-74b83572a40e",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": ", Your request is Approved by Manager\nStatus : In-Progress\n\nApproval Time:\nTicket Created ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{time.format(seconds={{steps.76d69871-1921-46e4-a334-a04809cb25e7.timestamp_started}}, dateType=DATE_WITH_ORDINAL_MONTH_YEAR_HOUR_MINUTE_AMPM_TZ)}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": "\nApproval :",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{time.format(seconds={{steps.0c92188d-5b44-426b-8f2f-cd03e033756e.action.action_ts}}, dateType=DATE_WITH_ORDINAL_MONTH_YEAR_HOUR_MINUTE_AMPM_TZ)}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.b98b0ea0-3903-495a-9121-0334f3134f4b.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "false"
+                          }
+                        }
+                      },
+                      {
+                        "id": "5bd8d470-7b47-466f-b405-da23e62c2585",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "type": "user",
+                                        "user_id": "U02MRFSKFKR"
+                                      },
+                                      {
+                                        "text": "  the request ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.ba533dc0-5516-4b60-bfe6-e2795185d753}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " : ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.48336d05-7464-4560-9f65-1fc22fe2818b}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " Submitted by ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " has been Approved. Please Proceed",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "U02MRFSKFKR"
+                          },
+                          "interactive_blocks": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "actions",
+                                "elements": [
+                                  {
+                                    "text": {
+                                      "text": "Done",
+                                      "type": "plain_text",
+                                      "emoji": true
+                                    },
+                                    "type": "button",
+                                    "style": "primary",
+                                    "value": "button",
+                                    "action_id": "a5f619ab-5bce-42f1-a13b-9fe0e0eff674"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "interactivity_configuration": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "actions": {
+                                "a5f619ab-5bce-42f1-a13b-9fe0e0eff674": {
+                                  "allowed_entities": {
+                                    "member_ids": [
+                                      "U02MRFSKFKR"
+                                    ]
+                                  },
+                                  "is_button_multi_click": false,
+                                  "is_mutually_exclusive": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "86d75004-8b86-488e-8b49-0cbfa3a6e827",
+                        "function_id": "Fn010N",
+                        "inputs": {
+                          "title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Request Details "
+                          },
+                          "fields": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "elements": [
+                                {
+                                  "long": true,
+                                  "name": "ee36c05f-b2f3-4725-a60f-b28694daa882",
+                                  "type": "string",
+                                  "title": " Details",
+                                  "description": ""
+                                }
+                              ],
+                              "required": [
+                                "ee36c05f-b2f3-4725-a60f-b28694daa882"
+                              ]
+                            }
+                          },
+                          "interactivity": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.5bd8d470-7b47-466f-b405-da23e62c2585.interactivity}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "7089cbd3-b2e3-456f-8eb2-65683dc90cf7",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " The Request ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.ba533dc0-5516-4b60-bfe6-e2795185d753}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " Submitted by ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Has been resolved\n\nPlease Check the Details ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.86d75004-8b86-488e-8b49-0cbfa3a6e827.fields.ee36c05f-b2f3-4725-a60f-b28694daa882}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}"
+                          }
+                        }
+                      },
+                      {
+                        "id": "86613263-218c-4bc0-859b-85aec4dedcb6",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Your request is Denied By ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.submit_user}}"
+                          },
+                          "interactive_blocks": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "actions",
+                                "elements": [
+                                  {
+                                    "text": {
+                                      "text": "All Set ",
+                                      "type": "plain_text",
+                                      "emoji": true
+                                    },
+                                    "type": "button",
+                                    "style": "danger",
+                                    "value": "button",
+                                    "action_id": "5e405890-d8f2-44d1-8445-d16bd1104811"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "interactivity_configuration": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "actions": {
+                                "5e405890-d8f2-44d1-8445-d16bd1104811": {
+                                  "is_button_multi_click": false,
+                                  "is_mutually_exclusive": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "d1b07aec-3362-4194-874f-9018f2ef3698",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Your Request ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.ba533dc0-5516-4b60-bfe6-e2795185d753}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " has been Resolved ,",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.b98b0ea0-3903-495a-9121-0334f3134f4b.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "true"
+                          }
+                        }
+                      },
+                      {
+                        "id": "263481ca-3c8a-4ac8-b2fb-800f581a92e1",
+                        "function_id": "Fn0592NZAAP4",
+                        "inputs": {
+                          "columns": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "0": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.ba533dc0-5516-4b60-bfe6-e2795185d753}}",
+                              "1": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.48336d05-7464-4560-9f65-1fc22fe2818b}}",
+                              "2": "{slack.user_mention_name(user_id={{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}})}",
+                              "3": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.8cd55926-02c3-4f5f-99fc-aaa3570d0438}}",
+                              "4": "{time.format(seconds={{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.043f36d7-0453-4881-90f2-6aa3eb8f42b6}}, dateType=DATE_WITH_ORDINAL_MONTH_YEAR_HOUR_MINUTE_AMPM_TZ)}",
+                              "5": "{slack.user_full_name(user_id={{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}})}",
+                              "6": "{time.format(seconds={{inputs.Ft0AD3JNGH7Y__event_timestamp}}, locale=en-US, dateType=DATE_MEDIUM_TIME_MEDIUM)}"
+                            }
+                          },
+                          "sheet_title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Form Responses"
+                          },
+                          "spreadsheet_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "12Qdtk1B50GVWcKMzHxNzh6tPGlSxtk9scJmyTPhCUqA"
+                          },
+                          "google_access_token": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": null
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ffd0951b-80fb-4b08-ab4f-3ea145f098d3",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.0c92188d-5b44-426b-8f2f-cd03e033756e.89fe3059-5d84-49f5-8aa0-dab5090ac1bd}}"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "46b8d7c4-33b9-4bef-a34c-24361633dd95",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Your request is Denied By ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.76d69871-1921-46e4-a334-a04809cb25e7.fields.b09236db-a977-448f-9df8-1c46c52fc29f}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{inputs.Ft0AD3JNGH7Y__user_id}}"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "017b9b33-d8ce-4ac9-8eb7-8e133fbfce89",
+            "function_id": "Fn0202",
+            "inputs": {},
+            "type": "case",
+            "expression": {
+              "version": 1,
+              "root": {
+                "statement": {
+                  "target": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.40e82739-a89d-4e23-8d45-f5156b3c3dc9}}"
+                }
+              }
+            },
+            "display_config": {
+              "color": "gray"
+            },
+            "steps": [
+              {
+                "id": "9988f43f-6689-44a3-a86c-beb1cc755747",
+                "function_id": "Fn010N",
+                "inputs": {
+                  "title": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "IT Support / Bug"
+                  },
+                  "fields": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": {
+                      "elements": [
+                        {
+                          "name": "7ba9500b-b2e2-4995-a23e-c40955636729",
+                          "type": "string",
+                          "title": "Request Title",
+                          "description": ""
+                        },
+                        {
+                          "long": true,
+                          "name": "d61eeb00-813f-498f-a1d8-75f4c8a6504d",
+                          "type": "string",
+                          "title": "Details",
+                          "description": ""
+                        },
+                        {
+                          "name": "9c778a6f-1a82-4d65-9e84-bb5d970a4859",
+                          "type": "array",
+                          "items": {
+                            "type": "slack#/types/file_id",
+                            "allowed_filetypes_group": "ALL"
+                          },
+                          "title": "Screenshots ",
+                          "maxItems": 10,
+                          "description": "Please provide some screenshots for Understanding Issues"
+                        },
+                        {
+                          "enum": [
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "High",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ],
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Low",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ],
+                            [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Medium",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          ],
+                          "name": "e59f653f-8606-44ae-938f-c407588a938b",
+                          "type": "slack#/types/limited_rich_text",
+                          "title": "Priority",
+                          "choices": [
+                            {
+                              "id": "04994fc6-d8a4-406f-9256-bff95d7b0ee2",
+                              "title": "High",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "High",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "High"
+                            },
+                            {
+                              "id": "eab64b23-6f40-4b21-9081-c97fd8f2d8df",
+                              "title": "Low ",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "Low",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "Low "
+                            },
+                            {
+                              "id": "46422491-5672-4214-ac5c-1278810b719b",
+                              "title": "Medium",
+                              "value": [
+                                {
+                                  "type": "rich_text",
+                                  "elements": [
+                                    {
+                                      "type": "rich_text_section",
+                                      "elements": [
+                                        {
+                                          "text": "Medium",
+                                          "type": "text"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "description": "Medium"
+                            }
+                          ],
+                          "default": "",
+                          "description": ""
+                        }
+                      ],
+                      "required": [
+                        "7ba9500b-b2e2-4995-a23e-c40955636729",
+                        "d61eeb00-813f-498f-a1d8-75f4c8a6504d",
+                        "9c778a6f-1a82-4d65-9e84-bb5d970a4859",
+                        "e59f653f-8606-44ae-938f-c407588a938b"
+                      ]
+                    }
+                  },
+                  "interactivity": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.b1388375-b659-4c2b-b588-dde99e8fac83.interactivity}}"
+                  }
+                }
+              },
+              {
+                "id": "e8f649ba-f06d-4df7-85e4-ae704b84ea5a",
+                "function_id": "Fn0102",
+                "inputs": {
+                  "files": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.9c778a6f-1a82-4d65-9e84-bb5d970a4859}}"
+                  },
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.submit_user}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": " Submitted the Request ",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.4e66b9d7-1c4f-4e84-b0f1-c9f0068bfab5.fields.21bb79fe-5ed8-4764-acea-426e326b2793}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "\n\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Details",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.d61eeb00-813f-498f-a1d8-75f4c8a6504d}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Request Title",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.7ba9500b-b2e2-4995-a23e-c40955636729}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "channel_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{inputs.Ft0AD3JNGH7Y__channel_id}}"
+                  }
+                }
+              },
+              {
+                "id": "9f51dd14-7cae-4b4e-9262-c62f6b8f1d00",
+                "function_id": "Fn010M",
+                "inputs": {
+                  "files": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.9c778a6f-1a82-4d65-9e84-bb5d970a4859}}"
+                  },
+                  "message": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "rich_text",
+                        "elements": [
+                          {
+                            "type": "rich_text_section",
+                            "elements": [
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.e59f653f-8606-44ae-938f-c407588a938b}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              },
+                              {
+                                "text": "Please Review the Request Submitted by ",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.submit_user}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/user_id"
+                              },
+                              {
+                                "text": "\n\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Details",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.d61eeb00-813f-498f-a1d8-75f4c8a6504d}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Request Title",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.7ba9500b-b2e2-4995-a23e-c40955636729}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "string"
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "text": "Priority",
+                                "type": "text",
+                                "style": {
+                                  "bold": true
+                                }
+                              },
+                              {
+                                "text": "\n",
+                                "type": "text"
+                              },
+                              {
+                                "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.e59f653f-8606-44ae-938f-c407588a938b}}",
+                                "type": "workflowtoken",
+                                "property": "",
+                                "data_type": "slack#/types/limited_rich_text"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "user_id": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": "U02MRFSKFKR"
+                  },
+                  "interactive_blocks": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": [
+                      {
+                        "type": "actions",
+                        "elements": [
+                          {
+                            "text": {
+                              "text": "Continue",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "primary",
+                            "value": "button",
+                            "action_id": "581b0b4f-a542-47e4-b5c3-0f37a4d936fc"
+                          },
+                          {
+                            "text": {
+                              "text": "Not Resolved",
+                              "type": "plain_text",
+                              "emoji": true
+                            },
+                            "type": "button",
+                            "style": "danger",
+                            "value": "button",
+                            "action_id": "3eda93c3-0eb9-4575-a195-742993cbd8d4"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "interactivity_configuration": {
+                    "hidden": false,
+                    "locked": false,
+                    "value": {
+                      "actions": {
+                        "3eda93c3-0eb9-4575-a195-742993cbd8d4": {
+                          "is_button_multi_click": false,
+                          "is_mutually_exclusive": false
+                        },
+                        "581b0b4f-a542-47e4-b5c3-0f37a4d936fc": {
+                          "allowed_entities": {
+                            "member_ids": [
+                              "U02MRFSKFKR"
+                            ]
+                          },
+                          "is_button_multi_click": false,
+                          "is_mutually_exclusive": false
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "63ae90ca-6a21-4280-ac65-1b632bf3ca9e",
+                "function_id": "Fn0201",
+                "inputs": {},
+                "type": "switch",
+                "steps": [
+                  {
+                    "id": "70526cf3-dcc1-47ae-8997-a330552c07f4",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.9f51dd14-7cae-4b4e-9262-c62f6b8f1d00.action.text.text}}",
+                          "operator": "CONTAINS",
+                          "value": "Not Resolved"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "f450a072-76fd-48c2-a8e3-b0f438540043",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "the Issue i could not Resolve , need to give it to service centre",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.e8f649ba-f06d-4df7-85e4-ae704b84ea5a.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "false"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "68cac5c7-7933-4a6b-9ee1-237a86601bd5",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.9f51dd14-7cae-4b4e-9262-c62f6b8f1d00.action.text.text}}",
+                          "operator": "CONTAINS"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "ae83b1f5-5079-4f9c-8ba8-dd650df0f1a5",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " Your Request Status : In-progress",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.e8f649ba-f06d-4df7-85e4-ae704b84ea5a.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "false"
+                          }
+                        }
+                      },
+                      {
+                        "id": "fc996d82-7dff-49c7-8cd3-0f74b3750dcf",
+                        "function_id": "Fn010M",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Issue Resolved",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "U02MRFSKFKR"
+                          },
+                          "interactive_blocks": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "actions",
+                                "elements": [
+                                  {
+                                    "text": {
+                                      "text": "Completed",
+                                      "type": "plain_text",
+                                      "emoji": true
+                                    },
+                                    "type": "button",
+                                    "style": "primary",
+                                    "value": "button",
+                                    "action_id": "13d0ec1f-94fd-42ab-aedd-e79dca044fec"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "interactivity_configuration": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "actions": {
+                                "13d0ec1f-94fd-42ab-aedd-e79dca044fec": {
+                                  "is_button_multi_click": false,
+                                  "is_mutually_exclusive": false
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "id": "b6f54818-9119-4d60-864e-af23fc0d3ce4",
+                        "function_id": "Fn010P",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "Hi ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.submit_user}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "slack#/types/user_id"
+                                      },
+                                      {
+                                        "text": " You Request ",
+                                        "type": "text"
+                                      },
+                                      {
+                                        "id": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.7ba9500b-b2e2-4995-a23e-c40955636729}}",
+                                        "type": "workflowtoken",
+                                        "property": "",
+                                        "data_type": "string"
+                                      },
+                                      {
+                                        "text": " is Resolved",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "message_context": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.9f51dd14-7cae-4b4e-9262-c62f6b8f1d00.message_context}}"
+                          },
+                          "reply_broadcast": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "false"
+                          }
+                        }
+                      },
+                      {
+                        "id": "99089416-0342-4870-9a9e-16f62cdba4ec",
+                        "function_id": "Fn0592NZAAP4",
+                        "inputs": {
+                          "columns": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": {
+                              "0": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.7ba9500b-b2e2-4995-a23e-c40955636729}}",
+                              "1": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.d61eeb00-813f-498f-a1d8-75f4c8a6504d}}",
+                              "2": "{slack.file_permalinks(file_ids={{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.9c778a6f-1a82-4d65-9e84-bb5d970a4859}})}",
+                              "3": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.fields.e59f653f-8606-44ae-938f-c407588a938b}}",
+                              "4": "{slack.user_full_name(user_id={{steps.9988f43f-6689-44a3-a86c-beb1cc755747.submit_user}})}",
+                              "5": "{time.format(seconds={{inputs.Ft0AD3JNGH7Y__event_timestamp}}, locale=en-US, dateType=DATE_MEDIUM_TIME_MEDIUM)}"
+                            }
+                          },
+                          "sheet_title": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "Form Responses"
+                          },
+                          "spreadsheet_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "10a8NwFWSU8sXUvwzOTh7TGvHtgNW7GlGmIKNBQMIcR4"
+                          },
+                          "google_access_token": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": null
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "80a6f85c-c540-4b98-8c53-e0f573ddd609",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.04994fc6-d8a4-406f-9256-bff95d7b0ee2}}"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "3146df73-0161-4135-a623-3b5499cd9f74",
+                        "function_id": "Fn013H",
+                        "inputs": {
+                          "list_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "F0ADT3Y0PMX"
+                          },
+                          "filter_by": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "filter_by_due_today"
+                          }
+                        }
+                      },
+                      {
+                        "id": "6ef25fad-cd04-4f8d-937b-04c109b2bbd9",
+                        "function_id": "Fn010F",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "SLA - Action should be taken by with in hour",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.b1388375-b659-4c2b-b588-dde99e8fac83.interactivity.interactor.id}}"
+                          },
+                          "channel_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{inputs.Ft0AD3JNGH7Y__channel_id}}"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "5ef8be65-33cf-4638-987a-cdc9fc7a1a67",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.46422491-5672-4214-ac5c-1278810b719b}}"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "aa27c8eb-36d0-42c5-879f-7796702660de",
+                        "function_id": "Fn013H",
+                        "inputs": {
+                          "list_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "F0ADT3Y0PMX"
+                          },
+                          "filter_by": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "filter_by_due_today"
+                          }
+                        }
+                      },
+                      {
+                        "id": "3743dfcb-fd5e-42d5-9edf-723c8103ba06",
+                        "function_id": "Fn010F",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "SLA - Action should be taken by with in 4 hour",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.b1388375-b659-4c2b-b588-dde99e8fac83.interactivity.interactor.id}}"
+                          },
+                          "channel_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{inputs.Ft0AD3JNGH7Y__channel_id}}"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "id": "50d9f35c-02b0-4758-81ad-a6199d938ca1",
+                    "function_id": "Fn0202",
+                    "inputs": {},
+                    "type": "case",
+                    "expression": {
+                      "version": 1,
+                      "root": {
+                        "statement": {
+                          "target": "{{steps.9988f43f-6689-44a3-a86c-beb1cc755747.eab64b23-6f40-4b21-9081-c97fd8f2d8df}}"
+                        }
+                      }
+                    },
+                    "display_config": {
+                      "color": "gray"
+                    },
+                    "steps": [
+                      {
+                        "id": "fbde2f2c-8aac-468d-8d9b-12cb643e9d76",
+                        "function_id": "Fn013H",
+                        "inputs": {
+                          "list_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "F0ADT3Y0PMX"
+                          },
+                          "filter_by": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "filter_by_due_today"
+                          }
+                        }
+                      },
+                      {
+                        "id": "3a0aa6ac-9b44-4fd0-9571-18f9f6424a33",
+                        "function_id": "Fn010F",
+                        "inputs": {
+                          "message": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": [
+                              {
+                                "type": "rich_text",
+                                "elements": [
+                                  {
+                                    "type": "rich_text_section",
+                                    "elements": [
+                                      {
+                                        "text": "SLA - Action should be taken by with in 6 hour",
+                                        "type": "text"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          "user_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{steps.b1388375-b659-4c2b-b588-dde99e8fac83.interactivity.interactor.id}}"
+                          },
+                          "channel_id": {
+                            "hidden": false,
+                            "locked": false,
+                            "value": "{{inputs.Ft0AD3JNGH7Y__channel_id}}"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "triggers": [
+    {
+      "name": "IT Request ",
+      "type": "shortcut",
+      "inputs": {
+        "Ft0AD3JNGH7Y__user_id": {
+          "value": "{{data.user_id}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft0AD3JNGH7Y__channel_id": {
+          "value": "{{data.channel_id}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft0AD3JNGH7Y__interactivity": {
+          "value": "{{data.interactivity}}",
+          "locked": false,
+          "hidden": false
+        },
+        "Ft0AD3JNGH7Y__event_timestamp": {
+          "value": "{{event_timestamp}}",
+          "locked": false,
+          "hidden": false
+        }
+      },
+      "shortcut": {
+        "schema": {}
+      }
+    }
+  ]
+}

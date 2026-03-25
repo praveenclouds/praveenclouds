@@ -69,12 +69,20 @@ function looksLikeEmail(value) {
   return /^\S+@\S+\.\S+$/.test(String(value || '').trim());
 }
 
+function normalizeLookupKey(value = '') {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '');
+}
+
 function normalizeUserSummary(user = {}) {
   const name = fullName(user);
   return {
     userId: user._id?.toString?.() || user.id || '',
     name,
     email: String(user.email || '').trim().toLowerCase(),
+    status: String(user.status || '').trim(),
     department: String(user.dept || '').trim(),
     location: String(user.location || '').trim(),
     jobTitle: String(user.jobTitle || '').trim(),
@@ -88,24 +96,53 @@ function normalizeUserSummary(user = {}) {
 
 async function loadUserDirectory() {
   const users = await User.find().sort({ first: 1, last: 1 }).lean();
+  const summaries = users
+    .map(normalizeUserSummary)
+    .sort((a, b) => {
+      const aInactive = String(a.status || '').toLowerCase() === 'inactive' ? 1 : 0;
+      const bInactive = String(b.status || '').toLowerCase() === 'inactive' ? 1 : 0;
+      if (aInactive !== bInactive) return aInactive - bInactive;
+      return String(a.name || '').localeCompare(String(b.name || ''));
+    });
   const byId = new Map();
   const byEmail = new Map();
   const byName = new Map();
+  const byAlias = new Map();
+  const aliasCollisions = new Set();
 
-  users.forEach(user => {
-    const summary = normalizeUserSummary(user);
+  function registerAlias(alias, summary) {
+    const key = normalizeLookupKey(alias);
+    if (!key) return;
+    const existing = byAlias.get(key);
+    if (existing) {
+      if (String(existing.userId || '') === String(summary.userId || '')) return;
+      aliasCollisions.add(key);
+      return;
+    }
+    byAlias.set(key, summary);
+  }
+
+  summaries.forEach(summary => {
     if (summary.userId) byId.set(summary.userId, summary);
     if (summary.email) byEmail.set(summary.email, summary);
     if (summary.name) byName.set(summary.name.toLowerCase(), summary);
+    if (summary.name) registerAlias(summary.name, summary);
+    const emailLocalPart = String(summary.email || '').split('@')[0] || '';
+    if (emailLocalPart) registerAlias(emailLocalPart, summary);
+    const firstName = String(summary.name || '').split(/\s+/).filter(Boolean)[0] || '';
+    if (firstName.length >= 3) registerAlias(firstName, summary);
   });
 
-  return { users: users.map(normalizeUserSummary), byId, byEmail, byName };
+  aliasCollisions.forEach(alias => byAlias.delete(alias));
+  return { users: summaries, byId, byEmail, byName, byAlias };
 }
 
 function resolveUserRef(input = {}, userDirectory = null) {
   const userId = String(input.userId || input.id || '').trim();
-  const email = String(input.email || '').trim().toLowerCase();
+  const explicitEmail = String(input.email || '').trim().toLowerCase();
   const name = String(input.name || input.label || input.value || '').trim();
+  const extractedEmail = explicitEmail ? '' : extractEmailFromText(name);
+  const email = explicitEmail || extractedEmail;
 
   if (isRequestorAssigneeRef({ userId, name })) {
     return {
@@ -120,10 +157,14 @@ function resolveUserRef(input = {}, userDirectory = null) {
   }
 
   if (userDirectory) {
+    const lookupNameKey = normalizeLookupKey(name);
+    const lookupEmailLocalKey = normalizeLookupKey(String(email || '').split('@')[0] || '');
     const matchedUser = (
       (userId && userDirectory.byId.get(userId))
       || (email && userDirectory.byEmail.get(email))
       || (name && userDirectory.byName.get(name.toLowerCase()))
+      || (lookupNameKey && userDirectory.byAlias?.get(lookupNameKey))
+      || (lookupEmailLocalKey && userDirectory.byAlias?.get(lookupEmailLocalKey))
     );
     if (matchedUser) return { ...matchedUser };
   }
@@ -293,6 +334,21 @@ async function syncCompletedOnboardingUser(request) {
   });
 }
 
+async function syncCompletedOffboardingUser(request) {
+  if (request.workflowType !== 'offboarding' || request.status !== 'completed') return null;
+
+  const email = String(request.employeeEmail || '').trim().toLowerCase();
+  if (!email) return null;
+
+  const user = await User.findOne({ email });
+  if (!user) return null;
+
+  user.status = 'Inactive';
+  if (request.endDate) user.lastWorkingDate = new Date(request.endDate);
+  await user.save();
+  return user;
+}
+
 function sanitizeChecklist(input = []) {
   return input.map(item => ({
     key: String(item.key || '').trim(),
@@ -414,6 +470,46 @@ function normalizeRequestTypeFormFields(input = []) {
   });
 }
 
+const CUSTOM_FORM_FIELD_TYPES = ['text', 'textarea', 'dropdown', 'file'];
+
+function normalizeCustomFormFields(input = []) {
+  if (!Array.isArray(input)) return [];
+  const seen = new Set();
+  return input
+    .map((field, index) => {
+      const rawKey = String(field.key || field.label || `field_${index + 1}`).trim()
+        .toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) || `field_${index + 1}`;
+      const key = seen.has(rawKey) ? `${rawKey}_${index + 1}` : rawKey;
+      seen.add(key);
+      const type = CUSTOM_FORM_FIELD_TYPES.includes(field.type) ? field.type : 'text';
+      const options = type === 'dropdown'
+        ? (Array.isArray(field.options) ? field.options : [])
+            .map(opt => ({ value: String(opt.value || opt.label || '').trim(), label: String(opt.label || opt.value || '').trim() }))
+            .filter(opt => opt.value && opt.label)
+        : [];
+      return {
+        key,
+        label: String(field.label || '').trim() || key,
+        type,
+        required: !!field.required,
+        options,
+        sortOrder: Number(field.sortOrder ?? index),
+      };
+    })
+    .filter(field => field.label);
+}
+
+function normalizeCustomFieldValues(input = []) {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map(item => ({
+      key:   String(item.key   || '').trim(),
+      label: String(item.label || '').trim(),
+      value: String(item.value || '').trim(),
+    }))
+    .filter(item => item.key);
+}
+
 async function normalizeRequestedApplications(input = []) {
   const requestedIds = [...new Set((Array.isArray(input) ? input : [])
     .map(item => (typeof item === 'string' ? item : item?.csvId))
@@ -497,6 +593,7 @@ function formatRequestTypeDefinition(doc) {
     autoAddDepartmentApps: !!source.autoAddDepartmentApps,
     isSystem: !!source.isSystem,
     formFields: normalizeRequestTypeFormFields(source.formFields || []),
+    customFormFields: normalizeCustomFormFields(source.customFormFields || []),
     checklist: sanitizeRequestTypeChecklist(source.checklist || []),
     stepCount: Array.isArray(source.checklist) ? source.checklist.length : 0,
     createdAt: source.createdAt,
@@ -623,6 +720,7 @@ async function createRequestTypeDefinition(input = {}) {
     defaultAssigneeEmail: allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeEmail : '',
     autoAddDepartmentApps,
     formFields,
+    customFormFields: normalizeCustomFormFields(input.customFormFields || []),
     checklist: people.checklist,
   });
 
@@ -660,6 +758,7 @@ async function updateRequestTypeDefinition(id, input = {}) {
       ? { ...field, enabled: true, required: true }
       : field
   ));
+  requestType.customFormFields = normalizeCustomFormFields(input.customFormFields || []);
   requestType.checklist = people.checklist;
 
   await requestType.save();
@@ -920,6 +1019,33 @@ function resolveReportingManagerRef(userRef = {}, userDirectory = null) {
   };
 }
 
+function applyManagerApprovalStepOwners(checklist = [], managerRef = {}, options = {}) {
+  const managerUserId = String(managerRef?.userId || '').trim();
+  const managerEmail = String(managerRef?.email || '').trim().toLowerCase();
+  const managerName = String(managerRef?.name || '').trim();
+  if (!managerUserId && !managerEmail && !managerName) return checklist;
+  const overwrite = !!options.overwrite;
+
+  return (Array.isArray(checklist) ? checklist : []).map(step => {
+    if (String(step?.approvalMode || 'none') !== 'manager') return step;
+    if (String(step?.status || 'pending') === 'done') return step;
+
+    const hasOwner = !!(
+      String(step?.ownerUserId || '').trim()
+      || String(step?.ownerEmail || '').trim()
+      || String(step?.owner || '').trim()
+    );
+    if (hasOwner && !overwrite) return step;
+
+    return {
+      ...step,
+      owner: managerName || String(step?.owner || '').trim(),
+      ownerUserId: managerUserId || '',
+      ownerEmail: managerEmail || '',
+    };
+  });
+}
+
 function resolveManagerApprovalDefaultAssignee({
   body = {},
   actor = {},
@@ -1010,7 +1136,7 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
   checklist = applyRequestorChecklistOwners(checklist, requestorRef);
   const requiresManagerApproval = checklist.some(item => item?.approvalMode === 'manager');
 
-  const manager = resolveUserRef(
+  let manager = resolveUserRef(
     {
       userId: body.managerUserId,
       email: body.managerEmail,
@@ -1018,6 +1144,12 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
     },
     userDirectory
   );
+  if (!manager.userId && !manager.email && !manager.name) {
+    manager = resolveReportingManagerRef(employeeProfile, userDirectory)
+      || resolveReportingManagerRef(requestorRef, userDirectory)
+      || manager;
+  }
+  checklist = applyManagerApprovalStepOwners(checklist, manager, { overwrite: true });
   const defaultAssignee = resolveManagerApprovalDefaultAssignee({
     body,
     actor,
@@ -1059,6 +1191,7 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
     startDate: body.startDate || '',
     endDate: body.endDate || '',
     notes: body.notes || '',
+    customFieldValues: normalizeCustomFieldValues(body.customFieldValues || []),
     assignee: assignee.name || String(body.assignee || '').trim(),
     assigneeUserId: assignee.userId || '',
     assigneeEmail: assignee.email || String(body.assigneeEmail || '').trim().toLowerCase(),
@@ -1081,7 +1214,7 @@ async function applySupportRequestUpdates(request, body = {}) {
     userDirectory
   );
 
-  const manager = resolveUserRef(
+  let manager = resolveUserRef(
     {
       userId: body.managerUserId !== undefined ? body.managerUserId : request.managerUserId,
       email: body.managerEmail !== undefined ? body.managerEmail : request.managerEmail,
@@ -1089,9 +1222,24 @@ async function applySupportRequestUpdates(request, body = {}) {
     },
     userDirectory
   );
+  if (!manager.userId && !manager.email && !manager.name) {
+    const employeeRef = resolveUserRef(
+      {
+        email: body.employeeEmail !== undefined ? body.employeeEmail : request.employeeEmail,
+        name: body.employeeName !== undefined ? body.employeeName : request.employeeName,
+      },
+      userDirectory
+    );
+    manager = resolveReportingManagerRef(employeeRef, userDirectory) || manager;
+  }
   request.managerName = manager.name || '';
   request.managerUserId = manager.userId || '';
   request.managerEmail = manager.email || '';
+  const managerExplicitlyUpdated = (
+    body.managerUserId !== undefined
+    || body.managerEmail !== undefined
+    || body.managerName !== undefined
+  );
 
   const assignee = resolveUserRef(
     {
@@ -1130,6 +1278,9 @@ async function applySupportRequestUpdates(request, body = {}) {
       OFFBOARDING_APP_TASK_OPTIONS
     );
   }
+  request.checklist = applyManagerApprovalStepOwners(request.checklist || [], manager, {
+    overwrite: managerExplicitlyUpdated,
+  });
 
   return request;
 }
@@ -1171,6 +1322,7 @@ module.exports = {
   resolveUserRef,
   sanitizeChecklist,
   syncCompletedOnboardingUser,
+  syncCompletedOffboardingUser,
   ensureCompletedOnboardingProvisioningReady,
   softwareDefaultOwner,
   softwareOwnerCandidates,

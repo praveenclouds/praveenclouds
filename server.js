@@ -1,7 +1,7 @@
 /**
  * server.js — TerzoCloud Asset Portal  (modular monolith entry point)
  *
- * Start:  node server.js
+ * Start:  node start-dev.js
  * Dev:    npm run dev
  *
  * Environment variables (set in .env or export):
@@ -221,8 +221,30 @@ function shutdown(signal) {
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT',  () => shutdown('SIGINT'));
 
+// ── Auto-start in-memory MongoDB if no external URI is configured ──────────────
+async function ensureMongoDB() {
+  const uri = process.env.MONGO_URI || process.env.MONGODB_URI || '';
+  if (!uri) {
+    try {
+      const { MongoMemoryServer } = require('mongodb-memory-server');
+      console.log('🔧  Starting in-memory MongoDB…');
+      const mongod = await MongoMemoryServer.create({ instance: { dbName: 'terzocloud_assets' } });
+      process.env.MONGO_URI = mongod.getUri();
+      console.log(`✅  In-memory MongoDB ready → ${process.env.MONGO_URI}`);
+    } catch (err) {
+      if (err.message && err.message.includes('already in use')) {
+        console.log('ℹ️   MongoDB already running — connecting to existing instance');
+        process.env.MONGO_URI = 'mongodb://127.0.0.1:27017/terzocloud_assets';
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
 // ── Start — explicit catch so boot errors surface clearly ─────────────────────
-connect()
+ensureMongoDB()
+  .then(() => connect())
   .then(async () => {
     await seedSoftware();
     await seedAdminUser();

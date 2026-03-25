@@ -46,6 +46,26 @@ const requestTypeFormFieldSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const customFormFieldOptionSchema = new mongoose.Schema(
+  {
+    value: { type: String, required: true, trim: true },
+    label: { type: String, required: true, trim: true },
+  },
+  { _id: false }
+);
+
+const customFormFieldSchema = new mongoose.Schema(
+  {
+    key:      { type: String, required: true, trim: true },
+    label:    { type: String, required: true, trim: true },
+    type:     { type: String, enum: ['text', 'textarea', 'dropdown', 'file'], default: 'text' },
+    required: { type: Boolean, default: false },
+    options:  { type: [customFormFieldOptionSchema], default: [] },
+    sortOrder:{ type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
 const requestTypeStepSchema = new mongoose.Schema(
   {
     key: { type: String, required: true, trim: true },
@@ -189,6 +209,7 @@ const supportRequestTypeSchema = new mongoose.Schema(
     autoAddDepartmentApps: { type: Boolean, default: false },
     isSystem: { type: Boolean, default: false },
     formFields: { type: [requestTypeFormFieldSchema], default: () => buildDefaultFormFields() },
+    customFormFields: { type: [customFormFieldSchema], default: [] },
     checklist: { type: [requestTypeStepSchema], default: [] },
   },
   { timestamps: true }

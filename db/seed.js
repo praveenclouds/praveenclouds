@@ -16,6 +16,7 @@ require('dotenv').config(); // optional – reads .env if present
 const { connect, disconnect, User, Asset } = require('./index');
 const { seedSoftware } = require('../seed/software.seed');
 const FORCE_SOFTWARE = process.argv.includes('--force-software');
+const SAFE_MODE = process.argv.includes('--safe');
 
 // ─── 1. USERS ──────────────────────────────────────────────────────────────────
 const USERS_RAW = [
@@ -160,44 +161,156 @@ const ASSETS_RAW = [
   {csvId:'A-42',name:'Macbook Pro 15',  type:'Laptop',serial:'J6R7D6Y6LF',   brand:'Apple / M4 Pro',  desc:'24GB RAM - 512GB SSD M4 Pro',         status:'In-Use',    legacyAssignTo:'u40',location:'Chennai',    dept:'Engineering',      vendor:'—',             notes:''},
 ];
 
-// ─── 3. MAIN ───────────────────────────────────────────────────────────────────
-async function seed() {
-  await connect();
+const roleMap = {
+  Editor: 'Staff',
+  Viewer: 'Staff',
+  Admin: 'Admin',
+  Manager: 'Manager',
+  Staff: 'Staff',
+};
+const locationMap = {
+  Remote: 'USA',
+  Chennai: 'India',
+  Coimbatore: 'India',
+  India: 'India',
+  USA: 'USA',
+  Canada: 'Canada',
+};
+const normalizeLocation = (value, fallback = 'India') => locationMap[value] || fallback;
+const normalizeUser = (user) => ({
+  ...user,
+  joined: new Date(user.joined),
+  role: roleMap[user.role] || 'Staff',
+  location: normalizeLocation(user.location, 'India'),
+});
 
-  // --- Users ---
+async function seedDestructive() {
   console.log('🗑️   Clearing users…');
   await User.deleteMany({});
 
-  // Map legacy roles to valid User model enum values
-  const roleMap     = { Editor: 'Staff', Viewer: 'Staff', Admin: 'Admin', Manager: 'Manager', Staff: 'Staff' };
-  // Map legacy location values to valid enum values
-  const locationMap = { Remote: 'USA', Chennai: 'Chennai', Coimbatore: 'Coimbatore', USA: 'USA', Canada: 'Canada' };
-
   console.log('👤  Inserting 93 users…');
-  const insertedUsers = await User.insertMany(
-    USERS_RAW.map(u => ({
-      ...u,
-      joined:   new Date(u.joined),
-      role:     roleMap[u.role]     || 'Staff',
-      location: locationMap[u.location] || 'USA',
-    }))
-  );
+  const insertedUsers = await User.insertMany(USERS_RAW.map(normalizeUser));
 
-  // Build legacyId → ObjectId map for asset assignment
   const userMap = {};
-  insertedUsers.forEach(u => { userMap[u.legacyId] = u._id; });
+  insertedUsers.forEach((user) => {
+    userMap[user.legacyId] = user._id;
+  });
 
-  // --- Assets ---
   console.log('🗑️   Clearing assets…');
   await Asset.deleteMany({});
 
   console.log('💻  Inserting 42 assets…');
   await Asset.insertMany(
-    ASSETS_RAW.map(({ legacyAssignTo, ...a }) => ({
-      ...a,
+    ASSETS_RAW.map(({ legacyAssignTo, ...asset }) => ({
+      ...asset,
+      location: normalizeLocation(asset.location, 'India'),
       assignedTo: legacyAssignTo ? (userMap[legacyAssignTo] ?? null) : null,
     }))
   );
+}
+
+async function seedSafe() {
+  console.log('🛡️   Safe seed mode (no deletes).');
+  console.log('👤  Upserting users…');
+
+  const rawEmails = USERS_RAW.map((user) => String(user.email || '').toLowerCase().trim());
+  const rawLegacyIds = USERS_RAW.map((user) => user.legacyId).filter(Boolean);
+  const existingUsers = await User.find({
+    $or: [
+      { email: { $in: rawEmails } },
+      { legacyId: { $in: rawLegacyIds } },
+    ],
+  }).select('_id email legacyId').lean();
+
+  const byEmail = new Map();
+  const byLegacyId = new Map();
+  existingUsers.forEach((user) => {
+    if (user.email) byEmail.set(user.email, user);
+    if (user.legacyId) byLegacyId.set(user.legacyId, user);
+  });
+
+  let updatedUsers = 0;
+  let insertedUsers = 0;
+  let skippedUsers = 0;
+  const userOps = [];
+
+  for (const rawUser of USERS_RAW) {
+    const normalizedUser = normalizeUser(rawUser);
+    const email = String(normalizedUser.email || '').toLowerCase().trim();
+    const matchByLegacy = normalizedUser.legacyId ? byLegacyId.get(normalizedUser.legacyId) : null;
+    const matchByEmail = byEmail.get(email);
+
+    if (matchByLegacy && matchByEmail && String(matchByLegacy._id) !== String(matchByEmail._id)) {
+      skippedUsers += 1;
+      console.warn(
+        `⚠️  Skipping conflicting user mapping for legacyId=${normalizedUser.legacyId}, email=${email}`
+      );
+      continue;
+    }
+
+    const matchedUser = matchByLegacy || matchByEmail;
+    if (matchedUser) {
+      userOps.push({
+        updateOne: {
+          filter: { _id: matchedUser._id },
+          update: { $set: normalizedUser },
+        },
+      });
+      updatedUsers += 1;
+    } else {
+      userOps.push({
+        insertOne: {
+          document: normalizedUser,
+        },
+      });
+      insertedUsers += 1;
+    }
+  }
+
+  if (userOps.length) await User.bulkWrite(userOps, { ordered: false });
+  console.log(`   Users updated: ${updatedUsers}, inserted: ${insertedUsers}, skipped: ${skippedUsers}`);
+
+  const seededUsers = await User.find({
+    legacyId: { $in: rawLegacyIds },
+  }).select('_id legacyId email').lean();
+
+  const userMap = {};
+  seededUsers.forEach((user) => {
+    if (user.legacyId) userMap[user.legacyId] = user._id;
+  });
+
+  console.log('💻  Upserting assets…');
+  let updatedAssets = 0;
+  let insertedAssets = 0;
+  const assetOps = ASSETS_RAW.map(({ legacyAssignTo, ...asset }) => ({
+    updateOne: {
+      filter: { csvId: asset.csvId },
+      update: {
+        $set: {
+          ...asset,
+          location: normalizeLocation(asset.location, 'India'),
+          assignedTo: legacyAssignTo ? (userMap[legacyAssignTo] ?? null) : null,
+        },
+      },
+      upsert: true,
+    },
+  }));
+  if (assetOps.length) {
+    const assetResult = await Asset.bulkWrite(assetOps, { ordered: false });
+    updatedAssets = assetResult.modifiedCount || 0;
+    insertedAssets = assetResult.upsertedCount || 0;
+  }
+  console.log(`   Assets updated: ${updatedAssets}, inserted: ${insertedAssets}`);
+}
+
+// ─── 3. MAIN ───────────────────────────────────────────────────────────────────
+async function seed() {
+  await connect();
+  if (SAFE_MODE) {
+    await seedSafe();
+  } else {
+    await seedDestructive();
+  }
 
   // --- Summary ---
   const totalUsers  = await User.countDocuments();
@@ -211,7 +324,7 @@ async function seed() {
     await seedSoftware(true);
   }
 
-  console.log('\n✅  Seed complete');
+  console.log(`\n✅  Seed complete (${SAFE_MODE ? 'safe mode' : 'destructive mode'})`);
   console.log(`   Users  : ${totalUsers}`);
   console.log(`   Assets : ${totalAssets}  (In-Use: ${inUse}, Available: ${available})`);
   if (FORCE_SOFTWARE) console.log('   Software: synced from seed file');

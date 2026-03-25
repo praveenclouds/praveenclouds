@@ -8,7 +8,7 @@
  */
 
 const mongoose = require('mongoose');
-const { MONGO_URI } = require('../config');
+require('../config'); // ensure dotenv is loaded
 
 const MONGO_OPTS = {
   serverSelectionTimeoutMS: 5_000,   // fail fast if no server found within 5 s
@@ -24,6 +24,9 @@ const MAX_RETRIES = 5;
 
 async function connect(attempt = 1) {
   if (mongoose.connection.readyState >= 1) return; // already connected
+
+  // Read URI at connect-time so in-memory MongoDB URI set after module load is picked up
+  const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/terzocloud_assets';
 
   try {
     await mongoose.connect(MONGO_URI, MONGO_OPTS);

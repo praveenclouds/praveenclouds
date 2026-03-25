@@ -717,6 +717,55 @@
       gap: 12px;
     }
     .workflow-step-grid .full { grid-column: 1 / -1; }
+    /* ── Custom Form Field Builder ── */
+    .custom-field-card {
+      border: 1px solid rgba(100,180,120,.22);
+      border-radius: 16px;
+      background: rgba(16, 28, 22, 0.92);
+      padding: 14px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+    }
+    .custom-field-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .custom-field-type-badge {
+      font-size:.75rem;
+      font-weight:700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(100,180,120,.18);
+      color: #7dda9a;
+      border: 1px solid rgba(100,180,120,.3);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .custom-field-grid {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .custom-field-grid .full { grid-column: 1 / -1; }
+    .option-list { display:flex; flex-direction:column; gap:6px; margin-top:4px; }
+    .option-row { display:flex; gap:8px; align-items:center; }
+    .option-row input { flex:1; }
+    .builder-add-btn {
+      border: 1px dashed rgba(130,96,185,.4);
+      background: transparent;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 10px;
+      font: inherit;
+      font-size:.88rem;
+      cursor:pointer;
+      width:100%;
+      transition:.2s;
+    }
+    .builder-add-btn:hover { border-color:rgba(130,96,185,.7); color:var(--text); }
     .mail-template-layout {
       display:grid;
       gap: 18px;
@@ -1207,6 +1256,11 @@
           <div class="full" id="createField_notes">
             <label id="createLabel_notes">Notes</label>
             <textarea id="newNotes" rows="4" placeholder="Anything the IT team should know before starting this request" disabled></textarea>
+          </div>
+          <div class="full" id="createCustomFieldsSection" style="display:none;grid-column:1/-1">
+            <div style="border-top:1px solid rgba(130,96,185,.18);margin:4px 0 12px"></div>
+            <div style="font-size:.85rem;font-weight:700;color:var(--muted);margin-bottom:10px;letter-spacing:.04em;text-transform:uppercase">Custom Fields</div>
+            <div id="createCustomFieldsList" style="display:flex;flex-direction:column;gap:12px"></div>
           </div>
           <div class="full preview-card" id="departmentAppsPreview" hidden>
             <div>
@@ -2400,6 +2454,7 @@
           ? { ...field, enabled: true, required: true }
           : field
       ));
+      const customFormFields = Array.isArray(definition.customFormFields) ? definition.customFormFields : [];
 
       editor.innerHTML = `
         <div class="builder-section-title">Request Type</div>
@@ -2457,7 +2512,62 @@
           <input id="requestTypeAutoApps" type="checkbox" ${definition.autoAddDepartmentApps ? 'checked' : ''} ${editable ? '' : 'disabled'} />
         </div>
 
-        <div class="builder-section-title">Request Form</div>
+        <div class="builder-section-title">Custom Form Fields</div>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">Add text, paragraph, dropdown, or file-upload fields specific to this request type. These appear on the request form and are saved with every ticket.</div>
+        <div class="workflow-step-list" id="customFieldList">
+          ${customFormFields.length === 0 ? `<div class="empty" style="padding:14px;border:1px dashed rgba(130,96,185,.2);border-radius:12px">No custom fields yet. Click "Add Field" below to build your form.</div>` : ''}
+          ${customFormFields.map((field, index) => `
+            <div class="custom-field-card">
+              <div class="custom-field-head">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <strong>Field ${index + 1}</strong>
+                  <span class="custom-field-type-badge">${escapeHtml(field.type || 'text')}</span>
+                  ${field.required ? `<span style="font-size:.75rem;color:#f59e0b;font-weight:700">Required</span>` : ''}
+                </div>
+                ${editable ? `<button class="btn btn-danger" type="button" onclick="removeCustomFormField(${index})" style="padding:4px 10px;font-size:.8rem">Remove</button>` : ''}
+              </div>
+              <div class="custom-field-grid">
+                <div class="full">
+                  <label>Field Label</label>
+                  <input data-editor-key="cfield-${index}-label" value="${escapeHtml(field.label || '')}" placeholder="e.g. Request Title" oninput="updateCustomFormField(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
+                </div>
+                <div>
+                  <label>Field Type</label>
+                  <select data-editor-key="cfield-${index}-type" onchange="updateCustomFormField(${index}, 'type', this.value)" ${editable ? '' : 'disabled'}>
+                    <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text (short)</option>
+                    <option value="textarea" ${field.type === 'textarea' ? 'selected' : ''}>Paragraph (long)</option>
+                    <option value="dropdown" ${field.type === 'dropdown' ? 'selected' : ''}>Dropdown</option>
+                    <option value="file" ${field.type === 'file' ? 'selected' : ''}>File Upload</option>
+                  </select>
+                </div>
+                <div>
+                  <label>Required</label>
+                  <select data-editor-key="cfield-${index}-required" onchange="updateCustomFormField(${index}, 'required', this.value === 'true')" ${editable ? '' : 'disabled'}>
+                    <option value="false" ${field.required ? '' : 'selected'}>Optional</option>
+                    <option value="true" ${field.required ? 'selected' : ''}>Required</option>
+                  </select>
+                </div>
+                ${field.type === 'dropdown' ? `
+                <div class="full">
+                  <label>Dropdown Options</label>
+                  <div class="option-list" id="optionList-${index}">
+                    ${(field.options || []).map((opt, oi) => `
+                      <div class="option-row">
+                        <input data-editor-key="cfield-${index}-opt-${oi}" value="${escapeHtml(opt.label || '')}" placeholder="Option label" oninput="updateCustomFieldOption(${index}, ${oi}, this.value)" ${editable ? '' : 'disabled'} />
+                        ${editable ? `<button class="btn btn-secondary" type="button" onclick="removeCustomFieldOption(${index}, ${oi})" style="padding:4px 10px;font-size:.8rem;flex-shrink:0">✕</button>` : ''}
+                      </div>
+                    `).join('')}
+                  </div>
+                  ${editable ? `<button class="builder-add-btn" style="margin-top:6px" type="button" onclick="addCustomFieldOption(${index})">+ Add Option</button>` : ''}
+                </div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ${editable ? `<button class="builder-add-btn" type="button" onclick="addCustomFormField()" style="margin-top:4px">＋ Add Custom Field</button>` : ''}
+
+        <div class="builder-section-title" style="margin-top:12px">Standard Form Fields</div>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">These are the built-in request fields. Toggle visibility and required status per request type.</div>
         <div class="workflow-step-list">
           ${formFields.map((field, index) => `
             <div class="workflow-step-card">
@@ -2488,12 +2598,17 @@
           `).join('')}
         </div>
 
-        <div class="builder-section-title">Workflow Steps</div>
+        <div class="builder-section-title" style="margin-top:12px">Workflow Steps</div>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">Define the checklist tasks IT runs when this request is created. Each step can have a default assignee, dependencies, and optional manager approval.</div>
         <div class="workflow-step-list">
           ${checklist.map((step, index) => `
             <div class="workflow-step-card">
               <div class="workflow-step-head">
-                <strong>Step ${index + 1}</strong>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <strong>Step ${index + 1}</strong>
+                  ${step.approvalMode === 'manager' ? `<span style="font-size:.75rem;padding:2px 8px;border-radius:999px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);font-weight:700">Approval</span>` : ''}
+                  ${step.dependsOn ? `<span style="font-size:.75rem;color:var(--muted)">after: ${escapeHtml(step.dependsOn)}</span>` : ''}
+                </div>
                 ${editable ? `<button class="btn btn-secondary" type="button" onclick="removeRequestTypeStep(${index})">Remove</button>` : ''}
               </div>
               <div class="workflow-step-grid">
@@ -2502,7 +2617,7 @@
                   <input data-editor-key="step-${index}-label" value="${escapeHtml(step.label || '')}" placeholder="Create user account" oninput="updateRequestTypeStep(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
-                  <label>Area</label>
+                  <label>Area / Team</label>
                   <input data-editor-key="step-${index}-area" value="${escapeHtml(step.area || '')}" placeholder="Identity" oninput="updateRequestTypeStep(${index}, 'area', this.value)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
@@ -2522,9 +2637,9 @@
                   </select>
                 </div>
                 <div>
-                  <label>Depends On</label>
+                  <label>Depends On (runs after)</label>
                   <select data-editor-key="step-${index}-dependsOn" onchange="updateRequestTypeStep(${index}, 'dependsOn', this.value)" ${editable ? '' : 'disabled'}>
-                    <option value="">No dependency</option>
+                    <option value="">No dependency (run immediately)</option>
                     ${checklist
                       .filter((candidate, candidateIndex) => candidateIndex !== index)
                       .map(candidate => `<option value="${escapeHtml(candidate.key || '')}" ${step.dependsOn === candidate.key ? 'selected' : ''}>${escapeHtml(candidate.label || candidate.key || 'Step')}</option>`)
@@ -2532,10 +2647,10 @@
                   </select>
                 </div>
                 <div>
-                  <label>Approval</label>
+                  <label>Approval Gate</label>
                   <select data-editor-key="step-${index}-approvalMode" onchange="updateRequestTypeStep(${index}, 'approvalMode', this.value)" ${editable ? '' : 'disabled'}>
-                    <option value="none" ${step.approvalMode === 'manager' ? '' : 'selected'}>No approval link</option>
-                    <option value="manager" ${step.approvalMode === 'manager' ? 'selected' : ''}>Manager approval required</option>
+                    <option value="none" ${step.approvalMode === 'manager' ? '' : 'selected'}>No approval required</option>
+                    <option value="manager" ${step.approvalMode === 'manager' ? 'selected' : ''}>Manager must approve</option>
                   </select>
                 </div>
               </div>
@@ -2602,6 +2717,72 @@
       }
       renderRequestTypeEditor({ preserveState: true });
     }
+
+    // ── Custom Form Field functions ──────────────────────────────────────
+    function addCustomFormField() {
+      const definition = currentRequestTypeDefinition();
+      if (!definition) { createRequestTypeDraft(); return; }
+      if (!Array.isArray(definition.customFormFields)) definition.customFormFields = [];
+      definition.customFormFields.push({
+        key: `field_${definition.customFormFields.length + 1}`,
+        label: '',
+        type: 'text',
+        required: false,
+        options: [],
+        sortOrder: definition.customFormFields.length,
+      });
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
+    function removeCustomFormField(index) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.customFormFields) return;
+      definition.customFormFields.splice(index, 1);
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
+    function updateCustomFormField(index, field, value) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.customFormFields?.[index]) return;
+      definition.customFormFields[index][field] = value;
+      // Auto-generate key from label when label changes
+      if (field === 'label' && !definition.customFormFields[index]._keyManuallySet) {
+        definition.customFormFields[index].key =
+          value.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 60) || `field_${index + 1}`;
+      }
+      // Clear options if type changes away from dropdown
+      if (field === 'type' && value !== 'dropdown') {
+        definition.customFormFields[index].options = [];
+      }
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
+    function addCustomFieldOption(fieldIndex) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.customFormFields?.[fieldIndex]) return;
+      if (!Array.isArray(definition.customFormFields[fieldIndex].options)) {
+        definition.customFormFields[fieldIndex].options = [];
+      }
+      definition.customFormFields[fieldIndex].options.push({ value: '', label: '' });
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
+    function removeCustomFieldOption(fieldIndex, optionIndex) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.customFormFields?.[fieldIndex]?.options) return;
+      definition.customFormFields[fieldIndex].options.splice(optionIndex, 1);
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
+    function updateCustomFieldOption(fieldIndex, optionIndex, labelValue) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition?.customFormFields?.[fieldIndex]?.options?.[optionIndex]) return;
+      definition.customFormFields[fieldIndex].options[optionIndex].label = labelValue;
+      definition.customFormFields[fieldIndex].options[optionIndex].value =
+        labelValue.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || `opt_${optionIndex + 1}`;
+      // No re-render needed for option text typing — avoids focus loss
+    }
+    // ─────────────────────────────────────────────────────────────────────
 
     function addRequestTypeStep() {
       const definition = currentRequestTypeDefinition();
@@ -2692,6 +2873,17 @@
           enabled: !!field.enabled,
           required: !!field.required,
         })),
+        customFormFields: (definition.customFormFields || []).map((field, i) => ({
+          key: String(field.key || `field_${i + 1}`).trim(),
+          label: String(field.label || '').trim(),
+          type: ['text','textarea','dropdown','file'].includes(field.type) ? field.type : 'text',
+          required: !!field.required,
+          options: (field.options || []).map(opt => ({
+            value: String(opt.value || opt.label || '').trim(),
+            label: String(opt.label || opt.value || '').trim(),
+          })).filter(opt => opt.label),
+          sortOrder: i,
+        })).filter(field => field.label),
         checklist: (definition.checklist || []).map(step => ({
           key: String(step.key || '').trim(),
           label: String(step.label || '').trim(),
@@ -3235,6 +3427,18 @@
             <label>Notes</label>
             <textarea id="detailNotes" rows="4" ${editable ? '' : 'disabled'}>${escapeHtml(request.notes || '')}</textarea>
           </div>
+          ${(Array.isArray(request.customFieldValues) && request.customFieldValues.length > 0) ? `
+          <div class="field" style="grid-column:1/-1">
+            <label style="font-weight:800;font-size:.9rem;margin-bottom:8px;display:block">Custom Form Fields</label>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${request.customFieldValues.map(cfv => `
+                <div style="display:flex;flex-direction:column;gap:3px">
+                  <label style="font-size:.8rem;color:var(--muted)">${escapeHtml(cfv.label || cfv.key)}</label>
+                  <div style="background:rgba(255,255,255,.04);border:1px solid rgba(130,96,185,.14);border-radius:8px;padding:8px 12px;font-size:.9rem;white-space:pre-wrap">${escapeHtml(cfv.value || '—')}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>` : ''}
         </div>
 
         <div>
@@ -3345,6 +3549,30 @@
         document.getElementById('createErr').textContent = '';
       }
       updateDepartmentChecklistPreview();
+      renderCreateCustomFields(definition);
+    }
+
+    function renderCreateCustomFields(definition) {
+      const section = document.getElementById('createCustomFieldsSection');
+      const list = document.getElementById('createCustomFieldsList');
+      if (!section || !list) return;
+      const fields = Array.isArray(definition?.customFormFields) ? definition.customFormFields : [];
+      if (!fields.length) { section.style.display = 'none'; list.innerHTML = ''; return; }
+      section.style.display = '';
+      list.innerHTML = fields.map((field, i) => {
+        const reqMark = field.required ? ' <span style="color:#f87171">*</span>' : '';
+        if (field.type === 'textarea') {
+          return `<div><label style="display:block;margin-bottom:4px;font-size:.88rem">${escapeHtml(field.label)}${reqMark}</label><textarea id="customField_${i}" rows="3" placeholder="${escapeHtml(field.label)}" style="width:100%;box-sizing:border-box"></textarea></div>`;
+        }
+        if (field.type === 'dropdown') {
+          const opts = (field.options || []).map(opt => `<option value="${escapeHtml(opt.value)}">${escapeHtml(opt.label)}</option>`).join('');
+          return `<div><label style="display:block;margin-bottom:4px;font-size:.88rem">${escapeHtml(field.label)}${reqMark}</label><select id="customField_${i}"><option value="">Select…</option>${opts}</select></div>`;
+        }
+        if (field.type === 'file') {
+          return `<div><label style="display:block;margin-bottom:4px;font-size:.88rem">${escapeHtml(field.label)}${reqMark}</label><input type="file" id="customField_${i}" multiple /></div>`;
+        }
+        return `<div><label style="display:block;margin-bottom:4px;font-size:.88rem">${escapeHtml(field.label)}${reqMark}</label><input type="text" id="customField_${i}" placeholder="${escapeHtml(field.label)}" /></div>`;
+      }).join('');
     }
 
     function openCreateModal() {
@@ -3380,6 +3608,15 @@
         startDate: document.getElementById('newStartDate').value,
         endDate: document.getElementById('newEndDate').value,
         notes: document.getElementById('newNotes').value.trim(),
+        customFieldValues: (() => {
+          const def = currentCreateDefinition();
+          const fields = Array.isArray(def?.customFormFields) ? def.customFormFields : [];
+          return fields.map((field, i) => {
+            const el = document.getElementById(`customField_${i}`);
+            const value = el ? (el.tagName === 'SELECT' ? el.value : (el.type === 'file' ? (el.files?.length ? el.files[0].name : '') : el.value.trim())) : '';
+            return { key: field.key, label: field.label, value };
+          }).filter(v => v.key);
+        })(),
       };
       const checklist = buildCreateChecklistPayload();
       if (checklist) payload.checklist = checklist;
@@ -3402,6 +3639,17 @@
       });
       if (requiredField) {
         errEl.textContent = `${requiredField.label} is required.`;
+        return;
+      }
+
+      // Validate required custom fields
+      const requiredCustomField = (definition.customFormFields || []).find((field, i) => {
+        if (!field.required || field.type === 'file') return false;
+        const cfv = (payload.customFieldValues || []).find(v => v.key === field.key);
+        return !String(cfv?.value || '').trim();
+      });
+      if (requiredCustomField) {
+        errEl.textContent = `${requiredCustomField.label} is required.`;
         return;
       }
 

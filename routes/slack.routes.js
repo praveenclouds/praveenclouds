@@ -26,6 +26,11 @@ const FORM_BLOCKS = {
   endDate: { blockId: 'end_date', actionId: 'end_date_action' },
   notes: { blockId: 'notes', actionId: 'notes_action' },
 };
+const COMMENT_MODAL = {
+  callbackId: 'support_request_add_comment_submit',
+  blockId: 'comment_input_block',
+  actionId: 'comment_input_action',
+};
 
 function safeCompare(a, b) {
   const aBuf = Buffer.from(String(a || ''), 'utf8');
@@ -175,7 +180,13 @@ function truncateLabel(value, max = 75) {
 }
 
 function managerOptions(users = []) {
-  return users.map(user => ({
+  const sorted = [...users].sort((a, b) => {
+    const aPriority = ['admin', 'manager'].includes(String(a?.role || '').trim().toLowerCase()) ? 0 : 1;
+    const bPriority = ['admin', 'manager'].includes(String(b?.role || '').trim().toLowerCase()) ? 0 : 1;
+    if (aPriority !== bPriority) return aPriority - bPriority;
+    return String(a?.name || '').localeCompare(String(b?.name || ''));
+  });
+  return sorted.map(user => ({
     text: {
       type: 'plain_text',
       text: truncateLabel(user.dept ? `${user.name} · ${user.dept}` : user.name),
@@ -283,9 +294,9 @@ async function listActiveSoftwareOptions() {
 }
 
 async function listSlackFormUsers() {
-  const users = await User.find()
+  const users = await User.find({ status: 'Active' })
     .sort({ first: 1, last: 1 })
-    .select('first last email dept')
+    .select('first last email dept role status')
     .lean();
 
   return users
@@ -294,7 +305,9 @@ async function listSlackFormUsers() {
       const name = `${String(user?.first || '').trim()} ${String(user?.last || '').trim()}`.trim();
       const email = String(user?.email || '').trim().toLowerCase();
       const dept = String(user?.dept || '').trim();
-      return { id, name, email, dept };
+      const role = String(user?.role || '').trim();
+      const status = String(user?.status || '').trim();
+      return { id, name, email, dept, role, status };
     })
     .filter(user => user.id && user.name);
 }
@@ -642,6 +655,12 @@ function actorFromSlackPayload(payload = {}) {
   return payload.user?.username || payload.user?.name || payload.user?.id || 'Slack User';
 }
 
+function compactText(value, max = 200) {
+  const normalized = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!normalized) return '';
+  return normalized.length <= max ? normalized : `${normalized.slice(0, Math.max(0, max - 3))}...`;
+}
+
 function allChecklistStepsDone(checklist = []) {
   const steps = Array.isArray(checklist) ? checklist : [];
   return steps.length > 0 && steps.every(step => step.status === 'done');
@@ -690,10 +709,120 @@ async function handleTaskCompleteAction(payload = {}, action = {}) {
   const slackPost = await postSupportRequestUpdateMessage(previousRequest, request, {
     source: 'slack_dm',
     actor: actorFromSlackPayload(payload),
+    forceRefresh: true,
+    eventText: `✅ ${actorFromSlackPayload(payload)} marked "${step.label}" complete`,
   });
   await persistSlackThreadContext(request, slackPost);
 
   return { ok: true, message: `Step "${step.label}" marked as done for request ${request.requestId}.` };
+}
+
+function modalStateValue(values = {}, blockId = '', actionId = '') {
+  const input = values?.[blockId]?.[actionId];
+  if (!input) return '';
+  if (typeof input.value === 'string') return input.value;
+  return '';
+}
+
+function buildCommentModal(commentToken = '') {
+  return {
+    type: 'modal',
+    callback_id: COMMENT_MODAL.callbackId,
+    title: {
+      type: 'plain_text',
+      text: 'Add Comment',
+      emoji: true,
+    },
+    submit: {
+      type: 'plain_text',
+      text: 'Save',
+      emoji: true,
+    },
+    close: {
+      type: 'plain_text',
+      text: 'Cancel',
+      emoji: true,
+    },
+    private_metadata: JSON.stringify({ commentToken: String(commentToken || '').trim() }),
+    blocks: [
+      {
+        type: 'input',
+        block_id: COMMENT_MODAL.blockId,
+        label: { type: 'plain_text', text: 'Comment', emoji: true },
+        element: {
+          type: 'plain_text_input',
+          action_id: COMMENT_MODAL.actionId,
+          multiline: true,
+          placeholder: { type: 'plain_text', text: 'Add an update for this request...' },
+        },
+      },
+    ],
+  };
+}
+
+async function handleAddCommentAction(payload = {}, action = {}) {
+  const token = String(action.value || '').trim();
+  if (!token) return { ok: false, message: 'Invalid comment action. Missing token.' };
+
+  let data = null;
+  try {
+    data = jwt.verify(token, JWT_SECRET);
+  } catch {
+    return { ok: false, message: 'This comment action link is invalid or expired.' };
+  }
+  if (data.kind !== 'support_request_add_comment') {
+    return { ok: false, message: 'This action is not valid for comments.' };
+  }
+
+  await callSlackApi('/api/views.open', {
+    trigger_id: payload.trigger_id,
+    view: buildCommentModal(token),
+  });
+
+  return { ok: true, message: '' };
+}
+
+async function handleCommentModalSubmission(payload = {}) {
+  const privateMetadata = parsePrivateMetadata(payload.view?.private_metadata);
+  const commentToken = String(privateMetadata.commentToken || '').trim();
+  if (!commentToken) return { ok: false, fieldError: 'Invalid comment token.' };
+
+  let data = null;
+  try {
+    data = jwt.verify(commentToken, JWT_SECRET);
+  } catch {
+    return { ok: false, fieldError: 'This comment link is invalid or expired.' };
+  }
+  if (data.kind !== 'support_request_add_comment') {
+    return { ok: false, fieldError: 'This comment action is no longer valid.' };
+  }
+
+  const values = payload.view?.state?.values || {};
+  const comment = modalStateValue(values, COMMENT_MODAL.blockId, COMMENT_MODAL.actionId).trim();
+  if (!comment) return { ok: false, fieldError: 'Comment is required.' };
+
+  const request = await SupportRequest.findById(data.requestId);
+  if (!request) return { ok: false, fieldError: 'Support request not found.' };
+
+  const previousRequest = request.toObject();
+  const actor = actorFromSlackPayload(payload);
+  const stamp = new Date().toLocaleString('en-IN');
+  const commentEntry = `[Slack comment by ${actor} on ${stamp}]\n${comment}`;
+  request.notes = `${request.notes ? `${request.notes}\n\n` : ''}${commentEntry}`.trim();
+  if (String(request.status || '').toLowerCase() === 'open') request.status = 'in_progress';
+
+  await request.save();
+  await notifySupportRequestChanges(previousRequest, request);
+  if (request.isModified()) await request.save();
+  const slackPost = await postSupportRequestUpdateMessage(previousRequest, request, {
+    source: 'slack_comment',
+    actor,
+    forceRefresh: true,
+    eventText: `💬 ${actor}: ${compactText(comment, 160)}`,
+  });
+  await persistSlackThreadContext(request, slackPost);
+
+  return { ok: true };
 }
 
 router.post(
@@ -708,33 +837,36 @@ router.post(
   async (req, res) => {
     try {
       await verifySlackRequest(req);
-
-      const options = await listWorkflowOptions();
-      const referenceData = await listSlackFormReferenceData();
-      const initialWorkflowType = resolveInitialWorkflowType(req.body?.text || '', options);
-      const schemaFingerprint = workflowDefinitionsSignature(options);
-      const requestorProfile = await resolveSlackRequestorProfile({
-        id: req.body?.user_id || '',
-        name: req.body?.user_name || '',
-        username: req.body?.user_name || '',
-      });
-      const privateMetadata = {
-        channelId: req.body?.channel_id || '',
-        teamId: req.body?.team_id || '',
-        commandUserId: req.body?.user_id || '',
-        requestorName: requestorProfile.name || req.body?.user_name || 'Slack User',
-        requestorEmail: requestorProfile.email || '',
-        schemaFingerprint,
-        schemaRefreshed: false,
-      };
-      await callSlackApi('/api/views.open', {
-        trigger_id: req.body?.trigger_id,
-        view: buildSupportRequestModal(options, referenceData, initialWorkflowType, privateMetadata),
-      });
-
+      // Ack immediately so Slack never times out this slash command.
+      // Modal open is done asynchronously and still uses the same trigger_id.
       res.status(200).send('');
+      void (async () => {
+        try {
+          const options = await listWorkflowOptions();
+          const referenceData = await listSlackFormReferenceData();
+          const initialWorkflowType = resolveInitialWorkflowType(req.body?.text || '', options);
+          const schemaFingerprint = workflowDefinitionsSignature(options);
+          const privateMetadata = {
+            channelId: req.body?.channel_id || '',
+            teamId: req.body?.team_id || '',
+            commandUserId: req.body?.user_id || '',
+            requestorName: req.body?.user_name || 'Slack User',
+            requestorEmail: '',
+            schemaFingerprint,
+            schemaRefreshed: false,
+          };
+          await callSlackApi('/api/views.open', {
+            trigger_id: req.body?.trigger_id,
+            view: buildSupportRequestModal(options, referenceData, initialWorkflowType, privateMetadata),
+          });
+        } catch (backgroundError) {
+          console.error('[slack support-command] modal open failed:', backgroundError.message);
+        }
+      })();
+      return;
     } catch (e) {
-      res.status(e.status || 400).json({
+      console.error('[slack support-command] request rejected:', e.message);
+      res.status(200).json({
         response_type: 'ephemeral',
         text: e.message || 'Slack support request form could not be opened.',
       });
@@ -766,6 +898,32 @@ router.post(
             text: result.ok ? `Done: ${result.message}` : `Error: ${result.message}`,
           });
         }
+
+        const addCommentAction = (payload.actions || []).find(action => action.action_id === 'support_request_add_comment');
+        if (addCommentAction) {
+          const result = await handleAddCommentAction(payload, addCommentAction);
+          if (!result.ok) {
+            return res.status(200).json({
+              response_type: 'ephemeral',
+              replace_original: false,
+              text: `Error: ${result.message}`,
+            });
+          }
+          return res.status(200).send('');
+        }
+      }
+
+      if (payload.type === 'view_submission' && payload.view?.callback_id === COMMENT_MODAL.callbackId) {
+        const result = await handleCommentModalSubmission(payload);
+        if (!result.ok) {
+          return res.status(200).json({
+            response_action: 'errors',
+            errors: {
+              [COMMENT_MODAL.blockId]: result.fieldError || 'Failed to save comment.',
+            },
+          });
+        }
+        return res.status(200).send('');
       }
 
       const options = await listWorkflowOptions();
