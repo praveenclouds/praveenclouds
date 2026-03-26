@@ -506,6 +506,18 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     .log-event-badge.user_created       { background: rgba(30,64,175,0.20);   color: #93c5fd; }
     .log-event-badge.user_updated       { background: rgba(124,58,237,0.15);  color: #a78bfa; }
     .log-event-badge.user_deleted       { background: rgba(220,38,38,0.15);   color: #f87171; }
+    .log-event-badge.software_created   { background: rgba(45,212,191,0.16);  color: #5eead4; }
+    .log-event-badge.software_updated   { background: rgba(34,197,94,0.14);   color: #86efac; }
+    .log-event-badge.software_deleted   { background: rgba(239,68,68,0.14);   color: #fca5a5; }
+    .log-event-badge.settings_updated   { background: rgba(251,191,36,0.16);  color: #fde68a; }
+    .log-event-badge.support_request_created { background: rgba(56,189,248,0.16); color: #7dd3fc; }
+    .log-event-badge.support_request_updated { background: rgba(168,85,247,0.14); color: #d8b4fe; }
+    .log-event-badge.support_request_deleted { background: rgba(248,113,113,0.15); color: #fda4af; }
+    .log-event-badge.support_task_assignment_changed { background: rgba(99,102,241,0.16); color: #a5b4fc; }
+    .log-event-badge.support_task_status_changed { background: rgba(16,185,129,0.16); color: #6ee7b7; }
+    .log-event-badge.support_approval_status_changed { background: rgba(14,165,233,0.14); color: #7dd3fc; }
+    .log-event-badge.support_comment_added { background: rgba(244,114,182,0.14); color: #f9a8d4; }
+    .log-event-badge.support_request_approval_action { background: rgba(250,204,21,0.16); color: #fde047; }
     .log-changes-list { margin-top: 6px; }
     .log-changes-list li {
       font-size: 11px; color: var(--gray-400); list-style: none;
@@ -1078,6 +1090,10 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <option value="asset_created">Asset Created</option>
               <option value="asset_updated">Asset Updated</option>
               <option value="asset_deleted">Asset Deleted</option>
+              <option value="software_created">Software Created</option>
+              <option value="software_updated">Software Updated</option>
+              <option value="software_deleted">Software Deleted</option>
+              <option value="settings_updated">Integration Settings Updated</option>
               <option value="user_created">User Created</option>
               <option value="user_updated">User Updated</option>
               <option value="user_deleted">User Deleted</option>
@@ -1086,6 +1102,8 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <option value="">All Types</option>
               <option value="asset">Device / Asset</option>
               <option value="user">User</option>
+              <option value="software">Software</option>
+              <option value="integration">Integration</option>
             </select>
             <button class="btn btn-secondary btn-sm" onclick="renderLogs(1)" style="font-size:12px">Refresh</button>
           </div>
@@ -2317,14 +2335,12 @@ function populateReportingManagerSelect(currentName=''){
     .sort((a,b)=>`${a.first||''} ${a.last||''}`.trim().localeCompare(`${b.first||''} ${b.last||''}`.trim()));
   const normalizedCurrent = String(currentName || '').trim().toLowerCase();
   const matchedUser = activeUsers.find(u => `${u.first||''} ${u.last||''}`.trim().toLowerCase() === normalizedCurrent);
-  const legacyOption = currentName && !matchedUser
-    ? `<option value="" data-legacy-name="${escHtml(String(currentName || '').trim())}" selected>${escHtml(`${String(currentName || '').trim()} (inactive or not found)`)}</option>`
-    : `<option value="" ${matchedUser ? '' : 'selected'}>— Select reporting manager —</option>`;
-
-  select.innerHTML = legacyOption + activeUsers.map(u => {
-    const fullName = `${u.first||''} ${u.last||''}`.trim();
-    return `<option value="${escHtml(fullName)}" ${matchedUser?.id===u.id ? 'selected' : ''}>${escHtml(fullName)}${u.dept ? ` — ${escHtml(u.dept)}` : ''}</option>`;
-  }).join('');
+  // If the stored manager is not found among active users, treat as unset (no legacy option shown)
+  select.innerHTML = `<option value="" ${matchedUser ? '' : 'selected'}>— Select reporting manager —</option>` +
+    activeUsers.map(u => {
+      const fullName = `${u.first||''} ${u.last||''}`.trim();
+      return `<option value="${escHtml(fullName)}" ${matchedUser?.id===u.id ? 'selected' : ''}>${escHtml(fullName)}${u.dept ? ` — ${escHtml(u.dept)}` : ''}</option>`;
+    }).join('');
 }
 
 // ── App Access helpers ────────────────────────────────────────────────────────
@@ -2620,6 +2636,10 @@ const LOG_EVENT_LABELS = {
   asset_created:     '➕ Asset Added',
   asset_updated:     '✏️ Asset Updated',
   asset_deleted:     '🗑️ Asset Deleted',
+  software_created:  '🧩 Software Added',
+  software_updated:  '🛠️ Software Updated',
+  software_deleted:  '🗑️ Software Deleted',
+  settings_updated:  '⚙️ Settings Updated',
   user_created:      '👤 User Added',
   user_updated:      '✏️ User Updated',
   user_deleted:      '🗑️ User Deleted',
@@ -2628,6 +2648,8 @@ const LOG_EVENT_LABELS = {
 const LOG_ENTITY_ICONS = {
   asset: `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>`,
   user:  `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>`,
+  software: `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>`,
+  integration: `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0A1.65 1.65 0 0 0 10.43 3H10.5a2 2 0 1 1 4 0h-.07a1.65 1.65 0 0 0 1.51 1h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0A1.65 1.65 0 0 0 21 10.43V10.5a2 2 0 1 1 0 4v-.07a1.65 1.65 0 0 0-1 1.51z"/></svg>`,
 };
 
 function fmtLogDate(d){

@@ -30,8 +30,14 @@ router.get('/', requireAuth, canViewActivityLog, async (req, res) => {
     const { type, entityType, search, page = 1, limit = 25 } = req.query;
 
     const filter = {};
-    if (type)       filter.eventType  = type;
-    if (entityType) filter.entityType = entityType;
+    if (type) filter.eventType = type;
+    if (entityType) {
+      filter.entityType = entityType;
+    } else {
+      // Keep Asset Portal Activity Log focused on portal entities;
+      // Support Center has its own dedicated log view.
+      filter.entityType = { $in: ['asset', 'user', 'software', 'integration'] };
+    }
     if (search) {
       const re = new RegExp(escapeRegex(String(search).slice(0, 200)), 'i');
       filter.$or = [

@@ -44,11 +44,20 @@ const logSchema = new mongoose.Schema(
         'user_created',
         'user_updated',
         'user_deleted',
+        'settings_updated',
+        'support_request_created',
+        'support_request_updated',
+        'support_request_deleted',
+        'support_task_assignment_changed',
+        'support_task_status_changed',
+        'support_approval_status_changed',
+        'support_comment_added',
+        'support_request_approval_action',
       ],
     },
 
     // The record that was affected
-    entityType: { type: String, enum: ['user', 'asset', 'software'], required: true },
+    entityType: { type: String, enum: ['user', 'asset', 'software', 'integration', 'support_request'], required: true },
     entityId:   { type: String, required: true },
     entityLabel:{ type: String, default: '' },   // e.g. "Macbook Pro 15 (A-42)"
 

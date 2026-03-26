@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-const { SupportRequest } = require('../db');
+const { SupportRequest, Log } = require('../db');
 const { requireAuth, canWrite, requirePermission, onlySuperAdmin } = require('../middleware/auth');
 const { JWT_SECRET } = require('../config');
 const {
@@ -25,6 +25,12 @@ const {
   listSupportMailTemplates,
   updateSupportMailTemplate,
 } = require('../services/support-mail-template.service');
+const {
+  logSupportRequestApprovalAction,
+  logSupportRequestCreated,
+  logSupportRequestDeleted,
+  logSupportRequestUpdated,
+} = require('../services/support-log.service');
 const { hashToken, notifySupportRequestChanges } = require('../services/support-notification.service');
 const { postSupportRequestUpdateMessage } = require('../services/support-slack-thread.service');
 const rateLimit = require('express-rate-limit');
@@ -84,6 +90,22 @@ function fmtSupportRequest(doc) {
     totalTasks: checklist.length,
     createdAt: o.createdAt,
     updatedAt: o.updatedAt,
+  };
+}
+
+function fmtSupportLog(doc) {
+  const log = doc?.toObject ? doc.toObject() : { ...(doc || {}) };
+  return {
+    id: log._id?.toString?.() || '',
+    eventType: log.eventType || '',
+    entityType: log.entityType || '',
+    entityId: log.entityId || '',
+    entityLabel: log.entityLabel || '',
+    summary: log.summary || '',
+    remarks: log.remarks || '',
+    actorName: log.actorName || '',
+    changes: Array.isArray(log.changes) ? log.changes : [],
+    createdAt: log.createdAt || null,
   };
 }
 
@@ -177,6 +199,14 @@ router.get('/approval-action', approvalRateLimiter, async (req, res) => {
       actor: request.managerName || 'Manager',
     });
     await persistSlackThreadContext(request, slackPost);
+    await logSupportRequestUpdated(previousRequest, request, request.managerName || request.managerEmail || 'Manager', 'manager_approval');
+    await logSupportRequestApprovalAction({
+      request,
+      step,
+      decision,
+      actorName: request.managerName || request.managerEmail || 'Manager',
+      source: 'manager_approval',
+    });
 
     return res.send(
       approvalPage(
@@ -313,6 +343,70 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
+router.get('/logs', requireAuth, async (req, res) => {
+  try {
+    const {
+      requestDbId,
+      requestId,
+      type,
+      search,
+      page = 1,
+      limit = 25,
+    } = req.query;
+
+    const safePage = Math.max(parseInt(page, 10) || 1, 1);
+    const safeLimit = Math.min(Math.max(parseInt(limit, 10) || 25, 1), 200);
+    const filter = { entityType: 'support_request' };
+
+    if (type) filter.eventType = String(type).trim();
+
+    const explicitEntityId = String(requestDbId || '').trim();
+    if (explicitEntityId) {
+      filter.entityId = explicitEntityId;
+    } else if (requestId) {
+      const normalizedRequestId = String(requestId).trim();
+      const requestDoc = await SupportRequest.findOne({
+        requestId: new RegExp(`^${escapeRegex(normalizedRequestId)}$`, 'i'),
+      }).select('_id requestId');
+      if (!requestDoc) {
+        return res.json({ total: 0, page: safePage, limit: safeLimit, logs: [] });
+      }
+      filter.entityId = requestDoc._id.toString();
+    }
+
+    if (search) {
+      const re = new RegExp(escapeRegex(String(search).slice(0, 200)), 'i');
+      filter.$or = [
+        { summary: re },
+        { entityLabel: re },
+        { actorName: re },
+        { remarks: re },
+        { 'changes.field': re },
+        { 'changes.oldValue': re },
+        { 'changes.newValue': re },
+      ];
+    }
+
+    const skip = (safePage - 1) * safeLimit;
+    const [total, logs] = await Promise.all([
+      Log.countDocuments(filter),
+      Log.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(safeLimit),
+    ]);
+
+    res.json({
+      total,
+      page: safePage,
+      limit: safeLimit,
+      logs: logs.map(fmtSupportLog),
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.post('/', requireAuth, async (req, res) => {
   try {
     const body = req.body || {};
@@ -327,6 +421,7 @@ router.post('/', requireAuth, async (req, res) => {
     await notifySupportRequestChanges(null, supportRequest);
     if (supportRequest.isModified()) await supportRequest.save();
     await syncCompletedOnboardingUser(supportRequest);
+    await logSupportRequestCreated(supportRequest, req.user?.name || req.user?.email || 'Support Admin', 'portal');
 
     res.status(201).json(fmtSupportRequest(supportRequest));
   } catch (e) {
@@ -358,6 +453,7 @@ router.put('/:id', requireAuth, canWrite, async (req, res) => {
     await persistSlackThreadContext(request, slackPost);
     await syncCompletedOnboardingUser(request);
     await syncCompletedOffboardingUser(request);
+    await logSupportRequestUpdated(previousRequest, request, req.user?.name || req.user?.email || 'Support Admin', 'support_center');
     res.json(fmtSupportRequest(request));
   } catch (e) {
     res.status(400).json({ error: e.message });
@@ -368,6 +464,7 @@ router.delete('/:id', requireAuth, canWrite, async (req, res) => {
   try {
     const request = await SupportRequest.findByIdAndDelete(req.params.id);
     if (!request) return res.status(404).json({ error: 'Support request not found' });
+    await logSupportRequestDeleted(request, req.user?.name || req.user?.email || 'Support Admin', 'support_center');
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: e.message });

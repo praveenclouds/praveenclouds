@@ -32,6 +32,28 @@ function taskMap(checklist = []) {
   return new Map((checklist || []).map(item => [item.key, item]));
 }
 
+function normalizeStepKey(step = {}) {
+  return String(step?.key || '').trim();
+}
+
+function dependencySatisfied(step = {}, checklist = []) {
+  const steps = Array.isArray(checklist) ? checklist : [];
+  let dependencyKey = String(step?.dependsOn || '').trim();
+  if (!dependencyKey) {
+    const currentStepKey = normalizeStepKey(step);
+    const currentIndex = currentStepKey
+      ? steps.findIndex(item => normalizeStepKey(item) === currentStepKey)
+      : -1;
+    if (currentIndex > 0) {
+      dependencyKey = normalizeStepKey(steps[currentIndex - 1]);
+    }
+  }
+  if (!dependencyKey) return true;
+  const dependencyStep = steps.find(item => normalizeStepKey(item) === dependencyKey);
+  if (!dependencyStep) return true;
+  return String(dependencyStep.status || 'pending') === 'done';
+}
+
 function fallbackValue(value, fallback = '—') {
   const normalized = String(value || '').trim();
   return normalized || fallback;
@@ -345,7 +367,9 @@ function buildApprovalToken(request, step, managerEmail) {
 
 async function notifySupportRequestChanges(previousRequest, currentRequest) {
   try {
-    const previousChecklist = taskMap(previousRequest?.checklist || []);
+    const previousChecklistItems = Array.isArray(previousRequest?.checklist) ? previousRequest.checklist : [];
+    const currentChecklistItems = Array.isArray(currentRequest?.checklist) ? currentRequest.checklist : [];
+    const previousChecklist = taskMap(previousChecklistItems);
     const softwareIds = [...new Set((currentRequest?.checklist || []).map(item => item.softwareCsvId).filter(Boolean))];
     const [userDirectory, softwareList] = await Promise.all([
       loadUserDirectory(),
@@ -430,7 +454,21 @@ async function notifySupportRequestChanges(previousRequest, currentRequest) {
         ])
         : uniqueEmails([currentOwner]);
 
-      if (stepRecipients.length && (!previousStep || personChanged(previousOwner, currentOwner))) {
+      const ownerChanged = !previousStep || personChanged(previousOwner, currentOwner);
+      const currentDependencySatisfied = dependencySatisfied(step, currentChecklistItems);
+      const previousDependencySatisfied = previousStep
+        ? dependencySatisfied(previousStep, previousChecklistItems)
+        : false;
+      const dependencyJustUnlocked = currentDependencySatisfied && (!previousStep || !previousDependencySatisfied);
+      const stepPending = String(step?.status || 'pending') !== 'done';
+      const shouldNotifyTaskAssignee = (
+        stepRecipients.length
+        && stepPending
+        && currentDependencySatisfied
+        && (ownerChanged || dependencyJustUnlocked)
+      );
+
+      if (shouldNotifyTaskAssignee) {
         await sendAssignmentEmail({
           to: stepRecipients,
           templateKey: 'task_assignment',
@@ -441,6 +479,7 @@ async function notifySupportRequestChanges(previousRequest, currentRequest) {
       }
 
       if (step.approvalMode !== 'manager' || !currentRequest.managerEmail || step.status === 'done') continue;
+      if (!currentDependencySatisfied) continue;
 
       const needsApprovalEmail = (
         !previousStep

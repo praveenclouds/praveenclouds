@@ -14,7 +14,9 @@ const { ACTOR } = require('../config');
  */
 async function writeLog(data) {
   try {
-    await Log.create({ ...data, actorName: ACTOR });
+    const payload = { ...data };
+    if (!payload.actorName) payload.actorName = ACTOR;
+    await Log.create(payload);
   } catch (err) {
     console.error('[LOG] write error:', err.message);
   }

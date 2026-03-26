@@ -614,6 +614,51 @@
     }
     .page-view { display:none; }
     .page-view.active { display:block; }
+    .support-log-filters {
+      grid-template-columns: 1.3fr 0.9fr 0.9fr;
+    }
+    .support-log-event-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: .75rem;
+      font-weight: 700;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .support-log-event-badge.evt-support_request_created { background: rgba(56, 189, 248, 0.16); color: #8fe8ff; border-color: rgba(56, 189, 248, 0.25); }
+    .support-log-event-badge.evt-support_request_updated { background: rgba(124, 92, 255, 0.16); color: #d7cfff; border-color: rgba(124, 92, 255, 0.26); }
+    .support-log-event-badge.evt-support_request_deleted { background: rgba(248, 113, 113, 0.15); color: #ffb6b6; border-color: rgba(248, 113, 113, 0.28); }
+    .support-log-event-badge.evt-support_task_assignment_changed { background: rgba(96, 165, 250, 0.15); color: #bfdbfe; border-color: rgba(96, 165, 250, 0.28); }
+    .support-log-event-badge.evt-support_task_status_changed { background: rgba(52, 211, 153, 0.16); color: #a7f3d0; border-color: rgba(52, 211, 153, 0.24); }
+    .support-log-event-badge.evt-support_approval_status_changed { background: rgba(14, 165, 233, 0.16); color: #bae6fd; border-color: rgba(14, 165, 233, 0.28); }
+    .support-log-event-badge.evt-support_comment_added { background: rgba(244, 114, 182, 0.16); color: #fbcfe8; border-color: rgba(244, 114, 182, 0.28); }
+    .support-log-event-badge.evt-support_request_approval_action { background: rgba(245, 158, 11, 0.18); color: #fde68a; border-color: rgba(245, 158, 11, 0.3); }
+    .support-log-event-badge.evt-default { background: rgba(148, 163, 184, 0.16); color: #d3dce9; border-color: rgba(148, 163, 184, 0.24); }
+    .support-log-summary {
+      display: grid;
+      gap: 6px;
+    }
+    .support-log-summary-main {
+      font-size: .9rem;
+      line-height: 1.45;
+    }
+    .support-log-meta {
+      color: var(--muted);
+      font-size: .78rem;
+      line-height: 1.45;
+    }
+    .support-log-pagination {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(130, 96, 185, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
     .request-type-layout {
       display:grid;
       grid-template-columns: 340px minmax(0, 1fr);
@@ -1025,7 +1070,7 @@
           <h1>Employee Support Requests</h1>
           <p>Track application, hardware, onboarding, and offboarding requests from one shared queue.</p>
         </div>
-<div id="requestActions" style="display:flex;gap:10px;flex-wrap:wrap">
+        <div id="requestActions" style="display:flex;gap:10px;flex-wrap:wrap">
           <div class="export-wrap" id="requestExportWrap">
             <button class="btn btn-secondary" type="button" onclick="toggleRequestExportMenu()">
               Export
@@ -1044,6 +1089,9 @@
           <button class="btn btn-secondary" onclick="loadRequests()">Refresh</button>
           <button class="btn btn-primary" onclick="openCreateModal()">New Request</button>
         </div>
+        <div id="requestLogsActions" style="display:none;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-secondary" onclick="loadSupportLogs(1)">Refresh Logs</button>
+        </div>
         <div id="requestTypeActions" style="display:none;gap:10px;flex-wrap:wrap">
           <button class="btn btn-secondary" onclick="loadRequestTypes()">Refresh Types</button>
           <button class="btn btn-primary" onclick="createRequestTypeDraft()">New Request Type</button>
@@ -1055,6 +1103,7 @@
 
       <div class="section-menu">
         <button class="section-tab active" id="requestsTab" onclick="setSupportView('requests')">Requests</button>
+        <button class="section-tab" id="requestLogsTab" onclick="setSupportView('request-logs')">Request Logs</button>
         <button class="section-tab" id="requestTypesTab" onclick="setSupportView('request-types')">Request Type</button>
         <button class="section-tab" id="mailTemplatesTab" onclick="setSupportView('mail-templates')">Mail Template</button>
       </div>
@@ -1097,6 +1146,53 @@
             </div>
           </section>
         </div>
+      </div>
+
+      <div class="page-view" id="requestLogsView">
+        <section class="panel">
+          <div class="panel-head">
+            <div class="panel-title">Support Request Logs</div>
+            <div style="color:var(--muted);font-size:.9rem" id="supportLogCountLabel">0 entries</div>
+          </div>
+          <div class="filters support-log-filters">
+            <input type="text" id="supportLogSearch" placeholder="Search summary, actor, source, or field changes…" oninput="queueSupportLogSearch()" />
+            <select id="supportLogRequestFilter" onchange="loadSupportLogs(1)">
+              <option value="">All requests</option>
+            </select>
+            <select id="supportLogTypeFilter" onchange="loadSupportLogs(1)">
+              <option value="">All events</option>
+              <option value="support_request_created">Request Created</option>
+              <option value="support_request_updated">Request Updated</option>
+              <option value="support_request_deleted">Request Deleted</option>
+              <option value="support_task_assignment_changed">Task Assignment Changed</option>
+              <option value="support_task_status_changed">Task Status Changed</option>
+              <option value="support_approval_status_changed">Approval Status Changed</option>
+              <option value="support_comment_added">Comment Added</option>
+              <option value="support_request_approval_action">Manager Approval Action</option>
+            </select>
+          </div>
+          <div class="request-list">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Request</th>
+                  <th>Event</th>
+                  <th>Summary</th>
+                  <th>Actor</th>
+                </tr>
+              </thead>
+              <tbody id="supportLogTableBody"></tbody>
+            </table>
+          </div>
+          <div class="support-log-pagination">
+            <div id="supportLogPageLabel" style="color:var(--muted);font-size:.88rem">Page 1 of 1</div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-secondary" type="button" id="supportLogPrevBtn" onclick="loadSupportLogs(Math.max(1, supportLogPage - 1))">Previous</button>
+              <button class="btn btn-secondary" type="button" id="supportLogNextBtn" onclick="loadSupportLogs(supportLogPage + 1)">Next</button>
+            </div>
+          </div>
+        </section>
       </div>
 
       <div class="page-view" id="requestTypesView">
@@ -1320,11 +1416,26 @@
     let selectedMailTemplateId = null;
     let supportView = 'requests';
     let mailTemplateMode = 'overview';
+    let supportLogs = [];
+    let supportLogTotal = 0;
+    let supportLogPage = 1;
+    let supportLogSearchTimer = null;
+    const SUPPORT_LOG_PAGE_SIZE = 25;
     let supportUsers = [];
     let createSelectedApplications = [];
     let detailSelectedApplications = [];
     let departmentOptions = [];
     let softwareInventory = [];
+    const SUPPORT_LOG_EVENT_LABELS = {
+      support_request_created: 'Request Created',
+      support_request_updated: 'Request Updated',
+      support_request_deleted: 'Request Deleted',
+      support_task_assignment_changed: 'Task Assignment Changed',
+      support_task_status_changed: 'Task Status Changed',
+      support_approval_status_changed: 'Approval Status Changed',
+      support_comment_added: 'Comment Added',
+      support_request_approval_action: 'Manager Approval Action',
+    };
     const CREATE_FORM_FIELD_CONFIG = {
       priority: { inputId: 'newPriority', wrapperId: 'createField_priority', labelId: 'createLabel_priority', defaultLabel: 'Priority' },
       employeeName: { inputId: 'newEmployeeName', wrapperId: 'createField_employeeName', labelId: 'createLabel_employeeName', defaultLabel: 'Employee Name' },
@@ -2360,14 +2471,21 @@
       }
       supportView = view;
       document.getElementById('requestsTab').classList.toggle('active', view === 'requests');
+      document.getElementById('requestLogsTab').classList.toggle('active', view === 'request-logs');
       document.getElementById('requestTypesTab').classList.toggle('active', view === 'request-types');
       document.getElementById('mailTemplatesTab').classList.toggle('active', view === 'mail-templates');
       document.getElementById('requestsView').classList.toggle('active', view === 'requests');
+      document.getElementById('requestLogsView').classList.toggle('active', view === 'request-logs');
       document.getElementById('requestTypesView').classList.toggle('active', view === 'request-types');
       document.getElementById('mailTemplatesView').classList.toggle('active', view === 'mail-templates');
       document.getElementById('requestActions').style.display = view === 'requests' ? 'flex' : 'none';
+      document.getElementById('requestLogsActions').style.display = view === 'request-logs' ? 'flex' : 'none';
       document.getElementById('requestTypeActions').style.display = view === 'request-types' ? 'flex' : 'none';
       document.getElementById('mailTemplateActions').style.display = view === 'mail-templates' && canManageMailTemplates() ? 'flex' : 'none';
+      if (view === 'request-logs') {
+        renderSupportLogRequestFilterOptions();
+        loadSupportLogs(1);
+      }
     }
 
     function renderRequestTypeList() {
@@ -2995,6 +3113,156 @@
       }
     }
 
+    function supportLogEventLabel(eventType) {
+      return SUPPORT_LOG_EVENT_LABELS[eventType] || String(eventType || 'Unknown event');
+    }
+
+    function supportLogEventClass(eventType) {
+      const safe = String(eventType || '')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_]+/g, '_');
+      return safe ? `evt-${safe}` : 'evt-default';
+    }
+
+    function supportLogSource(remarks) {
+      const value = String(remarks || '').trim();
+      if (!value) return '—';
+      const sourceMatch = value.match(/(?:^|;\s*)source=([^;]+)/i);
+      if (sourceMatch?.[1]) return sourceMatch[1].trim();
+      return value;
+    }
+
+    function formatSupportLogDate(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
+      return `${date.toLocaleDateString('en-IN', { year: 'numeric', month: 'short', day: 'numeric' })} ${date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+    }
+
+    function renderSupportLogRequestFilterOptions() {
+      const select = document.getElementById('supportLogRequestFilter');
+      if (!select) return;
+      const current = select.value;
+      const options = [...(requests || [])]
+        .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+
+      select.innerHTML = `
+        <option value="">All requests</option>
+        ${options.map(request => `<option value="${escapeHtml(request.id)}">${escapeHtml(request.requestId)} · ${escapeHtml(request.employeeName || 'Unknown employee')}</option>`).join('')}
+      `;
+
+      if (current && options.some(request => request.id === current)) {
+        select.value = current;
+      }
+    }
+
+    function queueSupportLogSearch() {
+      clearTimeout(supportLogSearchTimer);
+      supportLogSearchTimer = setTimeout(() => loadSupportLogs(1), 300);
+    }
+
+    function openRequestFromLog(requestDbId) {
+      if (!requestDbId) return;
+      setSupportView('requests');
+      selectRequest(requestDbId);
+    }
+
+    async function loadSupportLogs(page = 1) {
+      const tableBody = document.getElementById('supportLogTableBody');
+      if (!tableBody) return;
+      const nextPage = Math.max(parseInt(page, 10) || 1, 1);
+      tableBody.innerHTML = `<tr><td colspan="5" class="empty">Loading support logs…</td></tr>`;
+
+      try {
+        const requestDbId = document.getElementById('supportLogRequestFilter')?.value || '';
+        const type = document.getElementById('supportLogTypeFilter')?.value || '';
+        const search = document.getElementById('supportLogSearch')?.value?.trim() || '';
+        const params = new URLSearchParams({
+          page: String(nextPage),
+          limit: String(SUPPORT_LOG_PAGE_SIZE),
+        });
+        if (requestDbId) params.set('requestDbId', requestDbId);
+        if (type) params.set('type', type);
+        if (search) params.set('search', search);
+
+        const res = await authFetch(`${API}/logs?${params.toString()}`);
+        const data = await readApiResponse(res);
+        if (!res.ok) throw new Error(data.error || 'Failed to load support logs');
+
+        supportLogs = Array.isArray(data.logs) ? data.logs : [];
+        supportLogTotal = Number(data.total) || 0;
+        supportLogPage = Number(data.page) || nextPage;
+        renderSupportLogs();
+      } catch (e) {
+        supportLogs = [];
+        supportLogTotal = 0;
+        supportLogPage = 1;
+        tableBody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--danger)">${escapeHtml(e.message || 'Failed to load support logs.')}</td></tr>`;
+        document.getElementById('supportLogCountLabel').textContent = '0 entries';
+        document.getElementById('supportLogPageLabel').textContent = 'Page 1 of 1';
+        document.getElementById('supportLogPrevBtn').disabled = true;
+        document.getElementById('supportLogNextBtn').disabled = true;
+      }
+    }
+
+    function renderSupportLogs() {
+      const tableBody = document.getElementById('supportLogTableBody');
+      const countLabel = document.getElementById('supportLogCountLabel');
+      const pageLabel = document.getElementById('supportLogPageLabel');
+      const prevBtn = document.getElementById('supportLogPrevBtn');
+      const nextBtn = document.getElementById('supportLogNextBtn');
+      if (!tableBody || !countLabel || !pageLabel || !prevBtn || !nextBtn) return;
+
+      countLabel.textContent = `${supportLogTotal} entr${supportLogTotal === 1 ? 'y' : 'ies'}`;
+
+      if (!supportLogs.length) {
+        tableBody.innerHTML = `<tr><td colspan="5" class="empty">No support logs found for the selected filters.</td></tr>`;
+      } else {
+        tableBody.innerHTML = supportLogs.map(log => {
+          const request = requests.find(item => item.id === log.entityId);
+          const requestLabel = request
+            ? `${request.requestId} · ${request.employeeName || 'Unknown employee'}`
+            : (log.entityLabel || log.entityId || 'Unknown request');
+          const source = supportLogSource(log.remarks);
+          const changes = Array.isArray(log.changes) ? log.changes : [];
+          const compactChanges = changes.slice(0, 3).map(change => (
+            `${change.field || 'Field'}: ${change.oldValue || '—'} → ${change.newValue || '—'}`
+          ));
+          if (changes.length > 3) compactChanges.push(`+${changes.length - 3} more change(s)`);
+          const openButton = request
+            ? `<button type="button" class="btn btn-secondary" style="padding:4px 9px;font-size:.74rem" onclick="openRequestFromLog('${escapeHtml(request.id)}')">Open</button>`
+            : '';
+
+          return `
+            <tr>
+              <td style="white-space:nowrap">${escapeHtml(formatSupportLogDate(log.createdAt))}</td>
+              <td>
+                <div style="display:grid;gap:6px">
+                  <div>${escapeHtml(requestLabel)}</div>
+                  ${openButton}
+                </div>
+              </td>
+              <td><span class="support-log-event-badge ${supportLogEventClass(log.eventType)}">${escapeHtml(supportLogEventLabel(log.eventType))}</span></td>
+              <td>
+                <div class="support-log-summary">
+                  <div class="support-log-summary-main">${escapeHtml(log.summary || '—')}</div>
+                  ${compactChanges.length ? `<div class="support-log-meta">${escapeHtml(compactChanges.join(' · '))}</div>` : ''}
+                  <div class="support-log-meta">Source: ${escapeHtml(source)}</div>
+                </div>
+              </td>
+              <td style="white-space:nowrap">${escapeHtml(log.actorName || 'System')}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      const totalPages = Math.max(1, Math.ceil(supportLogTotal / SUPPORT_LOG_PAGE_SIZE));
+      pageLabel.textContent = `Page ${supportLogPage} of ${totalPages}`;
+      prevBtn.disabled = supportLogPage <= 1;
+      nextBtn.disabled = supportLogPage >= totalPages;
+    }
+
     async function loadRequests() {
       try {
         const res = await authFetch(API);
@@ -3004,6 +3272,8 @@
         renderSummary();
         renderRequests();
         renderDetail();
+        renderSupportLogRequestFilterOptions();
+        if (supportView === 'request-logs') loadSupportLogs(supportLogPage || 1);
       } catch (e) {
         showToast(e.message, 'danger');
       }

@@ -27,6 +27,7 @@ router.get('/', requireAuth, canManageIntegrations, async (req, res) => {
         allowedDomain:   googleSettings ? googleSettings.allowedDomain : '',
       },
       slack: {
+        enabled: !!(slackSettings && slackSettings.enabled),
         hasSigningSecret: !!(slackSettings && slackSettings.signingSecret),
       },
       email: {
@@ -47,30 +48,38 @@ router.get('/', requireAuth, canManageIntegrations, async (req, res) => {
 // ── PUT /api/admin/integrations ────────────────────────────────────────────────
 router.put('/', requireAuth, canManageIntegrations, async (req, res) => {
   try {
+    const hasGooglePayload = Object.prototype.hasOwnProperty.call(req.body || {}, 'google');
+    const hasSlackPayload = Object.prototype.hasOwnProperty.call(req.body || {}, 'slack');
+    const hasEmailPayload = Object.prototype.hasOwnProperty.call(req.body || {}, 'email');
     const g = req.body.google || {};
     const slack = req.body.slack || {};
     const email = req.body.email || {};
-    const googleUpdate = {
-      enabled:       !!g.enabled,
-      allowedDomain: (g.allowedDomain || '').trim().toLowerCase(),
-    };
-    if (g.clientId && g.clientId.trim()) {
-      googleUpdate.clientId = g.clientId.trim();
-    }
-    if (g.clientSecret && g.clientSecret.trim()) {
-      googleUpdate.clientSecret = g.clientSecret.trim();
+    const tasks = [];
+
+    if (hasGooglePayload) {
+      const googleUpdate = {
+        enabled:       !!g.enabled,
+        allowedDomain: (g.allowedDomain || '').trim().toLowerCase(),
+      };
+      if (g.clientId && g.clientId.trim()) {
+        googleUpdate.clientId = g.clientId.trim();
+      }
+      if (g.clientSecret && g.clientSecret.trim()) {
+        googleUpdate.clientSecret = g.clientSecret.trim();
+      }
+      tasks.push(
+        IntegrationSettings.findOneAndUpdate(
+          { provider: 'google' },
+          { $set: googleUpdate },
+          { upsert: true, new: true }
+        )
+      );
     }
 
-    const tasks = [
-      IntegrationSettings.findOneAndUpdate(
-        { provider: 'google' },
-        { $set: googleUpdate },
-        { upsert: true, new: true }
-      ),
-    ];
-
-    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'slack')) {
-      const slackUpdate = {};
+    if (hasSlackPayload) {
+      const slackUpdate = {
+        enabled: !!slack.enabled,
+      };
       if (slack.signingSecret && slack.signingSecret.trim()) {
         slackUpdate.signingSecret = slack.signingSecret.trim();
       }
@@ -83,7 +92,7 @@ router.put('/', requireAuth, canManageIntegrations, async (req, res) => {
       );
     }
 
-    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'email')) {
+    if (hasEmailPayload) {
       const emailUpdate = {
         enabled: !!email.enabled,
         smtpHost: String(email.smtpHost || '').trim(),
@@ -109,14 +118,16 @@ router.put('/', requireAuth, canManageIntegrations, async (req, res) => {
     await Promise.all(tasks);
 
     // Audit-log which providers were updated (never log secret values).
-    const updatedProviders = ['google'];
-    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'slack'))  updatedProviders.push('slack');
-    if (Object.prototype.hasOwnProperty.call(req.body || {}, 'email'))  updatedProviders.push('email');
+    const updatedProviders = [];
+    if (hasGooglePayload) updatedProviders.push('google');
+    if (hasSlackPayload) updatedProviders.push('slack');
+    if (hasEmailPayload) updatedProviders.push('email');
     await writeLog({
       eventType:   'settings_updated',
       entityType:  'integration',
+      entityId:    'integration_settings',
       entityLabel: 'Integration Settings',
-      summary:     `Integration settings updated by admin — providers: ${updatedProviders.join(', ')}`,
+      summary:     `Integration settings updated by admin — providers: ${updatedProviders.join(', ') || 'none'}`,
     });
 
     res.json({ ok: true });

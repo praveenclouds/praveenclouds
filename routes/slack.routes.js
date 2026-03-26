@@ -5,6 +5,11 @@ const { AppConnector, IntegrationSettings, Software, SupportRequest, User } = re
 const { JWT_SECRET } = require('../config');
 const { apiPost } = require('../utils/http');
 const { createSupportRequest, listWorkflowOptions } = require('../services/support-request.service');
+const {
+  logSupportCommentAdded,
+  logSupportRequestCreated,
+  logSupportRequestUpdated,
+} = require('../services/support-log.service');
 const { notifySupportRequestChanges } = require('../services/support-notification.service');
 const { postSupportRequestCreatedMessage, postSupportRequestUpdateMessage } = require('../services/support-slack-thread.service');
 
@@ -713,6 +718,7 @@ async function handleTaskCompleteAction(payload = {}, action = {}) {
     eventText: `✅ ${actorFromSlackPayload(payload)} marked "${step.label}" complete`,
   });
   await persistSlackThreadContext(request, slackPost);
+  await logSupportRequestUpdated(previousRequest, request, actorFromSlackPayload(payload), 'slack_task_complete');
 
   return { ok: true, message: `Step "${step.label}" marked as done for request ${request.requestId}.` };
 }
@@ -821,6 +827,8 @@ async function handleCommentModalSubmission(payload = {}) {
     eventText: `💬 ${actor}: ${compactText(comment, 160)}`,
   });
   await persistSlackThreadContext(request, slackPost);
+  await logSupportRequestUpdated(previousRequest, request, actor, 'slack_comment');
+  await logSupportCommentAdded(request, actor, comment, 'slack_comment');
 
   return { ok: true };
 }
@@ -1051,6 +1059,11 @@ router.post(
             supportRequest.slackThreadTs = slackPost.threadTs || supportRequest.slackThreadTs;
           }
           if (supportRequest.isModified()) await supportRequest.save();
+          await logSupportRequestCreated(
+            supportRequest,
+            requestorName || payload.user?.username || payload.user?.name || 'Slack User',
+            'slack_command'
+          );
         } catch (backgroundError) {
           console.error('[slack interactivity] post-submit processing failed:', backgroundError.message);
         }

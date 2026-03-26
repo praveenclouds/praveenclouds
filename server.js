@@ -22,6 +22,7 @@ const path         = require('path');
 const { connect }                     = require('./db');
 const { PORT, IS_PROD, CORS_ORIGINS } = require('./config');
 const { seedSoftware, seedAdminUser } = require('./seed/software.seed');
+const { seedUsers }                   = require('./seed/users.seed');
 
 // ── Route modules ──────────────────────────────────────────────────────────────
 const authRoutes             = require('./routes/auth.routes');
@@ -248,6 +249,7 @@ ensureMongoDB()
   .then(async () => {
     await seedSoftware();
     await seedAdminUser();
+    await seedUsers();
     const server = app.listen(PORT, () =>
       console.log(`🚀  Portal running → http://localhost:${PORT}  [${IS_PROD ? 'production' : 'development'}]`)
     );
