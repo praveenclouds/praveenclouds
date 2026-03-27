@@ -14,6 +14,36 @@
       --border: rgba(153,102,255,0.18);
       --text: #f0eeff; --text-muted: rgba(180,170,210,0.7);
     }
+    /* ── Light theme ── */
+    :root[data-theme="light"] {
+      --bg: #f1f5f9; --surface: #ffffff; --surface2: #f8fafc;
+      --border: rgba(148,163,184,0.35);
+      --text: #1e293b; --text-muted: #64748b;
+    }
+    [data-theme="light"] body { background: var(--bg); color: var(--text); }
+    [data-theme="light"] .sidebar { background: #ffffff; border-color: #e2e8f0; }
+    [data-theme="light"] .logo-sub { color: #6366f1; }
+    [data-theme="light"] .nav-label { color: #94a3b8; }
+    [data-theme="light"] .nav-item { color: #475569; }
+    [data-theme="light"] .nav-item:hover { background: #f1f5f9; color: #1e293b; }
+    [data-theme="light"] .nav-item.active { background: #eff6ff; color: #1d4ed8; }
+    [data-theme="light"] .nav-divider { background: #e2e8f0; }
+    [data-theme="light"] .user-chip { background: #f1f5f9; }
+    [data-theme="light"] .topbar { background: #ffffff; border-color: #e2e8f0; color: #1e293b; }
+    [data-theme="light"] .topbar h1 { color: #1e293b; }
+    [data-theme="light"] .card, [data-theme="light"] .modal-box,
+    [data-theme="light"] .confirm-box { background: #ffffff; border-color: #e2e8f0; }
+    [data-theme="light"] .section-title { color: #1e293b; }
+    [data-theme="light"] input, [data-theme="light"] select, [data-theme="light"] textarea {
+      background: #f8fafc !important; color: #1e293b !important; border-color: #cbd5e1 !important;
+    }
+    [data-theme="light"] input:focus, [data-theme="light"] select:focus { border-color: #3b82f6 !important; }
+    [data-theme="light"] .role-chip.super_admin { background:#f3e8ff; color:#7e22ce; border-color:#d8b4fe; }
+    [data-theme="light"] .role-chip.admin       { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+    [data-theme="light"] .role-chip.user        { background:#dcfce7; color:#15803d; border-color:#bbf7d0; }
+    [data-theme="light"] table th { color: #64748b; border-color: #e2e8f0; }
+    [data-theme="light"] table td { border-color: #f1f5f9; color: #334155; }
+    [data-theme="light"] table tr:hover td { background: #f8fafc; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
 
     /* SIDEBAR */
@@ -39,7 +69,7 @@
     .user-info span   { color: var(--text-muted); font-size: 10.5px; }
     .role-chip { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
     .role-chip.super_admin { background: rgba(147,51,234,0.2); color: #c084fc; border: 1px solid rgba(147,51,234,0.3); }
-    .role-chip.admin       { background: rgba(30,64,175,0.2);  color: #93c5fd; border: 1px solid rgba(30,64,175,0.3); }
+    .role-chip.admin       { background: rgba(30,64,175,0.2);  color: #c4b5fd; border: 1px solid rgba(30,64,175,0.3); }
     .role-chip.user        { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.25); }
 
     /* MAIN */
@@ -73,7 +103,7 @@
     .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
     .stat-icon.purple { background: rgba(147,51,234,0.15); color: #c084fc; }
-    .stat-icon.blue   { background: rgba(30,64,175,0.15);  color: #93c5fd; }
+    .stat-icon.blue   { background: rgba(30,64,175,0.15);  color: #c4b5fd; }
     .stat-icon.green  { background: rgba(22,163,74,0.13);  color: #4ade80; }
     .stat-icon.sky    { background: rgba(14,165,233,0.13); color: #38bdf8; }
     .stat-num   { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1; }
@@ -190,7 +220,7 @@
     .dept-btn.danger { color:#f87171;border-color:rgba(220,38,38,.25);background:rgba(220,38,38,.07); }
     .dept-btn.danger:hover { background:rgba(220,38,38,.15); }
     .dept-count-badge { display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700; }
-    .dept-count-badge.users { background:rgba(30,64,175,.15);color:#93c5fd; }
+    .dept-count-badge.users { background:rgba(30,64,175,.15);color:#c4b5fd; }
     .dept-count-badge.apps  { background:rgba(147,51,234,.15);color:#c084fc; }
     /* Mapping modal */
     .map-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,.68);z-index:300;align-items:center;justify-content:center;padding:20px; }
@@ -206,7 +236,7 @@
     .map-card:hover { border-color:rgba(99,66,255,.4);background:rgba(99,66,255,.08); }
     .map-card.checked { border-color:rgba(99,66,255,.55);background:rgba(99,66,255,.12); }
     .map-card input[type=checkbox] { width:15px;height:15px;accent-color:var(--primary);flex-shrink:0;cursor:pointer; }
-    .map-card .mc-avatar { width:26px;height:26px;border-radius:50%;background:rgba(30,64,175,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#93c5fd;flex-shrink:0; }
+    .map-card .mc-avatar { width:26px;height:26px;border-radius:50%;background:rgba(30,64,175,.2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#c4b5fd;flex-shrink:0; }
     .map-card .mc-name { font-size:12.5px;font-weight:600;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
     .map-card .mc-tag { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(14,165,233,.12);color:#38bdf8;white-space:nowrap;flex-shrink:0; }
     .map-card .mc-tag.sw { background:rgba(147,51,234,.12);color:#c084fc; }
@@ -247,7 +277,17 @@
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
-<body class="support-theme support-theme-admin">
+<script>
+  (function(){
+    var t = localStorage.getItem('portalTheme');
+    if (!t || t === 'dark') {
+      t = 'light';
+      localStorage.setItem('portalTheme', t);
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<body class="support-theme support-theme-admin" data-portal-theme="white">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -323,15 +363,17 @@
       </div>
       <svg viewBox="0 0 24 24" class="learning-link-arrow" style="width:13px;height:13px;stroke:#a78bfa;fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     </a>
-    <div class="user-chip">
-      <div class="avatar" id="sidebarAvatar">?</div>
-      <div class="user-info">
-        <strong id="sidebarName">Loading…</strong>
-        <span id="sidebarRole" class="role-chip super_admin">—</span>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="user-chip" style="flex:1;min-width:0">
+        <div class="avatar" id="sidebarAvatar">?</div>
+        <div class="user-info">
+          <strong id="sidebarName">Loading…</strong>
+          <span id="sidebarRole" class="role-chip super_admin">—</span>
+        </div>
+        <button onclick="signOut()" title="Sign Out" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:var(--text-muted);display:flex;align-items:center;transition:color .15s,background .15s" onmouseover="this.style.color='#f87171';this.style.background='rgba(248,113,113,0.1)'" onmouseout="this.style.color='var(--text-muted)';this.style.background='none'">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
       </div>
-      <button onclick="signOut()" title="Sign Out" style="margin-left:auto;background:none;border:none;cursor:pointer;padding:5px;border-radius:6px;color:var(--text-muted);display:flex;align-items:center;transition:color .15s,background .15s" onmouseover="this.style.color='#f87171';this.style.background='rgba(248,113,113,0.1)'" onmouseout="this.style.color='var(--text-muted)';this.style.background='none'">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
     </div>
   </div>
 </aside>
@@ -344,6 +386,9 @@
     <button id="alertBellBtn" onclick="showPage('alerts', document.getElementById('nav-alerts'))" title="Alerts" style="position:relative;background:rgba(153,102,255,0.1);border:1px solid var(--border);border-radius:9px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text-muted)" onmouseover="this.style.background='rgba(153,102,255,0.22)';this.style.color='#c4b5fd'" onmouseout="this.style.background='rgba(153,102,255,0.1)';this.style.color='var(--text-muted)'">
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span id="alertBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#f87171;border-radius:50%;border:1.5px solid var(--surface)"></span>
+    </button>
+    <button id="adminThemeBtn" onclick="toggleAdminTheme()" title="Toggle theme" style="background:rgba(153,102,255,0.1);border:1px solid var(--border);border-radius:9px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text-muted);font-size:15px" onmouseover="this.style.background='rgba(153,102,255,0.22)';this.style.color='#c4b5fd'" onmouseout="this.style.background='rgba(153,102,255,0.1)';this.style.color='var(--text-muted)'">
+      🌙
     </button>
     <button class="btn btn-back" onclick="location.href='/'">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
@@ -365,15 +410,25 @@
       <div class="card">
         <div class="card-header">
           <div class="card-title">Portal Users <span style="color:rgba(153,102,255,0.5);font-weight:400;font-size:12px" id="userCountLabel"></span></div>
-          <button class="btn btn-primary btn-sm" onclick="openAddModal()">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-            Add User
-          </button>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-secondary btn-sm" id="adminSelectModeBtn" onclick="toggleAdminSelectMode()" style="gap:5px">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
+              Select
+            </button>
+            <button class="btn btn-secondary btn-sm" id="adminExportSelectedBtn" style="display:none;border-color:#7c3aed;color:#7c3aed;gap:5px" onclick="exportSelectedAdminUsers()">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Selected (<span id="adminSelCount">0</span>)
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openAddModal()">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Add User
+            </button>
+          </div>
         </div>
         <table>
           <thead>
             <tr>
-              <th>User</th>
+              <th id="adminUserTh">User</th>
               <th>Email</th>
               <th>Role</th>
               <th>Status</th>
@@ -1109,6 +1164,22 @@
 
 <script>
 /* ── Auth guard ── */
+function toggleAdminTheme() {
+  var current = localStorage.getItem('portalTheme') || 'light';
+  var next = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('portalTheme', next);
+  document.documentElement.setAttribute('data-theme', next);
+  document.body.setAttribute('data-portal-theme', next === 'light' ? 'white' : 'dark');
+  var btn = document.getElementById('adminThemeBtn');
+  if (btn) btn.textContent = next === 'light' ? '☀️' : '🌙';
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var t = localStorage.getItem('portalTheme') || 'light';
+  document.body.setAttribute('data-portal-theme', t === 'light' ? 'white' : 'dark');
+  var btn = document.getElementById('adminThemeBtn');
+  if (btn) btn.textContent = t === 'light' ? '☀️' : '🌙';
+});
+
 const token = localStorage.getItem('tcToken');
 let currentUser = null;
 let googleSsoHasClientId = false;
@@ -1239,6 +1310,64 @@ function showPage(name, el) {
 /* ── PORTAL USERS ── */
 let adminUsers = [];
 let editingId  = null;
+let selectedAdminUsers = new Set();
+let selectModeAdmin = false;
+
+function toggleAdminSelectMode(){
+  selectModeAdmin = !selectModeAdmin;
+  if(!selectModeAdmin) selectedAdminUsers.clear();
+  const btn = document.getElementById('adminSelectModeBtn');
+  if(btn) btn.style.background = selectModeAdmin ? 'var(--primary,#7c3aed)' : '';
+  if(btn) btn.style.color      = selectModeAdmin ? '#fff' : '';
+  updateAdminSelectionUI();
+  renderUsersTable();
+}
+
+function toggleAdminSelectRow(id, checked){
+  checked ? selectedAdminUsers.add(id) : selectedAdminUsers.delete(id);
+  updateAdminSelectionUI();
+  const cb = document.querySelector(`input.admin-row-cb[data-id="${id}"]`);
+  if(cb) cb.closest('tr').style.background = checked ? 'rgba(124,58,237,0.07)' : '';
+  const allCbs = [...document.querySelectorAll('input.admin-row-cb')];
+  const hdr = document.getElementById('adminSelectAll');
+  if(hdr){
+    const n = allCbs.filter(el=>selectedAdminUsers.has(el.dataset.id)).length;
+    hdr.checked = n === allCbs.length;
+    hdr.indeterminate = n > 0 && n < allCbs.length;
+  }
+}
+
+function toggleAdminSelectAll(checked){
+  [...document.querySelectorAll('input.admin-row-cb')].forEach(el => {
+    checked ? selectedAdminUsers.add(el.dataset.id) : selectedAdminUsers.delete(el.dataset.id);
+  });
+  updateAdminSelectionUI();
+  renderUsersTable();
+}
+
+function updateAdminSelectionUI(){
+  const count = selectedAdminUsers.size;
+  const expBtn  = document.getElementById('adminExportSelectedBtn');
+  const countEl = document.getElementById('adminSelCount');
+  if(expBtn)  expBtn.style.display = (selectModeAdmin && count > 0) ? '' : 'none';
+  if(countEl) countEl.textContent = count;
+}
+
+function exportSelectedAdminUsers(){
+  const sel = adminUsers.filter(u => selectedAdminUsers.has(u.id));
+  if(!sel.length){ return; }
+  const headers = ['Name','Email','Role','Status','Last Login','Created'];
+  const rows = sel.map(u => [
+    u.name, u.email, u.role, u.status,
+    u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('en-IN') : '—',
+    new Date(u.createdAt).toLocaleDateString('en-IN')
+  ]);
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`portal-users-selected-${new Date().toISOString().slice(0,10)}.csv`;
+  a.style.display='none'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
 let deletingId = null;
 let resetId    = null;
 
@@ -1402,6 +1531,13 @@ function updateStats() {
 function renderUsersTable() {
   const tbody = document.getElementById('usersTableBody');
   if (!tbody) return;
+  // Update header th with select-all checkbox
+  const adminUserTh = document.getElementById('adminUserTh');
+  if(adminUserTh){
+    adminUserTh.innerHTML = selectModeAdmin
+      ? `<input type="checkbox" id="adminSelectAll" onchange="toggleAdminSelectAll(this.checked)" style="margin-right:6px;cursor:pointer;accent-color:#7c3aed"> User`
+      : 'User';
+  }
   if (!adminUsers.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:rgba(153,102,255,0.4)">No portal users found</td></tr>`;
     return;
@@ -1411,9 +1547,11 @@ function renderUsersTable() {
     const lastLogin = u.lastLogin ? new Date(u.lastLogin).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
     const created   = new Date(u.createdAt).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'});
     const isSelf = currentUser && u.id === currentUser.id;
-    return `<tr>
+    const isSelected = selectedAdminUsers.has(u.id);
+    return `<tr style="${isSelected?'background:rgba(124,58,237,0.07)':''}">
       <td>
         <div style="display:flex;align-items:center;gap:9px">
+          ${selectModeAdmin?`<input type="checkbox" class="admin-row-cb" data-id="${u.id}" ${isSelected?'checked':''} onchange="toggleAdminSelectRow('${u.id}',this.checked)" style="cursor:pointer;accent-color:#7c3aed;width:14px;height:14px;flex-shrink:0">` : ''}
           <div style="width:30px;height:30px;border-radius:50%;background:var(--primary);color:#fff;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${ini}</div>
           <div>
             <div style="font-size:13px;font-weight:600;color:var(--text)">${u.name}${isSelf?' <span style="font-size:10px;color:rgba(153,102,255,0.6)">(you)</span>':''}</div>

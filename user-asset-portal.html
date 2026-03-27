@@ -7,11 +7,11 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --primary: #1e40af; --primary-light: #3b82f6; --primary-lighter: #eff6ff; --primary-dark: #1e3a8a;
-      --accent: #0ea5e9; --success: #16a34a; --success-bg: #f0fdf4;
+      --primary: #7c3aed; --primary-light: #9333ea; --primary-lighter: #faf5ff; --primary-dark: #6d28d9;
+      --accent: #a855f7; --success: #16a34a; --success-bg: #f0fdf4;
       --warning: #d97706; --warning-bg: #fffbeb; --danger: #dc2626; --danger-bg: #fef2f2;
       --gray-50: #f8fafc; --gray-100: #f1f5f9; --gray-200: #e2e8f0; --gray-300: #cbd5e1;
-      --gray-400: #94a3b8; --gray-600: #475569; --gray-700: #334155; --gray-800: #1e293b;
+      --gray-400: #6b7280; --gray-600: #4b5563; --gray-700: #374151; --gray-800: #111827;
       --sidebar-w: 240px;
     }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); display: flex; height: 100vh; overflow: hidden; }
@@ -35,6 +35,105 @@
     .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .user-info strong { display: block; color: var(--gray-800); font-size: 12.5px; }
     .user-info span { color: var(--gray-400); font-size: 11px; }
+
+    /* White theme sidebar contrast */
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .sidebar {
+      background: #ffffff !important;
+      border-right: 1px solid #d1d5db !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo {
+      border-bottom: 1px solid #e5e7eb !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo-text {
+      color: #111827 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo-sub,
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-label {
+      color: #6b7280 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-item {
+      color: #374151 !important;
+      font-weight: 600 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-item:hover {
+      background: #f3f4f6 !important;
+      color: #111827 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-item.active {
+      background: #ede9fe !important;
+      color: #6d28d9 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-badge {
+      background: #8b5cf6 !important;
+      color: #fff !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .sidebar-footer {
+      border-top: 1px solid #e5e7eb !important;
+      background: #f8fafc !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .user-info strong {
+      color: #111827 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .user-info span {
+      color: #6b7280 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) {
+      background: #f8fafc !important;
+      color: #111827 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) :is(
+      .topbar,
+      .card,
+      .stat-card,
+      .modal,
+      .confirm-box,
+      #deptModalBox
+    ) {
+      background: #ffffff !important;
+      border-color: #e5e7eb !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) thead {
+      background: #f8fafc !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) th {
+      color: #4b5563 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) td {
+      color: #1f2937 !important;
+      border-top-color: #edf2f7 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) tr:hover td {
+      background: #f9fafb !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) :is(
+      .search-wrap input,
+      .filter-select,
+      .form-group input,
+      .form-group select,
+      .form-group textarea,
+      #logSearch,
+      .adv-field input,
+      .adv-field select,
+      .tag-picker
+    ) {
+      background: #ffffff !important;
+      color: #111827 !important;
+      border-color: #cbd5e1 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) :is(
+      .search-wrap input,
+      .filter-select,
+      .form-group input,
+      .form-group select,
+      .form-group textarea,
+      #logSearch,
+      .adv-field input,
+      .adv-field select,
+      .tag-picker
+    ):focus {
+      border-color: #9333ea !important;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.14) !important;
+    }
 
     /* MAIN */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -61,11 +160,11 @@
     .stat-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 13px; }
     .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
-    .stat-icon.blue { background: #eff6ff; color: var(--primary); }
+    .stat-icon.blue { background: #f5f3ff; color: var(--primary); }
     .stat-icon.green { background: #f0fdf4; color: var(--success); }
     .stat-icon.yellow { background: #fffbeb; color: var(--warning); }
     .stat-icon.red { background: #fef2f2; color: var(--danger); }
-    .stat-icon.sky { background: #f0f9ff; color: var(--accent); }
+    .stat-icon.sky { background: #faf5ff; color: var(--accent); }
     .stat-icon.purple { background: #faf5ff; color: #9333ea; }
     .stat-num { font-size: 26px; font-weight: 800; color: var(--gray-800); line-height: 1; }
     .stat-label { font-size: 11.5px; color: var(--gray-400); margin-top: 2px; }
@@ -87,14 +186,14 @@
     .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .badge.active { background: var(--success-bg); color: var(--success); }
     .badge.inactive { background: var(--gray-100); color: var(--gray-400); }
-    .badge.in-use { background: #eff6ff; color: var(--primary); }
+    .badge.in-use { background: #f5f3ff; color: var(--primary); }
     .badge.available { background: #f0fdf4; color: var(--success); }
     .badge.under-repair { background: #fffbeb; color: var(--warning); }
     .badge.retired { background: #fef2f2; color: var(--danger); }
     .badge.idle { background: var(--gray-100); color: var(--gray-400); }
     .badge.role-admin { background: #fdf4ff; color: #9333ea; }
     .badge.role-manager { background: #fff7ed; color: #ea580c; }
-    .badge.role-staff { background: #eff6ff; color: var(--primary); }
+    .badge.role-staff { background: #f5f3ff; color: var(--primary); }
 
     .user-cell { display: flex; align-items: center; gap: 9px; }
     .ava-sm { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
@@ -115,7 +214,7 @@
     .form-group { display: flex; flex-direction: column; gap: 4px; }
     .form-group label { font-size: 12px; font-weight: 600; color: var(--gray-700); }
     .form-group input, .form-group select, .form-group textarea { padding: 8px 11px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; outline: none; transition: border .14s; font-family: inherit; background: #fff; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
 
     /* CONFIRM */
@@ -144,7 +243,7 @@
     /* DEPT BREAKDOWN */
     .dept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
     .dept-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 10px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: box-shadow .15s, border-color .15s; }
-    .dept-card:hover { box-shadow: 0 4px 16px rgba(59,130,246,.13); border-color: var(--primary); }
+    .dept-card:hover { box-shadow: 0 4px 16px rgba(124,58,237,.13); border-color: var(--primary); }
     .dept-name { font-size: 12.5px; font-weight: 600; color: var(--gray-700); }
     .dept-count { font-size: 20px; font-weight: 800; color: var(--primary); }
 
@@ -200,20 +299,20 @@
     body.support-theme-portal .form-group input, body.support-theme-portal .form-group select, body.support-theme-portal .form-group textarea { background: #1e1525 !important; color: #faf9fa !important; }
     body.support-theme-portal .form-group input:focus, body.support-theme-portal .form-group select:focus, body.support-theme-portal .form-group textarea:focus { background: #231930 !important; }
     body.support-theme-portal .page-btn { background: #1e1525 !important; color: #cdc8d0 !important; }
-    body.support-theme-portal .stat-icon.blue   { background: rgba(30,64,175,0.18) !important; }
+    body.support-theme-portal .stat-icon.blue   { background: rgba(124,58,237,0.18) !important; }
     body.support-theme-portal .stat-icon.green  { background: rgba(22,163,74,0.15) !important; }
     body.support-theme-portal .stat-icon.yellow { background: rgba(217,119,6,0.15) !important; }
     body.support-theme-portal .stat-icon.red    { background: rgba(220,38,38,0.15) !important; }
-    body.support-theme-portal .stat-icon.sky    { background: rgba(14,165,233,0.15) !important; }
+    body.support-theme-portal .stat-icon.sky    { background: rgba(168,85,247,0.15) !important; }
     body.support-theme-portal .stat-icon.purple { background: rgba(147,51,234,0.15) !important; }
-    body.support-theme-portal .badge.in-use       { background: rgba(30,64,175,0.15) !important; }
+    body.support-theme-portal .badge.in-use       { background: rgba(124,58,237,0.15) !important; }
     body.support-theme-portal .badge.available    { background: rgba(22,163,74,0.12) !important; }
     body.support-theme-portal .badge.under-repair { background: rgba(217,119,6,0.12) !important; }
     body.support-theme-portal .badge.retired      { background: rgba(220,38,38,0.12) !important; }
     body.support-theme-portal .badge.idle         { background: rgba(131,117,138,0.15) !important; }
     body.support-theme-portal .badge.role-admin   { background: rgba(147,51,234,0.15) !important; }
     body.support-theme-portal .badge.role-manager { background: rgba(234,88,12,0.15) !important; }
-    body.support-theme-portal .badge.role-staff   { background: rgba(30,64,175,0.15) !important; }
+    body.support-theme-portal .badge.role-staff   { background: rgba(124,58,237,0.15) !important; }
     body.support-theme-portal .tag { background: #231930 !important; color: #b5acb9 !important; }
     body.support-theme-portal #deptModalClose:hover { background: #231930 !important; }
     body.support-theme-portal .dept-card:hover { box-shadow: 0 4px 16px rgba(153,102,255,0.2) !important; }
@@ -223,14 +322,70 @@
     body.support-theme-portal th.sortable:hover { color: #cea7fb; }
     body.support-theme-portal th.sortable.sort-asc .sort-arrow, body.support-theme-portal th.sortable.sort-desc .sort-arrow { color: #9966ff; }
 
+    /* ══ LIGHT THEME OVERRIDES — elements with hardcoded dark colors ══ */
+    /* Department management counts */
+    body:not(.support-theme-portal) .dept-mgmt-count.users     { background:#ede9fe; color:#6d28d9; }
+    body:not(.support-theme-portal) .dept-mgmt-count.software  { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .dept-mgmt-btn             { border-color:var(--gray-200); color:var(--gray-700); }
+    body:not(.support-theme-portal) .dept-mgmt-btn:hover       { background:var(--primary-lighter); border-color:var(--primary); color:var(--primary); }
+    body:not(.support-theme-portal) .dept-mgmt-btn.danger:hover{ background:#fef2f2; border-color:#fecaca; color:#dc2626; }
+
+    /* Software & User map cards */
+    body:not(.support-theme-portal) .sw-map-card   { background:#f8fafc; border-color:var(--gray-200); }
+    body:not(.support-theme-portal) .sw-map-card:hover  { background:var(--primary-lighter); border-color:var(--primary); }
+    body:not(.support-theme-portal) .sw-map-card.checked{ background:#f5f3ff; border-color:var(--primary); }
+    body:not(.support-theme-portal) .sw-map-card .sw-map-type  { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .sw-map-card.all-badge .sw-map-type { background:#dcfce7; color:#15803d; }
+    body:not(.support-theme-portal) .user-map-card { background:#f8fafc; border-color:var(--gray-200); }
+    body:not(.support-theme-portal) .user-map-card:hover  { background:var(--primary-lighter); border-color:var(--primary); }
+    body:not(.support-theme-portal) .user-map-card.checked{ background:#f5f3ff; border-color:var(--primary); }
+    body:not(.support-theme-portal) .user-map-card .umc-role { background:#f3e8ff; color:#6d28d9; }
+
+    /* Activity log event badges */
+    body:not(.support-theme-portal) .log-event-badge.device_allocated   { background:#dcfce7; color:#15803d; }
+    body:not(.support-theme-portal) .log-event-badge.device_unassigned  { background:#ffedd5; color:#c2410c; }
+    body:not(.support-theme-portal) .log-event-badge.asset_created      { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .log-event-badge.asset_updated      { background:#f3e8ff; color:#7e22ce; }
+    body:not(.support-theme-portal) .log-event-badge.asset_deleted      { background:#fef2f2; color:#b91c1c; }
+    body:not(.support-theme-portal) .log-event-badge.user_created       { background:#f5f3ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .log-event-badge.user_updated       { background:#f5f3ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .log-event-badge.user_deleted       { background:#fef2f2; color:#b91c1c; }
+    body:not(.support-theme-portal) .log-event-badge.software_created   { background:#ccfbf1; color:#0f766e; }
+    body:not(.support-theme-portal) .log-event-badge.software_updated   { background:#dcfce7; color:#15803d; }
+    body:not(.support-theme-portal) .log-event-badge.software_deleted   { background:#fef2f2; color:#b91c1c; }
+    body:not(.support-theme-portal) .log-event-badge.settings_updated   { background:#fef9c3; color:#a16207; }
+    body:not(.support-theme-portal) .log-event-badge.support_request_created { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .log-event-badge.support_request_updated { background:#f3e8ff; color:#7e22ce; }
+    body:not(.support-theme-portal) .log-event-badge.support_request_deleted { background:#fef2f2; color:#b91c1c; }
+    body:not(.support-theme-portal) .log-event-badge.support_task_assignment_changed { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .log-event-badge.support_task_status_changed     { background:#dcfce7; color:#15803d; }
+    body:not(.support-theme-portal) .log-event-badge.support_approval_status_changed { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .log-event-badge.support_comment_added           { background:#fdf2f8; color:#9d174d; }
+    body:not(.support-theme-portal) .log-event-badge.support_request_approval_action { background:#fef9c3; color:#a16207; }
+
+    /* Nav icons — ensure they're visible in light mode */
+    body:not(.support-theme-portal) .nav-item svg { stroke: var(--gray-600); }
+    body:not(.support-theme-portal) .nav-item:hover svg { stroke: var(--gray-800); }
+    body:not(.support-theme-portal) .nav-item.active svg { stroke: var(--primary); }
 
     /* ── Software Inventory ── */
     .sw-type-badge { display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600; }
-    .sw-type-badge.SAAS        { background:rgba(14,165,233,0.15); color:#38bdf8; }
+    /* Dark mode badge colors (default) */
+    .sw-type-badge.SAAS        { background:rgba(168,85,247,0.15); color:#a855f7; }
     .sw-type-badge.On-premises { background:rgba(147,51,234,0.15); color:#c084fc; }
     .sw-type-badge.Freeware    { background:rgba(22,163,74,0.15);  color:#4ade80; }
     .sw-type-badge.Open-Source { background:rgba(217,119,6,0.15);  color:#fbbf24; }
+    /* Light mode badge overrides */
+    body:not(.support-theme-portal) .sw-type-badge.SAAS        { background:#f3e8ff; color:#6d28d9; }
+    body:not(.support-theme-portal) .sw-type-badge.On-premises { background:#f3e8ff; color:#7e22ce; }
+    body:not(.support-theme-portal) .sw-type-badge.Freeware    { background:#dcfce7; color:#15803d; }
+    body:not(.support-theme-portal) .sw-type-badge.Open-Source { background:#fef9c3; color:#a16207; }
     .lic-bar { width:80px;height:6px;background:var(--gray-200);border-radius:3px;display:inline-block;vertical-align:middle;overflow:hidden; }
+    tr.row-selected td { background:#f5f3ff !important; }
+    body.support-theme-portal tr.row-selected td { background:#2a1f4a !important; }
+    .btn-select-mode { gap:5px; }
+    .btn-select-mode.active { background:var(--primary) !important; color:#fff !important; border-color:var(--primary) !important; }
+    input.row-cb { cursor:pointer; accent-color:var(--primary); width:14px; height:14px; vertical-align:middle; margin-right:6px; }
     .lic-bar-fill { height:100%;border-radius:3px;transition:width .3s; }
     .lic-bar-fill.ok      { background:#4ade80; }
     .lic-bar-fill.warning { background:#fbbf24; }
@@ -319,14 +474,14 @@
     .sw-plan-cell .pc-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--gray-400); margin-bottom:5px; }
     .sw-plan-cell .pc-val { font-size:15px; font-weight:700; color:var(--gray-800); }
     .sw-plan-cell .pc-sub { font-size:11px; color:var(--gray-400); margin-top:2px; }
-    .sw-plan-annual { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--primary-lighter); border-top:1px solid rgba(59,130,246,.15); }
+    .sw-plan-annual { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:var(--primary-lighter); border-top:1px solid rgba(124,58,237,.15); }
     .sw-plan-annual .pa-label { font-size:12px; font-weight:600; color:var(--primary); }
     .sw-plan-annual .pa-val { font-size:20px; font-weight:800; color:var(--primary); }
     .sw-total-spend { border:2px solid var(--primary); border-radius:14px; padding:16px 22px; margin-top:6px; display:flex; align-items:center; justify-content:space-between; background:var(--primary-lighter); }
     .sw-total-spend .ts-lines { display:flex; flex-direction:column; gap:4px; }
     .sw-total-spend .ts-line { font-size:12px; color:var(--gray-600); display:flex; gap:8px; }
     .sw-total-spend .ts-line span:first-child { min-width:160px; }
-    .sw-total-spend .ts-total { font-size:13px; font-weight:700; color:var(--primary); border-top:1px solid rgba(59,130,246,.2); padding-top:4px; margin-top:2px; display:flex; gap:8px; }
+    .sw-total-spend .ts-total { font-size:13px; font-weight:700; color:var(--primary); border-top:1px solid rgba(124,58,237,.2); padding-top:4px; margin-top:2px; display:flex; gap:8px; }
     .sw-total-spend .ts-total span:first-child { min-width:160px; }
     .sw-total-spend .ts-big { font-size:26px; font-weight:800; color:var(--primary); white-space:nowrap; }
     /* dark overrides for plan cards */
@@ -405,13 +560,13 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     .adv-field { display:flex; flex-direction:column; gap:3px; min-width:110px; flex:1; max-width:190px; }
     .adv-field label { font-size:10px; font-weight:700; color:var(--gray-400); text-transform:uppercase; letter-spacing:.06em; }
     .adv-field input, .adv-field select { padding:6px 9px; border:1px solid var(--gray-200); border-radius:6px; font-size:12px; outline:none; background:#fff; color:var(--gray-800); transition:border .13s; width:100%; box-sizing:border-box; }
-    .adv-field input:focus, .adv-field select:focus { border-color:var(--primary-light); box-shadow:0 0 0 2px rgba(59,130,246,.1); }
+    .adv-field input:focus, .adv-field select:focus { border-color:var(--primary-light); box-shadow:0 0 0 2px rgba(124,58,237,.1); }
     .adv-range-pair { display:flex; gap:5px; align-items:center; }
     .adv-range-pair input { flex:1; min-width:0; }
     .adv-range-sep { font-size:11px; color:var(--gray-400); flex-shrink:0; }
     /* Tag-picker (admin field) */
     .tag-picker { border:1px solid var(--gray-200); border-radius:6px; background:#fff; padding:4px 6px; min-height:32px; display:flex; flex-wrap:wrap; gap:4px; align-items:center; cursor:text; transition:border .13s; }
-    .tag-picker:focus-within { border-color:var(--primary-light); box-shadow:0 0 0 2px rgba(59,130,246,.1); }
+    .tag-picker:focus-within { border-color:var(--primary-light); box-shadow:0 0 0 2px rgba(124,58,237,.1); }
     .tag-chip { display:inline-flex; align-items:center; gap:3px; background:var(--primary-lighter); color:var(--primary); border-radius:4px; padding:2px 7px; font-size:11px; font-weight:600; }
     .tag-chip-x { cursor:pointer; font-size:13px; line-height:1; opacity:.7; }
     .tag-chip-x:hover { opacity:1; }
@@ -424,7 +579,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
 /* ── Department dropdown ── */
     .dept-dropdown { position:relative; }
     .dept-dd-trigger { width:100%; display:flex; align-items:center; justify-content:space-between; gap:6px; padding:8px 11px; border:1px solid var(--gray-200); border-radius:8px; font-size:13px; font-family:inherit; background:#fff; color:var(--gray-800); cursor:pointer; text-align:left; transition:border .14s; }
-    .dept-dd-trigger:focus, .dept-dd-trigger.open { border-color:var(--primary-light); box-shadow:0 0 0 3px rgba(59,130,246,.1); outline:none; }
+    .dept-dd-trigger:focus, .dept-dd-trigger.open { border-color:var(--primary-light); box-shadow:0 0 0 3px rgba(124,58,237,.1); outline:none; }
     .dept-dd-val { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .dept-dd-val.placeholder { color:var(--gray-400); }
     .dept-dd-arrow { width:14px; height:14px; stroke:var(--gray-400); fill:none; stroke-width:2.2; flex-shrink:0; transition:transform .15s; }
@@ -470,7 +625,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     .dept-mgmt-name-icon svg { width:15px;height:15px;stroke:#9b8aff;fill:none;stroke-width:2; }
     .dept-mgmt-count { display:inline-flex;align-items:center;justify-content:center;min-width:28px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700; }
     .dept-mgmt-count.users { background:rgba(124,92,255,.14);color:#9b8aff; }
-    .dept-mgmt-count.software { background:rgba(56,189,248,.12);color:#38bdf8; }
+    .dept-mgmt-count.software { background:rgba(56,189,248,.12);color:#a855f7; }
     .dept-mgmt-actions { display:flex;gap:6px;justify-content:flex-end; }
     .dept-mgmt-btn { display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:7px;border:1px solid var(--support-border,rgba(130,96,185,.28));background:transparent;color:var(--gray-600);font-size:11.5px;font-weight:600;cursor:pointer;transition:all .13s; }
     .dept-mgmt-btn:hover { background:rgba(124,92,255,.12);border-color:rgba(124,92,255,.4);color:#9b8aff; }
@@ -482,7 +637,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     .sw-map-card.checked { border-color:rgba(124,92,255,.55);background:rgba(124,92,255,.14); }
     .sw-map-card input[type=checkbox] { width:15px;height:15px;accent-color:#7c5cff;flex-shrink:0;cursor:pointer; }
     .sw-map-card .sw-map-name { font-size:12.5px;font-weight:600;color:var(--gray-700,#efe8ff);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-    .sw-map-card .sw-map-type { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(56,189,248,.12);color:#38bdf8;white-space:nowrap;flex-shrink:0; }
+    .sw-map-card .sw-map-type { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(56,189,248,.12);color:#a855f7;white-space:nowrap;flex-shrink:0; }
     .sw-map-card.all-badge .sw-map-type { background:rgba(52,211,153,.12);color:#34d399; }
     /* User mapping cards */
     .user-map-card { display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1px solid var(--support-border,rgba(130,96,185,.22));background:rgba(29,20,38,.7);cursor:pointer;transition:all .13s;user-select:none; }
@@ -491,7 +646,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     .user-map-card input[type=checkbox] { width:15px;height:15px;accent-color:#7c5cff;flex-shrink:0;cursor:pointer; }
     .user-map-card .umc-avatar { width:28px;height:28px;border-radius:50%;background:var(--primary-lighter,rgba(124,92,255,.18));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--primary,#7c5cff);flex-shrink:0; }
     .user-map-card .umc-name { font-size:12.5px;font-weight:600;color:var(--gray-700,#efe8ff);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-    .user-map-card .umc-role { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(56,189,248,.12);color:#38bdf8;white-space:nowrap;flex-shrink:0; }
+    .user-map-card .umc-role { font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;background:rgba(56,189,248,.12);color:#a855f7;white-space:nowrap;flex-shrink:0; }
 
 /* ── Activity Log ── */
     .log-event-badge {
@@ -500,22 +655,22 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     }
     .log-event-badge.device_allocated   { background: rgba(22,163,74,0.15);   color: #4ade80; }
     .log-event-badge.device_unassigned  { background: rgba(234,88,12,0.15);   color: #fb923c; }
-    .log-event-badge.asset_created      { background: rgba(14,165,233,0.15);  color: #38bdf8; }
+    .log-event-badge.asset_created      { background: rgba(168,85,247,0.15);  color: #a855f7; }
     .log-event-badge.asset_updated      { background: rgba(147,51,234,0.15);  color: #c084fc; }
     .log-event-badge.asset_deleted      { background: rgba(220,38,38,0.15);   color: #f87171; }
-    .log-event-badge.user_created       { background: rgba(30,64,175,0.20);   color: #93c5fd; }
+    .log-event-badge.user_created       { background: rgba(124,58,237,0.20);   color: #c4b5fd; }
     .log-event-badge.user_updated       { background: rgba(124,58,237,0.15);  color: #a78bfa; }
     .log-event-badge.user_deleted       { background: rgba(220,38,38,0.15);   color: #f87171; }
     .log-event-badge.software_created   { background: rgba(45,212,191,0.16);  color: #5eead4; }
     .log-event-badge.software_updated   { background: rgba(34,197,94,0.14);   color: #86efac; }
     .log-event-badge.software_deleted   { background: rgba(239,68,68,0.14);   color: #fca5a5; }
     .log-event-badge.settings_updated   { background: rgba(251,191,36,0.16);  color: #fde68a; }
-    .log-event-badge.support_request_created { background: rgba(56,189,248,0.16); color: #7dd3fc; }
+    .log-event-badge.support_request_created { background: rgba(56,189,248,0.16); color: #c4b5fd; }
     .log-event-badge.support_request_updated { background: rgba(168,85,247,0.14); color: #d8b4fe; }
     .log-event-badge.support_request_deleted { background: rgba(248,113,113,0.15); color: #fda4af; }
     .log-event-badge.support_task_assignment_changed { background: rgba(99,102,241,0.16); color: #a5b4fc; }
     .log-event-badge.support_task_status_changed { background: rgba(16,185,129,0.16); color: #6ee7b7; }
-    .log-event-badge.support_approval_status_changed { background: rgba(14,165,233,0.14); color: #7dd3fc; }
+    .log-event-badge.support_approval_status_changed { background: rgba(168,85,247,0.14); color: #c4b5fd; }
     .log-event-badge.support_comment_added { background: rgba(244,114,182,0.14); color: #f9a8d4; }
     .log-event-badge.support_request_approval_action { background: rgba(250,204,21,0.16); color: #fde047; }
     .log-changes-list { margin-top: 6px; }
@@ -584,10 +739,10 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     .notif-section-sub   { font-size: 11.5px; color: var(--gray-400); margin-top: 2px; }
     .notif-section-head-right { display: flex; align-items: center; gap: 8px; }
     .notif-clear-all {
-      font-size: 12px; font-weight: 600; color: var(--primary); background: #eff6ff;
-      border: 1px solid #bfdbfe; cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all .13s;
+      font-size: 12px; font-weight: 600; color: var(--primary); background: #f5f3ff;
+      border: 1px solid #ddd6fe; cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all .13s;
     }
-    .notif-clear-all:hover { background: #dbeafe; }
+    .notif-clear-all:hover { background: #ede9fe; }
     .notif-collapse-btn {
       font-size: 12px; font-weight: 600; color: var(--gray-500); background: var(--gray-50);
       border: 1px solid var(--gray-200); cursor: pointer; padding: 4px 10px; border-radius: 6px; transition: all .13s;
@@ -613,7 +768,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     }
     .notif-item-dot.critical { background: #ef4444; box-shadow: 0 0 0 3px rgba(239,68,68,.15); }
     .notif-item-dot.warning  { background: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.12); }
-    .notif-item-dot.info     { background: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.12); }
+    .notif-item-dot.info     { background: #8b5cf6; box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
     .notif-item-body { flex: 1; min-width: 0; }
     .notif-item-title { font-size: 13px; font-weight: 700; color: var(--gray-800); margin-bottom: 2px; }
     .notif-item-msg   { font-size: 12px; color: var(--gray-600); line-height: 1.5; }
@@ -622,12 +777,12 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: .04em;
     }
     .notif-cat-badge.users    { background: #faf5ff; color: #9333ea; border: 1px solid #e9d5ff; }
-    .notif-cat-badge.software { background: #eff6ff; color: #3b82f6; border: 1px solid #bfdbfe; }
+    .notif-cat-badge.software { background: #f5f3ff; color: #8b5cf6; border: 1px solid #ddd6fe; }
     .notif-cat-badge.assets   { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
     .notif-sev-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; text-transform: uppercase; }
     .notif-sev-badge.critical { background: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
     .notif-sev-badge.warning  { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
-    .notif-sev-badge.info     { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+    .notif-sev-badge.info     { background: #f5f3ff; color: #7c3aed; border: 1px solid #ddd6fe; }
     .notif-item-time  { font-size: 10.5px; color: var(--gray-400); }
     .notif-dismiss {
       background: none; border: none; cursor: pointer; color: var(--gray-300);
@@ -658,7 +813,18 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
 <body>
-<script>document.body.className='support-theme support-theme-portal';</script>
+<script>
+  (function(){
+    var t = localStorage.getItem('portalTheme');
+    if (!t || t === 'dark') {
+      t = 'light';
+      localStorage.setItem('portalTheme', t);
+    }
+    document.body.className = t === 'light' ? 'support-theme' : 'support-theme support-theme-portal';
+    document.documentElement.setAttribute('data-theme', t);
+    document.body.setAttribute('data-portal-theme', t === 'light' ? 'white' : 'dark');
+  })();
+</script>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -721,7 +887,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
   <div class="sidebar-footer">
     <!-- Learning Portal link -->
     <a href="scim-learning-portal.html" target="_blank" class="learning-link-card"
-      style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;margin-bottom:10px;background:linear-gradient(135deg,rgba(49,83,216,.18),rgba(124,92,255,.18));border:1px solid rgba(130,96,185,.35);text-decoration:none;transition:box-shadow .15s"
+      style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;margin-bottom:10px;background:linear-gradient(135deg,rgba(124,58,237,.18),rgba(124,92,255,.18));border:1px solid rgba(130,96,185,.35);text-decoration:none;transition:box-shadow .15s"
       onmouseover="this.style.boxShadow='0 2px 10px rgba(124,92,255,.25)'" onmouseout="this.style.boxShadow='none'">
       <div class="learning-link-icon" style="width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#3757e6,#7c5cff);display:flex;align-items:center;justify-content:center;flex-shrink:0">
         <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
@@ -732,13 +898,15 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       </div>
       <svg viewBox="0 0 24 24" class="learning-link-arrow" style="width:13px;height:13px;stroke:rgba(167,139,250,0.7);fill:none;stroke-width:2;flex-shrink:0"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
     </a>
-<div class="user-chip">
+<div style="display:flex;align-items:center;gap:8px">
+    <div class="user-chip" style="flex:1;min-width:0">
       <div class="avatar" id="portalAvatar">TC</div>
       <div class="user-info">
         <strong id="sidebarUserName">Loading…</strong>
         <span id="sidebarUserRole" style="font-size:10.5px">—</span>
       </div>
     </div>
+  </div>
   </div>
 </aside>
 
@@ -755,6 +923,9 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     <button class="notif-bell-btn" id="notifBellBtn" onclick="goToNotifications()" title="View Notifications">
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="bell-badge" id="notifBadge">0</span>
+    </button>
+    <button class="notif-bell-btn" id="themeToggleBtn" onclick="togglePortalTheme()" title="Toggle theme">
+      <span style="font-size:16px;line-height:1">🌙</span>
     </button>
 
     <button class="btn btn-primary rbac-write" id="addBtn" onclick="openAddModal()" style="display:none">
@@ -792,7 +963,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       </div>
 
       <div class="stat-grid" id="statGrid"></div>
-      <div style="margin-bottom:16px">
+      <div id="deptGridSection" style="margin-bottom:16px;display:none">
         <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px">Users by Department</div>
         <div class="dept-grid" id="deptGrid"></div>
       </div>
@@ -817,6 +988,12 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
 
     <!-- USERS -->
     <div class="page" id="page-users">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:500;color:var(--gray-600);user-select:none">
+          <input type="checkbox" id="deptGridVisibleChk" onchange="toggleDeptGridOnDashboard(this.checked)" style="width:15px;height:15px;cursor:pointer;accent-color:var(--primary)">
+          Visible on Dashboard
+        </label>
+      </div>
       <div class="card">
         <div class="card-header">
           <div class="card-title">All Users <span style="color:var(--gray-400);font-weight:400;font-size:12px" id="userCountLabel"></span></div>
@@ -854,6 +1031,14 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
             <button class="btn btn-secondary btn-sm" onclick="openExportConfig('users')">
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export
+            </button>
+            <button class="btn btn-secondary btn-sm btn-select-mode" id="selectModeBtn_users" onclick="toggleSelectMode('users')">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
+              Select
+            </button>
+            <button class="btn btn-secondary btn-sm" id="exportSelectedBtn_users" style="display:none;border-color:#7c3aed;color:#7c3aed" onclick="openExportSelected('users')">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Selected (<span id="selCount_users">0</span>)
             </button>
           </div>
         </div>
@@ -950,6 +1135,14 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export
             </button>
+            <button class="btn btn-secondary btn-sm btn-select-mode" id="selectModeBtn_assets" onclick="toggleSelectMode('assets')">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
+              Select
+            </button>
+            <button class="btn btn-secondary btn-sm" id="exportSelectedBtn_assets" style="display:none;border-color:#7c3aed;color:#7c3aed" onclick="openExportSelected('assets')">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Selected (<span id="selCount_assets">0</span>)
+            </button>
           </div>
         </div>
         <div class="adv-search-panel" id="assetsAdvPanel">
@@ -985,7 +1178,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         <div class="card-header" style="flex-wrap:wrap;gap:10px">
           <div class="card-title" style="display:flex;align-items:center;gap:10px;flex:1">
             Software Inventory <span style="color:var(--gray-400);font-weight:400;font-size:12px" id="swCountLabel"></span>
-            <button class="btn btn-secondary btn-sm" onclick="openScimAudit()" style="margin-left:auto;background:linear-gradient(135deg,#eff6ff,#f0fdf4);border-color:#bfdbfe;color:#1e40af;font-weight:700;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="openScimAudit()" style="margin-left:auto;background:linear-gradient(135deg,#f5f3ff,#f0fdf4);border-color:#ddd6fe;color:#6d28d9;font-weight:700;gap:6px">
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
               SCIM Audit
             </button>
@@ -1014,6 +1207,14 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
             <button class="btn btn-secondary btn-sm" onclick="openExportConfig('software')">
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Export
+            </button>
+            <button class="btn btn-secondary btn-sm btn-select-mode" id="selectModeBtn_software" onclick="toggleSelectMode('software')">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
+              Select
+            </button>
+            <button class="btn btn-secondary btn-sm" id="exportSelectedBtn_software" style="display:none;border-color:#7c3aed;color:#7c3aed" onclick="openExportSelected('software')">
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Selected (<span id="selCount_software">0</span>)
             </button>
             <div class="col-picker-wrap">
               <button class="btn btn-secondary btn-sm" onclick="toggleColPicker('software',event)">
@@ -1415,6 +1616,24 @@ function authFetch(url, opts = {}) {
   });
 }
 
+function togglePortalTheme() {
+  var current = localStorage.getItem('portalTheme') || 'light';
+  var next    = current === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('portalTheme', next);
+  document.body.className = next === 'light' ? 'support-theme' : 'support-theme support-theme-portal';
+  document.documentElement.setAttribute('data-theme', next);
+  document.body.setAttribute('data-portal-theme', next === 'light' ? 'white' : 'dark');
+  var btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = next === 'light' ? '☀️' : '🌙';
+}
+
+// Set correct icon on load
+document.addEventListener('DOMContentLoaded', function(){
+  var t   = localStorage.getItem('portalTheme') || 'light';
+  var btn = document.getElementById('themeToggleBtn');
+  if (btn) btn.textContent = t === 'light' ? '☀️' : '🌙';
+});
+
 function signOut() {
   localStorage.removeItem('tcToken');
   localStorage.removeItem('tcUser');
@@ -1480,7 +1699,7 @@ function updateTopbarUser() {
 }
 
 /* ══ HELPERS ══ */
-const COLORS=['#1e40af','#7c3aed','#0891b2','#059669','#d97706','#dc2626','#9333ea','#0ea5e9','#be185d','#0f766e'];
+const COLORS=['#6d28d9','#7c3aed','#0891b2','#059669','#d97706','#dc2626','#9333ea','#9333ea','#be185d','#0f766e'];
 const aColor = n => COLORS[(n.charCodeAt(0)+(n.charCodeAt(n.length-1)||0))%COLORS.length];
 const ini = (f,l) => ((f||'')[0]||'').toUpperCase()+((l||'')[0]||'').toUpperCase() || ((f||'')[0]||'?').toUpperCase();
 const uid = () => 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
@@ -1653,7 +1872,7 @@ async function loadData(){
   try {
     const safeFetch = url => authFetch(url).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).catch(()=>null);
     const [us, as, sw] = await Promise.all([
-      authFetch(`${API}/users`).then(r=>r.json()),
+      authFetch(`${API}/users?includeInactive=true`).then(r=>r.json()),
       authFetch(`${API}/assets`).then(r=>r.json()),
       safeFetch(`${API}/software`),
     ]);
@@ -1678,6 +1897,68 @@ const PAGE_SIZE=10;
 /* ══ SORT STATE ══ */
 let userSort={col:null,dir:1};
 let assetSort={col:null,dir:1};
+
+/* ══ SELECTION STATE ══ */
+let selectedUsers   = new Set();
+let selectedAssets  = new Set();
+let selectedSoftware= new Set();
+let selectMode = { users:false, assets:false, software:false };
+let exportSelectionOnly = false;
+
+function _selSet(table){ return table==='users'?selectedUsers:table==='assets'?selectedAssets:selectedSoftware; }
+function _rerender(table){ table==='users'?renderUsers():table==='assets'?renderAssets():renderSoftware(); }
+
+function toggleSelectMode(table){
+  selectMode[table] = !selectMode[table];
+  if(!selectMode[table]){ _selSet(table).clear(); }
+  updateSelectionUI(table);
+  _rerender(table);
+}
+
+function toggleSelectRow(table, id, checked){
+  checked ? _selSet(table).add(id) : _selSet(table).delete(id);
+  updateSelectionUI(table);
+  // update row highlight without full re-render
+  const cb = document.querySelector(`input.row-cb[data-id="${id}"][data-table="${table}"]`);
+  if(cb) cb.closest('tr').classList.toggle('row-selected', checked);
+  // update select-all header checkbox indeterminate state
+  _syncSelectAllHeader(table);
+}
+
+function toggleSelectAll(table, checked){
+  // operate on current visible page IDs
+  const pageIds = [...document.querySelectorAll(`input.row-cb[data-table="${table}"]`)].map(el=>el.dataset.id);
+  const sel = _selSet(table);
+  pageIds.forEach(id => checked ? sel.add(id) : sel.delete(id));
+  updateSelectionUI(table);
+  _rerender(table);
+}
+
+function _syncSelectAllHeader(table){
+  const allCbs = [...document.querySelectorAll(`input.row-cb[data-table="${table}"]`)];
+  if(!allCbs.length) return;
+  const sel = _selSet(table);
+  const checkedCount = allCbs.filter(el=>sel.has(el.dataset.id)).length;
+  const hdr = document.getElementById(`selectAll_${table}`);
+  if(!hdr) return;
+  hdr.checked = checkedCount === allCbs.length;
+  hdr.indeterminate = checkedCount > 0 && checkedCount < allCbs.length;
+}
+
+function updateSelectionUI(table){
+  const count = _selSet(table).size;
+  const modeBtn = document.getElementById(`selectModeBtn_${table}`);
+  const expBtn  = document.getElementById(`exportSelectedBtn_${table}`);
+  const countEl = document.getElementById(`selCount_${table}`);
+  if(modeBtn) modeBtn.classList.toggle('active', selectMode[table]);
+  if(expBtn)  expBtn.style.display = (selectMode[table] && count > 0) ? '' : 'none';
+  if(countEl) countEl.textContent = count;
+}
+
+function openExportSelected(table){
+  exportSelectionOnly = true;
+  openExportConfig(table);
+}
 
 /* ══ COLUMN VISIBILITY ══ */
 const userColVis = {
@@ -1847,7 +2128,7 @@ function renderDashboard(){
   // dept breakdown — exclude inactive users
   const deptCounts={};
   users.filter(u=>(u.status||'').toLowerCase()!=='inactive').forEach(u=>{ deptCounts[u.dept]=(deptCounts[u.dept]||0)+1; });
-  const deptColors={'Engineering':'var(--primary)','Data Science - Engineering':'#6366f1','Data Science':'#4f46e5','AI Services':'#9333ea','AI-Service':'#9333ea','Product':'#d97706','Customer Operations':'#0369a1','Customer Support':'#dc2626','Operations':'#0891b2','Sales':'#16a34a','Marketing':'#db2777','Legal':'#7c3aed','Human Resources':'#0d9488','Executive':'#0f172a','Executive Administration':'#334155','IT':'#0891b2','HR':'#16a34a','QA':'#ea580c','Accounts':'#be185d','Finance':'#059669'};
+  const deptColors={'Engineering':'var(--primary)','Data Science - Engineering':'#6366f1','Data Science':'#4f46e5','AI Services':'#9333ea','AI-Service':'#9333ea','Product':'#d97706','Customer Operations':'#6d28d9','Customer Support':'#dc2626','Operations':'#0891b2','Sales':'#16a34a','Marketing':'#db2777','Legal':'#7c3aed','Human Resources':'#0d9488','Executive':'#0f172a','Executive Administration':'#334155','IT':'#0891b2','HR':'#16a34a','QA':'#ea580c','Accounts':'#be185d','Finance':'#059669'};
   document.getElementById('deptGrid').innerHTML=Object.entries(deptCounts).sort((a,b)=>b[1]-a[1]).map(([d,c])=>`
     <div class="dept-card" onclick="showDeptUsers('${d.replace(/'/g,"\\'")}')">
       <div>
@@ -1856,6 +2137,13 @@ function renderDashboard(){
       </div>
       <div class="dept-count" style="color:${deptColors[d]||'var(--primary)'}">${c}</div>
     </div>`).join('');
+
+  // Restore dept grid visibility from saved preference
+  const deptGridVisible = localStorage.getItem('deptGridOnDashboard') === 'true';
+  const deptGridSection = document.getElementById('deptGridSection');
+  const deptGridChk = document.getElementById('deptGridVisibleChk');
+  if (deptGridSection) deptGridSection.style.display = deptGridVisible ? 'block' : 'none';
+  if (deptGridChk) deptGridChk.checked = deptGridVisible;
 
   const totalSwBudget = software.reduce((s,x)=>s+swTotalCost(x),0);
   const paidApps      = software.filter(x=>swTotalCost(x)>0);
@@ -1890,9 +2178,9 @@ function renderDashboard(){
       <div class="stat-icon yellow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
       <div><div class="stat-num" style="font-size:18px;color:var(--primary)">${totalSwBudget>0?'$'+(totalSwBudget>=1000000?(totalSwBudget/1000000).toFixed(1)+'M':(totalSwBudget/1000).toFixed(1)+'K'):'—'}</div><div class="stat-label">Total Annual Spend</div></div>
     </div>
-    <div class="stat-card" onclick="${swNav};setTimeout(()=>swBudgetChipClick('paid'),200)" style="cursor:pointer;border-top:3px solid #3b82f6">
+    <div class="stat-card" onclick="${swNav};setTimeout(()=>swBudgetChipClick('paid'),200)" style="cursor:pointer;border-top:3px solid #8b5cf6">
       <div class="stat-icon blue"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
-      <div><div class="stat-num" style="color:#3b82f6">${paidApps.length}</div><div class="stat-label">Paid Apps</div></div>
+      <div><div class="stat-num" style="color:#8b5cf6">${paidApps.length}</div><div class="stat-label">Paid Apps</div></div>
     </div>
     <div class="stat-card" onclick="${swNav};setTimeout(()=>swBudgetChipClick('free'),200)" style="cursor:pointer;border-top:3px solid var(--success)">
       <div class="stat-icon green"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
@@ -1978,10 +2266,14 @@ function renderUsers(){
   const head=document.getElementById('userTableHead');
   if(head){
     head.innerHTML='<tr>'+visCols.map(([key,cfg])=>{
+      const label = (selectMode.users && key==='name')
+        ? `<input type="checkbox" id="selectAll_users" onchange="toggleSelectAll('users',this.checked)" style="margin-right:6px;cursor:pointer;accent-color:var(--primary)">${cfg.label}`
+        : cfg.label;
       if(sortableKeys.has(key))
-        return `<th class="${sortClass(key,userSort)}" onclick="thSort('${key}',userSort,renderUsers)">${cfg.label}${sortArrow(key,userSort)}</th>`;
-      return `<th>${cfg.label}</th>`;
+        return `<th class="${sortClass(key,userSort)}" onclick="${(selectMode.users&&key==='name')?'':` thSort('${key}',userSort,renderUsers)`}">${label}${sortArrow(key,userSort)}</th>`;
+      return `<th>${label}</th>`;
     }).join('')+'</tr>';
+    if(selectMode.users) setTimeout(()=>_syncSelectAllHeader('users'),0);
   }
 
   const body=document.getElementById('userTableBody');
@@ -1996,7 +2288,7 @@ function renderUsers(){
       function userCell(key){
         switch(key){
           case 'name':
-            return `<td><div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--primary-light);text-decoration:underline;text-underline-offset:3px">${u.first} ${u.last}</strong></div></td>`;
+            return `<td><div style="display:flex;align-items:center;gap:6px">${selectMode.users?`<input type="checkbox" class="row-cb" data-table="users" data-id="${u._id}" ${selectedUsers.has(u._id)?'checked':''} onchange="toggleSelectRow('users','${u._id}',this.checked)" onclick="event.stopPropagation()">`:''}<div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${u.first} ${u.last}</strong></div></div></td>`;
           case 'email':
             return `<td style="color:var(--gray-600);font-size:12px">${u.email}</td>`;
           case 'dept':
@@ -2025,7 +2317,7 @@ function renderUsers(){
             return `<td>${u[key]||'—'}</td>`;
         }
       }
-      return `<tr>${visCols.map(([key])=>userCell(key)).join('')}</tr>`;
+      return `<tr class="${selectedUsers.has(u._id)?'row-selected':''}">${visCols.map(([key])=>userCell(key)).join('')}</tr>`;
     }).join('');
   }
   renderPag('userPagination',userPage,pages,p=>{userPage=p;renderUsers();});
@@ -2076,7 +2368,7 @@ function renderOffboarding(){
       return '<tr>' + cols.map(c => {
         switch(c.key){
           case 'name':
-            return `<td><div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--primary-light);text-decoration:underline;text-underline-offset:3px">${u.first} ${u.last}</strong></div></td>`;
+            return `<td><div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${u.first} ${u.last}</strong></div></td>`;
           case 'email':
             return `<td style="color:var(--gray-600);font-size:12px">${u.email}</td>`;
           case 'jobTitle':
@@ -2166,10 +2458,14 @@ function renderAssets(){
   const head=document.getElementById('assetTableHead');
   if(head){
     head.innerHTML='<tr>'+visCols.map(([key,cfg])=>{
+      const label = (selectMode.assets && key==='csvId')
+        ? `<input type="checkbox" id="selectAll_assets" onchange="toggleSelectAll('assets',this.checked)" style="margin-right:6px;cursor:pointer;accent-color:var(--primary)">${cfg.label}`
+        : cfg.label;
       if(sortableKeys.has(key))
-        return `<th class="${sortClass(key,assetSort)}" onclick="thSort('${key}',assetSort,renderAssets)">${cfg.label}${sortArrow(key,assetSort)}</th>`;
-      return `<th>${cfg.label}</th>`;
+        return `<th class="${sortClass(key,assetSort)}" onclick="thSort('${key}',assetSort,renderAssets)">${label}${sortArrow(key,assetSort)}</th>`;
+      return `<th>${label}</th>`;
     }).join('')+'</tr>';
+    if(selectMode.assets) setTimeout(()=>_syncSelectAllHeader('assets'),0);
   }
 
   const body=document.getElementById('assetTableBody');
@@ -2184,8 +2480,8 @@ function renderAssets(){
 
       function assetCell(key){
         switch(key){
-          case 'csvId':    return `<td class="mono" style="color:var(--gray-400)">${a.csvId}</td>`;
-          case 'name':     return `<td onclick="editAsset('${a.id}')" style="cursor:pointer"><strong style="color:var(--primary-light);text-decoration:underline;text-underline-offset:3px">${a.name}</strong><br><span style="color:var(--gray-400);font-size:11px">${a.desc}</span>${a.notes?`<div class="svc-note">⚠ ${a.notes}</div>`:''}</td>`;
+          case 'csvId':    return `<td class="mono" style="color:var(--gray-400)">${selectMode.assets?`<input type="checkbox" class="row-cb" data-table="assets" data-id="${a._id}" ${selectedAssets.has(a._id)?'checked':''} onchange="toggleSelectRow('assets','${a._id}',this.checked)">`:''} ${a.csvId}</td>`;
+          case 'name':     return `<td onclick="editAsset('${a.id}')" style="cursor:pointer"><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${a.name}</strong><br><span style="color:var(--gray-400);font-size:11px">${a.desc}</span>${a.notes?`<div class="svc-note">⚠ ${a.notes}</div>`:''}</td>`;
           case 'serial':   return `<td class="mono" style="font-size:11px;color:var(--gray-600)">${a.serial}</td>`;
           case 'assignTo': return `<td>${assignHtml}</td>`;
           case 'dept':     return `<td><span class="tag">${a.dept}</span></td>`;
@@ -2209,7 +2505,7 @@ function renderAssets(){
           default:         return `<td>${a[key]||'—'}</td>`;
         }
       }
-      return `<tr>${visCols.map(([key])=>assetCell(key)).join('')}</tr>`;
+      return `<tr class="${selectedAssets.has(a._id)?'row-selected':''}">${visCols.map(([key])=>assetCell(key)).join('')}</tr>`;
     }).join('');
   }
   renderPag('assetPagination',assetPage,pages,p=>{assetPage=p;renderAssets();});
@@ -2941,10 +3237,14 @@ function renderSoftware(){
   };
   document.getElementById('swTableHead').innerHTML = '<tr>'+swVisCols.map(([key])=>{
     const def = swColDefs[key] || { label: key, sortable: false, w: 100 };
+    const label = (selectMode.software && key==='csvId')
+      ? `<input type="checkbox" id="selectAll_software" onchange="toggleSelectAll('software',this.checked)" style="margin-right:6px;cursor:pointer;accent-color:var(--primary)">${def.label}`
+      : def.label;
     return def.sortable
-      ? `<th class="${sortClass(key,swSort)} sortable" style="width:${def.w}px" onclick="thSort('${key}',swSort,renderSoftware)">${def.label}${sortArrow(key,swSort)}</th>`
-      : `<th style="width:${def.w}px">${def.label}</th>`;
+      ? `<th class="${sortClass(key,swSort)} sortable" style="width:${def.w}px" onclick="thSort('${key}',swSort,renderSoftware)">${label}${sortArrow(key,swSort)}</th>`
+      : `<th style="width:${def.w}px">${label}</th>`;
   }).join('')+'</tr>';
+  if(selectMode.software) setTimeout(()=>_syncSelectAllHeader('software'),0);
 
   // Table body
   const NCOLS = swVisCols.length;
@@ -2961,9 +3261,9 @@ function renderSoftware(){
       function swCell(key){
         switch(key){
           case 'csvId':
-            return `<td style="font-size:11px;color:var(--gray-400);font-weight:600">${s.csvId}</td>`;
+            return `<td style="font-size:11px;color:var(--gray-400);font-weight:600">${selectMode.software?`<input type="checkbox" class="row-cb" data-table="software" data-id="${s._id}" ${selectedSoftware.has(s._id)?'checked':''} onchange="toggleSelectRow('software','${s._id}',this.checked)">`:''} ${s.csvId}</td>`;
           case 'name':
-            return `<td onclick="openSwDrawer('${s.id}')" style="cursor:pointer" title="Click to view details"><div style="font-weight:600;font-size:13px;color:var(--primary-light);text-decoration:underline;text-underline-offset:3px">${s.name}</div>${s.purpose?`<div style="font-size:11px;color:var(--gray-400)">${s.purpose}</div>`:''}</td>`;
+            return `<td onclick="openSwDrawer('${s.id}')" style="cursor:pointer" title="Click to view details"><div style="font-weight:600;font-size:13px;color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${s.name}</div>${s.purpose?`<div style="font-size:11px;color:var(--gray-400)">${s.purpose}</div>`:''}</td>`;
           case 'department':
             return `<td style="font-size:12px;color:var(--gray-600)">${getSoftwareMappedDepts(s)}</td>`;
           case 'deploymentType':
@@ -2982,7 +3282,7 @@ function renderSoftware(){
             return `<td>${s[key]||'—'}</td>`;
         }
       }
-      return `<tr>${swVisCols.map(([key])=>swCell(key)).join('')}</tr>`;
+      return `<tr class="${selectedSoftware.has(s._id)?'row-selected':''}">${swVisCols.map(([key])=>swCell(key)).join('')}</tr>`;
     }).join('');
   }
   renderPag('swPagination', swPage, pages, p=>{swPage=p;renderSoftware();});
@@ -3009,7 +3309,7 @@ async function renderSoftwareBudgetWidget(){
         const typeKey = a.deploymentType?.replace(' ','-')||'SAAS';
         return `<div class="budget-bar-row">
           <div class="budget-bar-label">${i+1}. ${a.name}</div>
-          <div class="budget-bar-track"><div class="budget-bar-fill" style="width:${pct}%;background:${['#3b82f6','#8b5cf6','#06b6d4','#10b981','#f59e0b'][i]}"></div></div>
+          <div class="budget-bar-track"><div class="budget-bar-fill" style="width:${pct}%;background:${['#8b5cf6','#8b5cf6','#06b6d4','#10b981','#f59e0b'][i]}"></div></div>
           <div class="budget-bar-cost">${fmtCost(a.annualCost, a.renewalPeriod).replace(/<[^>]+>/g,'')}</div>
         </div>`;
       }).join('');
@@ -3018,7 +3318,7 @@ async function renderSoftwareBudgetWidget(){
     // Breakdown by type
     const bw = document.getElementById('budgetBreakdownWidget');
     if(bw && b.byType){
-      const COLORS = {SAAS:'#3b82f6','On-premises':'#8b5cf6',Freeware:'#10b981','Open Source':'#f59e0b'};
+      const COLORS = {SAAS:'#8b5cf6','On-premises':'#8b5cf6',Freeware:'#10b981','Open Source':'#f59e0b'};
       const entries = Object.entries(b.byType).sort((a,b)=>b[1]-a[1]);
       const maxVal  = Math.max(...entries.map(e=>e[1]),1);
 
@@ -3295,7 +3595,7 @@ async function exportSwPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
     const list = filteredSoftware();
-    doc.setFontSize(18); doc.setTextColor(30,64,175);
+    doc.setFontSize(18); doc.setTextColor(124,58,237);
     doc.text('TerzoCloud — Software Inventory', 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
     const totalSpend = list.reduce((s,x)=>s+swTotalCost(x),0);
@@ -3318,7 +3618,7 @@ async function exportSwPDF(){
         ];
       }),
       styles: { fontSize: 7.5, cellPadding: 2 },
-      headStyles: { fillColor: [30,64,175], textColor: 255, fontStyle:'bold', fontSize:8 },
+      headStyles: { fillColor: [124,58,237], textColor: 255, fontStyle:'bold', fontSize:8 },
       alternateRowStyles: { fillColor: [248,250,252] },
       columnStyles: { 0:{cellWidth:11}, 1:{cellWidth:35}, 2:{cellWidth:18}, 7:{halign:'right'}, 9:{halign:'right'} },
     });
@@ -3357,7 +3657,7 @@ async function exportUserPDF(){
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
     const list = filteredUsers();
-    doc.setFontSize(18); doc.setTextColor(30,64,175);
+    doc.setFontSize(18); doc.setTextColor(124,58,237);
     doc.text('TerzoCloud — User Management', 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}   |   Users: ${list.length}   |   Active: ${list.filter(u=>u.status==='Active').length}`, 14, 23);
@@ -3373,7 +3673,7 @@ async function exportUserPDF(){
         ];
       }),
       styles:{fontSize:7.5,cellPadding:2},
-      headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold',fontSize:8},
+      headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold',fontSize:8},
       alternateRowStyles:{fillColor:[248,250,252]},
       columnStyles:{0:{cellWidth:30},1:{cellWidth:44},2:{cellWidth:24},3:{cellWidth:28},4:{cellWidth:26},5:{cellWidth:15},6:{cellWidth:20},7:{cellWidth:14},8:{cellWidth:10}},
     });
@@ -3413,7 +3713,7 @@ async function exportAssetPDF(){
     const doc = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
     const list = filteredAssets();
     const inUse = list.filter(a=>a.status==='In-Use').length;
-    doc.setFontSize(18); doc.setTextColor(30,64,175);
+    doc.setFontSize(18); doc.setTextColor(124,58,237);
     doc.text('TerzoCloud — Device Inventory', 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}   |   Assets: ${list.length}   |   In-Use: ${inUse}`, 14, 23);
@@ -3428,7 +3728,7 @@ async function exportAssetPDF(){
         ];
       }),
       styles:{fontSize:7.5,cellPadding:2},
-      headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold',fontSize:8},
+      headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold',fontSize:8},
       alternateRowStyles:{fillColor:[248,250,252]},
       columnStyles:{0:{cellWidth:14},1:{cellWidth:38},2:{cellWidth:28},3:{cellWidth:22},4:{cellWidth:16},5:{cellWidth:24},6:{cellWidth:20},7:{cellWidth:34},8:{cellWidth:14}},
     });
@@ -3692,7 +3992,7 @@ function swRenderUsersSection(s){
     return `<span class="sw-role-badge sw-role-member">Member</span>`;
   }
   function getAvatar(u){
-    const colors = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981','#3b82f6','#ef4444','#14b8a6'];
+    const colors = ['#6366f1','#8b5cf6','#ec4899','#f59e0b','#10b981','#8b5cf6','#ef4444','#14b8a6'];
     const i = (u.first||'?').charCodeAt(0) % colors.length;
     return `<div class="sw-user-avatar" style="background:${colors[i]}">${(u.first||'?')[0].toUpperCase()}</div>`;
   }
@@ -4160,7 +4460,10 @@ function doExportConfig(format){
   const en  = _excEnabled[section];
   const activeCols = def.cols.filter(c => en[c.key]);
   if(!activeCols.length){ showToast('Select at least one column','danger'); return; }
-  const list = def.getList();
+  const selSet = _selSet(section);
+  let list = def.getList();
+  if(exportSelectionOnly && selSet.size > 0) list = list.filter(r => selSet.has(r._id));
+  exportSelectionOnly = false;
   if(format === 'csv'){
     const headers = activeCols.map(c=>c.label);
     const rows = list.map(item => activeCols.map(c => String(c.get(item)??'')));
@@ -4185,7 +4488,7 @@ async function _excDoPDF(section, activeCols, list, def){
     }
     const {jsPDF} = window.jspdf;
     const doc = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-    doc.setFontSize(18); doc.setTextColor(30,64,175);
+    doc.setFontSize(18); doc.setTextColor(124,58,237);
     doc.text(def.pdfTitle, 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}   |   ${def.title}: ${list.length}   |   Columns: ${activeCols.length}`, 14, 23);
@@ -4195,7 +4498,7 @@ async function _excDoPDF(section, activeCols, list, def){
       head: [activeCols.map(c=>c.label)],
       body: list.map(item => activeCols.map(c => String(c.get(item)??'—'))),
       styles:{fontSize:7.5,cellPadding:2},
-      headStyles:{fillColor:[30,64,175],textColor:255,fontStyle:'bold',fontSize:8},
+      headStyles:{fillColor:[124,58,237],textColor:255,fontStyle:'bold',fontSize:8},
       alternateRowStyles:{fillColor:[248,250,252]},
       columnStyles: Object.fromEntries(activeCols.map((_,i)=>[i,{cellWidth:colW}])),
     });
@@ -5210,18 +5513,18 @@ function renderScimAuditRows(){
     // Connector cell — only shown for SCIM-ready apps that have a connector def
     const connKey = scimConnectorKey(s.name);
     const connDef = connKey ? SCIM_CONNECTOR_DEFS[connKey] : null;
-    let connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(49,83,216,.07)"></td>`;
+    let connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(124,58,237,.07)"></td>`;
     if(status === 'ready' && connDef){
       const existing = appConnectors.find(c => c.appName === connDef.appName);
       if(existing && existing.enabled){
-        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(49,83,216,.07)">
+        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(124,58,237,.07)">
           <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
             <span style="background:rgba(52,211,153,.14);color:#a3ffd3;border:1px solid rgba(52,211,153,.3);padding:3px 10px;border-radius:9999px;font-size:11.5px;font-weight:700;white-space:nowrap">✓ Connected</span>
-            <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" style="background:none;border:none;color:#93c5fd;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Edit</button>
+            <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" style="background:none;border:none;color:#c4b5fd;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Edit</button>
           </div>
         </td>`;
       } else {
-        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(49,83,216,.07)">
+        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(124,58,237,.07)">
           <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')"
             style="background:linear-gradient(135deg,#3757e6,#7c5cff);color:#fff;border:none;padding:5px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(124,92,255,.35)">
             🔌 Set Up
@@ -5406,9 +5709,15 @@ async function testConnectorSetup(){
 })();
 
 /* ══ DEPT USERS MODAL ══ */
+function toggleDeptGridOnDashboard(visible) {
+  localStorage.setItem('deptGridOnDashboard', visible ? 'true' : 'false');
+  const section = document.getElementById('deptGridSection');
+  if (section) section.style.display = visible ? 'block' : 'none';
+}
+
 function showDeptUsers(dept) {
   const deptUsers = users.filter(u => u.dept === dept);
-  const deptColors = {'Engineering':'var(--primary)','AI-Service':'#9333ea','QA':'#ea580c','IT':'#0891b2','HR':'#16a34a','Product':'#d97706','Customer Support':'#dc2626','Accounts':'#be185d','Data Science':'#2563eb','Sales':'#16a34a','Marketing':'#db2777','Legal':'#7c3aed','Executive':'#0f172a','Operations':'#0891b2','Finance':'#059669','Other':'#64748b'};
+  const deptColors = {'Engineering':'var(--primary)','AI-Service':'#9333ea','QA':'#ea580c','IT':'#0891b2','HR':'#16a34a','Product':'#d97706','Customer Support':'#dc2626','Accounts':'#be185d','Data Science':'#7c3aed','Sales':'#16a34a','Marketing':'#db2777','Legal':'#7c3aed','Executive':'#0f172a','Operations':'#0891b2','Finance':'#059669','Other':'#64748b'};
   const color = deptColors[dept] || 'var(--primary)';
   document.getElementById('deptModalTitle').innerHTML =
     `<span style="color:${color}">${dept}</span> &mdash; ${deptUsers.length} Member${deptUsers.length !== 1 ? 's' : ''}`;
@@ -5418,7 +5727,7 @@ function showDeptUsers(dept) {
         <thead><tr><th>Name</th><th>Job Title</th><th>Reporting Manager</th><th>Location</th><th>Role</th><th>Status</th></tr></thead>
         <tbody>${deptUsers.map(u => {
           const statusColor = u.status === 'Active' ? '#16a34a' : '#dc2626';
-          const roleColor = u.role === 'Admin' ? '#7c3aed' : u.role === 'Manager' ? '#d97706' : '#3b82f6';
+          const roleColor = u.role === 'Admin' ? '#7c3aed' : u.role === 'Manager' ? '#d97706' : '#8b5cf6';
           return `<tr>
             <td><div class="user-cell" style="gap:8px">
               <div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div>
@@ -5974,7 +6283,7 @@ function toggleNotifCollapse() {
     <!-- Header -->
     <div style="padding:20px 26px 16px;border-bottom:1px solid rgba(130,96,185,.2);display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(49,83,216,.35),rgba(124,92,255,.35));border:1px solid rgba(124,92,255,.4);display:flex;align-items:center;justify-content:center">
+        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(124,92,255,.35));border:1px solid rgba(124,92,255,.4);display:flex;align-items:center;justify-content:center">
           <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#a78bfa;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
         </div>
         <div>
@@ -6007,7 +6316,7 @@ function toggleNotifCollapse() {
             <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Current Cost/user/mo</th>
             <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Upgrade Cost/user/mo</th>
             <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#fcd34d;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(245,158,11,.08)">Annual Cost Delta</th>
-            <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:#93c5fd;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(49,83,216,.12)">Connector</th>
+            <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(124,58,237,.12)">Connector</th>
           </tr>
         </thead>
         <tbody id="scimAuditBody"></tbody>
@@ -6038,7 +6347,7 @@ function toggleNotifCollapse() {
     <!-- Body -->
     <div style="padding:20px 24px">
       <!-- Help banner -->
-      <div id="connModalHelp" style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:#1e40af;display:flex;align-items:flex-start;gap:8px">
+      <div id="connModalHelp" style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:#6d28d9;display:flex;align-items:flex-start;gap:8px">
         <svg viewBox="0 0 24 24" style="width:14px;height:14px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;margin-top:1px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
         <span id="connModalHelpText"></span>
       </div>
