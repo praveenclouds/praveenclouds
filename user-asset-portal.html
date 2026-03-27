@@ -2288,7 +2288,7 @@ function renderUsers(){
       function userCell(key){
         switch(key){
           case 'name':
-            return `<td><div style="display:flex;align-items:center;gap:6px">${selectMode.users?`<input type="checkbox" class="row-cb" data-table="users" data-id="${u._id}" ${selectedUsers.has(u._id)?'checked':''} onchange="toggleSelectRow('users','${u._id}',this.checked)" onclick="event.stopPropagation()">`:''}<div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${u.first} ${u.last}</strong></div></div></td>`;
+            return `<td><div style="display:flex;align-items:center;gap:6px">${selectMode.users?`<input type="checkbox" class="row-cb" data-table="users" data-id="${u.id}" ${selectedUsers.has(u.id)?'checked':''} onchange="toggleSelectRow('users','${u.id}',this.checked)" onclick="event.stopPropagation()">`:''}<div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${u.first} ${u.last}</strong></div></div></td>`;
           case 'email':
             return `<td style="color:var(--gray-600);font-size:12px">${u.email}</td>`;
           case 'dept':
@@ -2317,7 +2317,7 @@ function renderUsers(){
             return `<td>${u[key]||'—'}</td>`;
         }
       }
-      return `<tr class="${selectedUsers.has(u._id)?'row-selected':''}">${visCols.map(([key])=>userCell(key)).join('')}</tr>`;
+      return `<tr class="${selectedUsers.has(u.id)?'row-selected':''}">${visCols.map(([key])=>userCell(key)).join('')}</tr>`;
     }).join('');
   }
   renderPag('userPagination',userPage,pages,p=>{userPage=p;renderUsers();});
@@ -2480,7 +2480,7 @@ function renderAssets(){
 
       function assetCell(key){
         switch(key){
-          case 'csvId':    return `<td class="mono" style="color:var(--gray-400)">${selectMode.assets?`<input type="checkbox" class="row-cb" data-table="assets" data-id="${a._id}" ${selectedAssets.has(a._id)?'checked':''} onchange="toggleSelectRow('assets','${a._id}',this.checked)">`:''} ${a.csvId}</td>`;
+          case 'csvId':    return `<td class="mono" style="color:var(--gray-400)">${selectMode.assets?`<input type="checkbox" class="row-cb" data-table="assets" data-id="${a.id}" ${selectedAssets.has(a.id)?'checked':''} onchange="toggleSelectRow('assets','${a.id}',this.checked)">`:''} ${a.csvId}</td>`;
           case 'name':     return `<td onclick="editAsset('${a.id}')" style="cursor:pointer"><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${a.name}</strong><br><span style="color:var(--gray-400);font-size:11px">${a.desc}</span>${a.notes?`<div class="svc-note">⚠ ${a.notes}</div>`:''}</td>`;
           case 'serial':   return `<td class="mono" style="font-size:11px;color:var(--gray-600)">${a.serial}</td>`;
           case 'assignTo': return `<td>${assignHtml}</td>`;
@@ -2505,7 +2505,7 @@ function renderAssets(){
           default:         return `<td>${a[key]||'—'}</td>`;
         }
       }
-      return `<tr class="${selectedAssets.has(a._id)?'row-selected':''}">${visCols.map(([key])=>assetCell(key)).join('')}</tr>`;
+      return `<tr class="${selectedAssets.has(a.id)?'row-selected':''}">${visCols.map(([key])=>assetCell(key)).join('')}</tr>`;
     }).join('');
   }
   renderPag('assetPagination',assetPage,pages,p=>{assetPage=p;renderAssets();});
@@ -3261,7 +3261,7 @@ function renderSoftware(){
       function swCell(key){
         switch(key){
           case 'csvId':
-            return `<td style="font-size:11px;color:var(--gray-400);font-weight:600">${selectMode.software?`<input type="checkbox" class="row-cb" data-table="software" data-id="${s._id}" ${selectedSoftware.has(s._id)?'checked':''} onchange="toggleSelectRow('software','${s._id}',this.checked)">`:''} ${s.csvId}</td>`;
+            return `<td style="font-size:11px;color:var(--gray-400);font-weight:600">${selectMode.software?`<input type="checkbox" class="row-cb" data-table="software" data-id="${s.id}" ${selectedSoftware.has(s.id)?'checked':''} onchange="toggleSelectRow('software','${s.id}',this.checked)">`:''} ${s.csvId}</td>`;
           case 'name':
             return `<td onclick="openSwDrawer('${s.id}')" style="cursor:pointer" title="Click to view details"><div style="font-weight:600;font-size:13px;color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${s.name}</div>${s.purpose?`<div style="font-size:11px;color:var(--gray-400)">${s.purpose}</div>`:''}</td>`;
           case 'department':
@@ -3282,7 +3282,7 @@ function renderSoftware(){
             return `<td>${s[key]||'—'}</td>`;
         }
       }
-      return `<tr class="${selectedSoftware.has(s._id)?'row-selected':''}">${swVisCols.map(([key])=>swCell(key)).join('')}</tr>`;
+      return `<tr class="${selectedSoftware.has(s.id)?'row-selected':''}">${swVisCols.map(([key])=>swCell(key)).join('')}</tr>`;
     }).join('');
   }
   renderPag('swPagination', swPage, pages, p=>{swPage=p;renderSoftware();});
@@ -4462,7 +4462,7 @@ function doExportConfig(format){
   if(!activeCols.length){ showToast('Select at least one column','danger'); return; }
   const selSet = _selSet(section);
   let list = def.getList();
-  if(exportSelectionOnly && selSet.size > 0) list = list.filter(r => selSet.has(r._id));
+  if(exportSelectionOnly && selSet.size > 0) list = list.filter(r => selSet.has(r.id));
   exportSelectionOnly = false;
   if(format === 'csv'){
     const headers = activeCols.map(c=>c.label);
