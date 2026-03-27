@@ -386,6 +386,17 @@
     .btn-select-mode { gap:5px; }
     .btn-select-mode.active { background:var(--primary) !important; color:#fff !important; border-color:var(--primary) !important; }
     input.row-cb { cursor:pointer; accent-color:var(--primary); width:14px; height:14px; vertical-align:middle; margin-right:6px; }
+    .export-drop-wrap { position:relative; display:inline-flex; }
+    .export-drop { position:absolute; right:0; top:calc(100% + 6px); background:#fff; border:1px solid var(--gray-200); border-radius:10px; box-shadow:0 6px 24px rgba(0,0,0,0.13); padding:4px; min-width:190px; z-index:60; display:none; }
+    .export-drop.open { display:block; }
+    .export-drop-item { display:flex; align-items:center; gap:8px; padding:7px 12px; font-size:12.5px; color:var(--gray-700); cursor:pointer; border-radius:6px; transition:background .12s; white-space:nowrap; }
+    .export-drop-item:hover { background:var(--gray-50); }
+    .export-drop-item svg { flex-shrink:0; }
+    .export-drop-item.sel-option { color:#7c3aed; font-weight:600; }
+    body.support-theme-portal .export-drop { background:#1e1525; border-color:rgba(153,102,255,.2); }
+    body.support-theme-portal .export-drop-item { color:#ccc; }
+    body.support-theme-portal .export-drop-item:hover { background:rgba(255,255,255,.05); }
+    body.support-theme-portal .export-drop-item.sel-option { color:#c4b5fd; }
     .lic-bar-fill { height:100%;border-radius:3px;transition:width .3s; }
     .lic-bar-fill.ok      { background:#4ade80; }
     .lic-bar-fill.warning { background:#fbbf24; }
@@ -1028,17 +1039,26 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
                 <div class="col-picker-head">Show / Hide Columns</div>
               </div>
             </div>
-            <button class="btn btn-secondary btn-sm" onclick="openExportConfig('users')">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export
-            </button>
+            <div class="export-drop-wrap">
+              <button class="btn btn-secondary btn-sm" onclick="toggleExportDrop('users',event)">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+                <svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="export-drop" id="exportDrop_users">
+                <div class="export-drop-item" onclick="openExportConfig('users');closeExportDrop('users')">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export All
+                </div>
+                <div class="export-drop-item sel-option" id="exportSelectedBtn_users" style="display:none" onclick="openExportSelected('users');closeExportDrop('users')">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+                  Export Selected (<span id="selCount_users">0</span>)
+                </div>
+              </div>
+            </div>
             <button class="btn btn-secondary btn-sm btn-select-mode" id="selectModeBtn_users" onclick="toggleSelectMode('users')">
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
               Select
-            </button>
-            <button class="btn btn-secondary btn-sm" id="exportSelectedBtn_users" style="display:none;border-color:#7c3aed;color:#7c3aed" onclick="openExportSelected('users')">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export Selected (<span id="selCount_users">0</span>)
             </button>
           </div>
         </div>
@@ -1131,17 +1151,26 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
                 <div class="col-picker-head">Show / Hide Columns</div>
               </div>
             </div>
-            <button class="btn btn-secondary btn-sm" onclick="openExportConfig('assets')">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export
-            </button>
+            <div class="export-drop-wrap">
+              <button class="btn btn-secondary btn-sm" onclick="toggleExportDrop('assets',event)">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+                <svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="export-drop" id="exportDrop_assets">
+                <div class="export-drop-item" onclick="openExportConfig('assets');closeExportDrop('assets')">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export All
+                </div>
+                <div class="export-drop-item sel-option" id="exportSelectedBtn_assets" style="display:none" onclick="openExportSelected('assets');closeExportDrop('assets')">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+                  Export Selected (<span id="selCount_assets">0</span>)
+                </div>
+              </div>
+            </div>
             <button class="btn btn-secondary btn-sm btn-select-mode" id="selectModeBtn_assets" onclick="toggleSelectMode('assets')">
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
               Select
-            </button>
-            <button class="btn btn-secondary btn-sm" id="exportSelectedBtn_assets" style="display:none;border-color:#7c3aed;color:#7c3aed" onclick="openExportSelected('assets')">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export Selected (<span id="selCount_assets">0</span>)
             </button>
           </div>
         </div>
@@ -1204,17 +1233,26 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
               <option value="Inactive">Inactive</option>
             </select>
             <button class="btn btn-secondary btn-sm" id="softwareAdvBtn" onclick="toggleAdvSearch('software')">🔍 Advanced ▼</button>
-            <button class="btn btn-secondary btn-sm" onclick="openExportConfig('software')">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export
-            </button>
+            <div class="export-drop-wrap">
+              <button class="btn btn-secondary btn-sm" onclick="toggleExportDrop('software',event)">
+                <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export
+                <svg viewBox="0 0 24 24" style="width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.5;margin-left:2px"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="export-drop" id="exportDrop_software">
+                <div class="export-drop-item" onclick="openExportConfig('software');closeExportDrop('software')">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  Export All
+                </div>
+                <div class="export-drop-item sel-option" id="exportSelectedBtn_software" style="display:none" onclick="openExportSelected('software');closeExportDrop('software')">
+                  <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><line x1="12" y1="15" x2="12" y2="3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/></svg>
+                  Export Selected (<span id="selCount_software">0</span>)
+                </div>
+              </div>
+            </div>
             <button class="btn btn-secondary btn-sm btn-select-mode" id="selectModeBtn_software" onclick="toggleSelectMode('software')">
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><rect x="3" y="3" width="5" height="5" rx="1"/><polyline points="9 5 11 7 15 3"/><rect x="3" y="11" width="5" height="5" rx="1"/><polyline points="9 13 11 15 15 11"/></svg>
               Select
-            </button>
-            <button class="btn btn-secondary btn-sm" id="exportSelectedBtn_software" style="display:none;border-color:#7c3aed;color:#7c3aed" onclick="openExportSelected('software')">
-              <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Export Selected (<span id="selCount_software">0</span>)
             </button>
             <div class="col-picker-wrap">
               <button class="btn btn-secondary btn-sm" onclick="toggleColPicker('software',event)">
@@ -1948,17 +1986,37 @@ function _syncSelectAllHeader(table){
 function updateSelectionUI(table){
   const count = _selSet(table).size;
   const modeBtn = document.getElementById(`selectModeBtn_${table}`);
-  const expBtn  = document.getElementById(`exportSelectedBtn_${table}`);
-  const countEl = document.getElementById(`selCount_${table}`);
-  if(modeBtn) modeBtn.classList.toggle('active', selectMode[table]);
-  if(expBtn)  expBtn.style.display = (selectMode[table] && count > 0) ? '' : 'none';
-  if(countEl) countEl.textContent = count;
+  const selOption = document.getElementById(`exportSelectedBtn_${table}`);
+  const countEl   = document.getElementById(`selCount_${table}`);
+  if(modeBtn)    modeBtn.classList.toggle('active', selectMode[table]);
+  if(selOption)  selOption.style.display = (selectMode[table] && count > 0) ? '' : 'none';
+  if(countEl)    countEl.textContent = count;
 }
 
 function openExportSelected(table){
   exportSelectionOnly = true;
   openExportConfig(table);
 }
+
+function toggleExportDrop(table, e){
+  e.stopPropagation();
+  const drop = document.getElementById(`exportDrop_${table}`);
+  if(!drop) return;
+  const isOpen = drop.classList.contains('open');
+  // close all other export drops first
+  document.querySelectorAll('.export-drop.open').forEach(d => d.classList.remove('open'));
+  if(!isOpen) drop.classList.add('open');
+}
+
+function closeExportDrop(table){
+  const drop = document.getElementById(`exportDrop_${table}`);
+  if(drop) drop.classList.remove('open');
+}
+
+// Close export dropdowns when clicking outside
+document.addEventListener('click', () => {
+  document.querySelectorAll('.export-drop.open').forEach(d => d.classList.remove('open'));
+});
 
 /* ══ COLUMN VISIBILITY ══ */
 const userColVis = {
