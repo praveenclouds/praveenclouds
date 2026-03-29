@@ -12,6 +12,10 @@ const REQUEST_FIELDS = [
   ['location', 'Location'],
   ['startDate', 'Start Date'],
   ['endDate', 'End Date'],
+  ['slaStatus', 'SLA Status'],
+  ['slaResponseDueAt', 'SLA First Response Due'],
+  ['slaResolutionDueAt', 'SLA Resolution Due'],
+  ['slaBreachedAt', 'SLA Breached At'],
   ['notes', 'Notes'],
 ];
 

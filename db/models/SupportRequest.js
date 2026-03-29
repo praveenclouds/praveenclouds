@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 const SupportRequestType = require('./SupportRequestType');
+const DEFAULT_SLA_POLICY = SupportRequestType.DEFAULT_SLA_POLICY || {
+  enabled: true,
+  responseMinutes: 60,
+  resolutionMinutes: 480,
+  atRiskPercent: 80,
+};
+const normalizeSlaPolicy = SupportRequestType.normalizeSlaPolicy
+  || ((input = {}, fallback = DEFAULT_SLA_POLICY) => ({ ...fallback, ...input }));
+const SLA_STATUS_VALUES = ['no_sla', 'on_track', 'at_risk', 'breached', 'met', 'paused'];
 
 const WORKFLOW_TEMPLATES = Object.fromEntries(
   (SupportRequestType.DEFAULT_REQUEST_TYPE_DEFINITIONS || []).map(definition => [
@@ -84,6 +93,88 @@ const customFieldValueSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const requestSlaPolicySnapshotSchema = new mongoose.Schema(
+  {
+    enabled: { type: Boolean, default: DEFAULT_SLA_POLICY.enabled },
+    responseMinutes: { type: Number, default: DEFAULT_SLA_POLICY.responseMinutes, min: 1, max: 43200 },
+    resolutionMinutes: { type: Number, default: DEFAULT_SLA_POLICY.resolutionMinutes, min: 1, max: 43200 },
+    atRiskPercent: { type: Number, default: DEFAULT_SLA_POLICY.atRiskPercent, min: 1, max: 99 },
+  },
+  { _id: false }
+);
+
+function toDateOrNull(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function hasChecklistProgress(checklist = []) {
+  return (Array.isArray(checklist) ? checklist : []).some(item => String(item?.status || '') === 'done');
+}
+
+function evaluateSla(doc) {
+  const now = new Date();
+  const createdAt = toDateOrNull(doc.createdAt) || now;
+  const status = String(doc.status || '').toLowerCase();
+  const policy = normalizeSlaPolicy(doc.slaPolicySnapshot || {}, DEFAULT_SLA_POLICY);
+  doc.slaPolicySnapshot = policy;
+
+  if (!doc.firstResponseAt) {
+    const hasRespondedStatus = ['in_progress', 'blocked', 'completed'].includes(status);
+    if (hasRespondedStatus || hasChecklistProgress(doc.checklist || [])) {
+      doc.firstResponseAt = now;
+    }
+  } else {
+    doc.firstResponseAt = toDateOrNull(doc.firstResponseAt);
+  }
+
+  if (status === 'completed') {
+    if (!doc.resolvedAt) doc.resolvedAt = now;
+  } else {
+    doc.resolvedAt = null;
+  }
+
+  if (!policy.enabled) {
+    doc.slaResponseDueAt = null;
+    doc.slaResolutionDueAt = null;
+    doc.slaStatus = 'no_sla';
+    doc.slaBreachedAt = null;
+    return;
+  }
+
+  const responseDueAt = toDateOrNull(doc.slaResponseDueAt)
+    || new Date(createdAt.getTime() + (Number(policy.responseMinutes) * 60 * 1000));
+  const resolutionDueAt = toDateOrNull(doc.slaResolutionDueAt)
+    || new Date(createdAt.getTime() + (Number(policy.resolutionMinutes) * 60 * 1000));
+
+  doc.slaResponseDueAt = responseDueAt;
+  doc.slaResolutionDueAt = resolutionDueAt;
+
+  let nextStatus = 'on_track';
+  if (status === 'cancelled') {
+    nextStatus = 'paused';
+  } else if (status === 'completed') {
+    const resolvedAt = toDateOrNull(doc.resolvedAt) || now;
+    nextStatus = resolvedAt.getTime() > resolutionDueAt.getTime() ? 'breached' : 'met';
+  } else if ((!doc.firstResponseAt && now.getTime() > responseDueAt.getTime()) || now.getTime() > resolutionDueAt.getTime()) {
+    nextStatus = 'breached';
+  } else {
+    const totalMs = resolutionDueAt.getTime() - createdAt.getTime();
+    const elapsedMs = now.getTime() - createdAt.getTime();
+    const elapsedPercent = totalMs > 0 ? (elapsedMs / totalMs) * 100 : 100;
+    nextStatus = elapsedPercent >= Number(policy.atRiskPercent || 80) ? 'at_risk' : 'on_track';
+  }
+
+  if (nextStatus === 'breached') {
+    if (!doc.slaBreachedAt) doc.slaBreachedAt = now;
+  } else {
+    doc.slaBreachedAt = null;
+  }
+
+  doc.slaStatus = nextStatus;
+}
+
 const supportRequestSchema = new mongoose.Schema(
   {
     requestId: { type: String, unique: true, index: true },
@@ -139,6 +230,13 @@ const supportRequestSchema = new mongoose.Schema(
     applications: { type: [requestApplicationSchema], default: [] },
     notes: { type: String, default: '', trim: true },
     customFieldValues: { type: [customFieldValueSchema], default: [] },
+    slaPolicySnapshot: { type: requestSlaPolicySnapshotSchema, default: () => ({ ...DEFAULT_SLA_POLICY }) },
+    firstResponseAt: { type: Date, default: null },
+    resolvedAt: { type: Date, default: null },
+    slaResponseDueAt: { type: Date, default: null },
+    slaResolutionDueAt: { type: Date, default: null },
+    slaStatus: { type: String, enum: SLA_STATUS_VALUES, default: 'on_track', index: true },
+    slaBreachedAt: { type: Date, default: null },
     checklist: { type: [checklistItemSchema], default: [] },
   },
   { timestamps: true }
@@ -173,6 +271,7 @@ supportRequestSchema.pre('validate', function () {
       item.approvalRespondedAt = null;
     }
   }
+  evaluateSla(this);
 });
 
 supportRequestSchema.index({ workflowType: 1, status: 1 });

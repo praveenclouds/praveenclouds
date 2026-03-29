@@ -23,6 +23,32 @@ const REQUEST_FORM_FIELD_DEFINITIONS = [
   { key: 'notes', label: 'Notes', required: false, enabledByDefault: true },
 ];
 
+const DEFAULT_SLA_POLICY = Object.freeze({
+  enabled: true,
+  responseMinutes: 60,
+  resolutionMinutes: 480,
+  atRiskPercent: 80,
+});
+
+function clampNumber(value, min, max, fallback) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(parsed)));
+}
+
+function normalizeSlaPolicy(input = {}, fallback = DEFAULT_SLA_POLICY) {
+  const base = {
+    ...DEFAULT_SLA_POLICY,
+    ...(fallback || {}),
+  };
+  return {
+    enabled: input.enabled === undefined ? !!base.enabled : !!input.enabled,
+    responseMinutes: clampNumber(input.responseMinutes, 1, 43200, base.responseMinutes),
+    resolutionMinutes: clampNumber(input.resolutionMinutes, 1, 43200, base.resolutionMinutes),
+    atRiskPercent: clampNumber(input.atRiskPercent, 1, 99, base.atRiskPercent),
+  };
+}
+
 function buildDefaultFormFields(overrides = {}) {
   return REQUEST_FORM_FIELD_DEFINITIONS.map(field => ({
     key: field.key,
@@ -80,6 +106,16 @@ const requestTypeStepSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const requestTypeSlaPolicySchema = new mongoose.Schema(
+  {
+    enabled: { type: Boolean, default: DEFAULT_SLA_POLICY.enabled },
+    responseMinutes: { type: Number, default: DEFAULT_SLA_POLICY.responseMinutes, min: 1, max: 43200 },
+    resolutionMinutes: { type: Number, default: DEFAULT_SLA_POLICY.resolutionMinutes, min: 1, max: 43200 },
+    atRiskPercent: { type: Number, default: DEFAULT_SLA_POLICY.atRiskPercent, min: 1, max: 99 },
+  },
+  { _id: false }
+);
+
 const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
   {
     workflowType: 'application_access',
@@ -88,6 +124,12 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 10,
     defaultAssignee: '',
     autoAddDepartmentApps: false,
+    slaPolicy: {
+      enabled: true,
+      responseMinutes: 60,
+      resolutionMinutes: 480,
+      atRiskPercent: 80,
+    },
     formFields: buildDefaultFormFields({
       applications: { enabled: true, required: true },
     }),
@@ -106,6 +148,12 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 20,
     defaultAssignee: '',
     autoAddDepartmentApps: false,
+    slaPolicy: {
+      enabled: true,
+      responseMinutes: 120,
+      resolutionMinutes: 4320,
+      atRiskPercent: 80,
+    },
     formFields: buildDefaultFormFields(),
     checklist: [
       { key: 'business_case', label: 'Business need and app details captured', area: 'Intake' },
@@ -122,6 +170,12 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 30,
     defaultAssignee: '',
     autoAddDepartmentApps: false,
+    slaPolicy: {
+      enabled: true,
+      responseMinutes: 120,
+      resolutionMinutes: 2880,
+      atRiskPercent: 80,
+    },
     formFields: buildDefaultFormFields(),
     checklist: [
       { key: 'hardware_spec', label: 'Hardware specification confirmed', area: 'Intake' },
@@ -138,6 +192,12 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 40,
     defaultAssignee: '',
     autoAddDepartmentApps: false,
+    slaPolicy: {
+      enabled: true,
+      responseMinutes: 30,
+      resolutionMinutes: 1440,
+      atRiskPercent: 80,
+    },
     formFields: buildDefaultFormFields(),
     checklist: [
       { key: 'issue_logged', label: 'Issue details captured and categorized', area: 'Service Desk' },
@@ -154,6 +214,12 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 50,
     defaultAssignee: '',
     autoAddDepartmentApps: true,
+    slaPolicy: {
+      enabled: true,
+      responseMinutes: 240,
+      resolutionMinutes: 4320,
+      atRiskPercent: 80,
+    },
     formFields: buildDefaultFormFields(),
     checklist: [
       { key: 'employee_record', label: 'Employee profile created', area: 'HRIS' },
@@ -169,6 +235,12 @@ const DEFAULT_REQUEST_TYPE_DEFINITIONS = [
     sortOrder: 60,
     defaultAssignee: '',
     autoAddDepartmentApps: false,
+    slaPolicy: {
+      enabled: true,
+      responseMinutes: 120,
+      resolutionMinutes: 2880,
+      atRiskPercent: 80,
+    },
     formFields: buildDefaultFormFields({
       applications: { enabled: true, required: false },
     }),
@@ -208,6 +280,7 @@ const supportRequestTypeSchema = new mongoose.Schema(
     defaultAssigneeEmail: { type: String, default: '', trim: true, lowercase: true },
     autoAddDepartmentApps: { type: Boolean, default: false },
     isSystem: { type: Boolean, default: false },
+    slaPolicy: { type: requestTypeSlaPolicySchema, default: () => ({ ...DEFAULT_SLA_POLICY }) },
     formFields: { type: [requestTypeFormFieldSchema], default: () => buildDefaultFormFields() },
     customFormFields: { type: [customFormFieldSchema], default: [] },
     checklist: { type: [requestTypeStepSchema], default: [] },
@@ -218,6 +291,7 @@ const supportRequestTypeSchema = new mongoose.Schema(
 supportRequestTypeSchema.pre('validate', function () {
   this.workflowType = normalizeWorkflowType(this.workflowType);
   if (!this.sourceWorkflowKey) this.sourceWorkflowKey = this.workflowType;
+  this.slaPolicy = normalizeSlaPolicy(this.slaPolicy);
 });
 
 supportRequestTypeSchema.index({ isActive: 1, sortOrder: 1 });
@@ -228,4 +302,6 @@ module.exports = SupportRequestType;
 module.exports.REQUEST_TYPE_CLASSNAMES = REQUEST_TYPE_CLASSNAMES;
 module.exports.DEFAULT_REQUEST_TYPE_DEFINITIONS = DEFAULT_REQUEST_TYPE_DEFINITIONS;
 module.exports.REQUEST_FORM_FIELD_DEFINITIONS = REQUEST_FORM_FIELD_DEFINITIONS;
+module.exports.DEFAULT_SLA_POLICY = DEFAULT_SLA_POLICY;
+module.exports.normalizeSlaPolicy = normalizeSlaPolicy;
 module.exports.normalizeWorkflowType = normalizeWorkflowType;

@@ -4,6 +4,14 @@ const ALL_DEPARTMENT_LABEL = 'All Departments';
 const DEFAULT_REQUEST_TYPES = SupportRequestType.DEFAULT_REQUEST_TYPE_DEFINITIONS || [];
 const REQUEST_TYPE_CLASSNAMES = SupportRequestType.REQUEST_TYPE_CLASSNAMES || [];
 const REQUEST_FORM_FIELD_DEFINITIONS = SupportRequestType.REQUEST_FORM_FIELD_DEFINITIONS || [];
+const DEFAULT_SLA_POLICY = SupportRequestType.DEFAULT_SLA_POLICY || {
+  enabled: true,
+  responseMinutes: 60,
+  resolutionMinutes: 480,
+  atRiskPercent: 80,
+};
+const normalizeSlaPolicy = SupportRequestType.normalizeSlaPolicy
+  || ((input = {}, fallback = DEFAULT_SLA_POLICY) => ({ ...fallback, ...input }));
 const normalizeWorkflowType = SupportRequestType.normalizeWorkflowType;
 const DEFAULT_ASSIGNEE_WORKFLOW_TYPES = new Set(['app_hardware_issue', 'app_hardware_support']);
 const REQUESTOR_ASSIGNEE_USER_ID = '__requestor__';
@@ -27,6 +35,10 @@ const BUILTIN_WORKFLOW_META = Object.fromEntries(
 
 function fullName(user = {}) {
   return `${String(user.first || '').trim()} ${String(user.last || '').trim()}`.trim();
+}
+
+function normalizeSlaPolicyInput(input = {}, fallback = DEFAULT_SLA_POLICY) {
+  return normalizeSlaPolicy(input, fallback);
 }
 
 function supportsRequestTypeDefaultAssignee({ workflowType = '', workflowLabel = '' } = {}) {
@@ -95,15 +107,10 @@ function normalizeUserSummary(user = {}) {
 }
 
 async function loadUserDirectory() {
-  const users = await User.find().sort({ first: 1, last: 1 }).lean();
+  const users = await User.find({ status: 'Active' }).sort({ first: 1, last: 1 }).lean();
   const summaries = users
     .map(normalizeUserSummary)
-    .sort((a, b) => {
-      const aInactive = String(a.status || '').toLowerCase() === 'inactive' ? 1 : 0;
-      const bInactive = String(b.status || '').toLowerCase() === 'inactive' ? 1 : 0;
-      if (aInactive !== bInactive) return aInactive - bInactive;
-      return String(a.name || '').localeCompare(String(b.name || ''));
-    });
+    .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
   const byId = new Map();
   const byEmail = new Map();
   const byName = new Map();
@@ -592,6 +599,7 @@ function formatRequestTypeDefinition(doc) {
     defaultAssigneeEmail: allowDefaultAssignee && !hasRequestorDefaultAssignee ? (source.defaultAssigneeEmail || '') : '',
     autoAddDepartmentApps: !!source.autoAddDepartmentApps,
     isSystem: !!source.isSystem,
+    slaPolicy: normalizeSlaPolicyInput(source.slaPolicy || {}, DEFAULT_SLA_POLICY),
     formFields: normalizeRequestTypeFormFields(source.formFields || []),
     customFormFields: normalizeCustomFormFields(source.customFormFields || []),
     checklist: sanitizeRequestTypeChecklist(source.checklist || []),
@@ -620,6 +628,16 @@ async function ensureDefaultRequestTypes() {
     if (!defaults) return;
 
     let changed = false;
+    const normalizedSlaPolicy = normalizeSlaPolicyInput(item.slaPolicy || {}, defaults.slaPolicy || DEFAULT_SLA_POLICY);
+    const hasSlaDelta = (
+      !item.slaPolicy
+      || item.slaPolicy.enabled !== normalizedSlaPolicy.enabled
+      || Number(item.slaPolicy.responseMinutes) !== Number(normalizedSlaPolicy.responseMinutes)
+      || Number(item.slaPolicy.resolutionMinutes) !== Number(normalizedSlaPolicy.resolutionMinutes)
+      || Number(item.slaPolicy.atRiskPercent) !== Number(normalizedSlaPolicy.atRiskPercent)
+    );
+    if (hasSlaDelta) changed = true;
+
     const checklist = (item.checklist || []).map(step => {
       const defaultStep = (defaults.checklist || []).find(candidate => candidate.key === step.key);
       if (!defaultStep || step.approvalMode) return step;
@@ -661,7 +679,15 @@ async function ensureDefaultRequestTypes() {
 
     if (nextFormFields.length !== existingFormFields.length) changed = true;
     if (changed) {
-      await SupportRequestType.updateOne({ _id: item._id }, { $set: { checklist, formFields: nextFormFields } });
+      await SupportRequestType.updateOne({
+        _id: item._id,
+      }, {
+        $set: {
+          checklist,
+          formFields: nextFormFields,
+          slaPolicy: normalizedSlaPolicy,
+        },
+      });
     }
   }));
 }
@@ -719,6 +745,7 @@ async function createRequestTypeDefinition(input = {}) {
     defaultAssigneeUserId: allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeUserId : '',
     defaultAssigneeEmail: allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeEmail : '',
     autoAddDepartmentApps,
+    slaPolicy: normalizeSlaPolicyInput(input.slaPolicy || {}, DEFAULT_SLA_POLICY),
     formFields,
     customFormFields: normalizeCustomFormFields(input.customFormFields || []),
     checklist: people.checklist,
@@ -753,6 +780,10 @@ async function updateRequestTypeDefinition(id, input = {}) {
   requestType.defaultAssigneeUserId = allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeUserId : '';
   requestType.defaultAssigneeEmail = allowDefaultAssignee && !hasRequestorDefaultAssignee ? people.defaultAssigneeEmail : '';
   requestType.autoAddDepartmentApps = !!input.autoAddDepartmentApps;
+  requestType.slaPolicy = normalizeSlaPolicyInput(
+    input.slaPolicy || requestType.slaPolicy || {},
+    requestType.slaPolicy || DEFAULT_SLA_POLICY
+  );
   requestType.formFields = normalizeRequestTypeFormFields(input.formFields || []).map(field => (
     field.key === 'department' && requestType.autoAddDepartmentApps
       ? { ...field, enabled: true, required: true }
@@ -845,6 +876,7 @@ async function getSlackWorkflowDefinition(workflowType) {
     defaultAssigneeUserId: '',
     defaultAssigneeEmail: '',
     autoAddDepartmentApps: false,
+    slaPolicy: normalizeSlaPolicyInput({}, DEFAULT_SLA_POLICY),
     formFields: normalizeRequestTypeFormFields([]),
     checklist: buildSlackChecklist(workflow),
   };
@@ -864,6 +896,7 @@ async function resolveWorkflowDefinition(workflowType) {
       defaultAssigneeUserId: requestType.defaultAssigneeUserId || '',
       defaultAssigneeEmail: requestType.defaultAssigneeEmail || '',
       autoAddDepartmentApps: !!requestType.autoAddDepartmentApps,
+      slaPolicy: normalizeSlaPolicyInput(requestType.slaPolicy || {}, DEFAULT_SLA_POLICY),
       formFields: normalizeRequestTypeFormFields(requestType.formFields || []),
       checklist: requestType.checklist || [],
     };
@@ -1199,6 +1232,7 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
     requestedById: actor.id || '',
     requestedByName: actor.name || '',
     requestedByEmail: actor.email || '',
+    slaPolicySnapshot: normalizeSlaPolicyInput(workflow.slaPolicy || {}, DEFAULT_SLA_POLICY),
     checklist,
   });
 }
@@ -1300,7 +1334,9 @@ async function listWorkflowOptions() {
       defaultAssignee: definition.defaultAssignee || '',
       defaultAssigneeUserId: definition.defaultAssigneeUserId || '',
       defaultAssigneeEmail: definition.defaultAssigneeEmail || '',
+      slaPolicy: normalizeSlaPolicyInput(definition.slaPolicy || {}, DEFAULT_SLA_POLICY),
       formFields: normalizeRequestTypeFormFields(definition.formFields || []),
+      customFormFields: normalizeCustomFormFields(definition.customFormFields || []),
     }));
 }
 

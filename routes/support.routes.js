@@ -35,6 +35,13 @@ const { hashToken, notifySupportRequestChanges } = require('../services/support-
 const { postSupportRequestUpdateMessage } = require('../services/support-slack-thread.service');
 const rateLimit = require('express-rate-limit');
 
+const DEFAULT_SLA_POLICY = Object.freeze({
+  enabled: true,
+  responseMinutes: 60,
+  resolutionMinutes: 480,
+  atRiskPercent: 80,
+});
+
 // Prevent brute-force guessing of approval tokens: max 10 attempts per 15 min per IP.
 const approvalRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -44,10 +51,86 @@ const approvalRateLimiter = rateLimit({
   message: { error: 'Too many approval attempts from this IP, please try again later.' },
 });
 
+function toDateOrNull(value) {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function normalizeSlaPolicySnapshot(input = {}) {
+  const policy = { ...DEFAULT_SLA_POLICY, ...(input || {}) };
+  const toInt = (value, fallback, min, max) => {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.min(max, Math.max(min, Math.round(parsed)));
+  };
+  return {
+    enabled: policy.enabled !== false,
+    responseMinutes: toInt(policy.responseMinutes, DEFAULT_SLA_POLICY.responseMinutes, 1, 43200),
+    resolutionMinutes: toInt(policy.resolutionMinutes, DEFAULT_SLA_POLICY.resolutionMinutes, 1, 43200),
+    atRiskPercent: toInt(policy.atRiskPercent, DEFAULT_SLA_POLICY.atRiskPercent, 1, 99),
+  };
+}
+
+function deriveSlaPayload(request = {}) {
+  const now = new Date();
+  const policy = normalizeSlaPolicySnapshot(request.slaPolicySnapshot || {});
+  const createdAt = toDateOrNull(request.createdAt) || now;
+  const firstResponseAt = toDateOrNull(request.firstResponseAt);
+  const resolvedAt = toDateOrNull(request.resolvedAt);
+
+  if (!policy.enabled) {
+    return {
+      slaPolicySnapshot: policy,
+      firstResponseAt,
+      resolvedAt,
+      slaResponseDueAt: null,
+      slaResolutionDueAt: null,
+      slaStatus: 'no_sla',
+      slaBreachedAt: null,
+    };
+  }
+
+  const slaResponseDueAt = toDateOrNull(request.slaResponseDueAt)
+    || new Date(createdAt.getTime() + (policy.responseMinutes * 60 * 1000));
+  const slaResolutionDueAt = toDateOrNull(request.slaResolutionDueAt)
+    || new Date(createdAt.getTime() + (policy.resolutionMinutes * 60 * 1000));
+
+  let slaStatus = String(request.slaStatus || '').trim();
+  const validStatuses = new Set(['on_track', 'at_risk', 'breached', 'met', 'paused', 'no_sla']);
+  if (!validStatuses.has(slaStatus)) {
+    const status = String(request.status || '').toLowerCase();
+    if (status === 'cancelled') {
+      slaStatus = 'paused';
+    } else if (status === 'completed') {
+      const completedAt = resolvedAt || now;
+      slaStatus = completedAt.getTime() > slaResolutionDueAt.getTime() ? 'breached' : 'met';
+    } else if ((!firstResponseAt && now.getTime() > slaResponseDueAt.getTime()) || now.getTime() > slaResolutionDueAt.getTime()) {
+      slaStatus = 'breached';
+    } else {
+      const totalMs = slaResolutionDueAt.getTime() - createdAt.getTime();
+      const elapsedMs = now.getTime() - createdAt.getTime();
+      const elapsedPercent = totalMs > 0 ? (elapsedMs / totalMs) * 100 : 100;
+      slaStatus = elapsedPercent >= policy.atRiskPercent ? 'at_risk' : 'on_track';
+    }
+  }
+
+  return {
+    slaPolicySnapshot: policy,
+    firstResponseAt,
+    resolvedAt,
+    slaResponseDueAt,
+    slaResolutionDueAt,
+    slaStatus,
+    slaBreachedAt: toDateOrNull(request.slaBreachedAt),
+  };
+}
+
 function fmtSupportRequest(doc) {
   const o = doc.toObject ? doc.toObject() : { ...doc };
   const checklist = Array.isArray(o.checklist) ? o.checklist : [];
   const completedCount = checklist.filter(item => item.status === 'done').length;
+  const sla = deriveSlaPayload(o);
 
   return {
     id: o._id.toString(),
@@ -81,6 +164,13 @@ function fmtSupportRequest(doc) {
     assignee: o.assignee,
     assigneeUserId: o.assigneeUserId || '',
     assigneeEmail: o.assigneeEmail || '',
+    slaPolicySnapshot: sla.slaPolicySnapshot,
+    firstResponseAt: sla.firstResponseAt,
+    resolvedAt: sla.resolvedAt,
+    slaResponseDueAt: sla.slaResponseDueAt,
+    slaResolutionDueAt: sla.slaResolutionDueAt,
+    slaStatus: sla.slaStatus,
+    slaBreachedAt: sla.slaBreachedAt,
     applications: Array.isArray(o.applications) ? o.applications : [],
     notes: o.notes,
     customFieldValues: Array.isArray(o.customFieldValues) ? o.customFieldValues : [],
@@ -107,6 +197,36 @@ function fmtSupportLog(doc) {
     changes: Array.isArray(log.changes) ? log.changes : [],
     createdAt: log.createdAt || null,
   };
+}
+
+function buildSupportRequestFilter(query = {}) {
+  const {
+    workflowType,
+    status,
+    priority,
+    slaStatus,
+    assignee,
+    search,
+  } = query || {};
+  const filter = {};
+  if (workflowType) filter.workflowType = String(workflowType).trim();
+  if (status) filter.status = String(status).trim();
+  if (priority) filter.priority = String(priority).trim();
+  if (slaStatus) filter.slaStatus = String(slaStatus).trim();
+  if (assignee) filter.assignee = String(assignee).trim();
+  if (search) {
+    const re = new RegExp(escapeRegex(String(search).slice(0, 200)), 'i');
+    filter.$or = [
+      { requestId: re },
+      { employeeName: re },
+      { employeeEmail: re },
+      { department: re },
+      { requestedByName: re },
+      { assignee: re },
+      { workflowLabel: re },
+    ];
+  }
+  return filter;
 }
 
 function approvalPage(title, body, tone = '#111827') {
@@ -319,25 +439,75 @@ router.put('/mail-templates/:id', requireAuth, onlySuperAdmin, async (req, res) 
 
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const { workflowType, status, search } = req.query;
-    const filter = {};
-    if (workflowType) filter.workflowType = workflowType;
-    if (status) filter.status = status;
-    if (search) {
-      const re = new RegExp(escapeRegex(String(search).slice(0, 200)), 'i');
-      filter.$or = [
-        { requestId: re },
-        { employeeName: re },
-        { employeeEmail: re },
-        { department: re },
-        { requestedByName: re },
-        { assignee: re },
-        { workflowLabel: re },
-      ];
-    }
+    const filter = buildSupportRequestFilter(req.query);
 
     const requests = await SupportRequest.find(filter).sort({ createdAt: -1 });
     res.json(requests.map(fmtSupportRequest));
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/board', requireAuth, async (req, res) => {
+  try {
+    const filter = buildSupportRequestFilter(req.query);
+    const requests = await SupportRequest.find(filter).sort({ updatedAt: -1, createdAt: -1 });
+    const formatted = requests.map(fmtSupportRequest);
+
+    const statuses = ['open', 'in_progress', 'blocked', 'completed', 'cancelled'];
+    const columns = Object.fromEntries(statuses.map(status => [status, []]));
+    formatted.forEach(request => {
+      const status = statuses.includes(request.status) ? request.status : 'open';
+      columns[status].push(request);
+    });
+
+    const counts = Object.fromEntries(statuses.map(status => [status, columns[status].length]));
+    const slaStatuses = ['on_track', 'at_risk', 'breached', 'met', 'paused', 'no_sla'];
+    const slaCounts = Object.fromEntries(slaStatuses.map(key => [key, 0]));
+    formatted.forEach(request => {
+      const key = slaStatuses.includes(request.slaStatus) ? request.slaStatus : 'no_sla';
+      slaCounts[key] += 1;
+    });
+    res.json({
+      total: formatted.length,
+      counts,
+      slaCounts,
+      columns,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+router.get('/:id/activity', requireAuth, async (req, res) => {
+  try {
+    const request = await SupportRequest.findById(req.params.id).select('_id requestId');
+    if (!request) return res.status(404).json({ error: 'Support request not found' });
+
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 100, 1), 200);
+    const skip = (page - 1) * limit;
+    const filter = {
+      entityType: 'support_request',
+      entityId: request._id.toString(),
+    };
+
+    const [total, logs] = await Promise.all([
+      Log.countDocuments(filter),
+      Log.find(filter)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+    ]);
+
+    res.json({
+      requestDbId: request._id.toString(),
+      requestId: request.requestId,
+      total,
+      page,
+      limit,
+      activity: logs.map(fmtSupportLog),
+    });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
