@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: terzo-config
+  namespace: terzo
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  JWT_EXPIRES: "24h"
+  LOG_ACTOR: "Praveen M. (IT Admin)"
+  CORS_ORIGINS: "*"

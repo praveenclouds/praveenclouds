@@ -7,7 +7,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 (async () => {
   console.log('🔧  Starting in-memory MongoDB…');
   const mongod = await MongoMemoryServer.create({
-    instance: { port: 27017, dbName: 'terzocloud_assets' },
+    instance: { port: 27017, dbName: 'terzo_assets' },
   });
   const uri = mongod.getUri();
   console.log(`✅  In-memory MongoDB ready → ${uri}`);

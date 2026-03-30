@@ -1,6 +1,6 @@
 /**
  * db/index.js
- * MongoDB connection helper for TerzoCloud – User & Asset Management Portal
+ * MongoDB connection helper for Terzo – User & Asset Management Portal
  *
  * Usage:
  *   const { connect, disconnect } = require('./db');
@@ -26,7 +26,7 @@ async function connect(attempt = 1) {
   if (mongoose.connection.readyState >= 1) return; // already connected
 
   // Read URI at connect-time so in-memory MongoDB URI set after module load is picked up
-  const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/terzocloud_assets';
+  const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/terzo_assets';
 
   try {
     await mongoose.connect(MONGO_URI, MONGO_OPTS);
@@ -72,5 +72,25 @@ const SupportRequestType  = require('./models/SupportRequestType');
 const SupportMailTemplate = require('./models/SupportMailTemplate');
 const SlackWorkflowImport = require('./models/SlackWorkflowImport');
 const RolePermission      = require('./models/RolePermission');
+const Department          = require('./models/Department');
+const AlertRule           = require('./models/AlertRule');
 
-module.exports = { connect, disconnect, User, Asset, Log, Software, AdminUser, IntegrationSettings, SCIMConfig, AppConnector, SupportRequest, SupportRequestType, SupportMailTemplate, SlackWorkflowImport, RolePermission };
+module.exports = {
+  connect,
+  disconnect,
+  User,
+  Asset,
+  Log,
+  Software,
+  AdminUser,
+  IntegrationSettings,
+  SCIMConfig,
+  AppConnector,
+  SupportRequest,
+  SupportRequestType,
+  SupportMailTemplate,
+  SlackWorkflowImport,
+  RolePermission,
+  Department,
+  AlertRule,
+};

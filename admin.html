@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TerzoCloud — Admin Console</title>
+  <title>Terzo — Admin Console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --primary: #1e40af; --primary-light: #3b82f6; --primary-dark: #1e3a8a;
-      --accent: #9333ea; --accent-light: #a855f7;
+      --primary: #7c3aed; --primary-light: #9333ea; --primary-dark: #6d28d9;
+      --accent: #a855f7; --accent-light: #c084fc;
       --success: #16a34a; --danger: #dc2626; --warning: #d97706;
       --bg: #0e0a0f; --surface: #16101a; --surface2: #1e1525;
       --border: rgba(153,102,255,0.18);
@@ -44,29 +45,29 @@
     [data-theme="light"] table th { color: #64748b; border-color: #e2e8f0; }
     [data-theme="light"] table td { border-color: #f1f5f9; color: #334155; }
     [data-theme="light"] table tr:hover td { background: #f8fafc; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; }
 
     /* SIDEBAR */
-    .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
-    .logo { padding: 18px 16px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-    .logo-icon { width: 34px; height: 34px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .logo-icon svg { width: 17px; height: 17px; stroke: #fff; fill: none; stroke-width: 2; }
-    .logo-text { font-size: 13px; font-weight: 800; color: var(--text); line-height: 1.2; }
-    .logo-sub  { font-size: 10px; color: rgba(153,102,255,0.6); }
+    .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
+    .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 11px; }
+    .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .logo-text { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; letter-spacing: -0.01em; }
+    .logo-sub  { font-size: 11px; color: rgba(153,102,255,0.6); margin-top: 1px; }
 
-    nav { padding: 14px 8px; flex: 1; }
-    .nav-label { font-size: 9.5px; font-weight: 700; color: rgba(153,102,255,0.55); text-transform: uppercase; letter-spacing: .1em; padding: 8px 8px 4px; }
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 13px; font-weight: 500; transition: all .14s; margin-bottom: 1px; user-select: none; }
-    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; }
+    nav { padding: 16px 10px; flex: 1; }
+    .nav-label { font-size: 10.5px; font-weight: 600; color: rgba(153,102,255,0.55); text-transform: uppercase; letter-spacing: .08em; padding: 10px 10px 6px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 13.5px; font-weight: 500; transition: all .14s; margin-bottom: 2px; user-select: none; }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; }
     .nav-item:hover { background: rgba(153,102,255,0.1); color: var(--text); }
-    .nav-item.active { background: rgba(99,66,255,0.18); color: #a78bfa; }
+    .nav-item.active { background: rgba(99,66,255,0.18); color: #a78bfa; font-weight: 600; }
     .nav-divider { height: 1px; background: var(--border); margin: 10px 8px; }
 
-    .sidebar-footer { margin-top: auto; padding: 12px; border-top: 1px solid var(--border); }
-    .user-chip { display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: rgba(153,102,255,0.08); border-radius: 9px; }
-    .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .user-info strong { display: block; color: var(--text); font-size: 12px; }
-    .user-info span   { color: var(--text-muted); font-size: 10.5px; }
+    .sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--border); }
+    .user-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: rgba(153,102,255,0.08); border-radius: 10px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .user-info strong { display: block; color: var(--text); font-size: 13px; font-weight: 600; }
+    .user-info span   { color: var(--text-muted); font-size: 11.5px; }
     .role-chip { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
     .role-chip.super_admin { background: rgba(147,51,234,0.2); color: #c084fc; border: 1px solid rgba(147,51,234,0.3); }
     .role-chip.admin       { background: rgba(30,64,175,0.2);  color: #c4b5fd; border: 1px solid rgba(30,64,175,0.3); }
@@ -74,13 +75,13 @@
 
     /* MAIN */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { height: 58px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 14px; flex-shrink: 0; }
-    .topbar h1 { font-size: 17px; font-weight: 800; color: var(--text); flex: 1; }
-    .content { flex: 1; overflow-y: auto; padding: 24px; }
+    .topbar { height: 60px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 14px; flex-shrink: 0; }
+    .topbar h1 { font-size: 18px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.01em; }
+    .content { flex: 1; overflow-y: auto; padding: 24px 28px; }
 
     /* BUTTONS */
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 15px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .14s; white-space: nowrap; }
-    .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.5; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; transition: all .14s; white-space: nowrap; font-family: inherit; }
+    .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-dark); }
     .btn-secondary { background: rgba(153,102,255,0.12); color: #c4b5fd; border: 1px solid var(--border); }
@@ -88,31 +89,31 @@
     .btn-danger { background: rgba(220,38,38,0.12); color: #f87171; border: 1px solid rgba(220,38,38,0.25); }
     .btn-danger:hover { background: rgba(220,38,38,0.2); }
     .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-    .btn-icon { padding: 6px; border-radius: 7px; }
+    .btn-icon { padding: 7px; border-radius: 7px; }
     .btn-back { background: rgba(153,102,255,0.08); color: var(--text-muted); border: 1px solid var(--border); }
     .btn-back:hover { color: var(--text); background: rgba(153,102,255,0.15); }
 
     /* CARDS */
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 13px; overflow: hidden; }
-    .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
-    .card-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .card-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .card-title { font-size: 15px; font-weight: 700; color: var(--text); flex: 1; }
 
     /* STAT GRID */
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; align-items: center; gap: 13px; }
-    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
     .stat-icon.purple { background: rgba(147,51,234,0.15); color: #c084fc; }
-    .stat-icon.blue   { background: rgba(30,64,175,0.15);  color: #c4b5fd; }
+    .stat-icon.blue   { background: rgba(124,58,237,0.15);  color: #a78bfa; }
     .stat-icon.green  { background: rgba(22,163,74,0.13);  color: #4ade80; }
     .stat-icon.sky    { background: rgba(14,165,233,0.13); color: #38bdf8; }
-    .stat-num   { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1; }
-    .stat-label { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
+    .stat-num   { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -0.02em; }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
     /* TABLES */
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: rgba(153,102,255,0.7); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1px solid var(--border); white-space: nowrap; }
-    td { padding: 12px 14px; border-bottom: 1px solid rgba(153,102,255,0.07); vertical-align: middle; color: var(--text-muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th { padding: 11px 16px; text-align: left; font-size: 11.5px; font-weight: 600; color: rgba(153,102,255,0.7); text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    td { padding: 13px 16px; border-bottom: 1px solid rgba(153,102,255,0.07); vertical-align: middle; color: var(--text-muted); }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: rgba(153,102,255,0.04); }
 
@@ -276,11 +277,12 @@
     .channel-pill svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
+  <script src="/portal-api-client.js"></script>
 </head>
 <script>
   (function(){
     var t = localStorage.getItem('portalTheme');
-    if (!t || t === 'dark') {
+    if (!t) {
       t = 'light';
       localStorage.setItem('portalTheme', t);
     }
@@ -296,7 +298,7 @@
       <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
     </div>
     <div>
-      <div class="logo-text">TerzoCloud</div>
+      <div class="logo-text">Terzo</div>
       <div class="logo-sub">Admin Console</div>
     </div>
   </div>
@@ -387,9 +389,7 @@
       <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span id="alertBadge" style="display:none;position:absolute;top:4px;right:4px;width:8px;height:8px;background:#f87171;border-radius:50%;border:1.5px solid var(--surface)"></span>
     </button>
-    <button id="adminThemeBtn" onclick="toggleAdminTheme()" title="Toggle theme" style="background:rgba(153,102,255,0.1);border:1px solid var(--border);border-radius:9px;padding:8px 10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--text-muted);font-size:15px" onmouseover="this.style.background='rgba(153,102,255,0.22)';this.style.color='#c4b5fd'" onmouseout="this.style.background='rgba(153,102,255,0.1)';this.style.color='var(--text-muted)'">
-      🌙
-    </button>
+    <!-- Theme controlled from main portal toggle switch -->
     <button class="btn btn-back" onclick="location.href='/'">
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       Back to Portal
@@ -560,7 +560,7 @@
                 <div style="margin-bottom:4px"><span style="color:#a78bfa;font-weight:700">2.</span> Copy the <strong style="color:var(--text)">SCIM Base URL</strong> and <strong style="color:var(--text)">Bearer Token</strong> shown above</div>
                 <div style="margin-bottom:4px"><span style="color:#a78bfa;font-weight:700">3.</span> In your Identity Provider admin console, open <strong style="color:var(--text)">SCIM / Provisioning</strong> settings and paste both values</div>
                 <div style="margin-bottom:4px"><span style="color:#a78bfa;font-weight:700">4.</span> Map user attributes — <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:4px">userName → Email</code> <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:4px">name.givenName → First name</code> <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:4px">name.familyName → Last name</code> <code style="background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:4px">active → Account status</code></div>
-                <div><span style="color:#a78bfa;font-weight:700">5.</span> Enable provisioning — TerzoCloud will automatically create and deactivate users on join / leave events</div>
+                <div><span style="color:#a78bfa;font-weight:700">5.</span> Enable provisioning — Terzo will automatically create and deactivate users on join / leave events</div>
               </div>
             </div>
           </div>
@@ -747,7 +747,7 @@
             </div>
             <div class="form-group">
               <label>From Name</label>
-              <input type="text" id="emailFromName" placeholder="TerzoCloud Support" />
+              <input type="text" id="emailFromName" placeholder="Terzo Support" />
             </div>
           </div>
           <div class="form-row">
@@ -1163,21 +1163,19 @@
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-/* ── Auth guard ── */
-function toggleAdminTheme() {
-  var current = localStorage.getItem('portalTheme') || 'light';
-  var next = current === 'dark' ? 'light' : 'dark';
-  localStorage.setItem('portalTheme', next);
-  document.documentElement.setAttribute('data-theme', next);
-  document.body.setAttribute('data-portal-theme', next === 'light' ? 'white' : 'dark');
-  var btn = document.getElementById('adminThemeBtn');
-  if (btn) btn.textContent = next === 'light' ? '☀️' : '🌙';
+/* ── Theme — controlled from main portal toggle; syncs automatically ── */
+function _adminApplyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.body.setAttribute('data-portal-theme', t === 'light' ? 'white' : 'dark');
 }
 document.addEventListener('DOMContentLoaded', function(){
-  var t = localStorage.getItem('portalTheme') || 'light';
-  document.body.setAttribute('data-portal-theme', t === 'light' ? 'white' : 'dark');
-  var btn = document.getElementById('adminThemeBtn');
-  if (btn) btn.textContent = t === 'light' ? '☀️' : '🌙';
+  _adminApplyTheme(localStorage.getItem('portalTheme') || 'light');
+});
+// Listen for theme changes made in the main portal (other tabs)
+window.addEventListener('storage', function(e) {
+  if (e.key === 'portalTheme' && e.newValue) {
+    _adminApplyTheme(e.newValue);
+  }
 });
 
 const token = localStorage.getItem('tcToken');
@@ -1207,13 +1205,19 @@ let rolePermissionDrafts = [];
 })();
 
 function authFetch(url, opts = {}) {
-  return fetch(url, {
+  const h = {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': 'application/json',
+    ...(opts.headers || {}),
+  };
+  return window.tcApi.request(url, {
     ...opts,
-    headers: {
-      'Authorization': 'Bearer ' + token,
-      'Content-Type': 'application/json',
-      ...(opts.headers || {}),
-    },
+    headers: h,
+    timeoutMs: 30000,
+    retries: 2,
+    cancelPrevious: !!opts.cancelPrevious,
+    cancelKey: opts.requestKey || '',
+    dedupeKey: opts.requestKey || '',
   });
 }
 
@@ -1303,8 +1307,16 @@ function showPage(name, el) {
   if (name === 'scim') loadSCIMConfig();
   if (name === 'integrations') loadIntegrations();
   if (name === 'permissions') loadRolePermissions();
-  if (name === 'departments') { loadDepartmentsMgmt(); renderAdminDepartments(); }
-  if (name === 'alerts') renderAlerts();
+  if (name === 'departments') {
+    loadDepartmentsMgmt()
+      .then(() => renderAdminDepartments())
+      .catch(error => showToast(error.message || 'Failed to load departments', 'danger'));
+  }
+  if (name === 'alerts') {
+    loadAlertsFromServer()
+      .then(() => renderAlerts())
+      .catch(error => showToast(error.message || 'Failed to load alerts', 'danger'));
+  }
 }
 
 /* ── PORTAL USERS ── */
@@ -1501,15 +1513,15 @@ async function saveRolePermissions() {
 
 async function loadUsers() {
   if (!hasPermission('managePortalUsers')) {
-    adminUsers = [];
+    adminStore.setState({ adminUsers: [] }, 'admin:users:cleared');
     updateStats();
     return;
   }
   try {
-    const r = await authFetch('/api/admin/users');
+    const r = await authFetch('/api/admin/users', { requestKey: 'admin:users:load', cancelPrevious: true });
     if (r.status === 403) return;
     if (!r.ok) throw new Error('Failed to load users');
-    adminUsers = await r.json();
+    adminStore.setState({ adminUsers: await r.json() }, 'admin:users:loaded');
     renderUsersTable();
     updateStats();
   } catch (e) { showToast(e.message, 'danger'); }
@@ -1730,7 +1742,8 @@ function escapeHtml(value) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+    .replace(/'/g, '&#39;')
+    .replace(/`/g, '&#96;');
 }
 
 function updateSlackWorkflowStatus(imports = []) {
@@ -1857,7 +1870,7 @@ async function loadIntegrations() {
     document.getElementById('emailSmtpUser').value = email.smtpUser || '';
     document.getElementById('emailSmtpPass').value = '';
     document.getElementById('emailFromEmail').value = email.fromEmail || '';
-    document.getElementById('emailFromName').value = email.fromName || 'TerzoCloud Support';
+    document.getElementById('emailFromName').value = email.fromName || 'Terzo Support';
     document.getElementById('emailAppBaseUrl').value = email.appBaseUrl || `${location.protocol}//${location.host}`;
     document.getElementById('emailSmtpSecure').value = email.smtpSecure ? 'true' : 'false';
     document.getElementById('googleClientId').placeholder = googleSsoHasClientId
@@ -2092,7 +2105,7 @@ async function loadSCIMConfig() {
     if (label) label.textContent = enabled ? 'Enabled' : 'Disabled';
     document.getElementById('scimBaseUrl').value = d.scimBaseUrl || `${location.protocol}//${location.host}/scim/v2`;
     document.getElementById('scimTokenDisplay').value = d.hasToken
-      ? `…${d.tokenHint} (stored — regenerate to view)`
+      ? '••••••••••• (stored — regenerate to view)'
       : 'No token yet — click Regenerate';
     _scimFullToken = '';
     updateSCIMFreezeState(enabled);
@@ -2200,7 +2213,7 @@ function buildConnectorCard(appName) {
         <label class="toggle"><input type="checkbox" id="${p}Enabled"><span class="toggle-slider"></span></label>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="form-group"><label>GitHub Organisation</label><input type="text" id="${p}Org" placeholder="e.g. terzocloud" /></div>
+        <div class="form-group"><label>GitHub Organisation</label><input type="text" id="${p}Org" placeholder="e.g. terzo" /></div>
         <div class="form-group"><label>Software Record</label><select id="${p}Software"><option value="">— select record —</option></select></div>
       </div>
       <div class="form-group">
@@ -2221,7 +2234,7 @@ function buildConnectorCard(appName) {
         <label class="toggle"><input type="checkbox" id="${p}Enabled"><span class="toggle-slider"></span></label>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="form-group"><label>Workspace (for reference)</label><input type="text" id="${p}Org" placeholder="e.g. terzocloud" /></div>
+        <div class="form-group"><label>Workspace (for reference)</label><input type="text" id="${p}Org" placeholder="e.g. terzo" /></div>
         <div class="form-group"><label>Software Record</label><select id="${p}Software"><option value="">— select record —</option></select></div>
       </div>
       <div class="form-group">
@@ -2556,11 +2569,10 @@ async function testConnector(appName) {
 
 /* ══════════════════════════════════════════════════════════════
    DEPARTMENTS — Admin Console
-   Storage: localStorage 'tcDepartments' [{id,name}]
+   Storage: MongoDB via /api/admin/departments
    User mapping: PUT /api/users/:id  { dept }
    Software mapping: PUT /api/software/:id { department }
 ══════════════════════════════════════════════════════════════ */
-const ADMIN_DEPT_KEY = 'tcDepartments';
 let adminDepts     = [];   // [{id,name}]
 let adminEmployees = [];   // loaded from /api/users
 let adminSoftware  = [];   // loaded from /api/software
@@ -2588,33 +2600,30 @@ function adminGetSwMapped(name) {
   });
 }
 
-/* ── load / save localStorage ── */
-function loadDepartmentsMgmt() {
-  try { adminDepts = JSON.parse(localStorage.getItem(ADMIN_DEPT_KEY)||'[]'); } catch { adminDepts=[]; }
-  /* seed from employee dept values */
-  const existing = new Set(adminDepts.map(d=>d.name.toLowerCase()));
-  adminEmployees.forEach(u=>{
-    const d=(u.dept||'').trim();
-    if(d && !existing.has(d.toLowerCase())){
-      adminDepts.push({id:'dept-'+Date.now()+'-'+Math.random().toString(36).slice(2),name:d});
-      existing.add(d.toLowerCase());
-    }
-  });
-  saveDepartmentsMgmt();
-}
-function saveDepartmentsMgmt() {
-  localStorage.setItem(ADMIN_DEPT_KEY, JSON.stringify(adminDepts));
+/* ── load from server ── */
+async function loadDepartmentsMgmt() {
+  const r = await authFetch('/api/admin/departments', { requestKey: 'admin:departments:load', cancelPrevious: true });
+  if (!r.ok) {
+    const data = await r.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to load departments');
+  }
+  adminStore.setState({ adminDepts: await r.json() }, 'admin:departments:loaded');
+  return adminDepts;
 }
 
 /* ── load employee + software data ── */
 async function loadDepartmentData() {
   try {
     const [uRes, sRes] = await Promise.all([
-      authFetch('/api/users'),
-      authFetch('/api/software'),
+      authFetch('/api/users', { requestKey: 'admin:dept-users:load', cancelPrevious: true }),
+      authFetch('/api/software', { requestKey: 'admin:dept-software:load', cancelPrevious: true }),
     ]);
-    if (uRes.ok) adminEmployees = await uRes.json();
-    if (sRes.ok) adminSoftware  = (await sRes.json()).map(s=>({...s, department: String(s.department||'')}));
+    if (uRes.ok) adminStore.setState({ adminEmployees: await uRes.json() }, 'admin:dept-users:loaded');
+    if (sRes.ok) {
+      adminStore.setState({
+        adminSoftware: (await sRes.json()).map(s=>({...s, department: String(s.department||'')})),
+      }, 'admin:dept-software:loaded');
+    }
   } catch(e) { console.warn('Dept data load failed', e); }
 }
 
@@ -2694,22 +2703,28 @@ function closeAdminDeptNameModal() {
 function clearAdminDeptNameErr() {
   const e=document.getElementById('adminDeptNameErr'); if(e){ e.style.display='none'; e.textContent=''; }
 }
-function saveAdminDeptName() {
+async function saveAdminDeptName() {
   const name = document.getElementById('adminDeptNameInput').value.trim();
   const errEl = document.getElementById('adminDeptNameErr');
   if (!name) { errEl.textContent='Name is required'; errEl.style.display='block'; return; }
   const dup = adminDepts.find(d=>d.name.toLowerCase()===name.toLowerCase() && d.id!==adminDeptEditId);
   if (dup) { errEl.textContent='A department with this name already exists'; errEl.style.display='block'; return; }
-  if (adminDeptEditId) {
-    const dept = adminDepts.find(d=>d.id===adminDeptEditId);
-    if (dept) dept.name = name;
-  } else {
-    adminDepts.push({id:'dept-'+Date.now()+'-'+Math.random().toString(36).slice(2), name});
+  try {
+    const url = adminDeptEditId ? `/api/admin/departments/${encodeURIComponent(adminDeptEditId)}` : '/api/admin/departments';
+    const method = adminDeptEditId ? 'PUT' : 'POST';
+    const r = await authFetch(url, { method, body: JSON.stringify({ name }) });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to save department');
+    }
+    await loadDepartmentsMgmt();
+    closeAdminDeptNameModal();
+    renderAdminDepartments();
+    showToast(adminDeptEditId ? 'Department renamed' : 'Department added');
+  } catch (error) {
+    errEl.textContent = error.message || 'Failed to save department';
+    errEl.style.display='block';
   }
-  saveDepartmentsMgmt();
-  closeAdminDeptNameModal();
-  renderAdminDepartments();
-  showToast(adminDeptEditId ? 'Department renamed' : 'Department added');
 }
 
 /* ── Delete dept ── */
@@ -2721,12 +2736,20 @@ function confirmDeleteAdminDept(id) {
   document.getElementById('confirmMsg').textContent   = `Delete "${dept.name}"? This only removes the department record — users and software assignments won't be changed.`;
   box.classList.add('open');
   box._adminDeptDeleteId = id;
-  box._adminDeptDeleteCallback = ()=>{
-    adminDepts = adminDepts.filter(d=>d.id!==id);
-    saveDepartmentsMgmt();
-    renderAdminDepartments();
-    showToast('Department deleted');
-    closeConfirm();
+  box._adminDeptDeleteCallback = async ()=>{
+    try {
+      const r = await authFetch(`/api/admin/departments/${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to delete department');
+      }
+      await loadDepartmentsMgmt();
+      renderAdminDepartments();
+      showToast('Department deleted');
+      closeConfirm();
+    } catch (error) {
+      showToast(error.message || 'Failed to delete department', 'danger');
+    }
   };
 }
 
@@ -2931,7 +2954,7 @@ async function syncConnector(appName) {
 
 /* ══════════════════════════════════════════════════════
    ALERTS  —  full frontend implementation
-   Storage: localStorage key "tcAlerts"
+   Storage: MongoDB via /api/admin/alerts
    Alert shape: { id, name, category, condition, threshold, description, channels[], enabled, createdAt }
 ══════════════════════════════════════════════════════ */
 
@@ -2979,12 +3002,33 @@ const CHANNEL_META = {
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let alertsList = JSON.parse(localStorage.getItem('tcAlerts') || '[]');
+let alertsList = [];
 let alertEditingId = null;
 let alertChannels = ['inApp'];
+const adminStore = window.tcApi.createStore({
+  adminUsers: [],
+  adminDepts: [],
+  adminEmployees: [],
+  adminSoftware: [],
+  alertRules: [],
+});
 
-function saveAlertsToStorage() {
-  localStorage.setItem('tcAlerts', JSON.stringify(alertsList));
+adminStore.subscribe((nextState) => {
+  if (Array.isArray(nextState.adminUsers)) adminUsers = nextState.adminUsers;
+  if (Array.isArray(nextState.adminDepts)) adminDepts = nextState.adminDepts;
+  if (Array.isArray(nextState.adminEmployees)) adminEmployees = nextState.adminEmployees;
+  if (Array.isArray(nextState.adminSoftware)) adminSoftware = nextState.adminSoftware;
+  if (Array.isArray(nextState.alertRules)) alertsList = nextState.alertRules;
+});
+
+async function loadAlertsFromServer() {
+  const r = await authFetch('/api/admin/alerts', { requestKey: 'admin:alerts:load', cancelPrevious: true });
+  if (!r.ok) {
+    const data = await r.json().catch(() => ({}));
+    throw new Error(data.error || 'Failed to load alerts');
+  }
+  adminStore.setState({ alertRules: await r.json() }, 'admin:alerts:loaded');
+  return alertsList;
 }
 
 // ── Render all alert lists ────────────────────────────────────────────────────
@@ -3059,28 +3103,58 @@ function updateAlertStats() {
 }
 
 // ── Toggle enabled ────────────────────────────────────────────────────────────
-function toggleAlertEnabled(id, enabled) {
+async function toggleAlertEnabled(id, enabled) {
   const alert = alertsList.find(a => a.id === id);
   if (!alert) return;
-  alert.enabled = enabled;
-  saveAlertsToStorage();
-  // Update card border without full re-render
-  const card = document.getElementById('alertCard-' + id);
-  if (card) {
-    card.classList.toggle('alert-enabled', enabled);
-    card.title = '';
+  try {
+    const payload = {
+      name: alert.name,
+      category: alert.category,
+      condition: alert.condition,
+      threshold: alert.threshold,
+      description: alert.description || '',
+      channels: Array.isArray(alert.channels) ? alert.channels : ['inApp'],
+      enabled,
+    };
+    const r = await authFetch(`/api/admin/alerts/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to update alert');
+    }
+    const updated = await r.json();
+    const index = alertsList.findIndex(a => a.id === id);
+    if (index !== -1) alertsList[index] = updated;
+    const card = document.getElementById('alertCard-' + id);
+    if (card) {
+      card.classList.toggle('alert-enabled', enabled);
+      card.title = '';
+    }
+    updateAlertStats();
+    showToast(enabled ? 'Alert enabled' : 'Alert disabled');
+  } catch (error) {
+    showToast(error.message || 'Failed to update alert', 'danger');
+    renderAlerts();
   }
-  updateAlertStats();
-  showToast(enabled ? '🔔 Alert enabled' : '🔕 Alert disabled');
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
-function deleteAlert(id) {
+async function deleteAlert(id) {
   if (!confirm('Delete this alert? This cannot be undone.')) return;
-  alertsList = alertsList.filter(a => a.id !== id);
-  saveAlertsToStorage();
-  renderAlerts();
-  showToast('Alert deleted');
+  try {
+    const r = await authFetch(`/api/admin/alerts/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to delete alert');
+    }
+    alertsList = alertsList.filter(a => a.id !== id);
+    renderAlerts();
+    showToast('Alert deleted');
+  } catch (error) {
+    showToast(error.message || 'Failed to delete alert', 'danger');
+  }
 }
 
 // ── Modal open/close ─────────────────────────────────────────────────────────
@@ -3181,7 +3255,7 @@ function syncChannelPills() {
 }
 
 // ── Save alert ────────────────────────────────────────────────────────────────
-function saveAlert() {
+async function saveAlert() {
   const name     = document.getElementById('aName').value.trim();
   const category = document.getElementById('aCategory').value;
   const condition= document.getElementById('aCondition').value;
@@ -3202,27 +3276,47 @@ function saveAlert() {
     if (isNaN(threshold) || threshold < 0) { errEl.textContent = 'Please enter a valid threshold value.'; return; }
   }
 
-  if (alertEditingId) {
-    const idx = alertsList.findIndex(a => a.id === alertEditingId);
-    if (idx !== -1) {
-      alertsList[idx] = { ...alertsList[idx], name, category, condition, threshold, description: desc, channels: [...alertChannels], enabled };
+  const payload = {
+    name,
+    category,
+    condition,
+    threshold,
+    description: desc,
+    channels: [...alertChannels],
+    enabled,
+  };
+  try {
+    if (alertEditingId) {
+      const r = await authFetch(`/api/admin/alerts/${encodeURIComponent(alertEditingId)}`, {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to update alert');
+      }
+      const updated = await r.json();
+      const idx = alertsList.findIndex(a => a.id === alertEditingId);
+      if (idx !== -1) alertsList[idx] = updated;
+      showToast('Alert updated');
+    } else {
+      const r = await authFetch('/api/admin/alerts', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to create alert');
+      }
+      const created = await r.json();
+      alertsList.unshift(created);
+      showToast('Alert created');
     }
-    showToast('Alert updated');
-  } else {
-    alertsList.push({
-      id: 'alrt_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-      name, category, condition, threshold,
-      description: desc,
-      channels: [...alertChannels],
-      enabled,
-      createdAt: new Date().toISOString(),
-    });
-    showToast('🔔 Alert created');
+    closeAlertModal();
+    renderAlerts();
+  } catch (error) {
+    errEl.textContent = error.message || 'Failed to save alert';
   }
-
-  saveAlertsToStorage();
-  closeAlertModal();
-  renderAlerts();
 }
 
 // Initialise alerts badge on page load

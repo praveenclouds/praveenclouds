@@ -18,7 +18,7 @@ async function loadEmailSettings() {
     smtpUser: String(settings?.smtpUser || '').trim(),
     smtpPass: String(settings?.smtpPass || '').trim(),
     fromEmail: String(settings?.fromEmail || '').trim(),
-    fromName: String(settings?.fromName || 'TerzoCloud Support').trim(),
+    fromName: String(settings?.fromName || 'Terzo Support').trim(),
     appBaseUrl: sanitizeBaseUrl(settings?.appBaseUrl || process.env.APP_BASE_URL || `http://localhost:${PORT}`),
   };
 }

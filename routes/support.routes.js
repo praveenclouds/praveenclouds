@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 function escapeRegex(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-const { SupportRequest, Log } = require('../db');
+const { SupportRequest, SupportRequestType, Log } = require('../db');
 const { requireAuth, canWrite, requirePermission, onlySuperAdmin } = require('../middleware/auth');
 const { JWT_SECRET } = require('../config');
 const {
@@ -35,12 +35,32 @@ const { hashToken, notifySupportRequestChanges } = require('../services/support-
 const { postSupportRequestUpdateMessage } = require('../services/support-slack-thread.service');
 const rateLimit = require('express-rate-limit');
 
-const DEFAULT_SLA_POLICY = Object.freeze({
+const DEFAULT_SLA_POLICY = SupportRequestType.DEFAULT_SLA_POLICY || Object.freeze({
   enabled: true,
   responseMinutes: 60,
   resolutionMinutes: 480,
   atRiskPercent: 80,
+  priorityResponseMinutes: { low: 120, medium: 60, high: 30 },
+  priorityResolutionMinutes: { low: 120, medium: 60, high: 30 },
+  breachReminderMinutes: 10,
+  notifyAtRisk: true,
+  notifyOnBreach: true,
+  autoEscalateOnBreach: true,
 });
+const normalizePriority = SupportRequestType.normalizePriority
+  || (value => {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'critical') return 'high';
+    return ['low', 'medium', 'high'].includes(normalized) ? normalized : 'medium';
+  });
+const getSlaMinutesForPriority = SupportRequestType.getSlaMinutesForPriority
+  || ((policy = {}, priority = 'medium', kind = 'resolution') => {
+    const normalized = normalizePriority(priority);
+    if (kind === 'response') {
+      return Number(policy?.priorityResponseMinutes?.[normalized] || policy?.responseMinutes || 60);
+    }
+    return Number(policy?.priorityResolutionMinutes?.[normalized] || policy?.resolutionMinutes || 480);
+  });
 
 // Prevent brute-force guessing of approval tokens: max 10 attempts per 15 min per IP.
 const approvalRateLimiter = rateLimit({
@@ -69,6 +89,20 @@ function normalizeSlaPolicySnapshot(input = {}) {
     responseMinutes: toInt(policy.responseMinutes, DEFAULT_SLA_POLICY.responseMinutes, 1, 43200),
     resolutionMinutes: toInt(policy.resolutionMinutes, DEFAULT_SLA_POLICY.resolutionMinutes, 1, 43200),
     atRiskPercent: toInt(policy.atRiskPercent, DEFAULT_SLA_POLICY.atRiskPercent, 1, 99),
+    priorityResponseMinutes: {
+      low: toInt(policy?.priorityResponseMinutes?.low, DEFAULT_SLA_POLICY?.priorityResponseMinutes?.low || 120, 1, 43200),
+      medium: toInt(policy?.priorityResponseMinutes?.medium, DEFAULT_SLA_POLICY?.priorityResponseMinutes?.medium || 60, 1, 43200),
+      high: toInt(policy?.priorityResponseMinutes?.high, DEFAULT_SLA_POLICY?.priorityResponseMinutes?.high || 30, 1, 43200),
+    },
+    priorityResolutionMinutes: {
+      low: toInt(policy?.priorityResolutionMinutes?.low, DEFAULT_SLA_POLICY?.priorityResolutionMinutes?.low || 120, 1, 43200),
+      medium: toInt(policy?.priorityResolutionMinutes?.medium, DEFAULT_SLA_POLICY?.priorityResolutionMinutes?.medium || 60, 1, 43200),
+      high: toInt(policy?.priorityResolutionMinutes?.high, DEFAULT_SLA_POLICY?.priorityResolutionMinutes?.high || 30, 1, 43200),
+    },
+    breachReminderMinutes: toInt(policy.breachReminderMinutes, DEFAULT_SLA_POLICY?.breachReminderMinutes || 10, 1, 1440),
+    notifyAtRisk: policy.notifyAtRisk !== false,
+    notifyOnBreach: policy.notifyOnBreach !== false,
+    autoEscalateOnBreach: policy.autoEscalateOnBreach !== false,
   };
 }
 
@@ -76,6 +110,7 @@ function deriveSlaPayload(request = {}) {
   const now = new Date();
   const policy = normalizeSlaPolicySnapshot(request.slaPolicySnapshot || {});
   const createdAt = toDateOrNull(request.createdAt) || now;
+  const priority = normalizePriority(request.priority);
   const firstResponseAt = toDateOrNull(request.firstResponseAt);
   const resolvedAt = toDateOrNull(request.resolvedAt);
 
@@ -91,10 +126,12 @@ function deriveSlaPayload(request = {}) {
     };
   }
 
+  const responseMinutes = getSlaMinutesForPriority(policy, priority, 'response');
+  const resolutionMinutes = getSlaMinutesForPriority(policy, priority, 'resolution');
   const slaResponseDueAt = toDateOrNull(request.slaResponseDueAt)
-    || new Date(createdAt.getTime() + (policy.responseMinutes * 60 * 1000));
+    || new Date(createdAt.getTime() + (responseMinutes * 60 * 1000));
   const slaResolutionDueAt = toDateOrNull(request.slaResolutionDueAt)
-    || new Date(createdAt.getTime() + (policy.resolutionMinutes * 60 * 1000));
+    || new Date(createdAt.getTime() + (resolutionMinutes * 60 * 1000));
 
   let slaStatus = String(request.slaStatus || '').trim();
   const validStatuses = new Set(['on_track', 'at_risk', 'breached', 'met', 'paused', 'no_sla']);
@@ -171,6 +208,10 @@ function fmtSupportRequest(doc) {
     slaResolutionDueAt: sla.slaResolutionDueAt,
     slaStatus: sla.slaStatus,
     slaBreachedAt: sla.slaBreachedAt,
+    slaNotifiedAtRiskAt: o.slaNotifiedAtRiskAt || null,
+    slaNotifiedBreachAt: o.slaNotifiedBreachAt || null,
+    slaLastBreachReminderAt: o.slaLastBreachReminderAt || null,
+    slaEscalatedAt: o.slaEscalatedAt || null,
     applications: Array.isArray(o.applications) ? o.applications : [],
     notes: o.notes,
     customFieldValues: Array.isArray(o.customFieldValues) ? o.customFieldValues : [],
@@ -211,7 +252,7 @@ function buildSupportRequestFilter(query = {}) {
   const filter = {};
   if (workflowType) filter.workflowType = String(workflowType).trim();
   if (status) filter.status = String(status).trim();
-  if (priority) filter.priority = String(priority).trim();
+  if (priority) filter.priority = normalizePriority(priority);
   if (slaStatus) filter.slaStatus = String(slaStatus).trim();
   if (assignee) filter.assignee = String(assignee).trim();
   if (search) {
@@ -479,6 +520,97 @@ router.get('/board', requireAuth, async (req, res) => {
   }
 });
 
+router.get('/sla-dashboard', requireAuth, async (req, res) => {
+  try {
+    const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 365);
+    const since = new Date(Date.now() - (days * 24 * 60 * 60 * 1000));
+    const filter = buildSupportRequestFilter(req.query);
+    filter.createdAt = { $gte: since };
+
+    const rows = (await SupportRequest.find(filter).sort({ createdAt: -1 })).map(fmtSupportRequest);
+    const tracked = rows.filter(item => item?.slaPolicySnapshot?.enabled !== false);
+    const completed = tracked.filter(item => String(item.status || '').toLowerCase() === 'completed');
+    const active = tracked.filter(item => !['completed', 'cancelled'].includes(String(item.status || '').toLowerCase()));
+    const metCount = completed.filter(item => item.slaStatus === 'met').length;
+    const completedBreachedCount = completed.filter(item => item.slaStatus === 'breached').length;
+    const activeAtRiskCount = active.filter(item => item.slaStatus === 'at_risk').length;
+    const activeBreachedCount = active.filter(item => item.slaStatus === 'breached').length;
+    const complianceRate = completed.length ? Math.round((metCount / completed.length) * 1000) / 10 : 100;
+
+    const resolutionSamples = completed
+      .map(item => {
+        const createdAt = toDateOrNull(item.createdAt);
+        const resolvedAt = toDateOrNull(item.resolvedAt || item.updatedAt);
+        if (!createdAt || !resolvedAt) return null;
+        return Math.max(0, Math.round((resolvedAt.getTime() - createdAt.getTime()) / 60000));
+      })
+      .filter(value => Number.isFinite(value));
+    const averageResolutionMinutes = resolutionSamples.length
+      ? Math.round(resolutionSamples.reduce((sum, value) => sum + value, 0) / resolutionSamples.length)
+      : 0;
+
+    const byPriority = ['high', 'medium', 'low'].map(priority => {
+      const priorityRows = tracked.filter(item => normalizePriority(item.priority) === priority);
+      const priorityCompleted = priorityRows.filter(item => String(item.status || '').toLowerCase() === 'completed');
+      const priorityMet = priorityCompleted.filter(item => item.slaStatus === 'met').length;
+      const priorityBreached = priorityCompleted.filter(item => item.slaStatus === 'breached').length;
+      return {
+        priority,
+        total: priorityRows.length,
+        completed: priorityCompleted.length,
+        met: priorityMet,
+        breached: priorityBreached,
+        complianceRate: priorityCompleted.length
+          ? Math.round((priorityMet / priorityCompleted.length) * 1000) / 10
+          : 100,
+      };
+    });
+
+    const lastSevenDays = Array.from({ length: 7 }).map((_, idx) => {
+      const day = new Date();
+      day.setHours(0, 0, 0, 0);
+      day.setDate(day.getDate() - (6 - idx));
+      const nextDay = new Date(day);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      const dayRows = tracked.filter(item => {
+        const createdAt = toDateOrNull(item.createdAt);
+        return createdAt && createdAt >= day && createdAt < nextDay;
+      });
+      const dayCompleted = dayRows.filter(item => String(item.status || '').toLowerCase() === 'completed');
+      const dayMet = dayCompleted.filter(item => item.slaStatus === 'met').length;
+      const dayBreached = dayCompleted.filter(item => item.slaStatus === 'breached').length;
+
+      return {
+        date: day.toISOString().slice(0, 10),
+        total: dayRows.length,
+        met: dayMet,
+        breached: dayBreached,
+      };
+    });
+
+    res.json({
+      days,
+      generatedAt: new Date().toISOString(),
+      totals: {
+        tracked: tracked.length,
+        completed: completed.length,
+        met: metCount,
+        completedBreached: completedBreachedCount,
+        active: active.length,
+        activeAtRisk: activeAtRiskCount,
+        activeBreached: activeBreachedCount,
+        complianceRate,
+        averageResolutionMinutes,
+      },
+      byPriority,
+      trend: lastSevenDays,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.get('/:id/activity', requireAuth, async (req, res) => {
   try {
     const request = await SupportRequest.findById(req.params.id).select('_id requestId');
@@ -608,7 +740,9 @@ router.put('/:id', requireAuth, canWrite, async (req, res) => {
     const body = req.body || {};
     const allowedFields = ['status', 'priority', 'department', 'jobTitle', 'location', 'startDate', 'endDate', 'notes'];
     for (const field of allowedFields) {
-      if (body[field] !== undefined) request[field] = body[field];
+      if (body[field] !== undefined) {
+        request[field] = field === 'priority' ? normalizePriority(body[field]) : body[field];
+      }
     }
     await applySupportRequestUpdates(request, body);
     ensureCompletedOnboardingProvisioningReady(request);

@@ -1,6 +1,6 @@
 /**
  * db/seed.js
- * Populates the TerzoCloud Asset Portal database with the 40 users and 42 assets
+ * Populates the Terzo Asset Portal database with the 40 users and 42 assets
  * that currently live in user-asset-portal.html.
  *
  * Run:

@@ -8,3 +8,7 @@ yarn-error.log*
 *.log
 server.js.bak
 docs
+k8s
+docker-compose*.yml
+Dockerfile.dev
+.claude

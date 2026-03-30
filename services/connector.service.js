@@ -20,7 +20,7 @@ async function syncGitHub(connector) {
   const headers = {
     Authorization:         `Bearer ${connector.apiToken}`,
     'X-GitHub-Api-Version': '2022-11-28',
-    'User-Agent':           'TerzoCloud-Portal/1.0',
+    'User-Agent':           'Terzo-Portal/1.0',
     Accept:                 'application/vnd.github+json',
   };
 

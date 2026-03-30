@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TerzoCloud – User & Asset Management Portal</title>
+  <title>Terzo – User & Asset Management Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -14,27 +15,27 @@
       --gray-400: #6b7280; --gray-600: #4b5563; --gray-700: #374151; --gray-800: #111827;
       --sidebar-w: 240px;
     }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); display: flex; height: 100vh; overflow: hidden; }
+    body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--gray-50); color: var(--gray-800); display: flex; height: 100vh; overflow: hidden; font-size: 14px; -webkit-font-smoothing: antialiased; }
 
     /* SIDEBAR */
     .sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
-    .logo { padding: 18px 18px 14px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 10px; }
-    .logo-icon { width: 34px; height: 34px; background: var(--primary); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .logo-icon svg { width: 18px; height: 18px; stroke: #fff; fill: none; }
-    .logo-text { font-size: 13px; font-weight: 700; color: var(--primary-dark); line-height: 1.2; }
-    .logo-sub { font-size: 10px; color: var(--gray-400); }
-    nav { padding: 14px 10px; flex: 1; }
-    .nav-label { font-size: 10px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: .08em; padding: 8px 8px 4px; }
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 11px; border-radius: 8px; cursor: pointer; color: var(--gray-600); font-size: 13px; font-weight: 500; transition: all .14s; margin-bottom: 1px; user-select: none; }
-    .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; }
+    .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 11px; }
+    .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .logo-text { font-size: 15px; font-weight: 700; color: var(--primary-dark); line-height: 1.2; letter-spacing: -0.01em; }
+    .logo-sub { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+    nav { padding: 16px 10px; flex: 1; }
+    .nav-label { font-size: 10px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: .06em; padding: 12px 10px 5px; opacity: 0.75; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; color: var(--gray-600); font-size: 13.5px; font-weight: 500; transition: all .14s; margin-bottom: 2px; user-select: none; }
+    .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; }
     .nav-item:hover { background: var(--gray-100); color: var(--gray-800); }
-    .nav-item.active { background: var(--primary-lighter); color: var(--primary); }
-    .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 9999px; min-width: 20px; text-align: center; }
-    .sidebar-footer { margin-top: auto; padding: 14px; border-top: 1px solid var(--gray-200); }
+    .nav-item.active { background: var(--primary-lighter); color: var(--primary); font-weight: 600; }
+    .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; min-width: 22px; text-align: center; }
+    .sidebar-footer { margin-top: auto; padding: 16px; border-top: 1px solid var(--gray-200); }
     .user-chip { display: flex; align-items: center; gap: 10px; }
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .user-info strong { display: block; color: var(--gray-800); font-size: 12.5px; }
-    .user-info span { color: var(--gray-400); font-size: 11px; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .user-info strong { display: block; color: var(--gray-800); font-size: 13px; font-weight: 600; }
+    .user-info span { color: var(--gray-400); font-size: 11.5px; }
 
     /* White theme sidebar contrast */
     body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .sidebar {
@@ -137,13 +138,13 @@
 
     /* MAIN */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { height: 60px; background: #fff; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 24px; gap: 14px; flex-shrink: 0; }
-    .topbar h1 { font-size: 17px; font-weight: 700; color: var(--gray-800); flex: 1; }
-.search-wrap { position: relative; }
-    .search-wrap input { padding: 7px 12px 7px 34px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; width: 210px; background: var(--gray-50); outline: none; transition: border .14s; }
-    .search-wrap input:focus { border-color: var(--primary-light); background: #fff; }
-    .search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; stroke: var(--gray-400); fill: none; stroke-width: 2; pointer-events: none; }
-    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .14s; white-space: nowrap; }
+    .topbar { height: 60px; background: #fff; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; padding: 0 28px; gap: 14px; flex-shrink: 0; }
+    .topbar h1 { font-size: 18px; font-weight: 700; color: var(--gray-800); flex: 1; letter-spacing: -0.01em; }
+    .search-wrap { position: relative; }
+    .search-wrap input { padding: 8px 14px 8px 36px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13.5px; width: 220px; background: var(--gray-50); outline: none; transition: border .14s; font-family: inherit; }
+    .search-wrap input:focus { border-color: var(--primary-light); background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.08); }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--gray-400); fill: none; stroke-width: 2; pointer-events: none; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; transition: all .14s; white-space: nowrap; font-family: inherit; }
     .btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2.5; }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-dark); }
@@ -151,14 +152,14 @@
     .btn-secondary:hover { background: var(--gray-200); }
     .btn-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
     .btn-danger:hover { background: #fee2e2; }
-    .btn-sm { padding: 4px 9px; font-size: 11.5px; border-radius: 6px; }
-    .btn-icon { padding: 6px; border-radius: 6px; }
-    .content { flex: 1; overflow-y: auto; padding: 22px 24px; }
+    .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+    .btn-icon { padding: 7px; border-radius: 7px; }
+    .content { flex: 1; overflow-y: auto; padding: 24px 28px; }
 
     /* STAT CARDS */
-    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 22px; }
-    .stat-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 16px 18px; display: flex; align-items: center; gap: 13px; }
-    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .stat-icon svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; }
     .stat-icon.blue { background: #f5f3ff; color: var(--primary); }
     .stat-icon.green { background: #f0fdf4; color: var(--success); }
@@ -166,8 +167,8 @@
     .stat-icon.red { background: #fef2f2; color: var(--danger); }
     .stat-icon.sky { background: #faf5ff; color: var(--accent); }
     .stat-icon.purple { background: #faf5ff; color: #9333ea; }
-    .stat-num { font-size: 26px; font-weight: 800; color: var(--gray-800); line-height: 1; }
-    .stat-label { font-size: 11.5px; color: var(--gray-400); margin-top: 2px; }
+    .stat-num { font-size: 26px; font-weight: 800; color: var(--gray-800); line-height: 1; letter-spacing: -0.02em; }
+    .stat-label { font-size: 12px; color: var(--gray-400); margin-top: 3px; }
 
     /* TABLES */
     .card { background: #fff; border: 1px solid var(--gray-200); border-radius: 12px; overflow: hidden; }
@@ -265,6 +266,11 @@
       .sidebar { display: none; }
       .form-row { grid-template-columns: 1fr; }
       .stat-grid { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 1300px) {
+      .dashboard-software-tiles { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .software-budget-grid { grid-template-columns: 1fr; }
+      .software-budget-card { min-height: 0; }
     }
 
     /* ── Structural (theme-agnostic) ── */
@@ -380,7 +386,7 @@
     body:not(.support-theme-portal) .sw-type-badge.On-premises { background:#f3e8ff; color:#7e22ce; }
     body:not(.support-theme-portal) .sw-type-badge.Freeware    { background:#dcfce7; color:#15803d; }
     body:not(.support-theme-portal) .sw-type-badge.Open-Source { background:#fef9c3; color:#a16207; }
-    .lic-bar { width:80px;height:6px;background:var(--gray-200);border-radius:3px;display:inline-block;vertical-align:middle;overflow:hidden; }
+    .lic-bar { width:80px;height:9px;background:var(--gray-200);border-radius:4px;display:block;overflow:hidden;margin-top:4px; }
     tr.row-selected td { background:#f5f3ff !important; }
     body.support-theme-portal tr.row-selected td { background:#2a1f4a !important; }
     .btn-select-mode { gap:5px; }
@@ -397,10 +403,10 @@
     body.support-theme-portal .export-drop-item { color:#ccc; }
     body.support-theme-portal .export-drop-item:hover { background:rgba(255,255,255,.05); }
     body.support-theme-portal .export-drop-item.sel-option { color:#c4b5fd; }
-    .lic-bar-fill { height:100%;border-radius:3px;transition:width .3s; }
-    .lic-bar-fill.ok      { background:#4ade80; }
-    .lic-bar-fill.warning { background:#fbbf24; }
-    .lic-bar-fill.over    { background:#f87171; }
+    .lic-bar-fill { height:100%;border-radius:4px;transition:width .3s; }
+    .lic-bar-fill.ok      { background:linear-gradient(90deg,#4ade80,#22c55e); }
+    .lic-bar-fill.warning { background:linear-gradient(90deg,#fbbf24,#f59e0b); }
+    .lic-bar-fill.over    { background:linear-gradient(90deg,#f87171,#ef4444); }
     .budget-bar-row { display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--gray-200); }
     .budget-bar-row:last-child { border-bottom:none; }
     .budget-bar-label { font-size:12px;color:var(--gray-700);min-width:90px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
@@ -411,6 +417,14 @@
     .sw-budget-chip:hover { border-color:var(--primary); }
     .sw-budget-chip .chip-val { font-size:18px;font-weight:800;color:var(--primary);display:block;line-height:1.1; }
     .sw-budget-chip .chip-lbl { font-size:11px;color:var(--gray-400);font-weight:400; }
+    .dashboard-software-tiles { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px; }
+    .software-budget-grid { display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:14px;align-items:stretch;margin-bottom:4px; }
+    .software-budget-card { min-height:300px;display:flex;flex-direction:column; }
+    .software-budget-grid .card-header { padding:12px 14px; }
+    .software-budget-grid .card-title { font-size:15px; }
+    .software-budget-body { flex:1;padding:6px 14px 12px; }
+    .software-budget-grid .budget-bar-label { min-width:116px; }
+    .software-budget-grid .budget-bar-cost { min-width:72px; }
 
     /* ── Software Detail Drawer ── */
     /* ── SW App Detail Modal ── */
@@ -721,6 +735,32 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     }
     .notif-bell-btn .bell-badge.show { display: flex; }
 
+    /* ── Theme Toggle Switch ── */
+    .theme-toggle-switch { display:flex; align-items:center; gap:7px; cursor:pointer; user-select:none; }
+    .theme-toggle-switch input[type="checkbox"] { display:none; }
+    .theme-toggle-track {
+      position:relative; width:46px; height:26px;
+      background:#cbd5e1; border-radius:99px;
+      transition:background .25s;
+      box-shadow:inset 0 1px 3px rgba(0,0,0,.15);
+    }
+    .theme-toggle-switch input:checked + .theme-toggle-track { background:#7c3aed; }
+    .theme-toggle-thumb {
+      position:absolute; top:3px; left:3px;
+      width:20px; height:20px; border-radius:50%;
+      background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.2);
+      transition:transform .25s cubic-bezier(.4,0,.2,1);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .theme-toggle-switch input:checked + .theme-toggle-track .theme-toggle-thumb {
+      transform:translateX(20px);
+    }
+    .theme-toggle-thumb svg { width:11px; height:11px; stroke-width:2.5; }
+    .theme-toggle-label { font-size:11.5px; font-weight:600; color:var(--gray-500); letter-spacing:.01em; white-space:nowrap; }
+    body.support-theme-portal .theme-toggle-track { background:#4b2d8f; }
+    body.support-theme-portal .theme-toggle-switch input:checked + .theme-toggle-track { background:#a855f7; }
+    body.support-theme-portal .theme-toggle-label { color:#a0aec0; }
+
     /* ── NOTIFICATION SECTION — inline at top of dashboard ── */
     .notif-section {
       display: none; margin-bottom: 20px;
@@ -822,12 +862,13 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     body.support-theme-portal .notif-dismiss:hover  { background: rgba(248,113,113,.12); color: #f87171; }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
+  <script src="/portal-api-client.js"></script>
 </head>
 <body>
 <script>
   (function(){
     var t = localStorage.getItem('portalTheme');
-    if (!t || t === 'dark') {
+    if (!t) {
       t = 'light';
       localStorage.setItem('portalTheme', t);
     }
@@ -841,10 +882,10 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
 <aside class="sidebar">
   <div class="logo">
     <div class="logo-icon">
-      <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      <svg viewBox="0 0 64 64"><path d="M32 4L4 56h16l12-28 12 28h16L32 4z" /><rect x="18" y="38" width="28" height="8" rx="2" opacity=".5"/></svg>
     </div>
     <div>
-      <div class="logo-text">TerzoCloud</div>
+      <div class="logo-text">Terzo</div>
       <div class="logo-sub">Asset Management Portal</div>
     </div>
   </div>
@@ -925,9 +966,10 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
 <div class="main">
   <div class="topbar">
     <h1 id="pageTitle">Dashboard</h1>
-    <div class="search-wrap">
+    <div class="search-wrap" style="position:relative">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="globalSearch" placeholder="Search…" oninput="handleSearch(this.value)">
+      <input type="text" id="globalSearch" placeholder="Search… (/ to focus)" oninput="handleSearch(this.value)" title="Press / to quickly focus search">
+      <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--gray-400);background:var(--gray-100);padding:2px 5px;border-radius:4px;pointer-events:none;font-family:monospace">/</span>
     </div>
 
     <!-- ── Notification Bell ── -->
@@ -935,9 +977,18 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="bell-badge" id="notifBadge">0</span>
     </button>
-    <button class="notif-bell-btn" id="themeToggleBtn" onclick="togglePortalTheme()" title="Toggle theme">
-      <span style="font-size:16px;line-height:1">🌙</span>
-    </button>
+    <label class="theme-toggle-switch" title="Toggle dark / light mode">
+      <input type="checkbox" id="themeToggleCheck" onchange="togglePortalTheme()">
+      <span class="theme-toggle-track">
+        <span class="theme-toggle-thumb">
+          <svg id="themeIconMoon" viewBox="0 0 24 24" style="stroke:#94a3b8;fill:none;display:block"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg id="themeIconSun" viewBox="0 0 24 24" style="stroke:#7c3aed;fill:none;display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </span>
+      </span>
+      <span class="theme-toggle-label" id="themeToggleLabel">Light</span>
+    </label>
+
+    <button class="notif-bell-btn" onclick="_showKeyboardShortcuts()" title="Keyboard shortcuts (?)" style="font-size:13px;font-weight:600;font-family:monospace;color:var(--gray-400)">?</button>
 
     <button class="btn btn-primary rbac-write" id="addBtn" onclick="openAddModal()" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
@@ -979,20 +1030,20 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         <div class="dept-grid" id="deptGrid"></div>
       </div>
       <!-- SOFTWARE STAT TILES -->
-      <div id="swDashTiles" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px"></div>
+      <div id="swDashTiles" class="dashboard-software-tiles"></div>
 
       <!-- SOFTWARE BUDGET OVERVIEW -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px" id="softwareBudgetSection">
-        <div class="card">
+      <div id="softwareBudgetSection" class="software-budget-grid">
+        <div class="card software-budget-card">
           <div class="card-header">
             <div class="card-title">💰 Software Budget — Top Spends</div>
             <div style="font-size:11px;color:var(--gray-400)" id="budgetTotalLabel"></div>
           </div>
-          <div id="topAppsWidget"></div>
+          <div id="topAppsWidget" class="software-budget-body"></div>
         </div>
-        <div class="card">
+        <div class="card software-budget-card">
           <div class="card-header"><div class="card-title">📊 Budget Breakdown</div></div>
-          <div id="budgetBreakdownWidget" style="padding:4px 0"></div>
+          <div id="budgetBreakdownWidget" class="software-budget-body"></div>
         </div>
       </div>
     </div>
@@ -1181,6 +1232,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <div class="adv-field"><label>Assigned User</label><input type="text" id="advAssetUser" placeholder="User name…" oninput="renderAssets()"></div>
           <button class="btn btn-secondary btn-sm" onclick="clearAdvSearch('assets')" style="align-self:flex-end">✕ Clear</button>
         </div>
+        <div id="assetCompletenessBar" style="margin:0 0 12px 0;display:none"></div>
         <table>
           <thead id="assetTableHead"></thead>
           <tbody id="assetTableBody"></tbody>
@@ -1399,8 +1451,9 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <select id="userLocation"><option>India</option><option>USA</option><option>Canada</option></select>
         </div>
         <div class="form-group"><label>Status</label>
-          <select id="userStatus"><option>Active</option><option>Inactive</option></select>
+          <select id="userStatus" onchange="toggleUserLastWorkingDateInput()"><option>Active</option><option>Inactive</option></select>
         </div>
+        <div class="form-group"><label>Last Working Date</label><input type="date" id="userLastWorkingDate"></div>
         <div class="form-group"><label>Job Title</label><input type="text" id="userJobTitle" placeholder="e.g. Software Engineer III"></div>
         <div class="form-group"><label>Phone</label><input type="text" id="userPhone" placeholder="+91 …"></div>
         <div class="form-group" style="grid-column:1/-1"><label>Reporting Manager</label><select id="userReportingManager"></select></div>
@@ -1644,33 +1697,104 @@ const _tcToken = () => localStorage.getItem('tcToken');
 
 function authFetch(url, opts = {}) {
   const t = _tcToken();
-  return fetch(url, {
+  const h = {
+    'Content-Type': 'application/json',
+    ...(opts.headers || {}),
+    ...(t ? { 'Authorization': 'Bearer ' + t } : {}),
+  };
+  return window.tcApi.request(url, {
     ...opts,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(opts.headers || {}),
-      ...(t ? { 'Authorization': 'Bearer ' + t } : {}),
-    },
+    headers: h,
+    timeoutMs: 30000,
+    retries: 2,
+    cancelPrevious: !!opts.cancelPrevious,
+    cancelKey: opts.requestKey || '',
+    dedupeKey: opts.requestKey || '',
   });
 }
 
+function validateApiResponse(data, requiredFields) {
+  if (!data || typeof data !== 'object') throw new Error('Invalid API response format');
+  for (const f of requiredFields) {
+    if (data[f] === undefined) console.warn(`API response missing expected field: ${f}`);
+  }
+  return data;
+}
+
+function _applyThemeUI(theme) {
+  // Icons inside thumb
+  var moon = document.getElementById('themeIconMoon');
+  var sun  = document.getElementById('themeIconSun');
+  if (moon) moon.style.display = theme === 'dark' ? 'none' : 'block';
+  if (sun)  sun.style.display  = theme === 'dark' ? 'block' : 'none';
+  // Toggle checkbox state
+  var chk = document.getElementById('themeToggleCheck');
+  if (chk) chk.checked = (theme === 'dark');
+  // Label text
+  var lbl = document.getElementById('themeToggleLabel');
+  if (lbl) lbl.textContent = theme === 'dark' ? 'Dark' : 'Light';
+}
+
 function togglePortalTheme() {
-  var current = localStorage.getItem('portalTheme') || 'light';
-  var next    = current === 'dark' ? 'light' : 'dark';
+  var next = document.getElementById('themeToggleCheck')?.checked ? 'dark' : 'light';
   localStorage.setItem('portalTheme', next);
   document.body.className = next === 'light' ? 'support-theme' : 'support-theme support-theme-portal';
   document.documentElement.setAttribute('data-theme', next);
   document.body.setAttribute('data-portal-theme', next === 'light' ? 'white' : 'dark');
-  var btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.textContent = next === 'light' ? '☀️' : '🌙';
+  _applyThemeUI(next);
 }
 
-// Set correct icon on load
+// Set correct toggle state on load
 document.addEventListener('DOMContentLoaded', function(){
-  var t   = localStorage.getItem('portalTheme') || 'light';
-  var btn = document.getElementById('themeToggleBtn');
-  if (btn) btn.textContent = t === 'light' ? '☀️' : '🌙';
+  var t = localStorage.getItem('portalTheme') || 'light';
+  _applyThemeUI(t);
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e){
+    const tag = document.activeElement.tagName;
+    const isInput = tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||document.activeElement.isContentEditable;
+    // Press "/" to focus search (when not already in an input)
+    if (e.key==='/' && !isInput) {
+      e.preventDefault();
+      const s = document.getElementById('globalSearch');
+      if(s){ s.focus(); s.select(); }
+    }
+    // Press Escape to clear search and blur
+    if (e.key==='Escape' && document.activeElement.id==='globalSearch') {
+      document.getElementById('globalSearch').value='';
+      handleSearch('');
+      document.getElementById('globalSearch').blur();
+    }
+    // Press "?" to show keyboard shortcuts
+    if (e.key==='?' && !isInput) {
+      e.preventDefault();
+      _showKeyboardShortcuts();
+    }
+  });
 });
+
+function _showKeyboardShortcuts(){
+  var existing = document.getElementById('_kbShortcutsModal');
+  if(existing){ existing.remove(); return; }
+  var modal = document.createElement('div');
+  modal.id = '_kbShortcutsModal';
+  modal.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.18);padding:28px 32px;min-width:320px;max-width:420px';
+  modal.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <strong style="font-size:15px;color:#111827">Keyboard Shortcuts</strong>
+      <button onclick="document.getElementById('_kbShortcutsModal').remove()" style="border:none;background:none;cursor:pointer;font-size:18px;color:#6b7280;line-height:1">×</button>
+    </div>
+    ${[['/', 'Focus search bar'],['Esc','Clear & close search'],['?','Show this help']].map(([k,d])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f1f5f9">
+        <span style="font-size:13px;color:#374151">${d}</span>
+        <kbd style="font-family:monospace;font-size:12px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:5px;padding:3px 8px;color:#374151">${k}</kbd>
+      </div>`).join('')}
+    <div style="margin-top:14px;font-size:11px;color:#9ca3af">Press <kbd style="font-family:monospace;background:#f1f5f9;border:1px solid #d1d5db;border-radius:4px;padding:1px 5px">?</kbd> again to close</div>
+  `;
+  document.body.appendChild(modal);
+  // close on outside click
+  setTimeout(()=>{ document.addEventListener('click', function _kbClose(e){ if(!modal.contains(e.target)){ modal.remove(); document.removeEventListener('click',_kbClose); } }); }, 0);
+}
 
 function signOut() {
   localStorage.removeItem('tcToken');
@@ -1685,7 +1809,7 @@ async function initAuth() {
   const t = _tcToken();
   if (!t) { location.href = '/login'; return false; }
   try {
-    const r = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + t } });
+    const r = await authFetch('/api/auth/me', { requestKey: 'portal:auth:me', cancelPrevious: true });
     if (!r.ok) { localStorage.removeItem('tcToken'); location.href = '/login'; return false; }
     portalUser = await r.json();
     applyRBACUI();
@@ -1903,25 +2027,76 @@ document.addEventListener('click', function(e){
 let users = [];
 let assets = [];
 let software = [];
+let supportRequests = [];
 let appConnectors = [];   // SCIM app connector configs from /api/admin/connectors
+let departmentsMgmt = []; // [{id,name}]
+let alertRules = [];      // [{id,name,category,condition,...}]
+let departmentsLoaded = false;
+let departmentsLoadInFlight = null;
+let alertRulesLoaded = false;
+let alertRulesLoadInFlight = null;
+let alertRulesLoadedAt = 0;
+const ALERT_RULE_CACHE_MS = 30_000;
 const API = window.location.origin + '/api';
+
+const portalStore = window.tcApi.createStore({
+  users: [],
+  assets: [],
+  software: [],
+  supportRequests: [],
+  departments: [],
+  alertRules: [],
+});
+
+portalStore.subscribe((nextState) => {
+  if (Array.isArray(nextState.users)) users = nextState.users;
+  if (Array.isArray(nextState.assets)) assets = nextState.assets;
+  if (Array.isArray(nextState.software)) software = nextState.software;
+  if (Array.isArray(nextState.supportRequests)) supportRequests = nextState.supportRequests;
+  if (Array.isArray(nextState.departments)) departmentsMgmt = nextState.departments;
+  if (Array.isArray(nextState.alertRules)) alertRules = nextState.alertRules;
+});
 
 async function loadData(){
   try {
-    const safeFetch = url => authFetch(url).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).catch(()=>null);
-    const [us, as, sw] = await Promise.all([
-      authFetch(`${API}/users?includeInactive=true`).then(r=>r.json()),
-      authFetch(`${API}/assets`).then(r=>r.json()),
-      safeFetch(`${API}/software`),
+    const safeFetch = (url, requestKey) => authFetch(url, {
+      requestKey,
+      cancelPrevious: true,
+    }).then(r=>{ if(!r.ok) throw new Error(r.status); return r.json(); }).catch(()=>null);
+    const [us, as, sw, sr, deptRows, alertRows] = await Promise.all([
+      authFetch(`${API}/users?includeInactive=true`, { requestKey: 'portal:users:load', cancelPrevious: true }).then(r=>r.json()),
+      authFetch(`${API}/assets`, { requestKey: 'portal:assets:load', cancelPrevious: true }).then(r=>r.json()),
+      safeFetch(`${API}/software`, 'portal:software:load'),
+      safeFetch(`${API}/support`, 'portal:support:load'),
+      safeFetch(`${API}/admin/departments`, 'portal:departments:bootstrap'),
+      safeFetch(`${API}/admin/alerts`, 'portal:alerts:bootstrap'),
     ]);
-    users    = us;
-    software = (sw || []).map(item => ({
+    const nextUsers = Array.isArray(us) ? us : [];
+    const nextSoftware = (sw || []).map(item => ({
       ...item,
       department: normalizeSoftwareDepartmentValue(item?.department),
     }));
-    assets = as.map(a=>({...a, assignTo: a.assignedTo||''}));
+    const nextSupportRequests = Array.isArray(sr) ? sr : [];
+    const nextAssets = (as || []).map(a=>({...a, assignTo: a.assignedTo||''}));
+    const nextDepartments = Array.isArray(deptRows) ? deptRows : departmentsMgmt;
+    const nextAlertRules = Array.isArray(alertRows) ? alertRows : alertRules;
+
+    departmentsLoaded = departmentsLoaded || Array.isArray(deptRows);
+    if (Array.isArray(alertRows)) {
+      alertRulesLoaded = true;
+      alertRulesLoadedAt = Date.now();
+    }
+    portalStore.setState({
+      users: nextUsers,
+      assets: nextAssets,
+      software: nextSoftware,
+      supportRequests: nextSupportRequests,
+      departments: nextDepartments,
+      alertRules: nextAlertRules,
+    }, 'portal:data-loaded');
+
     renderAll();
-    evaluateAlerts(); // run alert engine after data loads
+    await evaluateAlerts(); // run alert engine after data loads
   } catch(e){
     console.error('Failed to load data:', e);
     showToast('Could not connect to server','danger');
@@ -2136,7 +2311,7 @@ function navigate(page, el){
   }
   if(page==='logs') renderLogs(1);
   else if(page==='software') renderSoftware();
-  else if(page==='departments') renderDepartments();
+  else if(page==='departments') renderDepartments(true);
   else if(page==='offboarding') renderOffboarding();
   else renderAll();
 }
@@ -2145,7 +2320,7 @@ function handleSearch(v){ searchQ=v.toLowerCase(); userPage=1; assetPage=1; rend
 
 /* ══ RENDER ALL ══ */
 function renderAll(){ updateBadges(); renderDashboard(); renderUsers(); renderAssets(); renderAssignments(); populateSwAdvDropdowns(); updateDeptNavBadge(); }
-function updateDeptNavBadge(){ loadDepartmentsMgmt(); const b=document.getElementById('navDeptsCount'); if(b) b.textContent=departmentsMgmt.length; }
+function updateDeptNavBadge(){ const b=document.getElementById('navDeptsCount'); if(b) b.textContent=departmentsMgmt.length; }
 
 /* ── Populate Software Adv-Search Datalists ── */
 function populateSwAdvDropdowns(){
@@ -2176,6 +2351,27 @@ function updateBadges(){
   document.getElementById('navSoftwareCount').textContent=software.length;
   const ob=document.getElementById('navOffboardingCount');
   if(ob) ob.textContent=users.filter(u=>(u.status||'').toLowerCase()==='inactive').length;
+}
+
+function buildAssetCountByUserId(){
+  return assets.reduce((map, asset) => {
+    const uid = String(asset?.assignTo || '').trim();
+    if (!uid) return map;
+    map[uid] = (map[uid] || 0) + 1;
+    return map;
+  }, {});
+}
+
+function isPendingOffboardingUser(user, assetCountByUser = {}, today = new Date()){
+  if ((user?.status || '').toLowerCase() !== 'inactive') return false;
+  const hasAssetsToReturn = (assetCountByUser[user.id] || 0) > 0;
+  if (hasAssetsToReturn) return true;
+  if (!user?.lastWorkingDate) return false;
+  const lastWorkingDate = new Date(user.lastWorkingDate);
+  if (Number.isNaN(lastWorkingDate.getTime())) return false;
+  const d = new Date(lastWorkingDate);
+  d.setHours(0, 0, 0, 0);
+  return d >= today;
 }
 
 /* ══ DASHBOARD ══ */
@@ -2209,22 +2405,66 @@ function renderDashboard(){
   const totalLicD     = software.reduce((s,x)=>s+(x.purchasedLicenses||0),0);
   const usedLicD      = software.reduce((s,x)=>s+(x.usedLicenses||0),0);
   const licPctD       = totalLicD>0 ? Math.round(usedLicD/totalLicD*100) : 0;
+  const activeSupportRequestCount = supportRequests.filter(r => ['open','in_progress','blocked'].includes(String(r?.status || '').toLowerCase())).length;
+  const completedSupportRequestCount = supportRequests.filter(r => String(r?.status || '').toLowerCase() === 'completed').length;
 
   const activeUsers=users.filter(u=>(u.status||'').toLowerCase()!=='inactive');
+  // Extra dashboard KPI calculations
+  const today = new Date(); today.setHours(0,0,0,0);
+  const assetCountByUser = buildAssetCountByUserId();
+  const warrantyExpiring = assets.filter(a=>{ if(!a.warrantyEnd) return false; const d=Math.ceil((new Date(a.warrantyEnd)-new Date())/86400000); return d>=0&&d<=90; }).length;
+  const pendingOffboard  = users.filter(u => isPendingOffboardingUser(u, assetCountByUser, today)).length;
+
   document.getElementById('statGrid').innerHTML=`
     ${sc('blue','<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',activeUsers.length,'Total Users')}
-    ${sc('green','<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',activeUsers.filter(u=>u.status==='Active').length,'Active Users')}
+    ${sc('green','<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',activeUsers.filter(u=>(u.status||'').toLowerCase()==='active').length,'Active Users')}
     ${sc('sky','<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',assets.length,'Total Assets')}
     ${sc('blue','<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>',inUse,'Assets In-Use')}
     ${sc('green','<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',avail,'Available')}
     ${sc('purple','<rect x="2" y="3" width="20" height="14" rx="2"/><circle cx="8" cy="10" r="2"/><path d="M10 10h8"/>',Object.keys(deptCounts).length,'Departments')}
-    <div class="stat-card stat-card-alerts" id="alertStatTile" onclick="goToNotifications()" style="cursor:pointer;border-top:3px solid #f59e0b;display:none">
+    <div class="stat-card stat-card-alerts" id="alertStatTile" onclick="goToNotifications()" style="cursor:pointer;border-top:3px solid #f59e0b">
       <div class="stat-icon" id="alertStatIcon" style="background:#fffbeb;color:#f59e0b">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       </div>
       <div>
         <div class="stat-num" id="alertStatNum" style="color:#f59e0b">0</div>
         <div class="stat-label">Active Alerts</div>
+      </div>
+    </div>
+    <div class="stat-card" onclick="navigate('assets',document.querySelector('.nav-item[onclick*=assets]'))" style="cursor:pointer;border-top:3px solid ${warrantyExpiring>0?'#f59e0b':'var(--gray-200)'}">
+      <div class="stat-icon" style="background:${warrantyExpiring>0?'#fffbeb':'var(--gray-100)'};color:${warrantyExpiring>0?'#d97706':'var(--gray-400)'}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+      </div>
+      <div>
+        <div class="stat-num" style="color:${warrantyExpiring>0?'#d97706':'var(--gray-400)'}">${warrantyExpiring}</div>
+        <div class="stat-label">Warranty Expiring <span style="font-size:10px;color:var(--gray-400)">(90d)</span></div>
+      </div>
+    </div>
+    <div class="stat-card" onclick="navigate('offboarding',document.querySelector('.nav-item[onclick*=offboarding]'))" style="cursor:pointer;border-top:3px solid ${pendingOffboard>0?'#8b5cf6':'var(--gray-200)'}">
+      <div class="stat-icon" style="background:${pendingOffboard>0?'#faf5ff':'var(--gray-100)'};color:${pendingOffboard>0?'var(--primary)':'var(--gray-400)'}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 17l5-5-5-5M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>
+      </div>
+      <div>
+        <div class="stat-num" style="color:${pendingOffboard>0?'var(--primary)':'var(--gray-400)'}">${pendingOffboard}</div>
+        <div class="stat-label">Pending Offboardings</div>
+      </div>
+    </div>
+    <div class="stat-card" onclick="location.href='/support'" style="cursor:pointer;border-top:3px solid ${activeSupportRequestCount>0?'#0ea5e9':'var(--gray-200)'}">
+      <div class="stat-icon" style="background:${activeSupportRequestCount>0?'#ecfeff':'var(--gray-100)'};color:${activeSupportRequestCount>0?'#0284c7':'var(--gray-400)'}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <div class="stat-num" style="color:${activeSupportRequestCount>0?'#0284c7':'var(--gray-400)'}">${activeSupportRequestCount}</div>
+        <div class="stat-label">Active Support Requests</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-top:3px solid ${completedSupportRequestCount>0?'#22c55e':'var(--gray-200)'}">
+      <div class="stat-icon" style="background:${completedSupportRequestCount>0?'#f0fdf4':'var(--gray-100)'};color:${completedSupportRequestCount>0?'#16a34a':'var(--gray-400)'}">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <div>
+        <div class="stat-num" style="color:${completedSupportRequestCount>0?'#16a34a':'var(--gray-400)'}">${completedSupportRequestCount}</div>
+        <div class="stat-label">Completed Support Requests</div>
       </div>
     </div>
   `;
@@ -2394,6 +2634,17 @@ function renderOffboarding(){
     `${u.first} ${u.last} ${u.email} ${u.dept} ${u.jobTitle} ${u.reportingManager}`.toLowerCase().includes(searchQ)
   );
 
+  // Sort by urgency: upcoming/past last working date first, then no-date entries last
+  const today = new Date(); today.setHours(0,0,0,0);
+  list = list.slice().sort((a, b) => {
+    const da = a.lastWorkingDate ? new Date(a.lastWorkingDate) : null;
+    const db = b.lastWorkingDate ? new Date(b.lastWorkingDate) : null;
+    if (!da && !db) return 0;
+    if (!da) return 1;
+    if (!db) return -1;
+    return da - db;
+  });
+
   const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
   if(offboardPage > pages) offboardPage = pages;
   const slice = list.slice((offboardPage - 1) * PAGE_SIZE, offboardPage * PAGE_SIZE);
@@ -2402,6 +2653,7 @@ function renderOffboarding(){
   if(lbl) lbl.textContent = `(${list.length} employee${list.length !== 1 ? 's' : ''})`;
 
   const cols = [
+    { key:'status_offboard',  label:'Status' },
     { key:'name',             label:'Name' },
     { key:'email',            label:'Email' },
     { key:'jobTitle',         label:'Job Title' },
@@ -2424,7 +2676,16 @@ function renderOffboarding(){
     body.innerHTML = slice.map(u => {
       const uAssets = assets.filter(a => a.assignTo === u.id);
       return '<tr>' + cols.map(c => {
+        const lwd = u.lastWorkingDate ? new Date(u.lastWorkingDate) : null;
+        const isOverdue = lwd && lwd < today;
+        const uAssetCount = uAssets.length;
         switch(c.key){
+          case 'status_offboard': {
+            if (isOverdue && uAssetCount > 0) return `<td><span style="font-size:11px;font-weight:600;background:#fef2f2;color:#dc2626;padding:3px 8px;border-radius:20px;white-space:nowrap">⚠ Overdue</span></td>`;
+            if (isOverdue) return `<td><span style="font-size:11px;font-weight:600;background:#f0fdf4;color:#166534;padding:3px 8px;border-radius:20px;white-space:nowrap">✓ Completed</span></td>`;
+            if (uAssetCount > 0) return `<td><span style="font-size:11px;font-weight:600;background:#eff6ff;color:#1d4ed8;padding:3px 8px;border-radius:20px;white-space:nowrap">📦 Asset Return</span></td>`;
+            return `<td><span style="font-size:11px;font-weight:600;background:#f0fdf4;color:#166534;padding:3px 8px;border-radius:20px;white-space:nowrap">✓ Completed</span></td>`;
+          }
           case 'name':
             return `<td><div class="user-cell" onclick="editUser('${u.id}')" style="cursor:pointer"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div><strong style="color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${u.first} ${u.last}</strong></div></td>`;
           case 'email':
@@ -2432,7 +2693,7 @@ function renderOffboarding(){
           case 'jobTitle':
             return `<td style="color:var(--gray-600);font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${u.jobTitle||''}">${u.jobTitle||'<span style="color:var(--gray-300)">—</span>'}</td>`;
           case 'dept':
-            return `<td><span class="tag">${u.dept||'—'}</span></td>`;
+            return `<td>${u.dept ? `<span class="tag">${u.dept}</span>` : '<span style="color:var(--gray-300);font-size:11px">No dept</span>'}</td>`;
           case 'reportingManager':
             return `<td style="color:var(--gray-600);font-size:12px;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${u.reportingManager||''}">${u.reportingManager||'<span style="color:var(--gray-300)">—</span>'}</td>`;
           case 'location':
@@ -2440,12 +2701,14 @@ function renderOffboarding(){
           case 'employmentType':
             return `<td style="color:var(--gray-600);font-size:12px">${u.employmentType||'—'}</td>`;
           case 'lastWorkingDate': {
-            const d = u.lastWorkingDate ? new Date(u.lastWorkingDate) : null;
-            const fmt = d ? d.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            const fmt = lwd ? lwd.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            if (isOverdue) return `<td><span style="font-size:11px;background:#fef2f2;color:#dc2626;padding:2px 6px;border-radius:4px;font-weight:600;white-space:nowrap">⚠ ${fmt}</span></td>`;
+            const daysLeft = lwd ? Math.ceil((lwd - today) / 86400000) : null;
+            if (daysLeft !== null && daysLeft <= 7) return `<td><span style="font-size:11px;background:#fffbeb;color:#d97706;padding:2px 6px;border-radius:4px;font-weight:600;white-space:nowrap">⏰ ${fmt}</span></td>`;
             return `<td style="color:var(--gray-600);font-size:12px;white-space:nowrap">${fmt}</td>`;
           }
           case 'assets':
-            return `<td style="color:var(--gray-600)">${uAssets.length ? `<span class="tag" style="background:#fef2f2;color:#dc2626">${uAssets.length} to return</span>` : '<span style="color:var(--gray-400)">—</span>'}</td>`;
+            return `<td style="color:var(--gray-600)">${uAssetCount ? `<span class="tag" style="background:#fef2f2;color:#dc2626">${uAssetCount} to return</span>` : '<span style="color:var(--gray-400)">—</span>'}</td>`;
           default:
             return `<td>${u[c.key]||'—'}</td>`;
         }
@@ -2509,6 +2772,21 @@ function renderAssets(){
   const lbl=document.getElementById('assetCountLabel');
   if(lbl) lbl.textContent=`(${list.length} of ${assets.length})`;
 
+  // Data completeness bar
+  const compBar = document.getElementById('assetCompletenessBar');
+  if(compBar && assets.length > 0){
+    const withDate = assets.filter(a=>a.purchaseDate||a.warrantyEnd).length;
+    const pct = Math.round(withDate/assets.length*100);
+    const barColor = pct>=80?'#22c55e':pct>=50?'#f59e0b':'#ef4444';
+    compBar.style.display = '';
+    compBar.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px">
+      <span style="font-size:12px;color:var(--gray-600);white-space:nowrap;font-weight:500">Asset Record Completeness</span>
+      <div style="flex:1;height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width .4s"></div></div>
+      <span style="font-size:12px;font-weight:700;color:${barColor};white-space:nowrap">${withDate}/${assets.length} <span style="color:var(--gray-400);font-weight:400">(${pct}% have dates)</span></span>
+      ${pct<100?`<span onclick="document.getElementById('assetPurchaseDate')?.focus()" style="font-size:11px;color:#a855f7;cursor:default;white-space:nowrap;font-weight:500">Click <strong>+ Add date</strong> on any row to fill gaps</span>`:''}
+    </div>`;
+  }
+
   const visCols = Object.entries(assetColVis).filter(([,c])=>c.visible);
   const colCount = visCols.length;
   const sortableKeys = new Set(['csvId','name','serial','assignTo','dept','location','status','purchaseDate','warrantyEnd']);
@@ -2547,9 +2825,9 @@ function renderAssets(){
           case 'status':   return `<td><span class="badge ${stcls}">${a.status}</span></td>`;
           case 'brand':        return `<td style="font-size:12px;color:var(--gray-600)">${a.brand||'—'}</td>`;
           case 'type':         return `<td style="font-size:12px;color:var(--gray-600)">${a.type||'—'}</td>`;
-          case 'purchaseDate': return `<td style="font-size:12px;color:var(--gray-600)">${a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—'}</td>`;
+          case 'purchaseDate': return `<td style="font-size:12px;color:var(--gray-600)">${a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : `<span onclick="editAsset('${a.id}')" style="color:#a855f7;cursor:pointer;font-size:11px;font-weight:500" title="Click to add purchase date">+ Add date</span>`}</td>`;
           case 'warrantyEnd': {
-            if (!a.warrantyEnd) return `<td style="font-size:12px;color:var(--gray-400)">—</td>`;
+            if (!a.warrantyEnd) return `<td><span onclick="editAsset('${a.id}')" style="color:#a855f7;cursor:pointer;font-size:11px;font-weight:500" title="Click to add warranty date">+ Add date</span></td>`;
             const wEnd = new Date(a.warrantyEnd);
             const today = new Date(); today.setHours(0,0,0,0);
             const diffDays = Math.ceil((wEnd - today) / 86400000);
@@ -2585,7 +2863,10 @@ function renderAssignments(){
       <td><span class="tag">${u?.dept||a.dept}</span></td>
       <td><span class="loc-tag"><svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>${a.location}</span></td>
       <td><span class="badge ${stcls}">${a.status}</span></td>
-      <td><button class="btn btn-secondary btn-sm" onclick="unassign('${a.id}')">Unassign</button></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-primary btn-sm" onclick="editAsset('${a.id}')" style="margin-right:4px" title="Change who this asset is assigned to">↔ Reassign</button>
+        <button class="btn btn-secondary btn-sm" onclick="unassign('${a.id}')">Unassign</button>
+      </td>
     </tr>`;
   }).join('');
 }
@@ -2621,6 +2902,25 @@ function showOverlay(mid){ document.getElementById('overlay').style.display='fle
 function closeModal(){ document.getElementById('overlay').style.display='none'; ['userModal','assetModal','softwareModal','confirmBox'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; }); }
 function closeModalOnOverlay(e){ if(e.target===document.getElementById('overlay')) closeModal(); }
 
+function toDateInputValue(value){
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function toggleUserLastWorkingDateInput(){
+  const statusEl = document.getElementById('userStatus');
+  const dateEl = document.getElementById('userLastWorkingDate');
+  if (!statusEl || !dateEl) return;
+  const inactive = String(statusEl.value || '').toLowerCase() === 'inactive';
+  dateEl.disabled = !inactive;
+  if (!inactive) dateEl.value = '';
+}
+
 function openUserModal(u=null){
   document.getElementById('userModalTitle').textContent=u?'Edit User':'Add User';
   document.getElementById('userId').value=u?.id||'';
@@ -2631,7 +2931,11 @@ function openUserModal(u=null){
   if (uDeptRO) uDeptRO.textContent = u ? getUserMappedDept(u) : '—';
   document.getElementById('userRole').value=u?.role||'Staff';
   document.getElementById('userLocation').value=u?.location||'India';
-  document.getElementById('userStatus').value=u?.status||'Active';
+  const _rawStatus = u?.status || 'Active';
+  const _normStatus = _rawStatus.charAt(0).toUpperCase() + _rawStatus.slice(1).toLowerCase();
+  document.getElementById('userStatus').value = _normStatus;
+  document.getElementById('userLastWorkingDate').value = toDateInputValue(u?.lastWorkingDate);
+  toggleUserLastWorkingDateInput();
   document.getElementById('userJobTitle').value=u?.jobTitle||'';
   populateReportingManagerSelect(u?.reportingManager||'');
   document.getElementById('userPhone').value=u?.phone||'';
@@ -2807,9 +3111,12 @@ async function saveUser(){
   const id=document.getElementById('userId').value;
   const reportingManagerSelect = document.getElementById('userReportingManager');
   const reportingManagerOption = reportingManagerSelect?.options?.[reportingManagerSelect.selectedIndex];
+  const statusValue = document.getElementById('userStatus').value;
+  const lastWorkingDateValue = document.getElementById('userLastWorkingDate').value;
   const data={ first,last:document.getElementById('userLast').value.trim(),email,
     role:document.getElementById('userRole').value,
-    location:document.getElementById('userLocation').value,status:document.getElementById('userStatus').value,
+    location:document.getElementById('userLocation').value,status:statusValue,
+    lastWorkingDate: statusValue === 'Inactive' ? (lastWorkingDateValue || null) : null,
     jobTitle:document.getElementById('userJobTitle').value.trim(),
     reportingManager:(reportingManagerSelect?.value || reportingManagerOption?.dataset?.legacyName || '').trim(),
     phone:document.getElementById('userPhone').value.trim() };
@@ -3322,16 +3629,22 @@ function renderSoftware(){
             return `<td style="font-size:11px;color:var(--gray-400);font-weight:600">${selectMode.software?`<input type="checkbox" class="row-cb" data-table="software" data-id="${s.id}" ${selectedSoftware.has(s.id)?'checked':''} onchange="toggleSelectRow('software','${s.id}',this.checked)">`:''} ${s.csvId}</td>`;
           case 'name':
             return `<td onclick="openSwDrawer('${s.id}')" style="cursor:pointer" title="Click to view details"><div style="font-weight:600;font-size:13px;color:var(--gray-800);text-decoration:underline;text-decoration-color:#a855f7;text-underline-offset:3px">${s.name}</div>${s.purpose?`<div style="font-size:11px;color:var(--gray-400)">${s.purpose}</div>`:''}</td>`;
-          case 'department':
-            return `<td style="font-size:12px;color:var(--gray-600)">${getSoftwareMappedDepts(s)}</td>`;
+          case 'department': {
+            const deptDisplay = getSoftwareMappedDepts(s);
+            const isBlank = !deptDisplay || deptDisplay === '—' || deptDisplay.trim() === '';
+            return `<td style="font-size:12px;color:${isBlank?'var(--gray-400)':'var(--gray-600)'}">${isBlank?'<span title="Available to all departments">🌐 Company-wide</span>':deptDisplay}</td>`;
+          }
           case 'deploymentType':
             return `<td><span class="sw-type-badge ${typeKey}">${s.deploymentType}</span></td>`;
           case 'subscriptionPlan':
             return `<td style="font-size:11.5px;color:var(--gray-600)">${s.subscriptionPlan||'—'}</td>`;
           case 'renewalPeriod':
             return `<td style="font-size:12px">${s.renewalPeriod||'—'}</td>`;
-          case 'licenses':
-            return `<td><div style="font-size:12px">${licLabel}</div>${s.purchasedLicenses>0?`<div><div class="lic-bar"><div class="lic-bar-fill ${licClass}" style="width:${Math.min(licPct*100,100)}%"></div></div></div>`:''}</td>`;
+          case 'licenses': {
+            const licPctNum = Math.round(licPct * 100);
+            const licPctColor = licClass==='over'?'#ef4444':licClass==='warning'?'#d97706':'#16a34a';
+            return `<td><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:12px;font-weight:500">${licLabel}</span>${s.purchasedLicenses>0?`<span style="font-size:10px;font-weight:700;color:${licPctColor}">${licPctNum}%</span>`:''}</div>${s.purchasedLicenses>0?`<div class="lic-bar"><div class="lic-bar-fill ${licClass}" style="width:${Math.min(licPct*100,100)}%"></div></div>`:''}</td>`;
+          }
           case 'owner':
             return `<td style="font-size:12px;color:var(--gray-600)">${s.owner||'—'}</td>`;
           case 'annualCost':
@@ -3366,7 +3679,7 @@ async function renderSoftwareBudgetWidget(){
         const pct = b.totalSpend>0 ? (a.annualCost/b.totalSpend*100).toFixed(1) : 0;
         const typeKey = a.deploymentType?.replace(' ','-')||'SAAS';
         return `<div class="budget-bar-row">
-          <div class="budget-bar-label">${i+1}. ${a.name}</div>
+          <div class="budget-bar-label">${a.name}</div>
           <div class="budget-bar-track"><div class="budget-bar-fill" style="width:${pct}%;background:${['#8b5cf6','#8b5cf6','#06b6d4','#10b981','#f59e0b'][i]}"></div></div>
           <div class="budget-bar-cost">${fmtCost(a.annualCost, a.renewalPeriod).replace(/<[^>]+>/g,'')}</div>
         </div>`;
@@ -3654,7 +3967,7 @@ async function exportSwPDF(){
     const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
     const list = filteredSoftware();
     doc.setFontSize(18); doc.setTextColor(124,58,237);
-    doc.text('TerzoCloud — Software Inventory', 14, 16);
+    doc.text('Terzo — Software Inventory', 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
     const totalSpend = list.reduce((s,x)=>s+swTotalCost(x),0);
     const paidCount  = list.filter(x=>swTotalCost(x)>0).length;
@@ -3716,9 +4029,9 @@ async function exportUserPDF(){
     const doc = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
     const list = filteredUsers();
     doc.setFontSize(18); doc.setTextColor(124,58,237);
-    doc.text('TerzoCloud — User Management', 14, 16);
+    doc.text('Terzo — User Management', 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
-    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}   |   Users: ${list.length}   |   Active: ${list.filter(u=>u.status==='Active').length}`, 14, 23);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}   |   Users: ${list.length}   |   Active: ${list.filter(u=>(u.status||'').toLowerCase()==='active').length}`, 14, 23);
     doc.autoTable({
       startY: 28,
       head: [['Name','Email','Department','Job Title','Reporting Manager','Role','Location','Status','Assets']],
@@ -3772,7 +4085,7 @@ async function exportAssetPDF(){
     const list = filteredAssets();
     const inUse = list.filter(a=>a.status==='In-Use').length;
     doc.setFontSize(18); doc.setTextColor(124,58,237);
-    doc.text('TerzoCloud — Device Inventory', 14, 16);
+    doc.text('Terzo — Device Inventory', 14, 16);
     doc.setFontSize(9); doc.setTextColor(100,116,139);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}   |   Assets: ${list.length}   |   In-Use: ${inUse}`, 14, 23);
     doc.autoTable({
@@ -4375,7 +4688,7 @@ function swdeDeleteApp(){
 const EXPORT_DEFS = {
   users: {
     title: 'Users',
-    pdfTitle: 'TerzoCloud — User Management',
+    pdfTitle: 'Terzo — User Management',
     filename: () => `users-${new Date().toISOString().slice(0,10)}`,
     getList: () => filteredUsers(),
     cols: [
@@ -4400,7 +4713,7 @@ const EXPORT_DEFS = {
   },
   assets: {
     title: 'Devices',
-    pdfTitle: 'TerzoCloud — Device Inventory',
+    pdfTitle: 'Terzo — Device Inventory',
     filename: () => `assets-${new Date().toISOString().slice(0,10)}`,
     getList: () => filteredAssets(),
     cols: [
@@ -4420,7 +4733,7 @@ const EXPORT_DEFS = {
   },
   software: {
     title: 'Software',
-    pdfTitle: 'TerzoCloud — Software Inventory',
+    pdfTitle: 'Terzo — Software Inventory',
     filename: () => `software-${new Date().toISOString().slice(0,10)}`,
     getList: () => filteredSoftware(),
     cols: [
@@ -4520,7 +4833,9 @@ function doExportConfig(format){
   if(!activeCols.length){ showToast('Select at least one column','danger'); return; }
   const selSet = _selSet(section);
   let list = def.getList();
-  if(exportSelectionOnly && selSet.size > 0) list = list.filter(r => selSet.has(r.id));
+  if(exportSelectionOnly && selSet.size > 0) {
+    list = list.filter(r => selSet.has(r.id) || selSet.has(String(r.id)) || selSet.has(r._id) || selSet.has(String(r._id)));
+  }
   exportSelectionOnly = false;
   if(format === 'csv'){
     const headers = activeCols.map(c=>c.label);
@@ -4622,36 +4937,40 @@ function exportUsersByApp(){
 
 /* ══════════════════════════════════════════════════════════════
    DEPARTMENT MANAGEMENT
-   Departments are stored in localStorage ('tcDepartments').
-   On first load the list is seeded from unique user.dept values.
+   Departments are stored in MongoDB via /api/admin/departments.
    Software mapping is saved back to the /api/software/:id endpoint.
 ══════════════════════════════════════════════════════════════ */
-let departmentsMgmt = [];   // [{id, name}]
 let deptDetailCurrentId = null;
 let deptNameModalMode = null; // 'add' | 'edit'
 let deptNameModalId   = null;
-const DEPT_STORE_KEY  = 'tcDepartments';
 
-/* ── Persistence ── */
-function loadDepartmentsMgmt() {
-  try {
-    const raw = localStorage.getItem(DEPT_STORE_KEY);
-    departmentsMgmt = raw ? JSON.parse(raw) : [];
-  } catch(e) { departmentsMgmt = []; }
-  // Seed from user dept values for any new dept not yet in the list
-  const existing = new Set(departmentsMgmt.map(d => d.name.toLowerCase()));
-  users.forEach(u => {
-    const d = (u.dept || '').trim();
-    if (d && !existing.has(d.toLowerCase())) {
-      departmentsMgmt.push({ id: 'dept-' + Date.now() + '-' + Math.random().toString(36).slice(2), name: d });
-      existing.add(d.toLowerCase());
+async function loadDepartmentsMgmt(options = {}) {
+  const force = !!options.force;
+  if (!force && departmentsLoaded) return departmentsMgmt;
+  if (!force && departmentsLoadInFlight) return departmentsLoadInFlight;
+
+  departmentsLoadInFlight = (async () => {
+    const resp = await authFetch(`${API}/admin/departments`, {
+      requestKey: 'portal:departments:load',
+      cancelPrevious: true,
+    });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to load departments');
     }
-  });
-  saveDepartmentsMgmt();
-}
+    const rows = await resp.json();
+    const nextDepartments = Array.isArray(rows) ? rows : [];
+    departmentsLoaded = true;
+    portalStore.setState({ departments: nextDepartments }, 'departments:loaded');
+    updateDeptNavBadge();
+    return departmentsMgmt;
+  })();
 
-function saveDepartmentsMgmt() {
-  localStorage.setItem(DEPT_STORE_KEY, JSON.stringify(departmentsMgmt));
+  try {
+    return await departmentsLoadInFlight;
+  } finally {
+    departmentsLoadInFlight = null;
+  }
 }
 
 /* ── Helpers ── */
@@ -4667,8 +4986,12 @@ function getDeptSoftwareMapped(name) {
 }
 
 /* ── Render Departments Table ── */
-function renderDepartments() {
-  loadDepartmentsMgmt();
+async function renderDepartments(forceRefresh = false) {
+  try {
+    await loadDepartmentsMgmt({ force: forceRefresh });
+  } catch (error) {
+    showToast(error.message || 'Failed to load departments', 'danger');
+  }
   const body  = document.getElementById('deptMgmtBody');
   const empty = document.getElementById('deptMgmtEmpty');
   const label = document.getElementById('deptMgmtCountLabel');
@@ -4726,7 +5049,7 @@ function renderDepartments() {
 }
 
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
 }
 
 /* ── Add / Edit Department Modal ── */
@@ -4756,30 +5079,38 @@ function closeDeptNameModal() {
   document.getElementById('deptNameModal').style.display = 'none';
 }
 
-function saveDeptName() {
+async function saveDeptName() {
   const name = (document.getElementById('deptNameInput').value || '').trim();
   if (!name) { showToast('Please enter a department name', 'warning'); return; }
 
-  if (deptNameModalMode === 'add') {
-    // Prevent duplicates
-    if (departmentsMgmt.some(d => d.name.toLowerCase() === name.toLowerCase())) {
-      showToast('A department with this name already exists', 'warning'); return;
-    }
-    departmentsMgmt.push({ id: 'dept-' + Date.now() + '-' + Math.random().toString(36).slice(2), name });
-    showToast(`Department "${name}" created`, 'success');
-  } else {
-    const dept = departmentsMgmt.find(d => d.id === deptNameModalId);
-    if (!dept) return;
-    const oldName = dept.name;
-    if (departmentsMgmt.some(d => d.id !== deptNameModalId && d.name.toLowerCase() === name.toLowerCase())) {
-      showToast('A department with this name already exists', 'warning'); return;
-    }
-    dept.name = name;
-    showToast(`Renamed "${oldName}" → "${name}"`, 'success');
+  const dup = departmentsMgmt.find(
+    d => d.name.toLowerCase() === name.toLowerCase() && d.id !== deptNameModalId
+  );
+  if (dup) {
+    showToast('A department with this name already exists', 'warning');
+    return;
   }
-  saveDepartmentsMgmt();
-  closeDeptNameModal();
-  renderDepartments();
+
+  try {
+    const method = deptNameModalMode === 'edit' ? 'PUT' : 'POST';
+    const url = deptNameModalMode === 'edit'
+      ? `${API}/admin/departments/${encodeURIComponent(deptNameModalId)}`
+      : `${API}/admin/departments`;
+    const resp = await authFetch(url, {
+      method,
+      body: JSON.stringify({ name }),
+    });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to save department');
+    }
+    await loadDepartmentsMgmt({ force: true });
+    showToast(deptNameModalMode === 'edit' ? 'Department renamed' : 'Department created', 'success');
+    closeDeptNameModal();
+    await renderDepartments();
+  } catch (error) {
+    showToast(error.message || 'Failed to save department', 'danger');
+  }
 }
 
 /* ── Delete Department ── */
@@ -4794,11 +5125,21 @@ function confirmDeleteDept(id) {
   openConfirm(
     `Delete "${dept.name}"?`,
     `This department will be removed from the list.${detail}`,
-    () => {
-      departmentsMgmt = departmentsMgmt.filter(d => d.id !== id);
-      saveDepartmentsMgmt();
-      renderDepartments();
-      showToast(`Department deleted`, 'success');
+    async () => {
+      try {
+        const resp = await authFetch(`${API}/admin/departments/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+        });
+        if (!resp.ok) {
+          const data = await resp.json().catch(() => ({}));
+          throw new Error(data.error || 'Failed to delete department');
+        }
+        await loadDepartmentsMgmt({ force: true });
+        await renderDepartments();
+        showToast('Department deleted', 'success');
+      } catch (error) {
+        showToast(error.message || 'Failed to delete department', 'danger');
+      }
     }
   );
 }
@@ -4933,7 +5274,7 @@ async function saveDeptSoftwareMapping() {
   else if (saved) showToast(`Software mapping updated (${saved} change${saved !== 1 ? 's' : ''})`, 'success');
   else showToast('No changes to save');
 
-  renderDepartments();
+  await renderDepartments();
   renderSoftware();
 
   /* If the software detail modal is open, refresh its department display */
@@ -5077,7 +5418,7 @@ async function saveDeptUserMapping() {
   else if (saved) showToast(`User mapping updated (${saved} change${saved !== 1 ? 's' : ''})`, 'success');
   else showToast('No changes to save');
 
-  renderDepartments();
+  await renderDepartments();
   renderUsers && renderUsers();
 }
 
@@ -5105,7 +5446,7 @@ const SCIM_CONNECTOR_DEFS = {
     tokenLabel: 'Personal Access Token (PAT)',
     tokenPlaceholder: 'ghp_…',
     orgLabel: 'Organisation Slug',
-    orgPlaceholder: 'e.g. terzocloud',
+    orgPlaceholder: 'e.g. terzo',
     helpUrl: 'https://docs.github.com/en/enterprise-cloud@latest/admin/identity-and-access-management/provisioning-user-accounts-with-scim',
     helpText: 'Token needs admin:org and scim:enterprise scope. Requires GitHub Enterprise Cloud.',
   },
@@ -5127,7 +5468,7 @@ const SCIM_CONNECTOR_DEFS = {
     tokenLabel: 'Bot OAuth Token',
     tokenPlaceholder: 'xoxb-…',
     orgLabel: 'Workspace Domain',
-    orgPlaceholder: 'e.g. terzocloud.slack.com',
+    orgPlaceholder: 'e.g. terzo.slack.com',
     helpUrl: 'https://api.slack.com/scim',
     helpText: 'Install the app in your workspace with users:read and users:write scopes.',
   },
@@ -5750,12 +6091,20 @@ async function testConnectorSetup(){
   setInterval(async () => {
     try {
       const snap = software.map(s => s.csvId + '|' + (s.subscriptionPlan||'') + '|' + (s.purchasedLicenses||0)).join(',');
-      const resp = await authFetch(`${API}/software`);
+      const resp = await authFetch(`${API}/software`, {
+        requestKey: 'portal:software:poll',
+        cancelPrevious: true,
+      });
       if(!resp.ok) return;
       const fresh = await resp.json();
       const snapFresh = fresh.map(s => s.csvId + '|' + (s.subscriptionPlan||'') + '|' + (s.purchasedLicenses||0)).join(',');
       if(snap !== snapFresh){
-        software = fresh;
+        portalStore.setState({
+          software: fresh.map(item => ({
+            ...item,
+            department: normalizeSoftwareDepartmentValue(item?.department),
+          })),
+        }, 'software:polled');
         renderSoftware();
         refreshOwnerBilledToDatalists();
         // If SCIM modal is open, re-render it live
@@ -5784,7 +6133,7 @@ function showDeptUsers(dept) {
     : `<table>
         <thead><tr><th>Name</th><th>Job Title</th><th>Reporting Manager</th><th>Location</th><th>Role</th><th>Status</th></tr></thead>
         <tbody>${deptUsers.map(u => {
-          const statusColor = u.status === 'Active' ? '#16a34a' : '#dc2626';
+          const statusColor = (u.status||'').toLowerCase() === 'active' ? '#16a34a' : '#dc2626';
           const roleColor = u.role === 'Admin' ? '#7c3aed' : u.role === 'Manager' ? '#d97706' : '#8b5cf6';
           return `<tr>
             <td><div class="user-cell" style="gap:8px">
@@ -5807,8 +6156,8 @@ function closeDeptModal() {
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ALERT NOTIFICATION ENGINE
-   Reads alert rules from localStorage("tcAlerts"), evaluates them against
-   live data (software / users / assets), and renders per-entity notifications
+   Reads alert rules from /api/admin/alerts, evaluates them against live
+   data (software / users / assets), and renders per-entity notifications
    in the topbar bell dropdown.
 ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -5847,10 +6196,47 @@ function _swTotalCost(s) {
   return base + svc;
 }
 
+async function loadAlertRules(options = {}) {
+  const force = !!options.force;
+  const isFresh = Date.now() - alertRulesLoadedAt < ALERT_RULE_CACHE_MS;
+  if (!force && alertRulesLoaded && isFresh) return alertRules;
+  if (!force && alertRulesLoadInFlight) return alertRulesLoadInFlight;
+
+  alertRulesLoadInFlight = (async () => {
+    const resp = await authFetch(`${API}/admin/alerts`, {
+      requestKey: 'portal:alerts:load',
+      cancelPrevious: true,
+    });
+    if (!resp.ok) {
+      const data = await resp.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to load alerts');
+    }
+    const rows = await resp.json();
+    const nextRules = Array.isArray(rows) ? rows : [];
+    alertRulesLoaded = true;
+    alertRulesLoadedAt = Date.now();
+    portalStore.setState({ alertRules: nextRules }, 'alerts:loaded');
+    return alertRules;
+  })();
+
+  try {
+    return await alertRulesLoadInFlight;
+  } finally {
+    alertRulesLoadInFlight = null;
+  }
+}
+
 // ── Main evaluation ───────────────────────────────────────────────────────────
-function evaluateAlerts() {
-  const rules = JSON.parse(localStorage.getItem('tcAlerts') || '[]')
-                  .filter(a => a.enabled);
+async function evaluateAlerts(forceReload = false) {
+  try {
+    await loadAlertRules({ force: forceReload });
+  } catch (error) {
+    console.warn('[alerts] failed to load rules:', error.message);
+    _activeNotifs = [];
+    renderNotifPanel();
+    return;
+  }
+  const rules = alertRules.filter(a => a.enabled);
   const results = [];
   const now = new Date().toISOString();
 
@@ -6008,14 +6394,20 @@ function renderNotifPanel() {
   const alertNum  = document.getElementById('alertStatNum');
   const alertIcon = document.getElementById('alertStatIcon');
   if (alertTile) {
-    alertTile.style.display = count > 0 ? '' : 'none';
+    // Always visible — use grey when 0 alerts, coloured when active
     if (alertNum) alertNum.textContent = count;
-    if (alertIcon) {
-      alertIcon.style.background = critical > 0 ? '#fef2f2' : '#fffbeb';
-      alertIcon.style.color      = critical > 0 ? '#ef4444' : '#f59e0b';
+    if (count === 0) {
+      if (alertIcon) { alertIcon.style.background = 'var(--gray-100)'; alertIcon.style.color = 'var(--gray-400)'; }
+      alertTile.style.borderTopColor = 'var(--gray-200)';
+      if (alertNum) alertNum.style.color = 'var(--gray-400)';
+    } else {
+      if (alertIcon) {
+        alertIcon.style.background = critical > 0 ? '#fef2f2' : '#fffbeb';
+        alertIcon.style.color      = critical > 0 ? '#ef4444' : '#f59e0b';
+      }
+      alertTile.style.borderTopColor = critical > 0 ? '#ef4444' : '#f59e0b';
+      if (alertNum) alertNum.style.color = critical > 0 ? '#ef4444' : '#f59e0b';
     }
-    alertTile.style.borderTopColor = critical > 0 ? '#ef4444' : '#f59e0b';
-    if (alertNum) alertNum.style.color = critical > 0 ? '#ef4444' : '#f59e0b';
   }
 
   // Show/hide the whole section
@@ -6070,7 +6462,7 @@ function renderNotifPanel() {
 }
 
 function _escHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');
 }
 
 // ── Dismiss ───────────────────────────────────────────────────────────────────

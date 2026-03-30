@@ -8,6 +8,20 @@ const DEFAULT_SLA_POLICY = SupportRequestType.DEFAULT_SLA_POLICY || {
 };
 const normalizeSlaPolicy = SupportRequestType.normalizeSlaPolicy
   || ((input = {}, fallback = DEFAULT_SLA_POLICY) => ({ ...fallback, ...input }));
+const normalizePriority = SupportRequestType.normalizePriority
+  || (value => {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'critical') return 'high';
+    return ['low', 'medium', 'high'].includes(normalized) ? normalized : 'medium';
+  });
+const getSlaMinutesForPriority = SupportRequestType.getSlaMinutesForPriority
+  || ((policy = {}, priority = 'medium', kind = 'resolution') => {
+    const normalized = normalizePriority(priority);
+    if (kind === 'response') {
+      return Number(policy?.priorityResponseMinutes?.[normalized] || policy?.responseMinutes || 60);
+    }
+    return Number(policy?.priorityResolutionMinutes?.[normalized] || policy?.resolutionMinutes || 480);
+  });
 const SLA_STATUS_VALUES = ['no_sla', 'on_track', 'at_risk', 'breached', 'met', 'paused'];
 
 const WORKFLOW_TEMPLATES = Object.fromEntries(
@@ -99,6 +113,20 @@ const requestSlaPolicySnapshotSchema = new mongoose.Schema(
     responseMinutes: { type: Number, default: DEFAULT_SLA_POLICY.responseMinutes, min: 1, max: 43200 },
     resolutionMinutes: { type: Number, default: DEFAULT_SLA_POLICY.resolutionMinutes, min: 1, max: 43200 },
     atRiskPercent: { type: Number, default: DEFAULT_SLA_POLICY.atRiskPercent, min: 1, max: 99 },
+    priorityResponseMinutes: {
+      low: { type: Number, default: Number(DEFAULT_SLA_POLICY?.priorityResponseMinutes?.low || 120), min: 1, max: 43200 },
+      medium: { type: Number, default: Number(DEFAULT_SLA_POLICY?.priorityResponseMinutes?.medium || 60), min: 1, max: 43200 },
+      high: { type: Number, default: Number(DEFAULT_SLA_POLICY?.priorityResponseMinutes?.high || 30), min: 1, max: 43200 },
+    },
+    priorityResolutionMinutes: {
+      low: { type: Number, default: Number(DEFAULT_SLA_POLICY?.priorityResolutionMinutes?.low || 120), min: 1, max: 43200 },
+      medium: { type: Number, default: Number(DEFAULT_SLA_POLICY?.priorityResolutionMinutes?.medium || 60), min: 1, max: 43200 },
+      high: { type: Number, default: Number(DEFAULT_SLA_POLICY?.priorityResolutionMinutes?.high || 30), min: 1, max: 43200 },
+    },
+    breachReminderMinutes: { type: Number, default: Number(DEFAULT_SLA_POLICY?.breachReminderMinutes || 10), min: 1, max: 1440 },
+    notifyAtRisk: { type: Boolean, default: DEFAULT_SLA_POLICY.notifyAtRisk !== false },
+    notifyOnBreach: { type: Boolean, default: DEFAULT_SLA_POLICY.notifyOnBreach !== false },
+    autoEscalateOnBreach: { type: Boolean, default: DEFAULT_SLA_POLICY.autoEscalateOnBreach !== false },
   },
   { _id: false }
 );
@@ -117,6 +145,7 @@ function evaluateSla(doc) {
   const now = new Date();
   const createdAt = toDateOrNull(doc.createdAt) || now;
   const status = String(doc.status || '').toLowerCase();
+  const priority = normalizePriority(doc.priority);
   const policy = normalizeSlaPolicy(doc.slaPolicySnapshot || {}, DEFAULT_SLA_POLICY);
   doc.slaPolicySnapshot = policy;
 
@@ -143,10 +172,10 @@ function evaluateSla(doc) {
     return;
   }
 
-  const responseDueAt = toDateOrNull(doc.slaResponseDueAt)
-    || new Date(createdAt.getTime() + (Number(policy.responseMinutes) * 60 * 1000));
-  const resolutionDueAt = toDateOrNull(doc.slaResolutionDueAt)
-    || new Date(createdAt.getTime() + (Number(policy.resolutionMinutes) * 60 * 1000));
+  const responseMinutes = getSlaMinutesForPriority(policy, priority, 'response');
+  const resolutionMinutes = getSlaMinutesForPriority(policy, priority, 'resolution');
+  const responseDueAt = new Date(createdAt.getTime() + (Number(responseMinutes) * 60 * 1000));
+  const resolutionDueAt = new Date(createdAt.getTime() + (Number(resolutionMinutes) * 60 * 1000));
 
   doc.slaResponseDueAt = responseDueAt;
   doc.slaResolutionDueAt = resolutionDueAt;
@@ -237,6 +266,10 @@ const supportRequestSchema = new mongoose.Schema(
     slaResolutionDueAt: { type: Date, default: null },
     slaStatus: { type: String, enum: SLA_STATUS_VALUES, default: 'on_track', index: true },
     slaBreachedAt: { type: Date, default: null },
+    slaNotifiedAtRiskAt: { type: Date, default: null },
+    slaNotifiedBreachAt: { type: Date, default: null },
+    slaLastBreachReminderAt: { type: Date, default: null },
+    slaEscalatedAt: { type: Date, default: null },
     checklist: { type: [checklistItemSchema], default: [] },
   },
   { timestamps: true }

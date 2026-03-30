@@ -10,6 +10,7 @@ const path     = require('path');
 const fs       = require('fs');
 const User     = require('../db/models/User');
 const Software = require('../db/models/Software');
+const { requireAuth, onlySuperAdmin } = require('../middleware/auth');
 
 const SW_ALIASES = {
   'Canva':'canva','Slack':'slack','Asana':'asana','Zoom':'zoom',
@@ -23,16 +24,9 @@ const SW_ALIASES = {
 
 const norm = s => (s||'').toLowerCase().trim();
 
-// Open CORS preflight
-router.options('/', (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.sendStatus(204);
-});
+// CORS handled by global middleware — no open wildcard
 
-router.post('/', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+router.post('/', requireAuth, onlySuperAdmin, async (req, res) => {
   try {
     const { sheetData } = req.body;
     if (!sheetData) return res.status(400).json({ error: 'sheetData required' });
@@ -106,7 +100,7 @@ router.post('/', async (req, res) => {
 });
 
 // ── GET /api/sheet-sync/run — read tmp-sheet-data.json and run the sync ──────
-router.get('/run', async (req, res) => {
+router.get('/run', requireAuth, onlySuperAdmin, async (req, res) => {
   try {
     const filePath = path.join(__dirname, '..', 'tmp-sheet-data.json');
     if (!fs.existsSync(filePath)) {

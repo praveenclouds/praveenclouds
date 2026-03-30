@@ -13,10 +13,17 @@ const { requireAuth, canWriteUsers } = require('../middleware/auth');
 const { fmt, diffObjects } = require('../utils/format');
 const { writeLog } = require('../services/log.service');
 const { sendAppInvite } = require('../services/connector.service');
+const crypto = require('crypto');
+const _EK = process.env.ENCRYPT_KEY || process.env.JWT_SECRET || 'terzo_encrypt_fallback_dev';
+function _dk(s) { return crypto.createHash('sha256').update(s).digest(); }
+function _decryptToken(v) {
+  if (!v || !v.startsWith('enc:')) return v;
+  try { const [,iv,enc]=v.split(':'); const d=crypto.createDecipheriv('aes-256-cbc',_dk(_EK),Buffer.from(iv,'hex')); return d.update(enc,'hex','utf8')+d.final('utf8'); } catch { return v; }
+}
 
 const TRACKED_FIELDS = [
   'first', 'last', 'email', 'dept', 'role', 'location', 'status',
-  'jobTitle', 'reportingManager', 'phone', 'employmentType',
+  'jobTitle', 'reportingManager', 'phone', 'employmentType', 'lastWorkingDate',
 ];
 
 // ── GET /api/users ─────────────────────────────────────────────────────────────
@@ -25,12 +32,16 @@ const TRACKED_FIELDS = [
 // but callers can opt-in to pagination when needed.
 router.get('/', requireAuth, async (req, res) => {
   try {
-    const { status, all } = req.query;
+    const { status, all, includeInactive } = req.query;
     const page  = Math.max(1, parseInt(req.query.page)  || 1);
     const limit = Math.max(0, parseInt(req.query.limit) || 0); // 0 = no limit (default)
 
     const filter = {};
-    if (status) filter.status = status;
+    if (status) {
+      filter.status = status;
+    } else if (!['1', 'true', 'yes'].includes(String(includeInactive || '').trim().toLowerCase())) {
+      filter.status = 'Active';
+    }
 
     const query = User.find(filter).sort({ first: 1 });
     if (limit > 0 && !all) {
@@ -47,7 +58,12 @@ router.get('/', requireAuth, async (req, res) => {
 // ── POST /api/users ────────────────────────────────────────────────────────────
 router.post('/', requireAuth, canWriteUsers, async (req, res) => {
   try {
-    const user = await User.create(req.body);
+    // Whitelist allowed fields to prevent mass assignment
+    const ALLOWED_CREATE_FIELDS = ['first', 'last', 'email', 'dept', 'role', 'location', 'status',
+      'jobTitle', 'reportingManager', 'phone', 'employmentType', 'lastWorkingDate'];
+    const sanitized = {};
+    ALLOWED_CREATE_FIELDS.forEach(k => { if (req.body[k] !== undefined) sanitized[k] = req.body[k]; });
+    const user = await User.create(sanitized);
     const u    = fmt(user);
     await writeLog({
       eventType:   'user_created',
@@ -64,7 +80,12 @@ router.post('/', requireAuth, canWriteUsers, async (req, res) => {
 router.put('/:id', requireAuth, canWriteUsers, async (req, res) => {
   try {
     const oldUser = await User.findById(req.params.id).lean();
-    const user    = await User.findByIdAndUpdate(req.params.id, req.body, {
+    // Whitelist allowed fields to prevent mass assignment
+    const ALLOWED_USER_FIELDS = ['first', 'last', 'email', 'dept', 'role', 'location', 'status',
+      'jobTitle', 'reportingManager', 'phone', 'employmentType', 'lastWorkingDate'];
+    const sanitized = {};
+    ALLOWED_USER_FIELDS.forEach(k => { if (req.body[k] !== undefined) sanitized[k] = req.body[k]; });
+    const user    = await User.findByIdAndUpdate(req.params.id, sanitized, {
       new: true, runValidators: true,
     });
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -140,7 +161,9 @@ router.put('/:id/app-access', requireAuth, canWriteUsers, async (req, res) => {
         inviteResults.push({ csvId, appName: software.name, status: 'no_connector', message: 'No active connector configured for this app' });
         continue;
       }
-      const result = await sendAppInvite(connector, user);
+      // Decrypt token if encrypted
+      const connDecrypted = { ...connector, apiToken: _decryptToken(connector.apiToken) };
+      const result = await sendAppInvite(connDecrypted, user);
       inviteResults.push({ csvId, appName: software.name, ...result });
     }
 

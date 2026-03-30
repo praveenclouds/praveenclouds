@@ -1,0 +1,72 @@
+## ── Terzo App Deployment ────────────────────────────────────────────────────
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: terzo-app
+  namespace: terzo
+  labels:
+    app: terzo-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: terzo-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: terzo-app
+    spec:
+      containers:
+        - name: terzo-app
+          image: terzocloud/asset-portal:latest
+          imagePullPolicy: Never    # Use local Minikube-built image
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: terzo-config
+            - secretRef:
+                name: terzo-secrets
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /api/csrf-token
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          livenessProbe:
+            httpGet:
+              path: /api/csrf-token
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 30
+            timeoutSeconds: 5
+---
+## ── Terzo App ClusterIP Service ────────────────────────────────────────────
+apiVersion: v1
+kind: Service
+metadata:
+  name: terzo-app-svc
+  namespace: terzo
+  labels:
+    app: terzo-app
+spec:
+  type: ClusterIP
+  selector:
+    app: terzo-app
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP

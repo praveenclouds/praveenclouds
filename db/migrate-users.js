@@ -58,8 +58,11 @@ function mapRole(title = '', email = '') {
 // ── 3b. Extract reporting manager name (strip title after " - ") ──────────────
 function extractManager(raw = '') {
   if (!raw || !raw.trim()) return '';
-  // Format: "Name - Title" → return "Name"
-  return raw.split(' - ')[0].trim();
+  // Format examples:
+  //  - "Name - Title" -> "Name"
+  //  - "Name (Title)" -> "Name"
+  const fromDash = raw.split(' - ')[0].trim();
+  return fromDash.replace(/\s*\(.*\)\s*$/g, '').trim();
 }
 
 // ── 4. Location heuristic ─────────────────────────────────────────────────────

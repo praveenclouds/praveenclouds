@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TerzoCloud — Support Workflows</title>
+  <title>Terzo — Support Workflows</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #140f18;
@@ -14,80 +15,368 @@
       --border-strong: rgba(130, 96, 185, 0.44);
       --text: #f5efff;
       --muted: #b8a9cf;
-      --accent: #7c5cff;
+      --accent: #7c3aed;
       --accent-2: #38bdf8;
       --success: #34d399;
       --warning: #f59e0b;
       --danger: #f87171;
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
-      --radius: 20px;
+      --radius: 12px;
     }
+    :root[data-theme="light"] {
+      --bg: #f4f7fc;
+      --bg-soft: #edf2f8;
+      --panel: #ffffff;
+      --panel-2: #f8fbff;
+      --border: rgba(148, 163, 184, 0.4);
+      --border-strong: rgba(100, 116, 139, 0.44);
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #695ce8;
+      --accent-2: #8274ff;
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+    }
+    :root[data-theme="light"] body.support-theme-support {
+      background: linear-gradient(180deg, #fbfdff 0%, #f1f5fa 100%);
+      color: var(--text);
+    }
+    :root[data-theme="light"] body.support-theme-support .sidebar {
+      background: #ffffff;
+      border-right: 1px solid #d1d5db;
+    }
+    :root[data-theme="light"] body.support-theme-support :is(.logo-sub, .nav-title) {
+      color: #64748b;
+    }
+    :root[data-theme="light"] body.support-theme-support .nav-link {
+      color: #334155;
+      font-weight: 600;
+    }
+    :root[data-theme="light"] body.support-theme-support .nav-link:hover,
+    :root[data-theme="light"] body.support-theme-support .nav-link.active {
+      background: #ede9fe;
+      color: #6d28d9;
+    }
+    :root[data-theme="light"] body.support-theme-support .sidebar-footer {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+    :root[data-theme="light"] body.support-theme-support .sidebar-footer strong {
+      color: #111827;
+    }
+    :root[data-theme="light"] body.support-theme-support .sidebar-footer span {
+      color: #64748b;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .sidebar {
+      background: #ffffff !important;
+      border-right: 1px solid #d1d5db !important;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] :is(.logo-sub, .nav-title) {
+      color: #64748b !important;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .nav-link {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .nav-link:hover,
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .nav-link.active {
+      background: #ede9fe !important;
+      color: #6d28d9 !important;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .sidebar-footer {
+      background: #f8fafc !important;
+      border-color: #e2e8f0 !important;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .sidebar-footer strong {
+      color: #111827 !important;
+    }
+    :root[data-theme="light"] body.support-theme.support-theme-support[data-portal-theme="white"] .sidebar-footer span {
+      color: #64748b !important;
+    }
+    :root[data-theme="light"] body.support-theme-support :is(
+      .panel,
+      .summary-card,
+      .workflow-card,
+      .task,
+      .export-menu,
+      .detail-drawer,
+      .drawer-head,
+      .modal-box,
+      .muted-note,
+      .preview-card,
+      .preview-item,
+      .multi-picker-trigger,
+      .multi-picker-panel,
+      .multi-picker-search,
+      .multi-picker-option,
+      .section-tab,
+      .request-type-list,
+      .request-type-card,
+      .request-type-editor,
+      .toggle-row,
+      .workflow-step-card,
+      .mail-template-subtab,
+      .mail-template-card,
+      .mail-template-preview,
+      .mail-template-list,
+      .mail-template-list-card,
+      .mail-template-editor,
+      .custom-field-card
+    ) {
+      background: var(--panel);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    :root[data-theme="light"] body.support-theme-support .summary-card {
+      background: var(--panel-2);
+    }
+    :root[data-theme="light"] body.support-theme-support .request-mode-switch {
+      background: #f1f5ff;
+      border-color: #dbe4ff;
+    }
+    :root[data-theme="light"] body.support-theme-support .request-mode-btn {
+      color: #475569;
+    }
+    :root[data-theme="light"] body.support-theme-support .request-mode-btn.active {
+      background: #e0e7ff;
+      color: #1e293b;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col {
+      background: #f9fbff;
+      border-color: rgba(148, 163, 184, 0.36);
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col-head {
+      border-bottom-color: rgba(148, 163, 184, 0.36);
+      color: #64748b;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col-count {
+      background: #eef2ff;
+      border-color: #d7defd;
+      color: #1e293b;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-open {
+      background: #f8fbff;
+      border-color: #dbeafe;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-open .board-col-head {
+      background: #eff6ff;
+      border-bottom-color: #dbeafe;
+      color: #365b88;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-open .board-col-count {
+      background: #e0eeff;
+      border-color: #c7ddfb;
+      color: #365b88;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-in_progress {
+      background: #fbf8ff;
+      border-color: #e9ddff;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-in_progress .board-col-head {
+      background: #f5efff;
+      border-bottom-color: #e9ddff;
+      color: #6d4ea6;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-in_progress .board-col-count {
+      background: #eee3ff;
+      border-color: #dfcbff;
+      color: #6d4ea6;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-blocked {
+      background: #fff9fa;
+      border-color: #f5d9df;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-blocked .board-col-head {
+      background: #fff2f4;
+      border-bottom-color: #f5d9df;
+      color: #a75a6b;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-blocked .board-col-count {
+      background: #ffe9ed;
+      border-color: #f7cfd7;
+      color: #a75a6b;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-completed {
+      background: #f7fdf9;
+      border-color: #d7efe3;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-completed .board-col-head {
+      background: #eefaf3;
+      border-bottom-color: #d7efe3;
+      color: #2f7b63;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-completed .board-col-count {
+      background: #e1f3e9;
+      border-color: #c6e9d8;
+      color: #2f7b63;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-cancelled {
+      background: #f8fafc;
+      border-color: #dfe6ee;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-cancelled .board-col-head {
+      background: #f2f5f9;
+      border-bottom-color: #dfe6ee;
+      color: #5f6f82;
+    }
+    :root[data-theme="light"] body.support-theme-support .board-col.board-status-cancelled .board-col-count {
+      background: #e9edf3;
+      border-color: #d7dee8;
+      color: #5f6f82;
+    }
+    :root[data-theme="light"] body.support-theme-support .request-card {
+      background: #ffffff;
+      border-color: rgba(148, 163, 184, 0.34);
+    }
+    :root[data-theme="light"] body.support-theme-support .request-card-title {
+      color: #0f172a;
+    }
+    :root[data-theme="light"] body.support-theme-support :is(.request-card-meta, .request-card-id, .request-card-foot) {
+      color: #64748b;
+    }
+    :root[data-theme="light"] body.support-theme-support :is(.detail-tab-btn, .activity-item, .comment-item) {
+      background: #ffffff;
+      border-color: rgba(148, 163, 184, 0.34);
+      color: #334155;
+    }
+    :root[data-theme="light"] body.support-theme-support .detail-tab-btn.active {
+      background: #ede9fe;
+      color: #4c1d95;
+    }
+    :root[data-theme="light"] body.support-theme-support .activity-item-title {
+      color: #0f172a;
+    }
+    :root[data-theme="light"] body.support-theme-support :is(.activity-item-head, .activity-item-meta, .comment-head) {
+      color: #64748b;
+    }
+    :root[data-theme="light"] body.support-theme-support .comment-body {
+      color: #1e293b;
+    }
+    :root[data-theme="light"] body.support-theme-support :is(.drawer-overlay, .modal) {
+      background: rgba(15, 23, 42, 0.36);
+    }
+    :root[data-theme="light"] body.support-theme-support :is(input, select, textarea) {
+      background: #fff;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    :root[data-theme="light"] body.support-theme-support :is(input, textarea)::placeholder {
+      color: #8da0b5;
+    }
+    :root[data-theme="light"] body.support-theme-support thead {
+      background: #f8fafc;
+    }
+    :root[data-theme="light"] body.support-theme-support th {
+      color: #64748b;
+      border-bottom-color: var(--border);
+    }
+    :root[data-theme="light"] body.support-theme-support tbody tr {
+      border-bottom-color: rgba(148, 163, 184, 0.24);
+    }
+    :root[data-theme="light"] body.support-theme-support tbody tr:hover {
+      background: #f5f8ff;
+    }
+    :root[data-theme="light"] body.support-theme-support tbody tr.active {
+      background: #ede9ff;
+    }
+    :root[data-theme="light"] body.support-theme-support .token-chip {
+      background: #ede9fe;
+      border-color: #ddd6fe;
+      color: #5b21b6;
+    }
+    :root[data-theme="light"] body.support-theme-support .pill.application-access { background: #e0f2fe; color: #0369a1; }
+    :root[data-theme="light"] body.support-theme-support .pill.new-app { background: #ede9fe; color: #6d28d9; }
+    :root[data-theme="light"] body.support-theme-support .pill.new-hardware { background: #dcfce7; color: #15803d; }
+    :root[data-theme="light"] body.support-theme-support .pill.app-hardware-issue { background: #fef3c7; color: #a16207; }
+    :root[data-theme="light"] body.support-theme-support .pill.onboarding { background: #dbeafe; color: #1d4ed8; }
+    :root[data-theme="light"] body.support-theme-support .pill.offboarding { background: #fee2e2; color: #b91c1c; }
+    :root[data-theme="light"] body.support-theme-support .pill.status-open { background: #eaf3ff; color: #365b88; }
+    :root[data-theme="light"] body.support-theme-support .pill.status-in_progress { background: #f4eeff; color: #6d4ea6; }
+    :root[data-theme="light"] body.support-theme-support .pill.status-blocked { background: #fff0f3; color: #a75a6b; }
+    :root[data-theme="light"] body.support-theme-support .pill.status-completed { background: #e9f9ef; color: #2f7b63; }
+    :root[data-theme="light"] body.support-theme-support .pill.status-cancelled { background: #eef2f6; color: #5f6f82; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
+      height: 100vh;
       min-height: 100vh;
-      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
       background:
-        radial-gradient(circle at top left, rgba(124,92,255,0.18), transparent 32%),
-        radial-gradient(circle at top right, rgba(56,189,248,0.12), transparent 24%),
+        radial-gradient(circle at top left, rgba(124,58,237,0.14), transparent 32%),
+        radial-gradient(circle at top right, rgba(56,189,248,0.08), transparent 24%),
         linear-gradient(180deg, #140f18 0%, #0f0a13 100%);
       color: var(--text);
     }
     .shell {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 240px 1fr;
+      height: 100vh;
       min-height: 100vh;
+      overflow: hidden;
     }
     .sidebar {
       display: flex;
       flex-direction: column;
-      padding: 28px 20px;
+      padding: 0;
       border-right: 1px solid rgba(130, 96, 185, 0.18);
       background: rgba(18, 12, 25, 0.88);
       backdrop-filter: blur(16px);
+      height: 100vh;
+      overflow-y: auto;
     }
     .logo {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 28px;
+      gap: 11px;
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid var(--border);
     }
     .logo-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 18px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, #3153d8, #6d4cf8);
-      box-shadow: 0 18px 40px rgba(49, 83, 216, 0.35);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--accent);
     }
-    .logo-icon svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2; }
-    .logo-title { font-size: 1.85rem; font-weight: 800; line-height: 1; }
-    .logo-sub { color: #9f82dd; margin-top: 4px; }
+    .logo-icon svg { width: 18px; height: 18px; fill: #fff; }
+    .logo-title { font-size: 15px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
+    .logo-sub { color: #9f82dd; margin-top: 1px; font-size: 11px; }
     .nav-title {
-      color: #8f77bb;
+      color: rgba(153,102,255,0.55);
       text-transform: uppercase;
-      letter-spacing: .12em;
-      font-size: .78rem;
-      margin: 22px 0 10px;
-      font-weight: 700;
+      letter-spacing: .08em;
+      font-size: 10.5px;
+      margin: 0;
+      padding: 10px 18px 6px;
+      font-weight: 600;
     }
+    .nav-links { padding: 0 10px; }
     .nav-link {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 14px;
-      border-radius: 14px;
+      padding: 9px 12px;
+      border-radius: 8px;
       color: var(--muted);
       text-decoration: none;
-      margin-bottom: 8px;
-      transition: background .16s ease, color .16s ease, transform .16s ease;
+      margin-bottom: 2px;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: background .14s ease, color .14s ease;
     }
     .nav-link:hover, .nav-link.active {
-      background: rgba(124, 92, 255, 0.18);
+      background: rgba(124, 58, 237, 0.18);
       color: #efe8ff;
-      transform: translateX(2px);
     }
+    .nav-link.active { font-weight: 600; }
     .nav-link svg {
       width: 18px;
       height: 18px;
@@ -95,54 +384,90 @@
       fill: none;
       stroke-width: 2;
     }
+    .nav-dropdown-toggle {
+      width: 100%;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      justify-content: space-between;
+    }
+    .nav-link-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-caret {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      transition: transform .14s ease;
+    }
+    .nav-group.open .nav-caret { transform: rotate(90deg); }
+    .nav-sub-links {
+      display: none;
+      padding: 0 0 0 26px;
+    }
+    .nav-group.open .nav-sub-links { display: block; }
+    .nav-sub-links .nav-link {
+      font-size: 13px;
+      padding: 8px 12px;
+      margin-bottom: 2px;
+    }
     .sidebar-footer {
       margin-top: auto;
       padding: 16px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: rgba(44, 29, 60, 0.74);
+      border-top: 1px solid var(--border);
     }
-    .sidebar-footer strong { display: block; margin-bottom: 4px; }
-    .sidebar-footer span { color: var(--muted); font-size: .92rem; }
+    .sidebar-footer strong { display: block; margin-bottom: 2px; font-size: 13px; font-weight: 600; }
+    .sidebar-footer span { color: var(--muted); font-size: 11.5px; }
     .main {
-      padding: 28px;
+      padding: 24px 28px;
+      min-height: 0;
+      overflow-y: auto;
     }
     .topbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 22px;
+      margin-bottom: 24px;
     }
     .title h1 {
       margin: 0;
-      font-size: 2rem;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
     }
     .title p {
-      margin: 6px 0 0;
+      margin: 4px 0 0;
       color: var(--muted);
+      font-size: 13.5px;
     }
     .btn {
       border: none;
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-weight: 700;
-      font-size: .95rem;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-weight: 600;
+      font-size: 13.5px;
       cursor: pointer;
-      transition: transform .14s ease, box-shadow .14s ease, opacity .14s ease;
+      font-family: inherit;
+      transition: all .14s ease;
     }
     .btn:hover { transform: translateY(-1px); }
     .btn:disabled { opacity: .6; cursor: not-allowed; transform: none; }
     .btn-primary {
       color: #fff;
-      background: linear-gradient(135deg, #3757e6, #7c5cff);
-      box-shadow: 0 18px 34px rgba(76, 89, 232, 0.25);
+      background: var(--accent);
     }
+    .btn-primary:hover { background: #6d28d9; }
     .btn-secondary {
       color: var(--text);
-      background: rgba(124, 92, 255, 0.14);
-      border: 1px solid rgba(124, 92, 255, 0.24);
+      background: rgba(124, 58, 237, 0.14);
+      border: 1px solid rgba(124, 58, 237, 0.24);
     }
     .grid {
       display: grid;
@@ -157,72 +482,154 @@
       overflow: hidden;
     }
     .panel-head {
-      padding: 18px 20px;
+      padding: 18px 22px;
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
     }
-    .panel-title { font-size: 1.08rem; font-weight: 800; }
+    .panel-title { font-size: 15px; font-weight: 700; }
     .summary {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-      gap: 14px;
-      margin-bottom: 18px;
+      gap: 16px;
+      margin-bottom: 20px;
     }
     .summary-card {
       background: linear-gradient(180deg, rgba(45, 32, 61, 0.9), rgba(31, 22, 41, 0.92));
       border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
+      border-radius: 12px;
+      padding: 18px 20px;
     }
-    .summary-card strong { display: block; font-size: 1.7rem; margin-top: 4px; }
-    .summary-card span { color: var(--muted); font-size: .9rem; }
+    .summary-card strong { display: block; font-size: 26px; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
+    .summary-card span { color: var(--muted); font-size: 12px; }
+    .sla-details {
+      padding: 0 20px 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .sla-detail-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(24, 18, 33, 0.72);
+      padding: 12px 14px;
+      display: grid;
+      gap: 8px;
+    }
+    .sla-detail-title {
+      font-size: .8rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .sla-priority-list,
+    .sla-trend-list {
+      display: grid;
+      gap: 6px;
+      font-size: .84rem;
+    }
+    .sla-priority-row,
+    .sla-trend-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .sla-priority-row strong,
+    .sla-trend-row strong {
+      font-size: .83rem;
+    }
+    .sla-metric-subtle {
+      color: var(--muted);
+      font-size: .8rem;
+    }
+    :root[data-theme="light"] body.support-theme-support .sla-detail-card {
+      background: #ffffff;
+      border-color: rgba(148, 163, 184, 0.34);
+    }
     .filters {
       display: grid;
-      grid-template-columns: 1.3fr .7fr .7fr;
+      grid-template-columns: minmax(240px, 1.3fr) repeat(4, minmax(130px, .7fr));
       gap: 10px;
       padding: 18px 20px 0;
     }
+    .request-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .request-mode-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: rgba(124, 58, 237, 0.08);
+    }
+    .request-mode-btn {
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 12px;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .request-mode-btn.active {
+      background: rgba(124, 58, 237, 0.24);
+      color: var(--text);
+    }
     input, select, textarea {
       width: 100%;
-      border-radius: 14px;
+      border-radius: 8px;
       border: 1px solid var(--border);
       background: rgba(29, 20, 38, 0.9);
       color: var(--text);
-      padding: 12px 14px;
+      padding: 9px 14px;
       font: inherit;
+      font-size: 13.5px;
       outline: none;
+      transition: border .14s, box-shadow .14s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(124,58,237,0.6);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
     }
     input:disabled, select:disabled, textarea:disabled {
       opacity: .58;
       cursor: not-allowed;
     }
     input::placeholder, textarea::placeholder { color: #8a76ad; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 14px 16px; text-align: left; font-size: .92rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    th, td { padding: 13px 16px; text-align: left; }
     th {
-      color: #9b8ab9;
+      color: rgba(153,102,255,0.7);
       text-transform: uppercase;
-      letter-spacing: .08em;
-      font-size: .72rem;
+      letter-spacing: .06em;
+      font-size: 11.5px;
+      font-weight: 600;
       border-bottom: 1px solid var(--border);
     }
     tbody tr {
       border-bottom: 1px solid rgba(130, 96, 185, 0.12);
       cursor: pointer;
     }
-    tbody tr:hover { background: rgba(124, 92, 255, 0.08); }
-    tbody tr.active { background: rgba(124, 92, 255, 0.16); }
+    tbody tr:hover { background: rgba(124, 58, 237, 0.06); }
+    tbody tr.active { background: rgba(124, 58, 237, 0.14); }
     .pill {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      border-radius: 999px;
-      padding: 5px 10px;
-      font-size: .78rem;
-      font-weight: 700;
+      border-radius: 9999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
     }
     .pill.application-access { background: rgba(56, 189, 248, 0.16); color: #8fe8ff; }
     .pill.new-app { background: rgba(124, 92, 255, 0.16); color: #d5caff; }
@@ -230,12 +637,160 @@
     .pill.app-hardware-issue { background: rgba(245, 158, 11, 0.18); color: #ffd88a; }
     .pill.onboarding { background: rgba(56, 189, 248, 0.16); color: #8fe8ff; }
     .pill.offboarding { background: rgba(248, 113, 113, 0.16); color: #ffb6b6; }
-    .pill.status-open { background: rgba(124, 92, 255, 0.16); color: #d5caff; }
-    .pill.status-in_progress { background: rgba(245, 158, 11, 0.18); color: #ffd88a; }
-    .pill.status-blocked { background: rgba(248, 113, 113, 0.18); color: #ffb6b6; }
-    .pill.status-completed { background: rgba(52, 211, 153, 0.16); color: #a3ffd3; }
-    .pill.status-cancelled { background: rgba(148, 163, 184, 0.16); color: #d3dce9; }
+    :root[data-theme="dark"] body.support-theme-support .pill.status-open { background: rgba(96, 153, 230, 0.2); color: #c8deff; }
+    :root[data-theme="dark"] body.support-theme-support .pill.status-in_progress { background: rgba(155, 120, 224, 0.22); color: #e1d2ff; }
+    :root[data-theme="dark"] body.support-theme-support .pill.status-blocked { background: rgba(220, 115, 145, 0.2); color: #ffd2df; }
+    :root[data-theme="dark"] body.support-theme-support .pill.status-completed { background: rgba(88, 191, 149, 0.2); color: #c7f4dd; }
+    :root[data-theme="dark"] body.support-theme-support .pill.status-cancelled { background: rgba(134, 151, 173, 0.22); color: #d6dfeb; }
     .request-list { max-height: calc(100vh - 320px); overflow: auto; }
+    .request-view-pane { display: none; }
+    .request-view-pane.active { display: block; }
+    .request-board { padding: 14px 16px 16px; }
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(220px, 1fr));
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    .board-col {
+      border: 1px solid rgba(130, 96, 185, 0.2);
+      border-radius: 12px;
+      background: rgba(29, 20, 38, 0.76);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-height: 320px;
+      min-width: 220px;
+    }
+    .board-col-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(130, 96, 185, 0.18);
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .board-col-count {
+      font-size: .72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(124, 58, 237, 0.15);
+      color: var(--text);
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-open .board-col-head {
+      background: rgba(93, 141, 214, 0.16);
+      border-bottom-color: rgba(93, 141, 214, 0.3);
+      color: #cde0ff;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-open .board-col-count {
+      background: rgba(93, 141, 214, 0.24);
+      border-color: rgba(93, 141, 214, 0.36);
+      color: #deebff;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-in_progress .board-col-head {
+      background: rgba(150, 113, 215, 0.16);
+      border-bottom-color: rgba(150, 113, 215, 0.32);
+      color: #e5d3ff;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-in_progress .board-col-count {
+      background: rgba(150, 113, 215, 0.24);
+      border-color: rgba(150, 113, 215, 0.38);
+      color: #eee3ff;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-blocked .board-col-head {
+      background: rgba(212, 113, 139, 0.16);
+      border-bottom-color: rgba(212, 113, 139, 0.32);
+      color: #ffd7e2;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-blocked .board-col-count {
+      background: rgba(212, 113, 139, 0.24);
+      border-color: rgba(212, 113, 139, 0.4);
+      color: #ffe3ea;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-completed .board-col-head {
+      background: rgba(88, 191, 149, 0.16);
+      border-bottom-color: rgba(88, 191, 149, 0.32);
+      color: #d0f8e4;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-completed .board-col-count {
+      background: rgba(88, 191, 149, 0.24);
+      border-color: rgba(88, 191, 149, 0.38);
+      color: #defbed;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-cancelled .board-col-head {
+      background: rgba(140, 157, 178, 0.15);
+      border-bottom-color: rgba(140, 157, 178, 0.28);
+      color: #d7e0ec;
+    }
+    :root[data-theme="dark"] body.support-theme-support .board-col.board-status-cancelled .board-col-count {
+      background: rgba(140, 157, 178, 0.23);
+      border-color: rgba(140, 157, 178, 0.34);
+      color: #e3eaf2;
+    }
+    .board-col-body {
+      padding: 10px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      overflow-y: auto;
+      max-height: 430px;
+    }
+    .board-empty {
+      color: var(--muted);
+      font-size: .82rem;
+      border: 1px dashed rgba(130, 96, 185, 0.25);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .request-card {
+      border: 1px solid rgba(130, 96, 185, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      background: rgba(39, 27, 52, 0.78);
+      display: grid;
+      gap: 8px;
+      cursor: pointer;
+      transition: border-color .14s ease, transform .14s ease, box-shadow .14s ease;
+    }
+    .request-card:hover {
+      border-color: rgba(124, 58, 237, 0.48);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+    .request-card.active {
+      border-color: rgba(124, 58, 237, 0.62);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.18) inset;
+    }
+    .request-card-id {
+      font-size: .72rem;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .request-card-title {
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text);
+    }
+    .request-card-meta {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+    .request-card-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: .78rem;
+      color: var(--muted);
+    }
     .detail {
       padding: 20px;
       display: grid;
@@ -292,6 +847,86 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
+    }
+    .detail-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .detail-tab-btn {
+      border: 1px solid var(--border);
+      background: rgba(124, 58, 237, 0.08);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .detail-tab-btn.active {
+      background: rgba(124, 58, 237, 0.24);
+      color: var(--text);
+      border-color: rgba(124, 58, 237, 0.42);
+    }
+    .detail-tab-pane { display: none; }
+    .detail-tab-pane.active { display: block; }
+    .activity-list {
+      display: grid;
+      gap: 10px;
+    }
+    .activity-item {
+      border: 1px solid rgba(130, 96, 185, 0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: rgba(34, 24, 47, 0.76);
+      display: grid;
+      gap: 4px;
+    }
+    .activity-item-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: .78rem;
+    }
+    .activity-item-title {
+      font-weight: 700;
+      color: var(--text);
+      font-size: .9rem;
+    }
+    .activity-item-meta {
+      color: var(--muted);
+      font-size: .8rem;
+      line-height: 1.45;
+    }
+    .comments-wrap {
+      display: grid;
+      gap: 10px;
+    }
+    .comment-item {
+      border: 1px solid rgba(130, 96, 185, 0.2);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: rgba(34, 24, 47, 0.76);
+    }
+    .comment-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .comment-body {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      color: var(--text);
+      font-size: .86rem;
     }
     .field label {
       display: block;
@@ -628,27 +1263,43 @@
       border: 1px solid transparent;
       white-space: nowrap;
     }
-    .support-log-event-badge.evt-support_request_created { background: rgba(56, 189, 248, 0.16); color: #8fe8ff; border-color: rgba(56, 189, 248, 0.25); }
-    .support-log-event-badge.evt-support_request_updated { background: rgba(124, 92, 255, 0.16); color: #d7cfff; border-color: rgba(124, 92, 255, 0.26); }
-    .support-log-event-badge.evt-support_request_deleted { background: rgba(248, 113, 113, 0.15); color: #ffb6b6; border-color: rgba(248, 113, 113, 0.28); }
-    .support-log-event-badge.evt-support_task_assignment_changed { background: rgba(96, 165, 250, 0.15); color: #bfdbfe; border-color: rgba(96, 165, 250, 0.28); }
-    .support-log-event-badge.evt-support_task_status_changed { background: rgba(52, 211, 153, 0.16); color: #a7f3d0; border-color: rgba(52, 211, 153, 0.24); }
-    .support-log-event-badge.evt-support_approval_status_changed { background: rgba(14, 165, 233, 0.16); color: #bae6fd; border-color: rgba(14, 165, 233, 0.28); }
-    .support-log-event-badge.evt-support_comment_added { background: rgba(244, 114, 182, 0.16); color: #fbcfe8; border-color: rgba(244, 114, 182, 0.28); }
-    .support-log-event-badge.evt-support_request_approval_action { background: rgba(245, 158, 11, 0.18); color: #fde68a; border-color: rgba(245, 158, 11, 0.3); }
-    .support-log-event-badge.evt-default { background: rgba(148, 163, 184, 0.16); color: #d3dce9; border-color: rgba(148, 163, 184, 0.24); }
+    /* Dark theme badge colors — bright text for contrast on dark backgrounds */
+    .support-log-event-badge.evt-support_request_created { background: rgba(56, 189, 248, 0.22); color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); }
+    .support-log-event-badge.evt-support_request_updated { background: rgba(167, 139, 250, 0.22); color: #a78bfa; border-color: rgba(167, 139, 250, 0.35); }
+    .support-log-event-badge.evt-support_request_deleted { background: rgba(248, 113, 113, 0.22); color: #f87171; border-color: rgba(248, 113, 113, 0.35); }
+    .support-log-event-badge.evt-support_task_assignment_changed { background: rgba(96, 165, 250, 0.22); color: #60a5fa; border-color: rgba(96, 165, 250, 0.35); }
+    .support-log-event-badge.evt-support_task_status_changed { background: rgba(52, 211, 153, 0.22); color: #34d399; border-color: rgba(52, 211, 153, 0.35); }
+    .support-log-event-badge.evt-support_approval_status_changed { background: rgba(56, 189, 248, 0.22); color: #38bdf8; border-color: rgba(56, 189, 248, 0.35); }
+    .support-log-event-badge.evt-support_comment_added { background: rgba(244, 114, 182, 0.22); color: #f472b6; border-color: rgba(244, 114, 182, 0.35); }
+    .support-log-event-badge.evt-support_request_approval_action { background: rgba(251, 191, 36, 0.22); color: #fbbf24; border-color: rgba(251, 191, 36, 0.35); }
+    .support-log-event-badge.evt-default { background: rgba(148, 163, 184, 0.22); color: #94a3b8; border-color: rgba(148, 163, 184, 0.35); }
+    /* Light theme badge overrides — dark text for contrast on white backgrounds */
+    :root[data-theme="light"] .support-log-event-badge.evt-support_request_created { background: rgba(56, 189, 248, 0.18); color: #0369a1; border-color: rgba(56, 189, 248, 0.45); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_request_updated { background: rgba(124, 92, 255, 0.15); color: #5b21b6; border-color: rgba(124, 92, 255, 0.4); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_request_deleted { background: rgba(248, 113, 113, 0.16); color: #b91c1c; border-color: rgba(248, 113, 113, 0.42); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_task_assignment_changed { background: rgba(96, 165, 250, 0.16); color: #1d4ed8; border-color: rgba(96, 165, 250, 0.42); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_task_status_changed { background: rgba(52, 211, 153, 0.18); color: #047857; border-color: rgba(52, 211, 153, 0.42); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_approval_status_changed { background: rgba(14, 165, 233, 0.16); color: #0c4a6e; border-color: rgba(14, 165, 233, 0.42); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_comment_added { background: rgba(244, 114, 182, 0.16); color: #9d174d; border-color: rgba(244, 114, 182, 0.42); }
+    :root[data-theme="light"] .support-log-event-badge.evt-support_request_approval_action { background: rgba(245, 158, 11, 0.18); color: #92400e; border-color: rgba(245, 158, 11, 0.45); }
+    :root[data-theme="light"] .support-log-event-badge.evt-default { background: rgba(148, 163, 184, 0.18); color: #334155; border-color: rgba(148, 163, 184, 0.42); }
     .support-log-summary {
       display: grid;
       gap: 6px;
     }
     .support-log-summary-main {
       font-size: .9rem;
+      font-weight: 500;
+      color: var(--text);
       line-height: 1.45;
     }
     .support-log-meta {
       color: var(--muted);
       font-size: .78rem;
       line-height: 1.45;
+    }
+    :root[data-theme="light"] .support-log-meta {
+      color: #475569;
     }
     .support-log-pagination {
       padding: 12px 20px 16px;
@@ -1013,17 +1664,37 @@
       to { opacity: 1; transform: translateY(0); }
     }
 @media (max-width: 1100px) {
+      body {
+        height: auto;
+        overflow: auto;
+      }
+      .shell {
+        height: auto;
+        overflow: visible;
+      }
       .shell { grid-template-columns: 1fr; }
-      .sidebar { border-right: none; border-bottom: 1px solid rgba(130,96,185,.18); }
+      .sidebar {
+        border-right: none;
+        border-bottom: 1px solid rgba(130,96,185,.18);
+        height: auto;
+        overflow: visible;
+      }
+      .main {
+        min-height: auto;
+        overflow: visible;
+      }
       .grid { grid-template-columns: 1fr; }
       .summary { grid-template-columns: repeat(2, 1fr); }
+      .sla-details { grid-template-columns: 1fr; padding: 0 12px 12px; }
+      .filters { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+      .board-grid { grid-template-columns: repeat(2, minmax(220px, 1fr)); }
       .modal-box { width: min(100vw, 720px); }
       .request-type-layout { grid-template-columns: 1fr; }
       .mail-template-edit-layout { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
       .main { padding: 18px; }
-      .summary, .detail-grid, .form-grid, .filters, .task-grid, .builder-grid, .workflow-step-grid { grid-template-columns: 1fr; }
+      .summary, .detail-grid, .form-grid, .filters, .task-grid, .builder-grid, .workflow-step-grid, .board-grid { grid-template-columns: 1fr; }
       .topbar, .panel-head, .modal-head, .modal-foot { flex-direction: column; align-items: stretch; }
       .modal-box {
         width: 100vw;
@@ -1032,32 +1703,70 @@
     }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
+  <script src="/portal-api-client.js"></script>
 </head>
-<body class="support-theme support-theme-support">
+<script>
+  (function(){
+    var t = localStorage.getItem('portalTheme');
+    if (!t) {
+      t = 'light';
+      localStorage.setItem('portalTheme', t);
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<body class="support-theme support-theme-support" data-portal-theme="white">
   <div class="shell">
     <aside class="sidebar">
       <div class="logo">
         <div class="logo-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <svg viewBox="0 0 64 64"><path d="M32 4L4 56h16l12-28 12 28h16L32 4z" /><rect x="18" y="38" width="28" height="8" rx="2" opacity=".5"/></svg>
         </div>
         <div>
-          <div class="logo-title">TerzoCloud</div>
+          <div class="logo-title">Terzo</div>
           <div class="logo-sub">Support Workflows</div>
         </div>
       </div>
-      <div class="nav-title">Navigate</div>
-      <a class="nav-link" href="/">
-        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Back to Portal
-      </a>
-      <a class="nav-link" href="/admin">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        Admin Console
-      </a>
-      <a class="nav-link active" href="/support">
-        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Support Center
-      </a>
+      <div style="padding:16px 10px;flex:1">
+        <div class="nav-title">Navigate</div>
+        <div class="nav-links">
+          <a class="nav-link" href="/">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Back to Portal
+          </a>
+          <div class="nav-group open" id="supportCenterNavGroup">
+            <button class="nav-link nav-dropdown-toggle active" type="button" id="supportCenterNavToggle" onclick="toggleSupportCenterMenu(event)">
+              <span class="nav-link-main">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Support Center
+              </span>
+              <svg class="nav-caret" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+            </button>
+            <div class="nav-sub-links" id="supportCenterSubLinks">
+              <a class="nav-link active" id="navViewRequests" href="#" onclick="openSupportView('requests', event)">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+                Requests
+              </a>
+              <a class="nav-link" id="navViewRequestTypes" href="#" onclick="openSupportView('request-types', event)">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16v6H4z"/><path d="M4 14h16v6H4z"/></svg>
+                Request Type
+              </a>
+              <a class="nav-link" id="navViewRequestLogs" href="#" onclick="openSupportView('request-logs', event)">
+                <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M8 14l3-3 2 2 4-4"/></svg>
+                Request Log
+              </a>
+              <a class="nav-link" id="navViewMailTemplates" href="#" onclick="openSupportView('mail-templates', event)">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="m4 8 8 5 8-5"/></svg>
+                Mail Template
+              </a>
+            </div>
+          </div>
+          <a class="nav-link" href="/admin">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Admin Console
+          </a>
+        </div>
+      </div>
       <div class="sidebar-footer">
         <strong id="currentUserName">Loading…</strong>
         <span id="currentUserRole">Checking access…</span>
@@ -1080,7 +1789,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
                 CSV
               </div>
-              <div class="export-menu-item" onclick="exportRequestsPdf()">
+            <div class="export-menu-item" onclick="exportRequestsPdf()">
                 <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2a1 1 0 0 1 0 2H8v3"/><path d="M14 18v-5h1a2 2 0 0 1 0 4h-1"/><path d="M18 18v-5h2"/></svg>
                 PDF
               </div>
@@ -1101,21 +1810,37 @@
         </div>
       </div>
 
-      <div class="section-menu">
-        <button class="section-tab active" id="requestsTab" onclick="setSupportView('requests')">Requests</button>
-        <button class="section-tab" id="requestLogsTab" onclick="setSupportView('request-logs')">Request Logs</button>
-        <button class="section-tab" id="requestTypesTab" onclick="setSupportView('request-types')">Request Type</button>
-        <button class="section-tab" id="mailTemplatesTab" onclick="setSupportView('mail-templates')">Mail Template</button>
-      </div>
-
       <div class="page-view active" id="requestsView">
         <div class="summary" id="summaryGrid"></div>
+        <section class="panel" id="slaDashboardPanel">
+          <div class="panel-head">
+            <div class="panel-title">SLA Dashboard</div>
+            <div class="sla-metric-subtle" id="slaGeneratedAtLabel">Loading SLA metrics…</div>
+          </div>
+          <div class="summary" id="slaSummaryGrid" style="padding:16px 20px 0"></div>
+          <div class="sla-details">
+            <article class="sla-detail-card">
+              <div class="sla-detail-title">By Priority</div>
+              <div class="sla-priority-list" id="slaByPriority"></div>
+            </article>
+            <article class="sla-detail-card">
+              <div class="sla-detail-title">Last 7 Days</div>
+              <div class="sla-trend-list" id="slaTrendList"></div>
+            </article>
+          </div>
+        </section>
 
         <div class="grid">
           <section class="panel">
             <div class="panel-head">
               <div class="panel-title">Request Queue</div>
-              <div style="color:var(--muted);font-size:.9rem" id="requestCountLabel">0 requests</div>
+              <div class="request-toolbar">
+                <div style="color:var(--muted);font-size:.9rem" id="requestCountLabel">0 requests</div>
+                <div class="request-mode-switch" role="tablist" aria-label="Request view mode">
+                  <button class="request-mode-btn active" id="requestViewListBtn" type="button" onclick="setRequestViewMode('list')">List</button>
+                  <button class="request-mode-btn" id="requestViewBoardBtn" type="button" onclick="setRequestViewMode('board')">Board</button>
+                </div>
+              </div>
             </div>
             <div class="filters">
               <input type="text" id="supportSearch" placeholder="Search by employee, request ID, assignee…" oninput="renderRequests()" />
@@ -1130,19 +1855,58 @@
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
               </select>
+              <select id="priorityFilter" onchange="renderRequests()">
+                <option value="">All priorities</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <select id="assigneeFilter" onchange="renderRequests()">
+                <option value="">All assignees</option>
+              </select>
             </div>
             <div class="request-list">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Request</th>
-                    <th>Request Type</th>
-                    <th>Status</th>
-                    <th>Progress</th>
-                  </tr>
-                </thead>
-                <tbody id="requestTableBody"></tbody>
-              </table>
+              <div class="request-view-pane active" id="requestListView">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Request</th>
+                      <th>Request Type</th>
+                      <th>Status</th>
+                      <th>Priority</th>
+                      <th>Assignee</th>
+                      <th>Progress</th>
+                    </tr>
+                  </thead>
+                  <tbody id="requestTableBody"></tbody>
+                </table>
+              </div>
+              <div class="request-view-pane" id="requestBoardView">
+                <div class="request-board">
+                  <div class="board-grid">
+                    <section class="board-col board-status-open">
+                      <div class="board-col-head">Open <span class="board-col-count" id="boardCountOpen">0</span></div>
+                      <div class="board-col-body" id="boardColOpen"></div>
+                    </section>
+                    <section class="board-col board-status-in_progress">
+                      <div class="board-col-head">In Progress <span class="board-col-count" id="boardCountInProgress">0</span></div>
+                      <div class="board-col-body" id="boardColInProgress"></div>
+                    </section>
+                    <section class="board-col board-status-blocked">
+                      <div class="board-col-head">Blocked <span class="board-col-count" id="boardCountBlocked">0</span></div>
+                      <div class="board-col-body" id="boardColBlocked"></div>
+                    </section>
+                    <section class="board-col board-status-completed">
+                      <div class="board-col-head">Completed <span class="board-col-count" id="boardCountCompleted">0</span></div>
+                      <div class="board-col-body" id="boardColCompleted"></div>
+                    </section>
+                    <section class="board-col board-status-cancelled">
+                      <div class="board-col-head">Cancelled <span class="board-col-count" id="boardCountCancelled">0</span></div>
+                      <div class="board-col-body" id="boardColCancelled"></div>
+                    </section>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -1400,6 +2164,18 @@
       { value: 'onboarding', label: 'Onboarding' },
       { value: 'offboarding', label: 'Offboarding' },
     ];
+    const DEFAULT_SLA_POLICY_CLIENT = {
+      enabled: true,
+      responseMinutes: 60,
+      resolutionMinutes: 480,
+      atRiskPercent: 80,
+      priorityResponseMinutes: { low: 120, medium: 60, high: 30 },
+      priorityResolutionMinutes: { low: 120, medium: 60, high: 30 },
+      breachReminderMinutes: 10,
+      notifyAtRisk: true,
+      notifyOnBreach: true,
+      autoEscalateOnBreach: true,
+    };
     const DEFAULT_ASSIGNEE_REQUEST_TYPES = new Set(['app_hardware_issue', 'app_hardware_support']);
     const REQUESTOR_ASSIGNMENT_USER_ID = '__requestor__';
     const REQUESTOR_ASSIGNMENT_LABEL = 'Requestor';
@@ -1415,8 +2191,12 @@
     let mailTemplates = [];
     let selectedMailTemplateId = null;
     let supportView = 'requests';
+    let requestViewMode = 'list';
     let mailTemplateMode = 'overview';
     let supportLogs = [];
+    let requestActivityByRequestId = {};
+    let slaDashboard = null;
+    let boardRenderToken = 0;
     let supportLogTotal = 0;
     let supportLogPage = 1;
     let supportLogSearchTimer = null;
@@ -1426,6 +2206,36 @@
     let detailSelectedApplications = [];
     let departmentOptions = [];
     let softwareInventory = [];
+    const supportStore = window.tcApi.createStore({
+      workflowOptions: [],
+      requestTypeDefinitions: [],
+      requests: [],
+      mailTemplates: [],
+      supportLogs: [],
+      requestActivityByRequestId: {},
+      slaDashboard: null,
+      supportUsers: [],
+      departmentOptions: [],
+      softwareInventory: [],
+    });
+    supportStore.subscribe((nextState) => {
+      if (Array.isArray(nextState.workflowOptions)) workflowOptions = nextState.workflowOptions;
+      if (Array.isArray(nextState.requestTypeDefinitions)) requestTypeDefinitions = nextState.requestTypeDefinitions;
+      if (Array.isArray(nextState.requests)) requests = nextState.requests;
+      if (Array.isArray(nextState.mailTemplates)) mailTemplates = nextState.mailTemplates;
+      if (Array.isArray(nextState.supportLogs)) supportLogs = nextState.supportLogs;
+      if (nextState.requestActivityByRequestId && typeof nextState.requestActivityByRequestId === 'object') {
+        requestActivityByRequestId = nextState.requestActivityByRequestId;
+      }
+      if (nextState.slaDashboard && typeof nextState.slaDashboard === 'object') {
+        slaDashboard = nextState.slaDashboard;
+      } else if (nextState.slaDashboard === null) {
+        slaDashboard = null;
+      }
+      if (Array.isArray(nextState.supportUsers)) supportUsers = nextState.supportUsers;
+      if (Array.isArray(nextState.departmentOptions)) departmentOptions = nextState.departmentOptions;
+      if (Array.isArray(nextState.softwareInventory)) softwareInventory = nextState.softwareInventory;
+    });
     const SUPPORT_LOG_EVENT_LABELS = {
       support_request_created: 'Request Created',
       support_request_updated: 'Request Updated',
@@ -1450,13 +2260,19 @@
       notes: { inputId: 'newNotes', wrapperId: 'createField_notes', labelId: 'createLabel_notes', defaultLabel: 'Notes' },
     };
     function authFetch(url, opts = {}) {
-      return fetch(url, {
+      const h = {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json',
+        ...(opts.headers || {}),
+      };
+      return window.tcApi.request(url, {
         ...opts,
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json',
-          ...(opts.headers || {}),
-        },
+        headers: h,
+        timeoutMs: 30000,
+        retries: 2,
+        cancelPrevious: !!opts.cancelPrevious,
+        cancelKey: opts.requestKey || '',
+        dedupeKey: opts.requestKey || '',
       });
     }
 
@@ -1808,6 +2624,7 @@
         isActive: true,
         defaultAssignee: '',
         autoAddDepartmentApps: false,
+        slaPolicy: clone(DEFAULT_SLA_POLICY_CLIENT),
         formFields: Object.entries(CREATE_FORM_FIELD_CONFIG).map(([key, config]) => ({
           key,
           label: config.defaultLabel,
@@ -1833,6 +2650,38 @@
       });
     }
 
+    function normalizeSlaPolicyDraft(input = {}) {
+      const base = {
+        ...clone(DEFAULT_SLA_POLICY_CLIENT),
+        ...(input || {}),
+      };
+      const toInt = (value, fallback, min, max) => {
+        const parsed = Number(value);
+        if (!Number.isFinite(parsed)) return fallback;
+        return Math.min(max, Math.max(min, Math.round(parsed)));
+      };
+      return {
+        enabled: base.enabled !== false,
+        responseMinutes: toInt(base.responseMinutes, DEFAULT_SLA_POLICY_CLIENT.responseMinutes, 1, 43200),
+        resolutionMinutes: toInt(base.resolutionMinutes, DEFAULT_SLA_POLICY_CLIENT.resolutionMinutes, 1, 43200),
+        atRiskPercent: toInt(base.atRiskPercent, DEFAULT_SLA_POLICY_CLIENT.atRiskPercent, 1, 99),
+        priorityResponseMinutes: {
+          low: toInt(base?.priorityResponseMinutes?.low, DEFAULT_SLA_POLICY_CLIENT.priorityResponseMinutes.low, 1, 43200),
+          medium: toInt(base?.priorityResponseMinutes?.medium, DEFAULT_SLA_POLICY_CLIENT.priorityResponseMinutes.medium, 1, 43200),
+          high: toInt(base?.priorityResponseMinutes?.high, DEFAULT_SLA_POLICY_CLIENT.priorityResponseMinutes.high, 1, 43200),
+        },
+        priorityResolutionMinutes: {
+          low: toInt(base?.priorityResolutionMinutes?.low, DEFAULT_SLA_POLICY_CLIENT.priorityResolutionMinutes.low, 1, 43200),
+          medium: toInt(base?.priorityResolutionMinutes?.medium, DEFAULT_SLA_POLICY_CLIENT.priorityResolutionMinutes.medium, 1, 43200),
+          high: toInt(base?.priorityResolutionMinutes?.high, DEFAULT_SLA_POLICY_CLIENT.priorityResolutionMinutes.high, 1, 43200),
+        },
+        breachReminderMinutes: toInt(base.breachReminderMinutes, DEFAULT_SLA_POLICY_CLIENT.breachReminderMinutes, 1, 1440),
+        notifyAtRisk: base.notifyAtRisk !== false,
+        notifyOnBreach: base.notifyOnBreach !== false,
+        autoEscalateOnBreach: base.autoEscalateOnBreach !== false,
+      };
+    }
+
     function currentCreateDefinition() {
       return requestTypeDefinitionByWorkflowType(document.getElementById('newWorkflowType').value);
     }
@@ -1840,22 +2689,22 @@
     async function loadReferenceData() {
       try {
         const [usersRes, softwareRes, requestTypeRes] = await Promise.all([
-          authFetch('/api/users'),
-          authFetch('/api/software'),
-          authFetch('/api/support/request-types'),
+          authFetch('/api/users', { requestKey: 'support:users:reference', cancelPrevious: true }),
+          authFetch('/api/software', { requestKey: 'support:software:reference', cancelPrevious: true }),
+          authFetch('/api/support/request-types', { requestKey: 'support:request-types:reference', cancelPrevious: true }),
         ]);
         if (!usersRes.ok) throw new Error('Failed to load user inventory departments');
         if (!softwareRes.ok) throw new Error('Failed to load software inventory');
         if (!requestTypeRes.ok) throw new Error('Failed to load request type definitions');
 
         const users = await usersRes.json();
-        supportUsers = normalizeSupportUsers(users);
-        softwareInventory = (await softwareRes.json()).map(app => ({
+        const nextSupportUsers = normalizeSupportUsers(users);
+        const nextSoftwareInventory = (await softwareRes.json()).map(app => ({
           ...app,
           department: normalizeSoftwareDepartmentValue(app?.department),
         }));
-        requestTypeDefinitions = await requestTypeRes.json();
-        workflowOptions = requestTypeDefinitions
+        const nextRequestTypeDefinitions = await requestTypeRes.json();
+        const nextWorkflowOptions = nextRequestTypeDefinitions
           .filter(definition => definition.isActive !== false)
           .map(definition => ({
             workflowType: definition.workflowType,
@@ -1864,19 +2713,30 @@
             autoAddDepartmentApps: !!definition.autoAddDepartmentApps,
             sourceSystem: definition.sourceSystem || 'portal',
           }));
-        departmentOptions = [...new Set((supportUsers || [])
+        const nextDepartmentOptions = [...new Set((nextSupportUsers || [])
           .map(user => user?.dept)
           .filter(Boolean))]
           .sort((a, b) => a.localeCompare(b));
+        supportStore.setState({
+          supportUsers: nextSupportUsers,
+          softwareInventory: nextSoftwareInventory,
+          requestTypeDefinitions: nextRequestTypeDefinitions,
+          workflowOptions: nextWorkflowOptions,
+          departmentOptions: nextDepartmentOptions,
+        }, 'support:reference-data');
         renderWorkflowOptions();
         renderDepartmentOptions();
         renderManagerOptions();
         renderRequestTypeList();
         renderRequestTypeEditor();
       } catch (e) {
-        supportUsers = [];
-        requestTypeDefinitions = [];
-        workflowOptions = builtinWorkflowOptions();
+        supportStore.setState({
+          supportUsers: [],
+          requestTypeDefinitions: [],
+          workflowOptions: builtinWorkflowOptions(),
+          departmentOptions: [],
+          softwareInventory: [],
+        }, 'support:reference-data-fallback');
         renderWorkflowOptions();
         renderManagerOptions();
         renderRequestTypeList();
@@ -2401,6 +3261,25 @@
       document.getElementById('mailTemplateEditPane')?.classList.toggle('active', mailTemplateMode === 'edit');
     }
 
+    function openSupportView(view, event) {
+      if (event && typeof event.preventDefault === 'function') event.preventDefault();
+      setSupportNavExpanded(true);
+      setSupportView(view);
+    }
+
+    function setSupportNavExpanded(expanded) {
+      const group = document.getElementById('supportCenterNavGroup');
+      if (!group) return;
+      group.classList.toggle('open', expanded);
+    }
+
+    function toggleSupportCenterMenu(event) {
+      if (event && typeof event.preventDefault === 'function') event.preventDefault();
+      const group = document.getElementById('supportCenterNavGroup');
+      if (!group) return;
+      group.classList.toggle('open');
+    }
+
     function selectMailTemplate(id) {
       selectedMailTemplateId = id;
       renderMailTemplateList();
@@ -2410,10 +3289,10 @@
     async function loadMailTemplates() {
       if (!canManageMailTemplates()) return;
       try {
-        const res = await authFetch('/api/support/mail-templates');
+        const res = await authFetch('/api/support/mail-templates', { requestKey: 'support:mail-templates:load', cancelPrevious: true });
         const data = await readApiResponse(res);
         if (!res.ok) throw new Error(data.error || 'Failed to load mail templates');
-        mailTemplates = data;
+        supportStore.setState({ mailTemplates: Array.isArray(data) ? data : [] }, 'support:mail-templates-loaded');
         if (!selectedMailTemplateId || !mailTemplates.some(template => template.id === selectedMailTemplateId)) {
           selectedMailTemplateId = mailTemplates[0]?.id || null;
         }
@@ -2470,10 +3349,18 @@
         view = 'requests';
       }
       supportView = view;
-      document.getElementById('requestsTab').classList.toggle('active', view === 'requests');
-      document.getElementById('requestLogsTab').classList.toggle('active', view === 'request-logs');
-      document.getElementById('requestTypesTab').classList.toggle('active', view === 'request-types');
-      document.getElementById('mailTemplatesTab').classList.toggle('active', view === 'mail-templates');
+      document.getElementById('requestsTab')?.classList.toggle('active', view === 'requests');
+      document.getElementById('requestLogsTab')?.classList.toggle('active', view === 'request-logs');
+      document.getElementById('requestTypesTab')?.classList.toggle('active', view === 'request-types');
+      document.getElementById('mailTemplatesTab')?.classList.toggle('active', view === 'mail-templates');
+      const supportCenterToggle = document.getElementById('supportCenterNavToggle');
+      const hasSupportCenterActiveView = ['requests', 'request-logs', 'request-types', 'mail-templates'].includes(view);
+      supportCenterToggle?.classList.toggle('active', hasSupportCenterActiveView);
+      document.getElementById('navViewRequests')?.classList.toggle('active', view === 'requests');
+      document.getElementById('navViewRequestLogs')?.classList.toggle('active', view === 'request-logs');
+      document.getElementById('navViewRequestTypes')?.classList.toggle('active', view === 'request-types');
+      document.getElementById('navViewMailTemplates')?.classList.toggle('active', view === 'mail-templates');
+      if (hasSupportCenterActiveView) setSupportNavExpanded(true);
       document.getElementById('requestsView').classList.toggle('active', view === 'requests');
       document.getElementById('requestLogsView').classList.toggle('active', view === 'request-logs');
       document.getElementById('requestTypesView').classList.toggle('active', view === 'request-types');
@@ -2482,6 +3369,10 @@
       document.getElementById('requestLogsActions').style.display = view === 'request-logs' ? 'flex' : 'none';
       document.getElementById('requestTypeActions').style.display = view === 'request-types' ? 'flex' : 'none';
       document.getElementById('mailTemplateActions').style.display = view === 'mail-templates' && canManageMailTemplates() ? 'flex' : 'none';
+      if (view === 'requests') {
+        setRequestViewMode(requestViewMode);
+        renderSlaDashboard();
+      }
       if (view === 'request-logs') {
         renderSupportLogRequestFilterOptions();
         loadSupportLogs(1);
@@ -2573,6 +3464,7 @@
           : field
       ));
       const customFormFields = Array.isArray(definition.customFormFields) ? definition.customFormFields : [];
+      const slaPolicy = normalizeSlaPolicyDraft(definition.slaPolicy || {});
 
       editor.innerHTML = `
         <div class="builder-section-title">Request Type</div>
@@ -2630,8 +3522,72 @@
           <input id="requestTypeAutoApps" type="checkbox" ${definition.autoAddDepartmentApps ? 'checked' : ''} ${editable ? '' : 'disabled'} />
         </div>
 
+        <div class="builder-section-title">SLA Policy</div>
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:800">Track SLA for this request type</div>
+            <div style="color:var(--muted);font-size:.88rem">Priority based SLA clocks: Low 120m, Medium 60m, High 30m (editable).</div>
+          </div>
+          <input data-editor-key="sla-enabled" type="checkbox" ${slaPolicy.enabled ? 'checked' : ''} onchange="updateRequestTypeSlaPolicy('enabled', this.checked)" ${editable ? '' : 'disabled'} />
+        </div>
+        <div class="builder-grid">
+          <div>
+            <label>At-Risk Threshold (%)</label>
+            <input data-editor-key="sla-at-risk" type="number" min="1" max="99" value="${escapeHtml(slaPolicy.atRiskPercent)}" oninput="updateRequestTypeSlaPolicy('atRiskPercent', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Breach Reminder (minutes)</label>
+            <input data-editor-key="sla-reminder" type="number" min="1" max="1440" value="${escapeHtml(slaPolicy.breachReminderMinutes)}" oninput="updateRequestTypeSlaPolicy('breachReminderMinutes', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Response SLA - Low (minutes)</label>
+            <input data-editor-key="sla-response-low" type="number" min="1" max="43200" value="${escapeHtml(slaPolicy.priorityResponseMinutes.low)}" oninput="updateRequestTypeSlaPolicy('priorityResponseMinutes.low', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Response SLA - Medium (minutes)</label>
+            <input data-editor-key="sla-response-medium" type="number" min="1" max="43200" value="${escapeHtml(slaPolicy.priorityResponseMinutes.medium)}" oninput="updateRequestTypeSlaPolicy('priorityResponseMinutes.medium', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Response SLA - High (minutes)</label>
+            <input data-editor-key="sla-response-high" type="number" min="1" max="43200" value="${escapeHtml(slaPolicy.priorityResponseMinutes.high)}" oninput="updateRequestTypeSlaPolicy('priorityResponseMinutes.high', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Resolution SLA - Low (minutes)</label>
+            <input data-editor-key="sla-resolution-low" type="number" min="1" max="43200" value="${escapeHtml(slaPolicy.priorityResolutionMinutes.low)}" oninput="updateRequestTypeSlaPolicy('priorityResolutionMinutes.low', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Resolution SLA - Medium (minutes)</label>
+            <input data-editor-key="sla-resolution-medium" type="number" min="1" max="43200" value="${escapeHtml(slaPolicy.priorityResolutionMinutes.medium)}" oninput="updateRequestTypeSlaPolicy('priorityResolutionMinutes.medium', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Resolution SLA - High (minutes)</label>
+            <input data-editor-key="sla-resolution-high" type="number" min="1" max="43200" value="${escapeHtml(slaPolicy.priorityResolutionMinutes.high)}" oninput="updateRequestTypeSlaPolicy('priorityResolutionMinutes.high', this.value)" ${editable ? '' : 'disabled'} />
+          </div>
+          <div>
+            <label>Notify on At-Risk</label>
+            <select data-editor-key="sla-notify-at-risk" onchange="updateRequestTypeSlaPolicy('notifyAtRisk', this.value === 'true')" ${editable ? '' : 'disabled'}>
+              <option value="true" ${slaPolicy.notifyAtRisk ? 'selected' : ''}>Enabled</option>
+              <option value="false" ${slaPolicy.notifyAtRisk ? '' : 'selected'}>Disabled</option>
+            </select>
+          </div>
+          <div>
+            <label>Notify on Breach</label>
+            <select data-editor-key="sla-notify-breach" onchange="updateRequestTypeSlaPolicy('notifyOnBreach', this.value === 'true')" ${editable ? '' : 'disabled'}>
+              <option value="true" ${slaPolicy.notifyOnBreach ? 'selected' : ''}>Enabled</option>
+              <option value="false" ${slaPolicy.notifyOnBreach ? '' : 'selected'}>Disabled</option>
+            </select>
+          </div>
+          <div class="full">
+            <label>Auto Escalate on Breach</label>
+            <select data-editor-key="sla-escalate" onchange="updateRequestTypeSlaPolicy('autoEscalateOnBreach', this.value === 'true')" ${editable ? '' : 'disabled'}>
+              <option value="true" ${slaPolicy.autoEscalateOnBreach ? 'selected' : ''}>Enabled</option>
+              <option value="false" ${slaPolicy.autoEscalateOnBreach ? '' : 'selected'}>Disabled</option>
+            </select>
+          </div>
+        </div>
+
         <div class="builder-section-title">Custom Form Fields</div>
-        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">Add text, paragraph, dropdown, or file-upload fields specific to this request type. These appear on the request form and are saved with every ticket.</div>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">Add text, paragraph, dropdown, or file-upload fields specific to this request type. These appear on the request form and are saved with every request.</div>
         <div class="workflow-step-list" id="customFieldList">
           ${customFormFields.length === 0 ? `<div class="empty" style="padding:14px;border:1px dashed rgba(130,96,185,.2);border-radius:12px">No custom fields yet. Click "Add Field" below to build your form.</div>` : ''}
           ${customFormFields.map((field, index) => `
@@ -2836,6 +3792,21 @@
       renderRequestTypeEditor({ preserveState: true });
     }
 
+    function updateRequestTypeSlaPolicy(path, value) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition) return;
+      const policy = normalizeSlaPolicyDraft(definition.slaPolicy || {});
+      if (path.includes('.')) {
+        const [root, key] = path.split('.');
+        if (!policy[root] || typeof policy[root] !== 'object') policy[root] = {};
+        policy[root][key] = value;
+      } else {
+        policy[path] = value;
+      }
+      definition.slaPolicy = normalizeSlaPolicyDraft(policy);
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
     // ── Custom Form Field functions ──────────────────────────────────────
     function addCustomFormField() {
       const definition = currentRequestTypeDefinition();
@@ -2933,11 +3904,11 @@
 
     async function loadRequestTypes() {
       try {
-        const res = await authFetch('/api/support/request-types');
+        const res = await authFetch('/api/support/request-types', { requestKey: 'support:request-types:load', cancelPrevious: true });
         const data = await readApiResponse(res);
         if (!res.ok) throw new Error(data.error || 'Failed to load request types');
-        requestTypeDefinitions = data;
-        workflowOptions = requestTypeDefinitions
+        const nextRequestTypeDefinitions = Array.isArray(data) ? data : [];
+        const nextWorkflowOptions = nextRequestTypeDefinitions
           .filter(definition => definition.isActive !== false)
           .map(definition => ({
             workflowType: definition.workflowType,
@@ -2946,6 +3917,10 @@
             autoAddDepartmentApps: !!definition.autoAddDepartmentApps,
             sourceSystem: definition.sourceSystem || 'portal',
           }));
+        supportStore.setState({
+          requestTypeDefinitions: nextRequestTypeDefinitions,
+          workflowOptions: nextWorkflowOptions,
+        }, 'support:request-types-loaded');
         if (selectedRequestTypeId && selectedRequestTypeId !== 'new') {
           const current = requestTypeDefinitions.find(item => item.id === selectedRequestTypeId);
           requestTypeDraft = current ? clone(current) : null;
@@ -2985,6 +3960,7 @@
           };
         })(),
         autoAddDepartmentApps: document.getElementById('requestTypeAutoApps').checked,
+        slaPolicy: normalizeSlaPolicyDraft(definition.slaPolicy || {}),
         formFields: normalizedFormFields(definition).map(field => ({
           key: field.key,
           label: String(field.label || '').trim(),
@@ -3080,7 +4056,7 @@
     async function init() {
       if (!token) { location.href = '/login'; return; }
       try {
-        const authRes = await authFetch('/api/auth/me');
+        const authRes = await authFetch('/api/auth/me', { requestKey: 'support:auth:me', cancelPrevious: true });
         if (!authRes.ok) { clearAuth(); return; }
         currentUser = await authRes.json();
         document.getElementById('currentUserName').textContent = currentUser.name;
@@ -3090,8 +4066,10 @@
         document.querySelector('#requestActions .btn.btn-primary').style.display = currentUser?.permissions?.manageSupportRequests ? '' : 'none';
         document.querySelector('#requestTypeActions .btn.btn-primary').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
         document.querySelector('#requestTypeActions .btn.btn-secondary').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
-        document.getElementById('requestTypesTab').style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
-        document.getElementById('mailTemplatesTab').style.display = canManageMailTemplates() ? '' : 'none';
+        const navRequestTypes = document.getElementById('navViewRequestTypes');
+        const navMailTemplates = document.getElementById('navViewMailTemplates');
+        if (navRequestTypes) navRequestTypes.style.display = currentUser?.permissions?.manageRequestTypes ? '' : 'none';
+        if (navMailTemplates) navMailTemplates.style.display = canManageMailTemplates() ? '' : 'none';
         document.getElementById('mailTemplateActions').style.display = 'none';
         setMailTemplateMode('overview');
         await loadReferenceData();
@@ -3100,7 +4078,7 @@
         if (canManageMailTemplates()) {
           await loadMailTemplates();
         } else {
-          mailTemplates = [];
+          supportStore.setState({ mailTemplates: [] }, 'support:mail-templates-cleared');
           selectedMailTemplateId = null;
           renderMailTemplateOverview();
           renderMailTemplateList();
@@ -3186,16 +4164,19 @@
         if (type) params.set('type', type);
         if (search) params.set('search', search);
 
-        const res = await authFetch(`${API}/logs?${params.toString()}`);
+        const res = await authFetch(`${API}/logs?${params.toString()}`, {
+          requestKey: 'support:logs:load',
+          cancelPrevious: true,
+        });
         const data = await readApiResponse(res);
         if (!res.ok) throw new Error(data.error || 'Failed to load support logs');
 
-        supportLogs = Array.isArray(data.logs) ? data.logs : [];
+        supportStore.setState({ supportLogs: Array.isArray(data.logs) ? data.logs : [] }, 'support:logs-loaded');
         supportLogTotal = Number(data.total) || 0;
         supportLogPage = Number(data.page) || nextPage;
         renderSupportLogs();
       } catch (e) {
-        supportLogs = [];
+        supportStore.setState({ supportLogs: [] }, 'support:logs-load-failed');
         supportLogTotal = 0;
         supportLogPage = 1;
         tableBody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--danger)">${escapeHtml(e.message || 'Failed to load support logs.')}</td></tr>`;
@@ -3265,28 +4246,78 @@
 
     async function loadRequests() {
       try {
-        const res = await authFetch(API);
+        const res = await authFetch(API, { requestKey: 'support:requests:load', cancelPrevious: true });
         if (!res.ok) throw new Error('Failed to load support requests');
-        requests = await res.json();
+        supportStore.setState({
+          requests: await res.json(),
+          requestActivityByRequestId: {},
+        }, 'support:requests-loaded');
         if (selectedRequestId && !requests.find(r => r.id === selectedRequestId)) selectedRequestId = null;
+        renderRequestFilters();
         renderSummary();
+        renderSlaDashboard();
         renderRequests();
         renderDetail();
         renderSupportLogRequestFilterOptions();
+        await loadSlaDashboard();
         if (supportView === 'request-logs') loadSupportLogs(supportLogPage || 1);
       } catch (e) {
         showToast(e.message, 'danger');
       }
     }
 
+    function renderRequestFilters() {
+      const assigneeSelect = document.getElementById('assigneeFilter');
+      if (!assigneeSelect) return;
+      const currentAssignee = assigneeSelect.value;
+      const assignees = [...new Set(
+        (requests || [])
+          .map(request => String(request?.assignee || '').trim())
+          .filter(Boolean)
+      )].sort((a, b) => a.localeCompare(b));
+      assigneeSelect.innerHTML = `
+        <option value="">All assignees</option>
+        ${assignees.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}
+      `;
+      if (assignees.includes(currentAssignee)) assigneeSelect.value = currentAssignee;
+    }
+
+    function setRequestViewMode(mode = 'list') {
+      requestViewMode = mode === 'board' ? 'board' : 'list';
+      document.getElementById('requestViewListBtn')?.classList.toggle('active', requestViewMode === 'list');
+      document.getElementById('requestViewBoardBtn')?.classList.toggle('active', requestViewMode === 'board');
+      document.getElementById('requestListView')?.classList.toggle('active', requestViewMode === 'list');
+      document.getElementById('requestBoardView')?.classList.toggle('active', requestViewMode === 'board');
+      if (requestViewMode === 'board') renderRequestBoard();
+    }
+
+    function buildRequestFilterParams() {
+      const search = document.getElementById('supportSearch')?.value?.trim() || '';
+      const workflowType = document.getElementById('workflowFilter')?.value || '';
+      const status = document.getElementById('statusFilter')?.value || '';
+      const priority = document.getElementById('priorityFilter')?.value || '';
+      const assignee = document.getElementById('assigneeFilter')?.value || '';
+      const params = new URLSearchParams();
+      if (search) params.set('search', search);
+      if (workflowType) params.set('workflowType', workflowType);
+      if (status) params.set('status', status);
+      if (priority) params.set('priority', priority);
+      if (assignee) params.set('assignee', assignee);
+      return params;
+    }
+
     function filteredRequests() {
       const search = document.getElementById('supportSearch').value.trim().toLowerCase();
       const workflowType = document.getElementById('workflowFilter').value;
       const status = document.getElementById('statusFilter').value;
+      const priority = document.getElementById('priorityFilter')?.value || '';
+      const assignee = document.getElementById('assigneeFilter')?.value || '';
 
       return requests.filter(request => {
         if (workflowType && request.workflowType !== workflowType) return false;
         if (status && request.status !== status) return false;
+        if (priority && request.priority !== priority) return false;
+        if (assignee && request.assignee !== assignee) return false;
         if (!search) return true;
         return [
           request.requestId,
@@ -3314,6 +4345,88 @@
           </div>
         `).join('')}
       `;
+    }
+
+    function formatMinutesCompact(value) {
+      const minutes = Number(value || 0);
+      if (!Number.isFinite(minutes) || minutes <= 0) return '0m';
+      if (minutes < 60) return `${Math.round(minutes)}m`;
+      const hours = Math.floor(minutes / 60);
+      const mins = Math.round(minutes % 60);
+      return mins ? `${hours}h ${mins}m` : `${hours}h`;
+    }
+
+    function renderSlaDashboard() {
+      const generatedEl = document.getElementById('slaGeneratedAtLabel');
+      const summaryEl = document.getElementById('slaSummaryGrid');
+      const priorityEl = document.getElementById('slaByPriority');
+      const trendEl = document.getElementById('slaTrendList');
+      if (!generatedEl || !summaryEl || !priorityEl || !trendEl) return;
+
+      if (!slaDashboard?.totals) {
+        generatedEl.textContent = 'No SLA data available';
+        summaryEl.innerHTML = `<div class="empty" style="grid-column:1/-1;padding:14px">SLA metrics will appear after requests are loaded.</div>`;
+        priorityEl.innerHTML = `<div class="sla-metric-subtle">No priority metrics</div>`;
+        trendEl.innerHTML = `<div class="sla-metric-subtle">No trend data</div>`;
+        return;
+      }
+
+      const totals = slaDashboard.totals || {};
+      generatedEl.textContent = `Updated ${formatActivityDate(slaDashboard.generatedAt)}`;
+      const cards = [
+        { label: 'Tracked Requests', value: Number(totals.tracked || 0), hint: `${Number(totals.active || 0)} active` },
+        { label: 'SLA Compliance', value: `${Number(totals.complianceRate || 0).toFixed(1)}%`, hint: `${Number(totals.met || 0)} met / ${Number(totals.completed || 0)} completed` },
+        { label: 'At Risk (Active)', value: Number(totals.activeAtRisk || 0), hint: 'Needs close follow-up' },
+        { label: 'Breached (Active)', value: Number(totals.activeBreached || 0), hint: 'Breach reminders in progress' },
+        { label: 'Breached (Completed)', value: Number(totals.completedBreached || 0), hint: 'Completed after breach' },
+        { label: 'Avg Resolution', value: formatMinutesCompact(totals.averageResolutionMinutes || 0), hint: 'Completed requests' },
+      ];
+      summaryEl.innerHTML = cards.map(card => `
+        <div class="summary-card">
+          <span>${escapeHtml(card.label)}</span>
+          <strong>${escapeHtml(String(card.value))}</strong>
+          <div class="sla-metric-subtle">${escapeHtml(card.hint)}</div>
+        </div>
+      `).join('');
+
+      const byPriority = Array.isArray(slaDashboard.byPriority) ? slaDashboard.byPriority : [];
+      priorityEl.innerHTML = byPriority.length
+        ? byPriority.map(item => `
+          <div class="sla-priority-row">
+            <strong>${escapeHtml(String(item.priority || '').toUpperCase())}</strong>
+            <span class="sla-metric-subtle">${escapeHtml(`${Number(item.met || 0)}/${Number(item.completed || 0)} met`)}</span>
+            <span>${escapeHtml(`${Number(item.complianceRate || 0).toFixed(1)}%`)}</span>
+          </div>
+        `).join('')
+        : `<div class="sla-metric-subtle">No priority metrics</div>`;
+
+      const trend = Array.isArray(slaDashboard.trend) ? slaDashboard.trend : [];
+      trendEl.innerHTML = trend.length
+        ? trend.map(item => `
+          <div class="sla-trend-row">
+            <strong>${escapeHtml(item.date || '—')}</strong>
+            <span class="sla-metric-subtle">${escapeHtml(`${Number(item.met || 0)} met`)}</span>
+            <span class="sla-metric-subtle">${escapeHtml(`${Number(item.breached || 0)} breached`)}</span>
+          </div>
+        `).join('')
+        : `<div class="sla-metric-subtle">No trend data</div>`;
+    }
+
+    async function loadSlaDashboard() {
+      try {
+        const params = new URLSearchParams({ days: '30' });
+        const res = await authFetch(`${API}/sla-dashboard?${params.toString()}`, {
+          requestKey: 'support:sla-dashboard:load',
+          cancelPrevious: true,
+        });
+        const data = await readApiResponse(res);
+        if (!res.ok) throw new Error(data.error || 'Failed to load SLA dashboard');
+        supportStore.setState({ slaDashboard: data || null }, 'support:sla-dashboard-loaded');
+      } catch (e) {
+        console.warn('[support] sla dashboard', e.message);
+        supportStore.setState({ slaDashboard: null }, 'support:sla-dashboard-failed');
+      }
+      renderSlaDashboard();
     }
 
     function workflowPill(type, label) {
@@ -3460,6 +4573,29 @@
       return `"${str.replace(/"/g, '""')}"`;
     }
 
+    function normalizeSlaPriority(priority) {
+      const normalized = String(priority || '').trim().toLowerCase();
+      if (normalized === 'critical') return 'high';
+      return ['low', 'medium', 'high'].includes(normalized) ? normalized : 'medium';
+    }
+
+    function exportDateTime(value) {
+      if (!value) return '';
+      const parsed = new Date(value);
+      return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString();
+    }
+
+    function requestSlaMinutes(request, kind = 'resolution') {
+      const policy = request?.slaPolicySnapshot || {};
+      const priority = normalizeSlaPriority(request?.priority);
+      const map = kind === 'response'
+        ? policy?.priorityResponseMinutes
+        : policy?.priorityResolutionMinutes;
+      const fallback = kind === 'response' ? policy?.responseMinutes : policy?.resolutionMinutes;
+      const raw = Number(map?.[priority] ?? fallback);
+      return Number.isFinite(raw) && raw > 0 ? Math.round(raw) : '';
+    }
+
     function exportRequestsCsv() {
       document.getElementById('requestExportWrap')?.classList.remove('open');
       const rows = filteredRequests();
@@ -3471,7 +4607,11 @@
       const headers = [
         'Request ID', 'Request Type', 'Status', 'Priority', 'Employee Name', 'Employee Email',
         'Department', 'Applications', 'Job Title', 'Location', 'Manager', 'Requested By', 'Requested Via',
-        'Assignee', 'Progress %', 'Completed Tasks', 'Total Tasks', 'Created At', 'Updated At', 'Notes',
+        'Assignee', 'Progress %', 'Completed Tasks', 'Total Tasks',
+        'SLA Status', 'SLA Response Target (min)', 'SLA Resolution Target (min)', 'SLA First Response At',
+        'SLA Response Due At', 'SLA Resolved At', 'SLA Resolution Due At', 'SLA Breached At',
+        'SLA At Risk Notified At', 'SLA Breach Notified At', 'SLA Breach Reminder At', 'SLA Escalated At',
+        'Created At', 'Updated At', 'Notes',
       ];
       const lines = [
         headers.map(csvCell).join(','),
@@ -3493,8 +4633,20 @@
           request.progressPercent,
           request.completedCount,
           request.totalTasks,
-          request.createdAt ? new Date(request.createdAt).toISOString() : '',
-          request.updatedAt ? new Date(request.updatedAt).toISOString() : '',
+          request.slaStatus,
+          requestSlaMinutes(request, 'response'),
+          requestSlaMinutes(request, 'resolution'),
+          exportDateTime(request.firstResponseAt),
+          exportDateTime(request.slaResponseDueAt),
+          exportDateTime(request.resolvedAt),
+          exportDateTime(request.slaResolutionDueAt),
+          exportDateTime(request.slaBreachedAt),
+          exportDateTime(request.slaNotifiedAtRiskAt),
+          exportDateTime(request.slaNotifiedBreachAt),
+          exportDateTime(request.slaLastBreachReminderAt),
+          exportDateTime(request.slaEscalatedAt),
+          exportDateTime(request.createdAt),
+          exportDateTime(request.updatedAt),
           request.notes,
         ].map(csvCell).join(',')),
       ];
@@ -3547,7 +4699,7 @@
           startY: 28,
           head: [[
             'Request ID', 'Type', 'Status', 'Priority', 'Employee', 'Department',
-            'Requested By', 'Assignee', 'Progress',
+            'Requested By', 'Assignee', 'Progress', 'SLA Status', 'Resp SLA', 'Res SLA', 'Response Due', 'Resolution Due',
           ]],
           body: rows.map(request => [
             request.requestId,
@@ -3559,6 +4711,11 @@
             request.requestedByName || '—',
             request.assignee || '—',
             `${request.progressPercent}% (${request.completedCount}/${request.totalTasks})`,
+            request.slaStatus || 'no_sla',
+            requestSlaMinutes(request, 'response') ? `${requestSlaMinutes(request, 'response')}m` : '—',
+            requestSlaMinutes(request, 'resolution') ? `${requestSlaMinutes(request, 'resolution')}m` : '—',
+            request.slaResponseDueAt ? new Date(request.slaResponseDueAt).toLocaleString('en-IN') : '—',
+            request.slaResolutionDueAt ? new Date(request.slaResolutionDueAt).toLocaleString('en-IN') : '—',
           ]),
           styles: { fontSize: 8, cellPadding: 2 },
           headStyles: { fillColor: [55, 87, 230], textColor: 255, fontStyle: 'bold' },
@@ -3576,7 +4733,8 @@
       document.getElementById('requestCountLabel').textContent = `${list.length} request${list.length === 1 ? '' : 's'}`;
       const body = document.getElementById('requestTableBody');
       if (!list.length) {
-        body.innerHTML = `<tr><td colspan="4" class="empty">No support requests match the current filters.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" class="empty">No support requests match the current filters.</td></tr>`;
+        if (requestViewMode === 'board') renderRequestBoard();
         return;
       }
 
@@ -3588,12 +4746,74 @@
           </td>
           <td>${workflowPill(request.workflowType, request.workflowLabel)}</td>
           <td>${statusPill(request.status)}</td>
+          <td><span class="pill status-${request.priority === 'high' ? 'blocked' : request.priority === 'low' ? 'completed' : 'open'}">${escapeHtml(request.priority || 'medium')}</span></td>
+          <td>${escapeHtml(request.assignee || 'Unassigned')}</td>
           <td>
             <div style="font-weight:700">${request.progressPercent}%</div>
             <div style="color:var(--muted);font-size:.82rem">${request.completedCount}/${request.totalTasks} tasks</div>
           </td>
         </tr>
       `).join('');
+      setRequestViewMode(requestViewMode);
+    }
+
+    function requestBoardCard(request) {
+      return `
+        <article class="request-card ${request.id === selectedRequestId ? 'active' : ''}" onclick="selectRequest('${request.id}')">
+          <div class="request-card-id">${escapeHtml(request.requestId || '—')}</div>
+          <div class="request-card-title">${escapeHtml(request.employeeName || 'Unknown employee')}</div>
+          <div class="request-card-meta">${escapeHtml(request.department || 'No department')}</div>
+          <div>${workflowPill(request.workflowType, request.workflowLabel)}</div>
+          <div class="request-card-foot">
+            <span>${escapeHtml(request.assignee || 'Unassigned')}</span>
+            <span>${Number(request.progressPercent || 0)}%</span>
+          </div>
+        </article>
+      `;
+    }
+
+    async function renderRequestBoard() {
+      const targets = [
+        { key: 'open', bodyId: 'boardColOpen', countId: 'boardCountOpen' },
+        { key: 'in_progress', bodyId: 'boardColInProgress', countId: 'boardCountInProgress' },
+        { key: 'blocked', bodyId: 'boardColBlocked', countId: 'boardCountBlocked' },
+        { key: 'completed', bodyId: 'boardColCompleted', countId: 'boardCountCompleted' },
+        { key: 'cancelled', bodyId: 'boardColCancelled', countId: 'boardCountCancelled' },
+      ];
+      const token = ++boardRenderToken;
+      targets.forEach(target => {
+        const body = document.getElementById(target.bodyId);
+        if (body) body.innerHTML = `<div class="board-empty">Loading requests…</div>`;
+      });
+
+      try {
+        const params = buildRequestFilterParams();
+        const query = params.toString();
+        const res = await authFetch(`${API}/board${query ? `?${query}` : ''}`);
+        const data = await readApiResponse(res);
+        if (!res.ok) throw new Error(data.error || 'Failed to load request board');
+        if (token !== boardRenderToken) return;
+
+        const columns = data?.columns || {};
+        targets.forEach(target => {
+          const items = Array.isArray(columns[target.key]) ? columns[target.key] : [];
+          const body = document.getElementById(target.bodyId);
+          const count = document.getElementById(target.countId);
+          if (count) count.textContent = String(items.length);
+          if (!body) return;
+          body.innerHTML = items.length
+            ? items.map(requestBoardCard).join('')
+            : `<div class="board-empty">No requests</div>`;
+        });
+      } catch (e) {
+        if (token !== boardRenderToken) return;
+        targets.forEach(target => {
+          const body = document.getElementById(target.bodyId);
+          const count = document.getElementById(target.countId);
+          if (count) count.textContent = '0';
+          if (body) body.innerHTML = `<div class="board-empty" style="color:var(--danger)">Unable to load requests</div>`;
+        });
+      }
     }
 
     function selectRequest(id) {
@@ -3606,6 +4826,88 @@
 
     function currentRequest() {
       return requests.find(r => r.id === selectedRequestId) || null;
+    }
+
+    function switchDetailTab(tab = 'overview') {
+      const normalized = ['overview', 'activity', 'comments'].includes(tab) ? tab : 'overview';
+      document.getElementById('detailTabBtnOverview')?.classList.toggle('active', normalized === 'overview');
+      document.getElementById('detailTabBtnActivity')?.classList.toggle('active', normalized === 'activity');
+      document.getElementById('detailTabBtnComments')?.classList.toggle('active', normalized === 'comments');
+      document.getElementById('detailTabOverview')?.classList.toggle('active', normalized === 'overview');
+      document.getElementById('detailTabActivity')?.classList.toggle('active', normalized === 'activity');
+      document.getElementById('detailTabComments')?.classList.toggle('active', normalized === 'comments');
+      if (normalized === 'activity') loadRequestActivity();
+    }
+
+    function formatActivityDate(value) {
+      if (!value) return '—';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '—';
+      return `${date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })} ${date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true })}`;
+    }
+
+    function detailCommentsMarkup(request) {
+      const notes = String(request?.notes || '').trim();
+      const requestedBy = String(request?.requestedByName || 'Requester');
+      const createdAt = formatActivityDate(request?.createdAt);
+      if (!notes) {
+        return `<div class="empty" style="padding:24px 8px;text-align:left">No comments yet. Use Notes or Slack comments to capture updates.</div>`;
+      }
+      return `
+        <div class="comments-wrap">
+          <div class="comment-item">
+            <div class="comment-head">
+              <strong>${escapeHtml(requestedBy)}</strong>
+              <span>${escapeHtml(createdAt)}</span>
+            </div>
+            <div class="comment-body">${escapeHtml(notes)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function loadRequestActivity() {
+      const request = currentRequest();
+      const container = document.getElementById('detailActivityList');
+      if (!request || !container) return;
+      if (requestActivityByRequestId[request.id]) {
+        container.innerHTML = requestActivityByRequestId[request.id];
+        return;
+      }
+      container.innerHTML = `<div class="empty" style="padding:24px 8px;text-align:left">Loading activity…</div>`;
+      try {
+        const params = new URLSearchParams({ page: '1', limit: '100' });
+        const res = await authFetch(`${API}/${encodeURIComponent(request.id)}/activity?${params.toString()}`, {
+          requestKey: `support:request-activity:${request.id}`,
+          cancelPrevious: true,
+        });
+        const data = await readApiResponse(res);
+        if (!res.ok) throw new Error(data.error || 'Failed to load request activity');
+        const logs = Array.isArray(data.activity) ? data.activity : [];
+        const markup = logs.length
+          ? `<div class="activity-list">
+              ${logs.map(log => `
+                <div class="activity-item">
+                  <div class="activity-item-head">
+                    <span class="support-log-event-badge ${supportLogEventClass(log.eventType)}">${escapeHtml(supportLogEventLabel(log.eventType))}</span>
+                    <span>${escapeHtml(formatActivityDate(log.createdAt))}</span>
+                  </div>
+                  <div class="activity-item-title">${escapeHtml(log.summary || 'Activity recorded')}</div>
+                  <div class="activity-item-meta">By ${escapeHtml(log.actorName || 'System')} · Source: ${escapeHtml(supportLogSource(log.remarks))}</div>
+                </div>
+              `).join('')}
+            </div>`
+          : `<div class="empty" style="padding:24px 8px;text-align:left">No activity yet for this request.</div>`;
+        supportStore.setState({
+          requestActivityByRequestId: {
+            ...requestActivityByRequestId,
+            [request.id]: markup,
+          },
+        }, 'support:request-activity-loaded');
+        container.innerHTML = markup;
+      } catch (e) {
+        container.innerHTML = `<div class="empty" style="padding:24px 8px;text-align:left;color:var(--danger)">${escapeHtml(e.message || 'Failed to load request activity')}</div>`;
+      }
     }
 
     function renderDetail() {
@@ -3648,104 +4950,122 @@
           <div class="progress"><div style="width:${request.progressPercent}%"></div></div>
         </div>
 
-        <div class="detail-grid">
-          <div class="field">
-            <label>Status</label>
-            <select id="detailStatus" ${editable ? '' : 'disabled'}>
-              ${['open','in_progress','blocked','completed','cancelled'].map(status => `<option value="${status}" ${request.status === status ? 'selected' : ''}>${status.replace('_', ' ')}</option>`).join('')}
-            </select>
+        <div class="detail-tabs">
+          <button class="detail-tab-btn active" id="detailTabBtnOverview" type="button" onclick="switchDetailTab('overview')">Overview</button>
+          <button class="detail-tab-btn" id="detailTabBtnActivity" type="button" onclick="switchDetailTab('activity')">Activity</button>
+          <button class="detail-tab-btn" id="detailTabBtnComments" type="button" onclick="switchDetailTab('comments')">Comments</button>
+        </div>
+
+        <section class="detail-tab-pane active" id="detailTabOverview">
+          <div class="detail-grid">
+            <div class="field">
+              <label>Status</label>
+              <select id="detailStatus" ${editable ? '' : 'disabled'}>
+                ${['open','in_progress','blocked','completed','cancelled'].map(status => `<option value="${status}" ${request.status === status ? 'selected' : ''}>${status.replace('_', ' ')}</option>`).join('')}
+              </select>
+            </div>
+            <div class="field">
+              <label>Priority</label>
+              <select id="detailPriority" ${editable ? '' : 'disabled'}>
+                ${['low','medium','high'].map(priority => `<option value="${priority}" ${request.priority === priority ? 'selected' : ''}>${priority}</option>`).join('')}
+              </select>
+            </div>
+            <div class="field">
+              <label>Department</label>
+              <input id="detailDepartment" value="${escapeHtml(request.department || '')}" ${editable ? '' : 'disabled'} />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Applications</label>
+              ${detailApplicationsFieldControl(editable)}
+            </div>
+            <div class="field">
+              <label>Job Title</label>
+              <input id="detailJobTitle" value="${escapeHtml(request.jobTitle || '')}" ${editable ? '' : 'disabled'} />
+            </div>
+            <div class="field">
+              <label>Location</label>
+              <input id="detailLocation" value="${escapeHtml(request.location || '')}" ${editable ? '' : 'disabled'} />
+            </div>
+            <div class="field">
+              <label>Manager</label>
+              ${managerFieldControl(request, editable)}
+            </div>
+            <div class="field">
+              <label>Start Date</label>
+              <input id="detailStartDate" type="date" value="${escapeHtml(request.startDate || '')}" ${editable ? '' : 'disabled'} />
+            </div>
+            <div class="field">
+              <label>End Date</label>
+              <input id="detailEndDate" type="date" value="${escapeHtml(request.endDate || '')}" ${editable ? '' : 'disabled'} />
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Assignee</label>
+              ${assigneeFieldControl(request, editable)}
+            </div>
+            <div class="field" style="grid-column:1/-1">
+              <label>Notes</label>
+              <textarea id="detailNotes" rows="4" ${editable ? '' : 'disabled'}>${escapeHtml(request.notes || '')}</textarea>
+            </div>
+            ${(Array.isArray(request.customFieldValues) && request.customFieldValues.length > 0) ? `
+            <div class="field" style="grid-column:1/-1">
+              <label style="font-weight:800;font-size:.9rem;margin-bottom:8px;display:block">Custom Form Fields</label>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                ${request.customFieldValues.map(cfv => `
+                  <div style="display:flex;flex-direction:column;gap:3px">
+                    <label style="font-size:.8rem;color:var(--muted)">${escapeHtml(cfv.label || cfv.key)}</label>
+                    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(130,96,185,.14);border-radius:8px;padding:8px 12px;font-size:.9rem;white-space:pre-wrap">${escapeHtml(cfv.value || '—')}</div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>` : ''}
           </div>
-          <div class="field">
-            <label>Priority</label>
-            <select id="detailPriority" ${editable ? '' : 'disabled'}>
-              ${['low','medium','high'].map(priority => `<option value="${priority}" ${request.priority === priority ? 'selected' : ''}>${priority}</option>`).join('')}
-            </select>
-          </div>
-          <div class="field">
-            <label>Department</label>
-            <input id="detailDepartment" value="${escapeHtml(request.department || '')}" ${editable ? '' : 'disabled'} />
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label>Applications</label>
-            ${detailApplicationsFieldControl(editable)}
-          </div>
-          <div class="field">
-            <label>Job Title</label>
-            <input id="detailJobTitle" value="${escapeHtml(request.jobTitle || '')}" ${editable ? '' : 'disabled'} />
-          </div>
-          <div class="field">
-            <label>Location</label>
-            <input id="detailLocation" value="${escapeHtml(request.location || '')}" ${editable ? '' : 'disabled'} />
-          </div>
-          <div class="field">
-            <label>Manager</label>
-            ${managerFieldControl(request, editable)}
-          </div>
-          <div class="field">
-            <label>Start Date</label>
-            <input id="detailStartDate" type="date" value="${escapeHtml(request.startDate || '')}" ${editable ? '' : 'disabled'} />
-          </div>
-          <div class="field">
-            <label>End Date</label>
-            <input id="detailEndDate" type="date" value="${escapeHtml(request.endDate || '')}" ${editable ? '' : 'disabled'} />
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label>Assignee</label>
-            ${assigneeFieldControl(request, editable)}
-          </div>
-          <div class="field" style="grid-column:1/-1">
-            <label>Notes</label>
-            <textarea id="detailNotes" rows="4" ${editable ? '' : 'disabled'}>${escapeHtml(request.notes || '')}</textarea>
-          </div>
-          ${(Array.isArray(request.customFieldValues) && request.customFieldValues.length > 0) ? `
-          <div class="field" style="grid-column:1/-1">
-            <label style="font-weight:800;font-size:.9rem;margin-bottom:8px;display:block">Custom Form Fields</label>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              ${request.customFieldValues.map(cfv => `
-                <div style="display:flex;flex-direction:column;gap:3px">
-                  <label style="font-size:.8rem;color:var(--muted)">${escapeHtml(cfv.label || cfv.key)}</label>
-                  <div style="background:rgba(255,255,255,.04);border:1px solid rgba(130,96,185,.14);border-radius:8px;padding:8px 12px;font-size:.9rem;white-space:pre-wrap">${escapeHtml(cfv.value || '—')}</div>
+
+          <div style="margin-top:16px">
+            <div style="font-size:1rem;font-weight:800;margin-bottom:10px">Request Checklist</div>
+            <div class="checklist">
+              ${(request.checklist || []).map((task, index) => `
+                <div class="task" data-task-index="${index}" data-task-key="${escapeHtml(task.key)}" data-task-depends-on="${escapeHtml(task.dependsOn || '')}">
+                  <div class="task-top">
+                    <div>
+                      <div class="task-title" data-task-title="${index}">${escapeHtml(task.label)}</div>
+                      <div class="task-area">
+                        ${escapeHtml(task.area || 'General')}
+                        ${taskProvisioningSummary(task) ? ` · ${escapeHtml(taskProvisioningSummary(task))}` : ''}
+                        ${task.approvalMode === 'manager' ? ` · Manager approval: ${escapeHtml(task.approvalStatus || 'not_requested')}` : ''}
+                      </div>
+                    </div>
+                    <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)">
+                      <input type="checkbox" data-task-done="${index}" data-editable="${editable ? 'true' : 'false'}" onchange="updateTaskFreezeState()" ${task.status === 'done' ? 'checked' : ''} ${editable ? '' : 'disabled'}>
+                      Done
+                    </label>
+                  </div>
+                  <div class="task-grid">
+                    <div class="field">
+                      <label>${taskAssignmentLabel(task)}</label>
+                      ${ownerFieldControl(task, index, editable)}
+                    </div>
+                    <div class="field">
+                      <label>Notes</label>
+                      <input data-task-notes="${index}" data-editable="${editable ? 'true' : 'false'}" value="${escapeHtml(task.notes || '')}" ${editable ? '' : 'disabled'} />
+                    </div>
+                  </div>
+                  ${task.provisioningNotes ? `<div style="margin-top:10px;color:var(--muted);font-size:.82rem;line-height:1.6">Automation note: ${escapeHtml(task.provisioningNotes)}</div>` : ''}
+                  <div class="task-lock-note" style="display:none"></div>
                 </div>
               `).join('')}
             </div>
-          </div>` : ''}
-        </div>
-
-        <div>
-          <div style="font-size:1rem;font-weight:800;margin-bottom:10px">Request Checklist</div>
-          <div class="checklist">
-            ${(request.checklist || []).map((task, index) => `
-              <div class="task" data-task-index="${index}" data-task-key="${escapeHtml(task.key)}" data-task-depends-on="${escapeHtml(task.dependsOn || '')}">
-                <div class="task-top">
-                  <div>
-                    <div class="task-title" data-task-title="${index}">${escapeHtml(task.label)}</div>
-                    <div class="task-area">
-                      ${escapeHtml(task.area || 'General')}
-                      ${taskProvisioningSummary(task) ? ` · ${escapeHtml(taskProvisioningSummary(task))}` : ''}
-                      ${task.approvalMode === 'manager' ? ` · Manager approval: ${escapeHtml(task.approvalStatus || 'not_requested')}` : ''}
-                    </div>
-                  </div>
-                  <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)">
-                    <input type="checkbox" data-task-done="${index}" data-editable="${editable ? 'true' : 'false'}" onchange="updateTaskFreezeState()" ${task.status === 'done' ? 'checked' : ''} ${editable ? '' : 'disabled'}>
-                    Done
-                  </label>
-                </div>
-                <div class="task-grid">
-                  <div class="field">
-                    <label>${taskAssignmentLabel(task)}</label>
-                    ${ownerFieldControl(task, index, editable)}
-                  </div>
-                  <div class="field">
-                    <label>Notes</label>
-                    <input data-task-notes="${index}" data-editable="${editable ? 'true' : 'false'}" value="${escapeHtml(task.notes || '')}" ${editable ? '' : 'disabled'} />
-                  </div>
-                </div>
-                ${task.provisioningNotes ? `<div style="margin-top:10px;color:var(--muted);font-size:.82rem;line-height:1.6">Automation note: ${escapeHtml(task.provisioningNotes)}</div>` : ''}
-                <div class="task-lock-note" style="display:none"></div>
-              </div>
-            `).join('')}
           </div>
-        </div>
+        </section>
+
+        <section class="detail-tab-pane" id="detailTabActivity">
+          <div id="detailActivityList" class="activity-list">
+            <div class="empty" style="padding:24px 8px;text-align:left">Loading activity…</div>
+          </div>
+        </section>
+
+        <section class="detail-tab-pane" id="detailTabComments">
+          ${detailCommentsMarkup(request)}
+        </section>
       `;
 
       document.querySelectorAll('[data-task-owner]').forEach(el => {
@@ -3753,6 +5073,7 @@
       });
       renderApplicationPicker('detail', editable);
       updateTaskFreezeState();
+      switchDetailTab('overview');
     }
 
     function escapeHtml(value) {
@@ -3760,7 +5081,9 @@
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/`/g, '&#96;');
     }
 
     document.addEventListener('click', event => {
@@ -4047,8 +5370,17 @@
       }
     }
 
-    /* Keep the support portal shell classes intact. */
-    document.body.className = 'support-theme support-theme-support';
+    /* Keep the support portal shell classes intact and apply saved theme. */
+    (function(){
+      var t = localStorage.getItem('portalTheme');
+      if (!t) {
+        t = 'light';
+        localStorage.setItem('portalTheme', t);
+      }
+      document.body.className = 'support-theme support-theme-support';
+      document.body.setAttribute('data-portal-theme', t === 'light' ? 'white' : 'dark');
+      document.documentElement.setAttribute('data-theme', t);
+    })();
 
     init();
   </script>

@@ -17,9 +17,9 @@ if (IS_PROD && !process.env.JWT_SECRET) {
 module.exports = {
   IS_PROD,
   PORT:        process.env.PORT        || 3000,
-  JWT_SECRET:  process.env.JWT_SECRET  || 'terzocloud_jwt_secret_2025_dev_only',
+  JWT_SECRET:  process.env.JWT_SECRET  || 'terzo_jwt_secret_2025_dev_only',
   JWT_EXPIRES: process.env.JWT_EXPIRES || '24h',
-  MONGO_URI:   process.env.MONGO_URI   || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/terzocloud_assets',
+  MONGO_URI:   process.env.MONGO_URI   || process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/terzo_assets',
   ACTOR:       process.env.LOG_ACTOR   || 'Praveen M. (IT Admin)',
   // Allowed origins for CORS — comma-separated in env, e.g. https://portal.terzocloud.com
   CORS_ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(s => s.trim()) : null,

@@ -12,6 +12,12 @@ const DEFAULT_SLA_POLICY = SupportRequestType.DEFAULT_SLA_POLICY || {
 };
 const normalizeSlaPolicy = SupportRequestType.normalizeSlaPolicy
   || ((input = {}, fallback = DEFAULT_SLA_POLICY) => ({ ...fallback, ...input }));
+const normalizePriority = SupportRequestType.normalizePriority
+  || (value => {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'critical') return 'high';
+    return ['low', 'medium', 'high'].includes(normalized) ? normalized : 'medium';
+  });
 const normalizeWorkflowType = SupportRequestType.normalizeWorkflowType;
 const DEFAULT_ASSIGNEE_WORKFLOW_TYPES = new Set(['app_hardware_issue', 'app_hardware_support']);
 const REQUESTOR_ASSIGNEE_USER_ID = '__requestor__';
@@ -635,6 +641,16 @@ async function ensureDefaultRequestTypes() {
       || Number(item.slaPolicy.responseMinutes) !== Number(normalizedSlaPolicy.responseMinutes)
       || Number(item.slaPolicy.resolutionMinutes) !== Number(normalizedSlaPolicy.resolutionMinutes)
       || Number(item.slaPolicy.atRiskPercent) !== Number(normalizedSlaPolicy.atRiskPercent)
+      || Number(item?.slaPolicy?.priorityResponseMinutes?.low) !== Number(normalizedSlaPolicy?.priorityResponseMinutes?.low)
+      || Number(item?.slaPolicy?.priorityResponseMinutes?.medium) !== Number(normalizedSlaPolicy?.priorityResponseMinutes?.medium)
+      || Number(item?.slaPolicy?.priorityResponseMinutes?.high) !== Number(normalizedSlaPolicy?.priorityResponseMinutes?.high)
+      || Number(item?.slaPolicy?.priorityResolutionMinutes?.low) !== Number(normalizedSlaPolicy?.priorityResolutionMinutes?.low)
+      || Number(item?.slaPolicy?.priorityResolutionMinutes?.medium) !== Number(normalizedSlaPolicy?.priorityResolutionMinutes?.medium)
+      || Number(item?.slaPolicy?.priorityResolutionMinutes?.high) !== Number(normalizedSlaPolicy?.priorityResolutionMinutes?.high)
+      || Number(item?.slaPolicy?.breachReminderMinutes) !== Number(normalizedSlaPolicy?.breachReminderMinutes)
+      || Boolean(item?.slaPolicy?.notifyAtRisk) !== Boolean(normalizedSlaPolicy?.notifyAtRisk)
+      || Boolean(item?.slaPolicy?.notifyOnBreach) !== Boolean(normalizedSlaPolicy?.notifyOnBreach)
+      || Boolean(item?.slaPolicy?.autoEscalateOnBreach) !== Boolean(normalizedSlaPolicy?.autoEscalateOnBreach)
     );
     if (hasSlaDelta) changed = true;
 
@@ -1212,7 +1228,7 @@ async function createSupportRequest(body = {}, actor = {}, options = {}) {
     slackThreadTs: String(slackContext.threadTs || body.slackThreadTs || '').trim(),
     slackTeamId: String(slackContext.teamId || body.slackTeamId || '').trim(),
     slackCommandUserId: String(slackContext.commandUserId || actor.id || '').trim(),
-    priority: body.priority || 'medium',
+    priority: normalizePriority(body.priority || 'medium'),
     employeeName: employeeName,
     employeeEmail: employeeEmail,
     department: department,

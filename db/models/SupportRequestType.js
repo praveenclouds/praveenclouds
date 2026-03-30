@@ -23,17 +23,43 @@ const REQUEST_FORM_FIELD_DEFINITIONS = [
   { key: 'notes', label: 'Notes', required: false, enabledByDefault: true },
 ];
 
+const PRIORITY_LEVELS = ['low', 'medium', 'high'];
+const DEFAULT_PRIORITY_RESPONSE_MINUTES = Object.freeze({
+  low: 120,
+  medium: 60,
+  high: 30,
+});
+const DEFAULT_PRIORITY_RESOLUTION_MINUTES = Object.freeze({
+  low: 120,
+  medium: 60,
+  high: 30,
+});
+
 const DEFAULT_SLA_POLICY = Object.freeze({
   enabled: true,
   responseMinutes: 60,
   resolutionMinutes: 480,
   atRiskPercent: 80,
+  priorityResponseMinutes: DEFAULT_PRIORITY_RESPONSE_MINUTES,
+  priorityResolutionMinutes: DEFAULT_PRIORITY_RESOLUTION_MINUTES,
+  breachReminderMinutes: 10,
+  notifyAtRisk: true,
+  notifyOnBreach: true,
+  autoEscalateOnBreach: true,
 });
 
 function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, Math.round(parsed)));
+}
+
+function normalizePriorityMinutesMap(input = {}, fallback = {}) {
+  const base = { ...(fallback || {}) };
+  return Object.fromEntries(PRIORITY_LEVELS.map(priority => [
+    priority,
+    clampNumber(input?.[priority], 1, 43200, clampNumber(base?.[priority], 1, 43200, PRIORITY_LEVELS.includes(priority) ? DEFAULT_PRIORITY_RESPONSE_MINUTES[priority] : 60)),
+  ]));
 }
 
 function normalizeSlaPolicy(input = {}, fallback = DEFAULT_SLA_POLICY) {
@@ -46,7 +72,44 @@ function normalizeSlaPolicy(input = {}, fallback = DEFAULT_SLA_POLICY) {
     responseMinutes: clampNumber(input.responseMinutes, 1, 43200, base.responseMinutes),
     resolutionMinutes: clampNumber(input.resolutionMinutes, 1, 43200, base.resolutionMinutes),
     atRiskPercent: clampNumber(input.atRiskPercent, 1, 99, base.atRiskPercent),
+    priorityResponseMinutes: normalizePriorityMinutesMap(
+      input.priorityResponseMinutes,
+      base.priorityResponseMinutes || DEFAULT_PRIORITY_RESPONSE_MINUTES
+    ),
+    priorityResolutionMinutes: normalizePriorityMinutesMap(
+      input.priorityResolutionMinutes,
+      base.priorityResolutionMinutes || DEFAULT_PRIORITY_RESOLUTION_MINUTES
+    ),
+    breachReminderMinutes: clampNumber(input.breachReminderMinutes, 1, 1440, base.breachReminderMinutes),
+    notifyAtRisk: input.notifyAtRisk === undefined ? !!base.notifyAtRisk : !!input.notifyAtRisk,
+    notifyOnBreach: input.notifyOnBreach === undefined ? !!base.notifyOnBreach : !!input.notifyOnBreach,
+    autoEscalateOnBreach: input.autoEscalateOnBreach === undefined ? !!base.autoEscalateOnBreach : !!input.autoEscalateOnBreach,
   };
+}
+
+function normalizePriority(priority = '') {
+  const normalized = String(priority || '').trim().toLowerCase();
+  if (normalized === 'critical') return 'high';
+  return PRIORITY_LEVELS.includes(normalized) ? normalized : 'medium';
+}
+
+function getSlaMinutesForPriority(policy = {}, priority = 'medium', kind = 'resolution') {
+  const normalizedPolicy = normalizeSlaPolicy(policy);
+  const normalizedPriority = normalizePriority(priority);
+  if (kind === 'response') {
+    return clampNumber(
+      normalizedPolicy?.priorityResponseMinutes?.[normalizedPriority],
+      1,
+      43200,
+      normalizedPolicy.responseMinutes
+    );
+  }
+  return clampNumber(
+    normalizedPolicy?.priorityResolutionMinutes?.[normalizedPriority],
+    1,
+    43200,
+    normalizedPolicy.resolutionMinutes
+  );
 }
 
 function buildDefaultFormFields(overrides = {}) {
@@ -112,6 +175,20 @@ const requestTypeSlaPolicySchema = new mongoose.Schema(
     responseMinutes: { type: Number, default: DEFAULT_SLA_POLICY.responseMinutes, min: 1, max: 43200 },
     resolutionMinutes: { type: Number, default: DEFAULT_SLA_POLICY.resolutionMinutes, min: 1, max: 43200 },
     atRiskPercent: { type: Number, default: DEFAULT_SLA_POLICY.atRiskPercent, min: 1, max: 99 },
+    priorityResponseMinutes: {
+      low: { type: Number, default: DEFAULT_PRIORITY_RESPONSE_MINUTES.low, min: 1, max: 43200 },
+      medium: { type: Number, default: DEFAULT_PRIORITY_RESPONSE_MINUTES.medium, min: 1, max: 43200 },
+      high: { type: Number, default: DEFAULT_PRIORITY_RESPONSE_MINUTES.high, min: 1, max: 43200 },
+    },
+    priorityResolutionMinutes: {
+      low: { type: Number, default: DEFAULT_PRIORITY_RESOLUTION_MINUTES.low, min: 1, max: 43200 },
+      medium: { type: Number, default: DEFAULT_PRIORITY_RESOLUTION_MINUTES.medium, min: 1, max: 43200 },
+      high: { type: Number, default: DEFAULT_PRIORITY_RESOLUTION_MINUTES.high, min: 1, max: 43200 },
+    },
+    breachReminderMinutes: { type: Number, default: DEFAULT_SLA_POLICY.breachReminderMinutes, min: 1, max: 1440 },
+    notifyAtRisk: { type: Boolean, default: DEFAULT_SLA_POLICY.notifyAtRisk },
+    notifyOnBreach: { type: Boolean, default: DEFAULT_SLA_POLICY.notifyOnBreach },
+    autoEscalateOnBreach: { type: Boolean, default: DEFAULT_SLA_POLICY.autoEscalateOnBreach },
   },
   { _id: false }
 );
@@ -302,6 +379,9 @@ module.exports = SupportRequestType;
 module.exports.REQUEST_TYPE_CLASSNAMES = REQUEST_TYPE_CLASSNAMES;
 module.exports.DEFAULT_REQUEST_TYPE_DEFINITIONS = DEFAULT_REQUEST_TYPE_DEFINITIONS;
 module.exports.REQUEST_FORM_FIELD_DEFINITIONS = REQUEST_FORM_FIELD_DEFINITIONS;
+module.exports.PRIORITY_LEVELS = PRIORITY_LEVELS;
 module.exports.DEFAULT_SLA_POLICY = DEFAULT_SLA_POLICY;
+module.exports.normalizePriority = normalizePriority;
+module.exports.getSlaMinutesForPriority = getSlaMinutesForPriority;
 module.exports.normalizeSlaPolicy = normalizeSlaPolicy;
 module.exports.normalizeWorkflowType = normalizeWorkflowType;

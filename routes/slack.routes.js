@@ -240,6 +240,46 @@ function getStateMultiValues(values, field) {
     .filter(Boolean);
 }
 
+function customFieldIdPart(value = '', fallback = 'field') {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 40);
+  return normalized || fallback;
+}
+
+function customFieldMeta(field = {}, index = 0) {
+  const keyPart = customFieldIdPart(field.key || field.label, `field_${index + 1}`);
+  const suffix = `${keyPart}_${index + 1}`;
+  return {
+    blockId: `custom_${suffix}`.slice(0, 255),
+    actionId: `custom_${suffix}_action`.slice(0, 255),
+  };
+}
+
+function customFieldsFromDefinition(definition = null) {
+  return Array.isArray(definition?.customFormFields) ? definition.customFormFields : [];
+}
+
+function customFieldStateValue(values = {}, field = {}, index = 0) {
+  const meta = customFieldMeta(field, index);
+  const input = values?.[meta.blockId]?.[meta.actionId];
+  if (!input) return '';
+  if (typeof input.value === 'string') return input.value;
+  if (input.selected_option?.value) return input.selected_option.value;
+  return '';
+}
+
+function customFieldValuesFromState(values = {}, definition = null) {
+  return customFieldsFromDefinition(definition).map((field, index) => ({
+    key: String(field.key || '').trim(),
+    label: String(field.label || field.key || '').trim(),
+    value: String(customFieldStateValue(values, field, index) || '').trim(),
+  })).filter(item => item.key);
+}
+
 function fieldConfigMap(definition = null) {
   const map = new Map((definition?.formFields || []).map(field => [field.key, field]));
   return map;
@@ -275,6 +315,20 @@ function workflowDefinitionsSignature(definitions = []) {
           label: String(field.label || ''),
           enabled: !!field.enabled,
           required: !!field.required,
+        }))
+        .sort((a, b) => a.key.localeCompare(b.key)),
+      customFormFields: (definition.customFormFields || [])
+        .map((field, index) => ({
+          key: String(field.key || `field_${index + 1}`),
+          label: String(field.label || ''),
+          type: String(field.type || 'text'),
+          required: !!field.required,
+          options: (field.options || [])
+            .map(option => ({
+              label: String(option?.label || ''),
+              value: String(option?.value || ''),
+            }))
+            .sort((a, b) => a.value.localeCompare(b.value)),
         }))
         .sort((a, b) => a.key.localeCompare(b.key)),
     }))
@@ -561,6 +615,64 @@ function buildSupportRequestModal(definitions = [], referenceData = {}, selected
     });
   }
 
+  customFieldsFromDefinition(definition).forEach((field, index) => {
+    const meta = customFieldMeta(field, index);
+    const label = truncateLabel(String(field.label || field.key || `Field ${index + 1}`), 120);
+    const initialValue = customFieldStateValue(stateValues, field, index);
+    const optional = !field.required;
+
+    if (field.type === 'dropdown') {
+      const dropdownOptions = (Array.isArray(field.options) ? field.options : [])
+        .map(option => {
+          const value = String(option?.value || option?.label || '').trim();
+          const text = truncateLabel(option?.label || option?.value || value, 75);
+          if (!value || !text) return null;
+          return {
+            text: { type: 'plain_text', text, emoji: true },
+            value,
+          };
+        })
+        .filter(Boolean);
+
+      if (dropdownOptions.length) {
+        const block = {
+          type: 'input',
+          optional,
+          block_id: meta.blockId,
+          label: { type: 'plain_text', text: label, emoji: true },
+          element: {
+            type: 'static_select',
+            action_id: meta.actionId,
+            placeholder: { type: 'plain_text', text: 'Select an option' },
+            options: dropdownOptions,
+          },
+        };
+        const initialOption = findInitialOption(dropdownOptions, initialValue);
+        if (initialOption) block.element.initial_option = initialOption;
+        blocks.push(block);
+        return;
+      }
+    }
+
+    const multiline = field.type === 'textarea';
+    const placeholderText = field.type === 'file'
+      ? 'Paste file name or URL'
+      : label;
+    blocks.push({
+      type: 'input',
+      optional,
+      block_id: meta.blockId,
+      label: { type: 'plain_text', text: label, emoji: true },
+      element: {
+        type: 'plain_text_input',
+        action_id: meta.actionId,
+        ...(initialValue ? { initial_value: initialValue } : {}),
+        ...(multiline ? { multiline: true } : {}),
+        placeholder: { type: 'plain_text', text: truncateLabel(placeholderText, 150) || 'Enter value' },
+      },
+    });
+  });
+
   return {
     type: 'modal',
     callback_id: 'support_request_create',
@@ -629,6 +741,20 @@ function validationErrors(payload, definition = null) {
   if (fieldEnabled(definition, 'managerName', true) && fieldRequired(definition, 'managerName', false) && !payload.managerUserId) {
     errors[FORM_BLOCKS.managerName.blockId] = 'Select a manager.';
   }
+  const customValueByKey = new Map(
+    (Array.isArray(payload.customFieldValues) ? payload.customFieldValues : [])
+      .map(item => [String(item.key || '').trim(), String(item.value || '').trim()])
+  );
+  customFieldsFromDefinition(definition).forEach((field, index) => {
+    if (!field?.required) return;
+    const key = String(field.key || '').trim();
+    if (!key) return;
+    const value = customValueByKey.get(key) || '';
+    if (!value) {
+      const meta = customFieldMeta(field, index);
+      errors[meta.blockId] = `${field.label || key} is required.`;
+    }
+  });
   return errors;
 }
 
@@ -983,24 +1109,29 @@ router.post(
       const needsTargetEmployee = definitionNeedsTargetEmployee(workflowDefinition);
       let requestorName = String(privateMetadata.requestorName || '').trim();
       let requestorEmail = String(privateMetadata.requestorEmail || '').trim().toLowerCase();
-      if (!requestorName || !requestorEmail) {
-        const requestorProfile = await resolveSlackRequestorProfile(payload.user || {});
-        if (!requestorName) requestorName = requestorProfile.name || '';
-        if (!requestorEmail) requestorEmail = requestorProfile.email || '';
+      const fallbackSlackName = String(payload.user?.username || payload.user?.name || '').trim();
+      const requestorProfile = await resolveSlackRequestorProfile(payload.user || {});
+      if (!requestorName || (fallbackSlackName && requestorName === fallbackSlackName)) {
+        requestorName = requestorProfile.name || requestorName || fallbackSlackName;
+      }
+      if (!requestorEmail) {
+        requestorEmail = requestorProfile.email || '';
       }
       const managerUserId = getStateValue(values, 'managerName').trim();
       const manager = managerById(referenceData.users || [], managerUserId);
+      const slackEmployeeName = (requestorName || getStateValue(values, 'employeeName').trim() || '').trim();
+      const slackEmployeeEmail = (requestorEmail || getStateValue(values, 'employeeEmail').trim() || '').trim();
       const supportPayload = {
         workflowType: getStateValue(values, 'workflowType'),
         priority: fieldEnabled(workflowDefinition, 'priority', true)
           ? (getStateValue(values, 'priority') || 'medium')
           : 'medium',
-        employeeName: fieldEnabled(workflowDefinition, 'employeeName', true)
-          ? (needsTargetEmployee ? getStateValue(values, 'employeeName').trim() : (requestorName || getStateValue(values, 'employeeName').trim()))
-          : '',
-        employeeEmail: fieldEnabled(workflowDefinition, 'employeeEmail', true)
-          ? (needsTargetEmployee ? getStateValue(values, 'employeeEmail').trim() : (requestorEmail || getStateValue(values, 'employeeEmail').trim()))
-          : '',
+        employeeName: needsTargetEmployee
+          ? (fieldEnabled(workflowDefinition, 'employeeName', true) ? getStateValue(values, 'employeeName').trim() : '')
+          : slackEmployeeName,
+        employeeEmail: needsTargetEmployee
+          ? (fieldEnabled(workflowDefinition, 'employeeEmail', true) ? getStateValue(values, 'employeeEmail').trim() : '')
+          : slackEmployeeEmail,
         department: fieldEnabled(workflowDefinition, 'department', true)
           ? getStateValue(values, 'department').trim()
           : '',
@@ -1022,6 +1153,7 @@ router.post(
         endDate: fieldEnabled(workflowDefinition, 'endDate', true)
           ? getStateValue(values, 'endDate').trim()
           : '',
+        customFieldValues: customFieldValuesFromState(values, workflowDefinition),
         notes: fieldEnabled(workflowDefinition, 'notes', true)
           ? getStateValue(values, 'notes').trim()
           : '',

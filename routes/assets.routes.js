@@ -36,7 +36,11 @@ router.get('/', requireAuth, async (req, res) => {
 // ── POST /api/assets ───────────────────────────────────────────────────────────
 router.post('/', requireAuth, canWriteAssets, async (req, res) => {
   try {
-    const body  = { ...req.body };
+    // Whitelist allowed fields to prevent mass assignment
+    const ALLOWED_ASSET_FIELDS = ['name', 'type', 'serial', 'brand', 'desc', 'status', 'location',
+      'vendor', 'notes', 'assignedTo', 'csvId', 'purchaseDate', 'warrantyEnd', 'purchaseCost'];
+    const body = {};
+    ALLOWED_ASSET_FIELDS.forEach(k => { if (req.body[k] !== undefined) body[k] = req.body[k]; });
     if (!body.assignedTo) body.assignedTo = null;
     const asset = await Asset.create(body);
     const a     = fmt(asset);
@@ -77,7 +81,11 @@ router.post('/', requireAuth, canWriteAssets, async (req, res) => {
 // ── PUT /api/assets/:id ────────────────────────────────────────────────────────
 router.put('/:id', requireAuth, canWriteAssets, async (req, res) => {
   try {
-    const body     = { ...req.body };
+    // Whitelist allowed fields to prevent mass assignment
+    const ALLOWED_ASSET_FIELDS = ['name', 'type', 'serial', 'brand', 'desc', 'status', 'location',
+      'vendor', 'notes', 'assignedTo', 'csvId', 'purchaseDate', 'warrantyEnd', 'purchaseCost'];
+    const body = {};
+    ALLOWED_ASSET_FIELDS.forEach(k => { if (req.body[k] !== undefined) body[k] = req.body[k]; });
     if (!body.assignedTo) body.assignedTo = null;
 
     const oldAsset = await Asset.findById(req.params.id).lean();

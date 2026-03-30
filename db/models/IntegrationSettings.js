@@ -1,6 +1,6 @@
 /**
  * db/models/IntegrationSettings.js
- * Stores OAuth / SSO integration configuration for TerzoCloud Portal
+ * Stores OAuth / SSO integration configuration for Terzo Portal
  */
 
 const mongoose = require('mongoose');
@@ -18,7 +18,7 @@ const IntegrationSettingsSchema = new mongoose.Schema({
   smtpUser:       { type: String,  default: '' },
   smtpPass:       { type: String,  default: '' },
   fromEmail:      { type: String,  default: '' },
-  fromName:       { type: String,  default: 'TerzoCloud Support' },
+  fromName:       { type: String,  default: 'Terzo Support' },
   appBaseUrl:     { type: String,  default: '' },
 }, { timestamps: true });
 

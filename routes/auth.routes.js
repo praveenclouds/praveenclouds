@@ -59,6 +59,14 @@ router.post('/login', loginLimiter, async (req, res) => {
     const permissions = await getResolvedPermissions(user.role);
     const payload = { id: user._id.toString(), email: user.email, name: user.name, role: user.role };
     const token   = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+    // Set JWT as HttpOnly cookie for security (prevents XSS token theft)
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge:   24 * 60 * 60 * 1000, // 24 hours
+      path:     '/',
+    });
     res.json({
       token,
       user: {
@@ -89,6 +97,12 @@ router.get('/me', requireAuth, async (req, res) => {
       permissions,
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── POST /api/auth/logout ──────────────────────────────────────────────────────
+router.post('/logout', (req, res) => {
+  res.clearCookie('token', { httpOnly: true, sameSite: 'lax', path: '/' });
+  res.json({ ok: true });
 });
 
 // ── GET /api/auth/google/status ────────────────────────────────────────────────
@@ -191,6 +205,14 @@ router.get('/google/callback', async (req, res) => {
 
     const payload = { id: adminUser._id.toString(), email: adminUser.email, name: adminUser.name, role: adminUser.role };
     const token   = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
+    // Set JWT as HttpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure:   process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge:   24 * 60 * 60 * 1000,
+      path:     '/',
+    });
     res.redirect(`/login?sso_token=${encodeURIComponent(token)}`);
   } catch (e) {
     console.error('[AUTH] Google OAuth callback error:', e.message);

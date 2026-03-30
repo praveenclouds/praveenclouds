@@ -244,10 +244,30 @@ async function logSupportRequestUpdated(previousRequest, currentRequest, actorNa
   }
 }
 
+async function logSupportSlaEvent({
+  request,
+  actorName = 'SLA Monitor',
+  source = 'sla_monitor',
+  label = 'SLA event',
+  changes = [],
+  remarks = '',
+} = {}) {
+  if (!request) return;
+  await writeSupportLog({
+    eventType: 'support_request_updated',
+    request,
+    actorName,
+    remarks: [remarks, `source=${source}`].filter(Boolean).join('; '),
+    summary: `${requestLabel(request)} • ${label}`,
+    changes: Array.isArray(changes) ? changes : [],
+  });
+}
+
 module.exports = {
   logSupportCommentAdded,
   logSupportRequestApprovalAction,
   logSupportRequestCreated,
   logSupportRequestDeleted,
   logSupportRequestUpdated,
+  logSupportSlaEvent,
 };

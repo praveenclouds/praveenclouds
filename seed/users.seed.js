@@ -5,7 +5,7 @@
  * Runs on every server start — upserts so existing records are kept up to date.
  */
 const User = require('../db/models/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const EMPLOYEES = [
   {
@@ -1286,20 +1286,19 @@ const EMPLOYEES = [
 
 async function seedUsers() {
   try {
-    const defaultHash = await bcrypt.hash('TerzoCloud@2025', 10);
-    let created = 0, updated = 0;
+    const defaultHash = await bcrypt.hash('Terzo@2025', 10);
+    let created = 0, skipped = 0;
     for (const emp of EMPLOYEES) {
       const { email, ...rest } = emp;
       const existing = await User.findOne({ email });
       if (existing) {
-        await User.updateOne({ email }, { $set: { ...rest } });
-        updated++;
+        skipped++;
       } else {
         await User.create({ email, ...rest, password: defaultHash });
         created++;
       }
     }
-    console.log(`👥  Users seeded — ${created} created, ${updated} updated`);
+    console.log(`👥  Users seeded — ${created} created, ${skipped} skipped (existing preserved)`);
   } catch (err) {
     console.error('❌  User seed failed:', err.message);
   }

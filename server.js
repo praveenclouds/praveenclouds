@@ -1,12 +1,12 @@
 /**
- * server.js — TerzoCloud Asset Portal  (modular monolith entry point)
+ * server.js — Terzo Asset Portal  (modular monolith entry point)
  *
  * Start:  node start-dev.js
  * Dev:    npm run dev
  *
  * Environment variables (set in .env or export):
  *   PORT         = 3000
- *   MONGO_URI    = mongodb://127.0.0.1:27017/terzocloud_assets
+ *   MONGO_URI    = mongodb://127.0.0.1:27017/terzo_assets
  *   JWT_SECRET   = <strong-random-secret>   ← required in production
  *   LOG_ACTOR    = Praveen M. (IT Admin)
  *   CORS_ORIGINS = https://portal.terzocloud.com   ← comma-separated, production
@@ -17,6 +17,7 @@ const express      = require('express');
 const cors         = require('cors');
 const helmet       = require('helmet');
 const cookieParser = require('cookie-parser');
+const crypto       = require('crypto');
 const path         = require('path');
 
 const { connect }                     = require('./db');
@@ -39,19 +40,39 @@ const adminScimRoutes        = require('./routes/admin/scim.routes');
 const adminConnectorRoutes   = require('./routes/admin/connectors.routes');
 const adminRolePermissionRoutes = require('./routes/admin/role-permissions.routes');
 const adminSlackWorkflowRoutes = require('./routes/admin/slack-workflows.routes');
+const adminDepartmentRoutes    = require('./routes/admin/departments.routes');
+const adminAlertRoutes         = require('./routes/admin/alerts.routes');
 const sheetSyncRoutes          = require('./routes/sheet-sync.routes');
+const { requireAuth, onlySuperAdmin } = require('./middleware/auth');
+const { runSupportSlaMonitor } = require('./services/support-notification.service');
 
 // ── App setup ──────────────────────────────────────────────────────────────────
 const app = express();
+let supportSlaMonitorInterval = null;
 
 // Respect X-Forwarded-* headers when running behind a single reverse proxy.
 if (IS_PROD) app.set('trust proxy', 1);
 
 // ── Security headers via helmet ────────────────────────────────────────────────
 app.use(helmet({
-  // Disable CSP — our single-page HTML files use inline scripts/styles
-  contentSecurityPolicy:      false,
-  crossOriginEmbedderPolicy:  false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc:  ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net", "https://unpkg.com"],
+      // This app still uses inline HTML handlers (onclick/onsubmit) across pages.
+      // Allow script attributes so button/form actions execute in browser.
+      scriptSrcAttr: ["'unsafe-inline'"],
+      styleSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com"],
+      fontSrc:    ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      imgSrc:     ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+      frameSrc:   ["'none'"],
+      objectSrc:  ["'none'"],
+      baseUri:    ["'self'"],
+      formAction: ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
 }));
 
 // ── CORS — open in dev, origin-restricted in production ───────────────────────
@@ -68,8 +89,86 @@ if (IS_PROD && CORS_ORIGINS) {
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
+// ── Request ID tracing ─────────────────────────────────────────────────────────
+app.use((req, res, next) => {
+  const incoming = String(req.get('x-request-id') || '').trim();
+  const requestId = incoming || crypto.randomUUID();
+  req.requestId = requestId;
+  res.setHeader('X-Request-ID', requestId);
+  next();
+});
+
+// ── CSRF protection ────────────────────────────────────────────────────────────
+// Double-submit cookie: generate token on every response, validate on state-changing requests.
+function ensureCsrfCookie(req, res) {
+  if (!req.cookies._csrf) {
+    const csrfToken = crypto.randomBytes(32).toString('hex');
+    res.cookie('_csrf', csrfToken, {
+      httpOnly: false,  // JS needs to read this to send as header
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+    return csrfToken;
+  }
+  return req.cookies._csrf;
+}
+// Set CSRF cookie on ALL requests (including GET) so the token is ready before first POST
+app.use((req, res, next) => {
+  ensureCsrfCookie(req, res);
+  // Only validate on state-changing methods
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+  // Skip CSRF for SCIM (Bearer token), login (no cookie yet), and sheet-sync webhook
+  const csrfBypassPaths = new Set([
+    '/api/auth/login',
+    '/api/auth/logout',
+    '/api/auth/google/callback',
+    '/api/v1/auth/login',
+    '/api/v1/auth/logout',
+    '/api/v1/auth/google/callback',
+  ]);
+  if (req.path.startsWith('/scim/') ||
+      csrfBypassPaths.has(req.path)) {
+    return next();
+  }
+  const cookieToken = req.cookies._csrf;
+  const headerToken = req.headers['x-csrf-token'];
+  if (!cookieToken || !headerToken || cookieToken !== headerToken) {
+    return res.status(403).json({ error: 'Invalid or missing CSRF token' });
+  }
+  next();
+});
+
 // ── Static files ───────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname)));
+
+// ── CSRF token endpoint — provides token for SPA to use ──────────────────────────
+app.get('/api/csrf-token', (req, res) => {
+  let token = req.cookies._csrf;
+  if (!token) {
+    token = crypto.randomBytes(32).toString('hex');
+    res.cookie('_csrf', token, {
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+  }
+  res.json({ csrfToken: token });
+});
+app.get('/api/v1/csrf-token', (req, res) => {
+  let token = req.cookies._csrf;
+  if (!token) {
+    token = crypto.randomBytes(32).toString('hex');
+    res.cookie('_csrf', token, {
+      httpOnly: false,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+  }
+  res.json({ csrfToken: token });
+});
 
 // ── Public page routes ─────────────────────────────────────────────────────────
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
@@ -78,23 +177,30 @@ app.get('/support', (req, res) => res.sendFile(path.join(__dirname, 'support.htm
 app.get('/',      (req, res) => res.sendFile(path.join(__dirname, 'user-asset-portal.html')));
 
 // ── API routes ─────────────────────────────────────────────────────────────────
-app.use('/api/auth',               authRoutes);
-app.use('/api/users',              userRoutes);
-app.use('/api/assets',             assetRoutes);
-app.use('/api/software',           softwareRoutes);
-app.use('/api/logs',               logRoutes);
-app.use('/api/support',            supportRoutes);
-app.use('/api/slack',              slackRoutes);
-app.use('/api/admin/users',        adminUserRoutes);
-app.use('/api/admin/integrations', adminIntegrationRoutes);
-app.use('/api/admin/scim',         adminScimRoutes);
-app.use('/api/admin/connectors',   adminConnectorRoutes);
-app.use('/api/admin/role-permissions', adminRolePermissionRoutes);
-app.use('/api/admin/slack-workflows', adminSlackWorkflowRoutes);
-app.use('/api/sheet-sync',           sheetSyncRoutes);
+function mountApiRoutes(base = '/api') {
+  app.use(`${base}/auth`, authRoutes);
+  app.use(`${base}/users`, userRoutes);
+  app.use(`${base}/assets`, assetRoutes);
+  app.use(`${base}/software`, softwareRoutes);
+  app.use(`${base}/logs`, logRoutes);
+  app.use(`${base}/support`, supportRoutes);
+  app.use(`${base}/slack`, slackRoutes);
+  app.use(`${base}/admin/users`, adminUserRoutes);
+  app.use(`${base}/admin/integrations`, adminIntegrationRoutes);
+  app.use(`${base}/admin/scim`, adminScimRoutes);
+  app.use(`${base}/admin/connectors`, adminConnectorRoutes);
+  app.use(`${base}/admin/role-permissions`, adminRolePermissionRoutes);
+  app.use(`${base}/admin/slack-workflows`, adminSlackWorkflowRoutes);
+  app.use(`${base}/admin/departments`, adminDepartmentRoutes);
+  app.use(`${base}/admin/alerts`, adminAlertRoutes);
+  app.use(`${base}/sheet-sync`, sheetSyncRoutes);
+}
+
+mountApiRoutes('/api');
+mountApiRoutes('/api/v1');
 
 // ── Inline sheet-sync /run endpoint (reads tmp-sheet-data.json, runs sync) ──
-app.get('/api/sheet-sync/run', async (req, res) => {
+app.get('/api/sheet-sync/run', requireAuth, onlySuperAdmin, async (req, res) => {
   const fs   = require('fs');
   const path = require('path');
   const User     = require('./db/models/User');
@@ -152,9 +258,12 @@ app.get('/api/sheet-sync/run', async (req, res) => {
     res.json({ ok: true, report, notInPortal, updated, errors });
   } catch(e) { res.status(500).json({ error: e.message }); }
 });
+app.get('/api/v1/sheet-sync/run', requireAuth, onlySuperAdmin, async (req, res) => {
+  return res.redirect(307, '/api/sheet-sync/run');
+});
 
 // ── ONE-TIME migration: fix all legacy location values ─────────────────────────
-app.get('/api/migrate-location', async (req, res) => {
+app.get('/api/migrate-location', requireAuth, onlySuperAdmin, async (req, res) => {
   try {
     const mongoose = require('mongoose');
     const col = mongoose.connection.db.collection('users');
@@ -172,6 +281,9 @@ app.get('/api/migrate-location', async (req, res) => {
       usa:   { matched: r2.matchedCount, updated: r2.modifiedCount },
     });
   } catch(e) { res.status(500).json({ error: e.message }); }
+});
+app.get('/api/v1/migrate-location', requireAuth, onlySuperAdmin, async (req, res) => {
+  return res.redirect(307, '/api/migrate-location');
 });
 
 // ── SCIM 2.0 — force application/scim+json content-type ───────────────────────
@@ -206,6 +318,10 @@ const { disconnect } = require('./db');
 
 function shutdown(signal) {
   console.log(`\n⚠️   ${signal} received — shutting down gracefully`);
+  if (supportSlaMonitorInterval) {
+    clearInterval(supportSlaMonitorInterval);
+    supportSlaMonitorInterval = null;
+  }
   // Stop accepting new connections, drain in-flight requests, then close DB.
   if (global._httpServer) {
     global._httpServer.close(async () => {
@@ -229,13 +345,13 @@ async function ensureMongoDB() {
     try {
       const { MongoMemoryServer } = require('mongodb-memory-server');
       console.log('🔧  Starting in-memory MongoDB…');
-      const mongod = await MongoMemoryServer.create({ instance: { dbName: 'terzocloud_assets' } });
+      const mongod = await MongoMemoryServer.create({ instance: { dbName: 'terzo_assets' } });
       process.env.MONGO_URI = mongod.getUri();
       console.log(`✅  In-memory MongoDB ready → ${process.env.MONGO_URI}`);
     } catch (err) {
       if (err.message && err.message.includes('already in use')) {
         console.log('ℹ️   MongoDB already running — connecting to existing instance');
-        process.env.MONGO_URI = 'mongodb://127.0.0.1:27017/terzocloud_assets';
+        process.env.MONGO_URI = 'mongodb://127.0.0.1:27017/terzo_assets';
       } else {
         throw err;
       }
@@ -267,6 +383,24 @@ ensureMongoDB()
         console.warn('⚠️  [keepalive] DB ping failed:', e.message);
       }
     }, 5 * 60 * 1000); // every 5 minutes
+
+    const monitorIntervalMs = Math.max(Number(process.env.SUPPORT_SLA_MONITOR_MS || 60_000) || 60_000, 15_000);
+    supportSlaMonitorInterval = setInterval(async () => {
+      try {
+        const stats = await runSupportSlaMonitor();
+        if ((stats?.alertsSent || 0) || (stats?.remindersSent || 0) || (stats?.escalations || 0)) {
+          console.log(
+            `ℹ️  [sla monitor] processed=${stats.processed || 0} updated=${stats.updated || 0} alerts=${stats.alertsSent || 0} reminders=${stats.remindersSent || 0} escalations=${stats.escalations || 0}`
+          );
+        }
+      } catch (error) {
+        console.warn('⚠️  [sla monitor] run failed:', error.message);
+      }
+    }, monitorIntervalMs);
+    supportSlaMonitorInterval.unref?.();
+    runSupportSlaMonitor().catch(error => {
+      console.warn('⚠️  [sla monitor] initial run failed:', error.message);
+    });
   })
   .catch(err => {
     console.error('❌  Failed to start server:', err.message);

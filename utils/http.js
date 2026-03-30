@@ -61,7 +61,7 @@ function apiGet(url, extraHeaders = {}) {
       hostname: parsed.hostname,
       path:     parsed.pathname + (parsed.search || ''),
       method:   'GET',
-      headers:  { 'User-Agent': 'TerzoCloud/1.0', ...extraHeaders },
+      headers:  { 'User-Agent': 'Terzo/1.0', ...extraHeaders },
     };
     const req = https.request(opts, r => {
       let data = '';
@@ -88,7 +88,7 @@ function apiPost(hostname, path, body, extraHeaders = {}) {
       headers: {
         'Content-Type':   'application/json',
         'Content-Length': Buffer.byteLength(bodyStr),
-        'User-Agent':     'TerzoCloud/1.0',
+        'User-Agent':     'Terzo/1.0',
         ...extraHeaders,
       },
     };
@@ -114,7 +114,7 @@ function apiPostForm(hostname, path, body, extraHeaders = {}) {
       headers: {
         'Content-Type':   'application/x-www-form-urlencoded',
         'Content-Length': Buffer.byteLength(bodyStr),
-        'User-Agent':     'TerzoCloud/1.0',
+        'User-Agent':     'Terzo/1.0',
         ...extraHeaders,
       },
     };

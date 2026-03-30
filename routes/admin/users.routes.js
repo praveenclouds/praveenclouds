@@ -11,6 +11,7 @@ const router = require('express').Router();
 const { AdminUser } = require('../../db');
 const { requireAuth, canManagePortalUsers } = require('../../middleware/auth');
 const { normalizeRoleForDisplay } = require('../../services/role-permission.service');
+const { writeLog } = require('../../services/log.service');
 
 // ── GET /api/admin/users ───────────────────────────────────────────────────────
 router.get('/', requireAuth, canManagePortalUsers, async (req, res) => {
@@ -36,6 +37,12 @@ router.post('/', requireAuth, canManagePortalUsers, async (req, res) => {
       return res.status(400).json({ error: 'name, email and password are required' });
 
     const user = await AdminUser.create({ name, email, password, role: role || 'user' });
+    await writeLog({
+      eventType: 'admin_user_created', entityType: 'admin_user',
+      entityId: user._id.toString(), entityLabel: user.name,
+      actor: req.user?.name || req.user?.email || 'unknown',
+      summary: `Admin user created: ${user.name} (${user.email}, role: ${user.role})`,
+    });
     res.status(201).json({
       id: user._id.toString(), name: user.name, email: user.email,
       role: normalizeRoleForDisplay(user.role), status: user.status,
@@ -56,6 +63,12 @@ router.put('/:id', requireAuth, canManagePortalUsers, async (req, res) => {
       { new: true, runValidators: true }
     ).select('-password');
     if (!user) return res.status(404).json({ error: 'Portal user not found' });
+    await writeLog({
+      eventType: 'admin_user_updated', entityType: 'admin_user',
+      entityId: req.params.id, entityLabel: name || email || req.params.id,
+      actor: req.user?.name || req.user?.email || 'unknown',
+      summary: `Admin user updated: ${name || ''} (${email || ''}) — role: ${role || 'unchanged'}, status: ${status || 'unchanged'}`,
+    });
     res.json({ id: user._id.toString(), name: user.name, email: user.email, role: normalizeRoleForDisplay(user.role), status: user.status });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });
@@ -89,6 +102,12 @@ router.delete('/:id', requireAuth, canManagePortalUsers, async (req, res) => {
 
     const user = await AdminUser.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ error: 'Portal user not found' });
+    await writeLog({
+      eventType: 'admin_user_deleted', entityType: 'admin_user',
+      entityId: req.params.id, entityLabel: user.name,
+      actor: req.user?.name || req.user?.email || 'unknown',
+      summary: `Admin user deleted: ${user.name} (${user.email})`,
+    });
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

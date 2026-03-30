@@ -21,7 +21,7 @@ const { getResolvedPermissions } = require('../services/role-permission.service'
 
 function requireAuth(req, res, next) {
   const header = req.headers['authorization'] || '';
-  const token  = header.startsWith('Bearer ') ? header.slice(7) : null;
+  const token  = header.startsWith('Bearer ') ? header.slice(7) : (req.cookies?.token || null);
   if (!token) return res.status(401).json({ error: 'Authentication required' });
   try {
     req.user = jwt.verify(token, JWT_SECRET);

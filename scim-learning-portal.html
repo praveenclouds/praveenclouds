@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Learning Portal — TerzoCloud IT</title>
+  <title>Learning Portal — Terzo IT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -19,7 +20,7 @@
       --sidebar-w: 280px;
     }
     html { scroll-behavior: smooth; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); display: flex; min-height: 100vh; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--gray-50); color: var(--gray-800); display: flex; min-height: 100vh; }
 
     /* ── SIDEBAR ── */
     .sidebar {
@@ -266,7 +267,17 @@
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
 </head>
-<body class="support-theme support-theme-learning">
+<script>
+  (function(){
+    var t = localStorage.getItem('portalTheme');
+    if (!t) {
+      t = 'light';
+      localStorage.setItem('portalTheme', t);
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+<body class="support-theme support-theme-learning" data-portal-theme="white">
 
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar">
@@ -276,7 +287,7 @@
     </div>
     <div>
       <div class="brand-text">Learning Portal</div>
-      <div class="brand-sub">TerzoCloud IT — Admin Guides</div>
+      <div class="brand-sub">Terzo IT — Admin Guides</div>
     </div>
   </div>
 
@@ -390,7 +401,7 @@
       <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       Bot Token & Scopes
     </a>
-    <a class="nav-item" href="#slack-terzocloud-config">
+    <a class="nav-item" href="#slack-terzo-config">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
       Configure in Portal
     </a>
@@ -438,7 +449,7 @@
   <div class="hero">
     <div class="hero-badge">
       <svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:#fff;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      TerzoCloud SCIM Integration Guide
+      Terzo SCIM Integration Guide
     </div>
     <h1>SCIM Server &amp; App Connector<br>Configuration Guide</h1>
     <p>Learn how to set up automated user provisioning across all your SaaS applications using SCIM 2.0 — keeping user access in sync with your HR system automatically.</p>
@@ -486,7 +497,7 @@
 
       <div class="callout info">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <div>SCIM 2.0 is defined in <strong>RFC 7642, RFC 7643, and RFC 7644</strong>. Your TerzoCloud SCIM server implements the full SCIM 2.0 protocol at <code>/scim/v2/</code> endpoints.</div>
+        <div>SCIM 2.0 is defined in <strong>RFC 7642, RFC 7643, and RFC 7644</strong>. Your Terzo SCIM server implements the full SCIM 2.0 protocol at <code>/scim/v2/</code> endpoints.</div>
       </div>
     </section>
 
@@ -506,7 +517,7 @@
           </div>
           <div class="arch-arrow">→</div>
           <div>
-            <div class="arch-box" style="background:linear-gradient(135deg,#eff6ff,#f3e8ff);border-color:#c4b5fd;color:#5b21b6">TerzoCloud<br>SCIM Server<br><span style="font-size:10px;font-weight:400">localhost:3000/scim/v2</span></div>
+            <div class="arch-box" style="background:linear-gradient(135deg,#eff6ff,#f3e8ff);border-color:#c4b5fd;color:#5b21b6">Terzo<br>SCIM Server<br><span style="font-size:10px;font-weight:400">localhost:3000/scim/v2</span></div>
             <div class="arch-label">Orchestrator</div>
           </div>
           <div class="arch-arrow">→</div>
@@ -529,7 +540,7 @@
 
       <h3>What happens when a user is added?</h3>
       <div class="steps">
-        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">User created in TerzoCloud portal</div><div class="step-text">HR adds a new employee in the User Management section. The user record is saved to MongoDB.</div></div></div>
+        <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">User created in Terzo portal</div><div class="step-text">HR adds a new employee in the User Management section. The user record is saved to MongoDB.</div></div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">SCIM event triggered</div><div class="step-text">The portal calls <code>POST /scim/v2/Users</code> with the user's profile data (name, email, department).</div></div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Connector routing</div><div class="step-text">The SCIM server checks which App Connectors are enabled and routes the provisioning request to each one.</div></div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">User created in each app</div><div class="step-text">Each connector calls the target app's API to create the user account (e.g. GitHub API, Slack API, Zoom API).</div></div></div>
@@ -546,7 +557,7 @@
 
       <h3>System Requirements</h3>
       <ul class="checklist">
-        <li>TerzoCloud Portal running at <code>http://localhost:3000</code> with MongoDB connected</li>
+        <li>Terzo Portal running at <code>http://localhost:3000</code> with MongoDB connected</li>
         <li>Admin account with <strong>Super Admin</strong> role (SCIM endpoints require <code>onlySuperAdmin</code> middleware)</li>
         <li>Node.js 18+ and the <code>AppConnector</code> Mongoose model deployed</li>
         <li>Outbound internet access from the server to each app's API endpoint</li>
@@ -580,17 +591,17 @@
     <section class="section" id="scim-server-config">
       <div class="section-header">
         <div class="section-icon blue"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-        <div><div class="section-title">SCIM Server Configuration</div><div class="section-desc">Setting up your TerzoCloud SCIM server</div></div>
+        <div><div class="section-title">SCIM Server Configuration</div><div class="section-desc">Setting up your Terzo SCIM server</div></div>
       </div>
 
-      <p>The TerzoCloud SCIM server is built into <code>server.js</code> and runs on the same Node.js/Express process as the main API. No additional setup is needed — just make sure the server is running and you are authenticated as Super Admin.</p>
+      <p>The Terzo SCIM server is built into <code>server.js</code> and runs on the same Node.js/Express process as the main API. No additional setup is needed — just make sure the server is running and you are authenticated as Super Admin.</p>
 
       <h3>Environment Variables</h3>
       <p>Ensure your <code>.env</code> file contains the following:</p>
       <div class="code-block" style="position:relative">
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
 <span class="cmt"># MongoDB connection</span>
-<span class="key">MONGODB_URI</span>=<span class="str">mongodb://localhost:27017/terzocloud</span>
+<span class="key">MONGODB_URI</span>=<span class="str">mongodb://localhost:27017/terzo</span>
 
 <span class="cmt"># JWT secret (keep this secret!)</span>
 <span class="key">JWT_SECRET</span>=<span class="str">your-super-secret-key-here</span>
@@ -715,7 +726,7 @@
         <div><div class="section-title">How to Connect SCIM Apps</div><div class="section-desc">Best path for apps that support lifecycle provisioning</div></div>
       </div>
 
-      <p>Use the <strong>SCIM</strong> provisioning method when the downstream app can create, update, and deactivate users automatically. In TerzoCloud, this is the highest-automation path and should be your default for identity-critical apps.</p>
+      <p>Use the <strong>SCIM</strong> provisioning method when the downstream app can create, update, and deactivate users automatically. In Terzo, this is the highest-automation path and should be your default for identity-critical apps.</p>
 
       <div class="callout success">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -727,7 +738,7 @@
         <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Add or edit the software record</div><div class="step-text">Open Software Inventory and set <code>Provisioning Method</code> to <code>SCIM</code>. Optionally add the connector name in <code>Connector Type</code> and mark <code>Supports automatic deprovision</code> if the app can also disable users on exit.</div></div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Save the connector under Admin → SCIM</div><div class="step-text">If the app uses one of the supported connectors, open the connector card in Admin and paste the token, tenant, org, or SCIM endpoint details provided by the vendor.</div></div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Test connection and sync</div><div class="step-text">Use <strong>Test Connection</strong> first, then <strong>Sync Now</strong>. This validates credentials before you rely on the app in onboarding or offboarding workflows.</div></div></div>
-        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Route checklist tasks to software admins</div><div class="step-text">Even when SCIM is automated, keep software admins assigned in TerzoCloud so each access step still has an accountable owner and visible audit trail in Support Center.</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-body"><div class="step-title">Route checklist tasks to software admins</div><div class="step-text">Even when SCIM is automated, keep software admins assigned in Terzo so each access step still has an accountable owner and visible audit trail in Support Center.</div></div></div>
       </div>
 
       <h3>Recommended Software Inventory values for SCIM apps</h3>
@@ -743,7 +754,7 @@
 
       <div class="callout info">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <div>For Google Workspace-based identity, TerzoCloud works best when user lifecycle is centralized first and SCIM-capable downstream apps are automated second. Not every app needs to be SCIM-ready for the architecture to work.</div>
+        <div>For Google Workspace-based identity, Terzo works best when user lifecycle is centralized first and SCIM-capable downstream apps are automated second. Not every app needs to be SCIM-ready for the architecture to work.</div>
       </div>
     </section>
 
@@ -774,7 +785,7 @@
         <div class="card-title">Suggested note patterns</div>
         <ul class="checklist">
           <li><strong>Slack:</strong> “Bot token saved in App Connectors. Supports workspace lookup and command flow; user lifecycle outside Enterprise Grid is partially manual.”</li>
-          <li><strong>Google Workspace:</strong> “Managed through Admin SDK sync worker. Create/suspend supported; reporting manager still maintained inside TerzoCloud.”</li>
+          <li><strong>Google Workspace:</strong> “Managed through Admin SDK sync worker. Create/suspend supported; reporting manager still maintained inside Terzo.”</li>
           <li><strong>Microsoft 365:</strong> “Uses Microsoft Graph for seat counts and tenant data; app-level access still reviewed by software admins.”</li>
         </ul>
       </div>
@@ -811,7 +822,7 @@
         </div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body">
           <div class="step-title">Create a Server-to-Server OAuth App</div>
-          <div class="step-text">Name it "TerzoCloud SCIM". Copy the <strong>Account ID</strong>, <strong>Client ID</strong>, and <strong>Client Secret</strong>.</div>
+          <div class="step-text">Name it "Terzo SCIM". Copy the <strong>Account ID</strong>, <strong>Client ID</strong>, and <strong>Client Secret</strong>.</div>
         </div></div>
         <div class="step"><div class="step-num">3</div><div class="step-body">
           <div class="step-title">Add Required Scopes</div>
@@ -822,7 +833,7 @@
           <div class="step-text">Click <strong>Activate your app</strong> in the Marketplace. Generate an <strong>Account-Level OAuth token</strong> using your Client ID and Client Secret.</div>
         </div></div>
         <div class="step"><div class="step-num">5</div><div class="step-body">
-          <div class="step-title">Configure in TerzoCloud</div>
+          <div class="step-title">Configure in Terzo</div>
           <div class="step-text">Go to <strong>Admin → App Connectors → Add Connector → Zoom</strong>. Paste your OAuth token and Account ID, then click Save.</div>
         </div></div>
       </div>
@@ -878,8 +889,8 @@
           <div class="step-text">GitHub shows the token only once. Copy it immediately — you cannot view it again.</div>
         </div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body">
-          <div class="step-title">Configure in TerzoCloud</div>
-          <div class="step-text">Go to <strong>Admin → App Connectors → Add Connector → GitHub</strong>. Enter your <strong>Organisation slug</strong> (e.g. <code>terzocloud</code>) and paste the PAT.</div>
+          <div class="step-title">Configure in Terzo</div>
+          <div class="step-text">Go to <strong>Admin → App Connectors → Add Connector → GitHub</strong>. Enter your <strong>Organisation slug</strong> (e.g. <code>terzo</code>) and paste the PAT.</div>
         </div></div>
       </div>
 
@@ -891,7 +902,7 @@
         </div>
         <div class="field-row" style="padding:12px 16px">
           <div class="field-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <div><div class="field-name">Organisation Slug</div><div class="field-desc">Your GitHub organisation name as it appears in the URL (case-sensitive).</div><div class="field-example">terzocloud</div></div>
+          <div><div class="field-name">Organisation Slug</div><div class="field-desc">Your GitHub organisation name as it appears in the URL (case-sensitive).</div><div class="field-example">terzo</div></div>
         </div>
       </div>
 
@@ -923,7 +934,7 @@
       <div class="steps">
         <div class="step"><div class="step-num">1</div><div class="step-body">
           <div class="step-title">Create a Google Cloud Project</div>
-          <div class="step-text">Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → Create a new project (e.g. "TerzoCloud SCIM").</div>
+          <div class="step-text">Go to <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → Create a new project (e.g. "Terzo SCIM").</div>
         </div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body">
           <div class="step-title">Enable Admin SDK API</div>
@@ -938,7 +949,7 @@
           <div class="step-text">In the service account settings, enable <strong>Domain-wide delegation</strong>. Then in your Google Workspace Admin Console: Security → API Controls → Domain-wide delegation → Add your service account's Client ID with scope <code>https://www.googleapis.com/auth/admin.directory.user.readonly</code>.</div>
         </div></div>
         <div class="step"><div class="step-num">5</div><div class="step-body">
-          <div class="step-title">Configure in TerzoCloud</div>
+          <div class="step-title">Configure in Terzo</div>
           <div class="step-text">Go to <strong>Admin → App Connectors → Google Workspace</strong>. Paste the full service account JSON key and enter your Admin email (e.g. <code>admin@yourcompany.com</code>).</div>
         </div></div>
       </div>
@@ -947,7 +958,7 @@
       <div class="card" style="padding:0">
         <div class="field-row" style="padding:12px 16px">
           <div class="field-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-          <div><div class="field-name">Service Account Key JSON</div><div class="field-desc">The full JSON key file downloaded from Google Cloud Console. Contains the private key for API authentication.</div><div class="field-example">{"type":"service_account","project_id":"terzocloud-scim","private_key":"-----BEGIN RSA PRIVATE KEY-----…"}</div></div>
+          <div><div class="field-name">Service Account Key JSON</div><div class="field-desc">The full JSON key file downloaded from Google Cloud Console. Contains the private key for API authentication.</div><div class="field-example">{"type":"service_account","project_id":"terzo-scim","private_key":"-----BEGIN RSA PRIVATE KEY-----…"}</div></div>
         </div>
         <div class="field-row" style="padding:12px 16px">
           <div class="field-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
@@ -989,7 +1000,7 @@
           <div class="step-text">Click <strong>Install to Workspace</strong>. Authorize the app. Copy the <strong>Bot User OAuth Token</strong> (starts with <code>xoxb-</code>).</div>
         </div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body">
-          <div class="step-title">Configure in TerzoCloud</div>
+          <div class="step-title">Configure in Terzo</div>
           <div class="step-text">Go to <strong>Admin → App Connectors → Slack</strong>. Paste the <code>xoxb-</code> token and enter your workspace domain.</div>
         </div></div>
       </div>
@@ -1002,7 +1013,7 @@
         </div>
         <div class="field-row" style="padding:12px 16px">
           <div class="field-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div><div class="field-name">Workspace Domain</div><div class="field-desc">Your Slack workspace domain (the part before .slack.com).</div><div class="field-example">terzocloud</div></div>
+          <div><div class="field-name">Workspace Domain</div><div class="field-desc">Your Slack workspace domain (the part before .slack.com).</div><div class="field-example">terzo</div></div>
         </div>
       </div>
     </section>
@@ -1029,7 +1040,7 @@
       <div class="steps">
         <div class="step"><div class="step-num">1</div><div class="step-body">
           <div class="step-title">Register an App in Azure Portal</div>
-          <div class="step-text">Go to <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> → Azure Active Directory → App registrations → New registration. Name it "TerzoCloud SCIM".</div>
+          <div class="step-text">Go to <a href="https://portal.azure.com" target="_blank">portal.azure.com</a> → Azure Active Directory → App registrations → New registration. Name it "Terzo SCIM".</div>
         </div></div>
         <div class="step"><div class="step-num">2</div><div class="step-body">
           <div class="step-title">Copy Tenant ID and Client ID</div>
@@ -1044,7 +1055,7 @@
           <div class="step-text">API permissions → Add permission → Microsoft Graph → Application permissions → Add: <code>User.Read.All</code>. Then click <strong>Grant admin consent</strong>.</div>
         </div></div>
         <div class="step"><div class="step-num">5</div><div class="step-body">
-          <div class="step-title">Configure in TerzoCloud</div>
+          <div class="step-title">Configure in Terzo</div>
           <div class="step-text">Go to <strong>Admin → App Connectors → Microsoft 365</strong>. Enter your <strong>Tenant ID</strong> and paste the <strong>Client Secret Value</strong>.</div>
         </div></div>
       </div>
@@ -1057,7 +1068,7 @@
         </div>
         <div class="field-row" style="padding:12px 16px">
           <div class="field-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-          <div><div class="field-name">Tenant ID / Domain</div><div class="field-desc">Your Azure tenant ID (GUID) or your primary domain (e.g. <code>terzocloud.onmicrosoft.com</code>).</div><div class="field-example">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</div></div>
+          <div><div class="field-name">Tenant ID / Domain</div><div class="field-desc">Your Azure tenant ID (GUID) or your primary domain (e.g. <code>terzo.onmicrosoft.com</code>).</div><div class="field-example">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</div></div>
         </div>
       </div>
     </section>
@@ -1095,7 +1106,7 @@
           <div class="step-text">Copy both the <strong>SCIM endpoint URL</strong> (e.g. <code>https://scim.us-east-1.amazonaws.com/xxxx/scim/v2</code>) and the <strong>Access token</strong>. The token is only shown once.</div>
         </div></div>
         <div class="step"><div class="step-num">4</div><div class="step-body">
-          <div class="step-title">Configure in TerzoCloud</div>
+          <div class="step-title">Configure in Terzo</div>
           <div class="step-text">Go to <strong>Admin → App Connectors → AWS IAM Identity Center</strong>. Paste the <strong>SCIM Endpoint URL</strong> as the org field and the <strong>Access token</strong> as the token field.</div>
         </div></div>
       </div>
@@ -1108,7 +1119,7 @@
         </div>
         <div class="field-row" style="padding:12px 16px">
           <div class="field-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
-          <div><div class="field-name">SCIM Endpoint URL</div><div class="field-desc">The full SCIM endpoint URL from your IAM Identity Center settings. This is where TerzoCloud will send user provisioning requests.</div><div class="field-example">https://scim.us-east-1.amazonaws.com/xxxxxxxx/scim/v2</div></div>
+          <div><div class="field-name">SCIM Endpoint URL</div><div class="field-desc">The full SCIM endpoint URL from your IAM Identity Center settings. This is where Terzo will send user provisioning requests.</div><div class="field-example">https://scim.us-east-1.amazonaws.com/xxxxxxxx/scim/v2</div></div>
         </div>
       </div>
 
@@ -1209,7 +1220,7 @@
       <div style="text-align:center;padding:20px 0">
         <div style="font-size:22px;margin-bottom:8px">🚀</div>
         <div style="font-size:15px;font-weight:700;color:var(--gray-800);margin-bottom:6px">Ready to configure SCIM?</div>
-        <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Go to the TerzoCloud Admin panel to add your first connector.</div>
+        <div style="font-size:13px;color:var(--gray-500);margin-bottom:16px">Go to the Terzo Admin panel to add your first connector.</div>
         <a href="http://localhost:3000/admin" target="_blank"
           style="display:inline-flex;align-items:center;gap:8px;background:var(--primary);color:#fff;padding:10px 22px;border-radius:10px;font-size:13.5px;font-weight:700;text-decoration:none;transition:background .14s"
           onmouseover="this.style.background='#1e3a8a'" onmouseout="this.style.background='var(--primary)'">
@@ -1231,7 +1242,7 @@
         </div>
       </div>
 
-      <p>Email Automation lets TerzoCloud automatically send emails when assets are assigned to users, and route manager approval requests so managers can approve or reject directly from their inbox — no login required.</p>
+      <p>Email Automation lets Terzo automatically send emails when assets are assigned to users, and route manager approval requests so managers can approve or reject directly from their inbox — no login required.</p>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0">
         <div class="card" style="border-left:4px solid var(--success)">
@@ -1275,7 +1286,7 @@
           <div class="step-num">1</div>
           <div class="step-body">
             <div class="step-title">Open Admin Console → Integrations</div>
-            <div class="step-text">Log in to the TerzoCloud Admin Console (<code>localhost:3000/admin</code>), click <strong>Integrations</strong> in the left sidebar, then scroll to the <strong>Support Email Automation</strong> card.</div>
+            <div class="step-text">Log in to the Terzo Admin Console (<code>localhost:3000/admin</code>), click <strong>Integrations</strong> in the left sidebar, then scroll to the <strong>Support Email Automation</strong> card.</div>
           </div>
         </div>
         <div class="step">
@@ -1349,7 +1360,7 @@
               These appear in the recipient's inbox as the sender identity.
               <div class="code-block" style="margin-top:8px">
                 From Email: <span class="str">support@yourcompany.com</span><br>
-                From Name:  <span class="str">TerzoCloud Support</span>
+                From Name:  <span class="str">Terzo Support</span>
                 <button class="copy-btn" onclick="copyCode(this)">Copy</button>
               </div>
               <p style="margin-top:8px">The From Email must be an address your SMTP provider is authorised to send from. For Gmail, it must match your Gmail account address.</p>
@@ -1470,7 +1481,7 @@
         </div>
       </div>
 
-      <p>When an asset assignment is created or software access is granted, TerzoCloud can notify the employee's reporting manager and ask for approval. The manager receives an email with inline Approve and Reject buttons — no login needed.</p>
+      <p>When an asset assignment is created or software access is granted, Terzo can notify the employee's reporting manager and ask for approval. The manager receives an email with inline Approve and Reject buttons — no login needed.</p>
 
       <div class="arch-diagram">
         <div class="arch-row">
@@ -1478,7 +1489,7 @@
         </div>
         <div class="arch-row"><div class="arch-arrow">↓</div></div>
         <div class="arch-row">
-          <div class="arch-box green">TerzoCloud sends approval email to manager</div>
+          <div class="arch-box green">Terzo sends approval email to manager</div>
         </div>
         <div class="arch-row"><div class="arch-arrow">↓</div></div>
         <div class="arch-row">
@@ -1497,7 +1508,7 @@
 
       <div class="callout info" style="margin-top:16px">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <div>The approve/reject links use <strong>one-time tokens</strong> and point to your <strong>Public App Base URL</strong>. The manager does not need a TerzoCloud account — clicking the link records their decision via a secure API call. Make sure the base URL is publicly accessible before enabling approvals.</div>
+        <div>The approve/reject links use <strong>one-time tokens</strong> and point to your <strong>Public App Base URL</strong>. The manager does not need a Terzo account — clicking the link records their decision via a secure API call. Make sure the base URL is publicly accessible before enabling approvals.</div>
       </div>
 
       <h3>Required: Reporting Manager field on each user</h3>
@@ -1572,7 +1583,7 @@
         <span class="pill" style="background:#fff7ed;color:#c2410c;border:1px solid #fdba74">Notifications</span>
       </div>
 
-      <p>TerzoCloud has two distinct Slack integrations that work together. The <strong>Slack Connector</strong> (under SCIM → App Connectors) syncs user counts and plan details from your workspace. The <strong>Slack Integration</strong> covered here does two more powerful things: it lets employees raise IT support requests without leaving Slack, and it routes alert notifications from the Admin Console to any Slack channel.</p>
+      <p>Terzo has two distinct Slack integrations that work together. The <strong>Slack Connector</strong> (under SCIM → App Connectors) syncs user counts and plan details from your workspace. The <strong>Slack Integration</strong> covered here does two more powerful things: it lets employees raise IT support requests without leaving Slack, and it routes alert notifications from the Admin Console to any Slack channel.</p>
 
       <h3>What you get</h3>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px">
@@ -1588,7 +1599,7 @@
 
       <div class="callout info" style="margin-top:18px">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-        <div>This integration requires a <strong>Slack App</strong> you create and own in your workspace. TerzoCloud never asks for your Slack admin password — it only uses a Bot Token and Signing Secret that you generate yourself.</div>
+        <div>This integration requires a <strong>Slack App</strong> you create and own in your workspace. Terzo never asks for your Slack admin password — it only uses a Bot Token and Signing Secret that you generate yourself.</div>
       </div>
     </section>
 
@@ -1600,11 +1611,11 @@
         </div>
         <div>
           <div class="section-title">Create a Slack App</div>
-          <div class="section-desc">Set up a new Slack app for your TerzoCloud workspace</div>
+          <div class="section-desc">Set up a new Slack app for your Terzo workspace</div>
         </div>
       </div>
 
-      <p>All Slack integrations in TerzoCloud run through a single Slack App that you create and install in your workspace. This takes about 5 minutes.</p>
+      <p>All Slack integrations in Terzo run through a single Slack App that you create and install in your workspace. This takes about 5 minutes.</p>
 
       <div class="steps">
         <div class="step"><div class="step-num">1</div><div class="step-body">
@@ -1614,12 +1625,12 @@
 
         <div class="step"><div class="step-num">2</div><div class="step-body">
           <div class="step-title">Create New App</div>
-          <div class="step-text">Click <strong>Create New App</strong> → choose <strong>From scratch</strong>. Give it a name (e.g. <em>TerzoCloud IT</em>) and select your workspace.</div>
+          <div class="step-text">Click <strong>Create New App</strong> → choose <strong>From scratch</strong>. Give it a name (e.g. <em>Terzo IT</em>) and select your workspace.</div>
         </div></div>
 
         <div class="step"><div class="step-num">3</div><div class="step-body">
           <div class="step-title">Copy the Signing Secret</div>
-          <div class="step-text">On the <strong>Basic Information</strong> page, scroll to <em>App Credentials</em>. Copy the <strong>Signing Secret</strong> — you'll need this for the TerzoCloud Admin Console.</div>
+          <div class="step-text">On the <strong>Basic Information</strong> page, scroll to <em>App Credentials</em>. Copy the <strong>Signing Secret</strong> — you'll need this for the Terzo Admin Console.</div>
         </div></div>
 
         <div class="step"><div class="step-num">4</div><div class="step-body">
@@ -1646,7 +1657,7 @@
         </div>
       </div>
 
-      <p>The Bot Token is what TerzoCloud uses to call Slack's API — opening modals, reading user info, and posting messages. You control exactly what the bot is allowed to do through <strong>scopes</strong>.</p>
+      <p>The Bot Token is what Terzo uses to call Slack's API — opening modals, reading user info, and posting messages. You control exactly what the bot is allowed to do through <strong>scopes</strong>.</p>
 
       <h3>Required Bot Token Scopes</h3>
       <table class="req-table">
@@ -1655,7 +1666,7 @@
           <tr><td><code>chat:write</code></td><td>Post notification messages to channels</td></tr>
           <tr><td><code>commands</code></td><td>Respond to the <code>/it-support</code> slash command</td></tr>
           <tr><td><code>users:read</code></td><td>Look up user profiles by Slack user ID</td></tr>
-          <tr><td><code>users:read.email</code></td><td>Match Slack users to TerzoCloud employee records by email</td></tr>
+          <tr><td><code>users:read.email</code></td><td>Match Slack users to Terzo employee records by email</td></tr>
         </tbody>
       </table>
 
@@ -1678,29 +1689,29 @@
 
         <div class="step"><div class="step-num">4</div><div class="step-body">
           <div class="step-title">Copy the Bot User OAuth Token</div>
-          <div class="step-text">After installing, you'll see a <strong>Bot User OAuth Token</strong> starting with <code>xoxb-</code>. Copy it — this goes into TerzoCloud under SCIM → App Connectors → Slack.</div>
+          <div class="step-text">After installing, you'll see a <strong>Bot User OAuth Token</strong> starting with <code>xoxb-</code>. Copy it — this goes into Terzo under SCIM → App Connectors → Slack.</div>
         </div></div>
       </div>
 
       <div class="callout warning">
         <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <div>Treat the Bot Token like a password. Don't commit it to source control. TerzoCloud stores it encrypted in the database.</div>
+        <div>Treat the Bot Token like a password. Don't commit it to source control. Terzo stores it encrypted in the database.</div>
       </div>
     </section>
 
     <!-- ══ CONFIGURE IN PORTAL ══ -->
-    <section class="section" id="slack-terzocloud-config">
+    <section class="section" id="slack-terzo-config">
       <div class="section-header">
         <div class="section-icon" style="background:#eff6ff">
           <svg viewBox="0 0 24 24" style="width:20px;height:20px;stroke:#2563eb;fill:none;stroke-width:2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
         </div>
         <div>
-          <div class="section-title">Configure in TerzoCloud</div>
+          <div class="section-title">Configure in Terzo</div>
           <div class="section-desc">Save your Slack credentials in the Admin Console</div>
         </div>
       </div>
 
-      <p>TerzoCloud stores Slack credentials in two places — the <strong>Bot Token</strong> goes under SCIM App Connectors, and the <strong>Signing Secret</strong> goes under Integrations. Both are required.</p>
+      <p>Terzo stores Slack credentials in two places — the <strong>Bot Token</strong> goes under SCIM App Connectors, and the <strong>Signing Secret</strong> goes under Integrations. Both are required.</p>
 
       <h3>Save the Bot Token</h3>
       <div class="steps">
@@ -1773,13 +1784,13 @@
         </div></div>
 
         <div class="step"><div class="step-num">3</div><div class="step-body">
-          <div class="step-title">Copy the Command URL from TerzoCloud</div>
+          <div class="step-title">Copy the Command URL from Terzo</div>
           <div class="step-text">The exact URL is shown in <strong>Admin Console → Integrations → Slack → Slack Command URL</strong>. It looks like: <code>https://yourportal.com/api/slack/support-command</code></div>
         </div></div>
 
         <div class="step"><div class="step-num">4</div><div class="step-body">
           <div class="step-title">Enable Interactivity</div>
-          <div class="step-text">Go to <strong>Interactivity &amp; Shortcuts</strong>. Toggle it <strong>On</strong>. Paste the <strong>Interactivity URL</strong> from TerzoCloud: <code>https://yourportal.com/api/slack/interactivity</code>. Save changes.</div>
+          <div class="step-text">Go to <strong>Interactivity &amp; Shortcuts</strong>. Toggle it <strong>On</strong>. Paste the <strong>Interactivity URL</strong> from Terzo: <code>https://yourportal.com/api/slack/interactivity</code>. Save changes.</div>
         </div></div>
 
         <div class="step"><div class="step-num">5</div><div class="step-body">
@@ -1800,7 +1811,7 @@
           <span style="color:var(--gray-400)">→</span>
           <span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:6px;font-weight:600">4. Ticket created in portal</span>
         </div>
-        <p style="margin-top:12px;margin-bottom:0;font-size:13px;color:var(--gray-500)">The form shows all available request types (Onboarding, Hardware Request, App Access, etc.) as a dropdown. TerzoCloud matches the Slack user's email to their employee record automatically.</p>
+        <p style="margin-top:12px;margin-bottom:0;font-size:13px;color:var(--gray-500)">The form shows all available request types (Onboarding, Hardware Request, App Access, etc.) as a dropdown. Terzo matches the Slack user's email to their employee record automatically.</p>
       </div>
 
       <div class="callout info">
@@ -1832,7 +1843,7 @@
 
         <div class="step"><div class="step-num">2</div><div class="step-body">
           <div class="step-title">Invite the bot to your target channel</div>
-          <div class="step-text">In Slack, open the channel you want to receive IT alerts (e.g. <code>#it-alerts</code>). Type <code>/invite @TerzoCloud IT</code> (or whatever you named your bot). This is required — bots can only post to channels they're a member of.</div>
+          <div class="step-text">In Slack, open the channel you want to receive IT alerts (e.g. <code>#it-alerts</code>). Type <code>/invite @Terzo IT</code> (or whatever you named your bot). This is required — bots can only post to channels they're a member of.</div>
         </div></div>
 
         <div class="step"><div class="step-num">3</div><div class="step-body">
@@ -1849,7 +1860,7 @@
       <h3>What the notification looks like</h3>
       <div class="card">
         <div class="card-title">Example Slack Message</div>
-        <div class="code-block" style="background:#1a1d27;border-radius:8px;padding:16px;font-size:13px;color:#e2e8f0;white-space:pre-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span style="color:#f59e0b;font-weight:700">🔔 TerzoCloud Alert — Software Inventory</span>
+        <div class="code-block" style="background:#1a1d27;border-radius:8px;padding:16px;font-size:13px;color:#e2e8f0;white-space:pre-wrap"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span style="color:#f59e0b;font-weight:700">🔔 Terzo Alert — Software Inventory</span>
 <span style="color:#94a3b8">Severity: </span><span style="color:#ef4444">Critical</span>
 <span style="color:#94a3b8">App:      </span><span style="color:#e2e8f0">Datadog</span>
 <span style="color:#94a3b8">Message:  </span><span style="color:#e2e8f0">License utilisation has reached 100% (42/42 used)</span>
@@ -1909,8 +1920,8 @@
           </tr>
           <tr>
             <td>User submits form but no ticket appears</td>
-            <td>Slack user email doesn't match TerzoCloud employee record</td>
-            <td>Ensure the employee's email in TerzoCloud matches their Slack workspace email exactly</td>
+            <td>Slack user email doesn't match Terzo employee record</td>
+            <td>Ensure the employee's email in Terzo matches their Slack workspace email exactly</td>
           </tr>
         </tbody>
       </table>
