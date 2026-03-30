@@ -61,6 +61,25 @@ const softwareSchema = new mongoose.Schema(
 
     // Add-on services (e.g. Zoom → Zoom Phone, Zoom Rooms)
     services: { type: [serviceSchema], default: [] },
+
+    // Invoices attached to this software record
+    invoices: {
+      type: [{
+        filename:      { type: String, required: true },
+        uploadedAt:    { type: Date,   default: Date.now },
+        amount:        { type: Number, default: 0 },
+        licenseQuantity: { type: Number, default: null },
+        currency:      { type: String, default: 'USD' },
+        billingPeriod: { type: String, enum: ['Monthly', 'Quarterly', 'Annual', ''], default: '' },
+        periodFrom:    { type: Date,   default: null },
+        periodTo:      { type: Date,   default: null },
+        note:          { type: String, default: '' },
+        data:          { type: String, default: '' }, // base64-encoded file
+        mimeType:      { type: String, default: 'application/pdf' },
+        parseConfidence: { type: String, enum: ['high', 'medium', 'low', ''], default: '' },
+      }],
+      default: [],
+    },
   },
   { timestamps: true }
 );

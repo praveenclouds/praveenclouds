@@ -86,7 +86,7 @@ if (IS_PROD && CORS_ORIGINS) {
   app.use(cors()); // development — allow all origins
 }
 
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '8mb' })); // increased for base64 invoice uploads
 app.use(cookieParser());
 
 // ── Request ID tracing ─────────────────────────────────────────────────────────

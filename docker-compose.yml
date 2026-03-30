@@ -10,11 +10,23 @@ services:
       NODE_ENV: production
       PORT: 3000
       MONGO_URI: mongodb://mongo:27017/terzocloud_assets
+      INVOICE_PARSER_URL: http://invoice-parser:8001
+      INVOICE_PARSER_TIMEOUT_MS: 30000
     ports:
       - "3000:3000"
     depends_on:
       mongo:
         condition: service_healthy
+    restart: unless-stopped
+
+  invoice-parser:
+    build:
+      context: .
+      dockerfile: services/invoice_parser/Dockerfile
+    container_name: terzocloud-invoice-parser
+    environment:
+      OCR_ENABLED: "true"
+      OCR_MAX_PAGES: "3"
     restart: unless-stopped
 
   mongo:

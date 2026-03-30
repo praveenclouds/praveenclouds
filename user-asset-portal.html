@@ -1559,6 +1559,9 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       <button class="modal-tab-btn" id="swTabServicesBtn" onclick="swSwitchTab('services')">
         Services <span id="swSvcCount" style="font-size:10px;background:var(--primary);color:#fff;padding:1px 6px;border-radius:9999px;margin-left:4px;vertical-align:middle">0</span>
       </button>
+      <button class="modal-tab-btn" id="swTabInvoicesBtn" onclick="swSwitchTab('invoices')">
+        Invoices <span id="swInvCount" style="font-size:10px;background:var(--gray-400);color:#fff;padding:1px 6px;border-radius:9999px;margin-left:4px;vertical-align:middle">0</span>
+      </button>
     </div>
     <!-- Tab: Details -->
     <div class="modal-tab-panel active" id="swTabDetails">
@@ -1663,6 +1666,76 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         &nbsp;·&nbsp; <strong>Grand Total:</strong> <span id="svcGrandTotal" style="color:var(--success);font-weight:700">$0</span> / year
       </div>
     </div>
+    <!-- Tab: Invoices -->
+    <div class="modal-tab-panel" id="swTabInvoices">
+      <!-- Upload form -->
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px 16px">
+        <div style="font-size:12.5px;font-weight:600;color:var(--gray-700);margin-bottom:10px">📎 Attach Invoice</div>
+        <!-- File picker row -->
+        <div class="form-row" style="margin-bottom:8px">
+          <div class="form-group" style="flex:2">
+            <label>Invoice File (PDF / image)</label>
+            <input type="file" id="invFile" accept=".pdf,.png,.jpg,.jpeg"
+              style="font-size:12px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;width:100%"
+              onchange="onInvFileSelected(this)">
+          </div>
+          <div class="form-group" style="flex:1;align-items:flex-end;padding-top:22px">
+            <div id="invParseStatus" style="font-size:11px;color:var(--gray-400);padding:4px 0"></div>
+          </div>
+        </div>
+        <!-- Auto-filled fields (pre-filled by parser, user can correct) -->
+        <div class="form-row" style="margin-bottom:8px">
+          <div class="form-group">
+            <label>Amount <span id="invParseAmtHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <input type="number" id="invAmount" placeholder="0.00" min="0" step="0.01" style="font-size:12.5px">
+          </div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select id="invCurrency" style="font-size:12.5px">
+              <option value="USD">USD</option><option value="CAD">CAD</option>
+              <option value="INR">INR</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>License Quantity <span id="invParseQtyHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <input type="number" id="invLicenseQty" placeholder="e.g. 7" min="0" step="1" style="font-size:12.5px">
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom:8px">
+          <div class="form-group">
+            <label>Billing Period <span id="invParsePeriodHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <select id="invBillingPeriod" style="font-size:12.5px">
+              <option value="">— select —</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Quarterly">Quarterly</option>
+              <option value="Annual">Annual</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Period From <span id="invParseFromHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <input type="date" id="invPeriodFrom" style="font-size:12.5px">
+          </div>
+          <div class="form-group">
+            <label>Period To <span id="invParseToHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <input type="date" id="invPeriodTo" style="font-size:12.5px">
+          </div>
+        </div>
+        <div class="form-row" style="margin-bottom:8px">
+          <div class="form-group">
+            <label>Note (optional)</label>
+            <input type="text" id="invNote" placeholder="e.g. March 2026 invoice" style="font-size:12.5px">
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
+          <span id="invUploadStatus" style="font-size:11px;color:var(--gray-400)"></span>
+          <button class="btn btn-primary btn-sm" onclick="uploadInvoice()">Upload Invoice</button>
+        </div>
+      </div>
+      <!-- Invoice list -->
+      <div id="invList" style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>
+      </div>
+    </div>
     <div class="modal-footer" style="justify-content:space-between;">
       <button class="btn btn-danger" id="swDeleteBtn" style="display:none" onclick="deleteCurrentSoftware()">
         <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
@@ -1711,6 +1784,23 @@ function authFetch(url, opts = {}) {
     cancelKey: opts.requestKey || '',
     dedupeKey: opts.requestKey || '',
   });
+}
+
+// Backward-compatible helper used by older invoice handlers.
+// Returns parsed payload and throws on non-2xx responses.
+async function apiFetch(url, opts = {}) {
+  const res = await authFetch(url, opts);
+  const contentType = String(res.headers.get('content-type') || '').toLowerCase();
+  const payload = contentType.includes('application/json')
+    ? await res.json()
+    : await res.text();
+  if (!res.ok) {
+    const message = (payload && typeof payload === 'object')
+      ? (payload.error || payload.message || `Request failed (${res.status})`)
+      : (String(payload || '').trim() || `Request failed (${res.status})`);
+    throw new Error(message);
+  }
+  return payload;
 }
 
 function validateApiResponse(data, requiredFields) {
@@ -3414,8 +3504,391 @@ let editingServices = []; // services being edited in the modal
 function swSwitchTab(tab){
   document.getElementById('swTabDetailsBtn').classList.toggle('active', tab==='details');
   document.getElementById('swTabServicesBtn').classList.toggle('active', tab==='services');
+  document.getElementById('swTabInvoicesBtn').classList.toggle('active', tab==='invoices');
   document.getElementById('swTabDetails').classList.toggle('active', tab==='details');
   document.getElementById('swTabServices').classList.toggle('active', tab==='services');
+  document.getElementById('swTabInvoices').classList.toggle('active', tab==='invoices');
+  if (tab === 'invoices') loadInvoices();
+}
+
+// ── Invoice helpers ────────────────────────────────────────────────────────────
+async function loadInvoices(){
+  const swId = document.getElementById('swId').value;
+  if (!swId) return;
+  const list = document.getElementById('invList');
+  list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">Loading…</div>';
+  try {
+    const data = await apiFetch(`/api/software/${swId}/invoices`);
+    renderInvoiceList(data);
+    document.getElementById('swInvCount').textContent = data.length;
+  } catch(e) {
+    list.innerHTML = `<div style="color:#ef4444;font-size:12px;padding:8px">${e.message}</div>`;
+  }
+}
+
+function renderInvoiceList(invoices){
+  const list = document.getElementById('invList');
+  if (!invoices.length){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>';
+    return;
+  }
+  list.innerHTML = invoices.map(inv => {
+    const uploaded = new Date(inv.uploadedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+    const amt = inv.amount ? `${inv.currency || 'USD'} ${Number(inv.amount).toLocaleString('en-US', { minimumFractionDigits:2 })}` : '—';
+    const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : null;
+    const periodStr = inv.periodFrom && inv.periodTo
+      ? `${fmtDate(inv.periodFrom)} → ${fmtDate(inv.periodTo)}`
+      : (inv.periodFrom ? `From ${fmtDate(inv.periodFrom)}` : '');
+    const periodBadge = inv.billingPeriod
+      ? `<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'}">${inv.billingPeriod}</span>` : '';
+    const confDot = inv.parseConfidence === 'high' ? '🟢' : inv.parseConfidence === 'medium' ? '🟡' : '';
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;background:#fff">
+      <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:16px">📄</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:12.5px;font-weight:600;color:var(--gray-800)">${inv.filename}</span>
+          ${periodBadge}
+          ${confDot ? `<span title="Parse confidence: ${inv.parseConfidence}" style="font-size:11px">${confDot}</span>` : ''}
+        </div>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
+          Uploaded ${uploaded}${periodStr ? ' · ' + periodStr : ''}${inv.note ? ' · ' + inv.note : ''}
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--primary);white-space:nowrap">${amt}</div>
+      <a href="/api/software/${document.getElementById('swId').value}/invoices/${inv.id}/download"
+         style="font-size:11px;font-weight:600;color:var(--primary);text-decoration:none;padding:4px 10px;border:1px solid var(--primary);border-radius:6px;white-space:nowrap"
+         download="${inv.filename}">⬇ Download</a>
+      <button onclick="deleteInvoice('${inv.id}')" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:0 2px" title="Delete invoice">×</button>
+    </div>`;
+  }).join('');
+}
+
+function findSoftwareById(id) {
+  if (!id) return null;
+  return (software || []).find(s => s.id === id) || null;
+}
+
+function buildInvoiceParseContext(swRecord = null, fallbackBillingAddress = '') {
+  const rec = swRecord || {};
+  const siteCountries = [];
+  if (rec.siteUSA) siteCountries.push('US');
+  if (rec.siteCAN) siteCountries.push('CA');
+  if (rec.siteIND) siteCountries.push('IN');
+
+  const countryCode = siteCountries.length === 1 ? siteCountries[0] : '';
+  const billingAddress = String(rec.billedTo || fallbackBillingAddress || '').trim();
+  const countryHints = [];
+
+  if (rec.siteUSA) countryHints.push('US', 'USA', 'United States');
+  if (rec.siteCAN) countryHints.push('CA', 'Canada');
+  if (rec.siteIND) countryHints.push('IN', 'India');
+  if (billingAddress) countryHints.push(billingAddress);
+
+  const currencyByCountry = { US: 'USD', CA: 'CAD', IN: 'INR' };
+  const defaultCurrency = currencyByCountry[countryCode] || '';
+
+  return {
+    billingAddress,
+    countryCode,
+    countryHints,
+    defaultCurrency,
+  };
+}
+
+function safeParseJson(value, fallback = {}) {
+  try { return JSON.parse(value); } catch { return fallback; }
+}
+
+function normalizeInvoicePeriod(value = '') {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  const key = raw.toLowerCase();
+  if (key.startsWith('month')) return 'Monthly';
+  if (key.startsWith('quarter')) return 'Quarterly';
+  if (key.startsWith('annual') || key.startsWith('year')) return 'Annual';
+  if (key === 'freeware') return 'Freeware';
+  if (key === 'pay-as-you-go' || key === 'payg') return 'Pay-as-you-go';
+  return '';
+}
+
+function annualizeInvoiceAmount(amount, period = '') {
+  const n = Number(amount);
+  if (!Number.isFinite(n) || n <= 0) return 0;
+  const p = normalizeInvoicePeriod(period);
+  if (p === 'Annual') return n;
+  if (p === 'Quarterly') return n * 4;
+  if (p === 'Monthly') return n * 12;
+  return n;
+}
+
+function deriveSoftwareUpdateFromInvoice({
+  amount = 0,
+  billingPeriod = '',
+  parsed = {},
+  currentSoftware = null,
+  manualLicenseQuantity = null,
+} = {}) {
+  const update = {};
+  const current = currentSoftware || {};
+  const renewal = normalizeInvoicePeriod(parsed.renewalPeriod || billingPeriod);
+  if (renewal) update.renewalPeriod = renewal;
+
+  const annualizedCost = annualizeInvoiceAmount(amount, renewal || billingPeriod);
+  if (annualizedCost > 0) {
+    update.annualCost = Number(annualizedCost.toFixed(2));
+  }
+
+  const manualQty = Number(manualLicenseQuantity);
+  const parsedQty = Number(parsed.licenseQuantity);
+  const currentQty = Number(current.purchasedLicenses);
+  const effectiveQty = (Number.isFinite(manualQty) && manualQty > 0)
+    ? manualQty
+    : ((Number.isFinite(parsedQty) && parsedQty > 0)
+      ? parsedQty
+      : (Number.isFinite(currentQty) && currentQty > 0 ? currentQty : 0));
+  if (effectiveQty > 0) {
+    update.purchasedLicenses = Math.round(effectiveQty);
+  }
+
+  const plan = String(parsed.subscriptionPlan || '').trim();
+  if (plan) {
+    update.subscriptionPlan = plan;
+  }
+
+  let unitPrice = Number(parsed.licenseUnitPrice);
+  if (!(Number.isFinite(unitPrice) && unitPrice > 0) && effectiveQty > 0 && annualizedCost > 0) {
+    unitPrice = annualizedCost / (effectiveQty * 12);
+  }
+  if (Number.isFinite(unitPrice) && unitPrice > 0 && renewal !== 'Freeware' && renewal !== 'Pay-as-you-go') {
+    update.licensePricePerUserMonth = Number(unitPrice.toFixed(2));
+  }
+
+  return update;
+}
+
+function applyInvoiceDerivedFieldsToForm(update = {}) {
+  if (!update || typeof update !== 'object') return;
+
+  if (update.renewalPeriod) {
+    const renewalMain = document.getElementById('swRenewal');
+    if (renewalMain) {
+      renewalMain.value = update.renewalPeriod;
+      swTogglePaygHint('swCostLabel', 'swRecalcBtn', 'swLicPriceRow', renewalMain.value);
+    }
+    const renewalEdit = document.getElementById('swdeRenewal');
+    if (renewalEdit) {
+      renewalEdit.value = update.renewalPeriod;
+      swTogglePaygHint('swdeCostLabel', 'swdeRecalcBtn', 'swdeLicPriceRow', renewalEdit.value);
+    }
+  }
+
+  if (Number.isFinite(update.purchasedLicenses)) {
+    const elMain = document.getElementById('swPurchased');
+    const elEdit = document.getElementById('swdePurchased');
+    if (elMain) elMain.value = update.purchasedLicenses;
+    if (elEdit) elEdit.value = update.purchasedLicenses;
+    const invQty = document.getElementById('invLicenseQty');
+    const dmInvQty = document.getElementById('swDmInvLicenseQty');
+    if (invQty) invQty.value = update.purchasedLicenses;
+    if (dmInvQty) dmInvQty.value = update.purchasedLicenses;
+  }
+
+  if (Number.isFinite(update.licensePricePerUserMonth)) {
+    const elMain = document.getElementById('swLicPrice');
+    const elEdit = document.getElementById('swdeLicPrice');
+    if (elMain) elMain.value = update.licensePricePerUserMonth;
+    if (elEdit) elEdit.value = update.licensePricePerUserMonth;
+  }
+
+  if (Number.isFinite(update.annualCost)) {
+    const elMain = document.getElementById('swCost');
+    const elEdit = document.getElementById('swdeCost');
+    if (elMain) elMain.value = update.annualCost;
+    if (elEdit) elEdit.value = update.annualCost;
+  }
+
+  if (typeof update.subscriptionPlan === 'string' && update.subscriptionPlan.trim()) {
+    const elMain = document.getElementById('swPlan');
+    const elEdit = document.getElementById('swdePlan');
+    if (elMain) elMain.value = update.subscriptionPlan.trim();
+    if (elEdit) elEdit.value = update.subscriptionPlan.trim();
+  }
+}
+
+function applyInvoiceDerivedFieldsToSoftwareRecord(swId, update = {}) {
+  const rec = findSoftwareById(swId);
+  if (!rec || !update || typeof update !== 'object') return;
+  Object.assign(rec, update);
+}
+
+// Called when user picks a file — reads it as base64, sends to parse endpoint
+function onInvFileSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.type !== 'application/pdf') return; // only parse PDFs
+  input.dataset.parseConfidence = '';
+  input.dataset.parsedInvoiceMeta = '';
+  const qtyField = document.getElementById('invLicenseQty');
+  if (qtyField) qtyField.value = '';
+
+  const status = document.getElementById('invParseStatus');
+  status.textContent = '🔍 Reading invoice…';
+  status.style.color = 'var(--gray-500)';
+
+  // Clear previous hints
+  ['invParseAmtHint','invParseQtyHint','invParsePeriodHint','invParseFromHint','invParseToHint'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+
+  const reader = new FileReader();
+  reader.onload = async e => {
+    status.textContent = '🔍 Analysing…';
+    try {
+      const swId = document.getElementById('swId')?.value || '';
+      const swRecord = findSoftwareById(swId);
+      const context = buildInvoiceParseContext(swRecord, document.getElementById('swBilledTo')?.value || '');
+      const result = await apiFetch('/api/software/parse-invoice', {
+        method: 'POST',
+        body: JSON.stringify({ data: e.target.result, context }),
+      });
+
+      const hint = (id, text) => {
+        const el = document.getElementById(id);
+        if (el && text) { el.textContent = `✓ auto-filled`; }
+      };
+
+      if (result.amount) {
+        document.getElementById('invAmount').value = result.amount;
+        hint('invParseAmtHint', true);
+      }
+      if (result.licenseQuantity) {
+        document.getElementById('invLicenseQty').value = result.licenseQuantity;
+        hint('invParseQtyHint', true);
+      }
+      if (result.currency) {
+        const sel = document.getElementById('invCurrency');
+        const opt = [...sel.options].find(o => o.value === result.currency);
+        if (opt) sel.value = result.currency;
+      }
+      if (result.billingPeriod) {
+        document.getElementById('invBillingPeriod').value = result.billingPeriod;
+        hint('invParsePeriodHint', true);
+      }
+      if (result.periodFrom) {
+        document.getElementById('invPeriodFrom').value = result.periodFrom;
+        hint('invParseFromHint', true);
+      }
+      if (result.periodTo) {
+        document.getElementById('invPeriodTo').value = result.periodTo;
+        hint('invParseToHint', true);
+      }
+
+      const conf = result.confidence;
+      status.textContent = conf === 'high' ? '🟢 Fields auto-filled — please verify'
+                         : conf === 'medium' ? '🟡 Partially extracted — check the fields'
+                         : '🔴 Could not extract — please fill manually';
+      status.style.color = conf === 'high' ? '#10b981' : conf === 'medium' ? '#f59e0b' : '#ef4444';
+
+      // Store confidence for saving
+      document.getElementById('invFile').dataset.parseConfidence = conf || '';
+      document.getElementById('invFile').dataset.parsedInvoiceMeta = JSON.stringify(result || {});
+
+      const derivedUpdate = deriveSoftwareUpdateFromInvoice({
+        amount: result.amount || 0,
+        billingPeriod: result.billingPeriod || '',
+        parsed: result || {},
+        currentSoftware: swRecord || {},
+        manualLicenseQuantity: Number(document.getElementById('invLicenseQty')?.value || 0),
+      });
+      applyInvoiceDerivedFieldsToForm(derivedUpdate);
+      applyInvoiceDerivedFieldsToSoftwareRecord(swId, derivedUpdate);
+    } catch(err) {
+      status.textContent = '⚠️ Parse failed — fill manually';
+      status.style.color = '#ef4444';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadInvoice(){
+  const swId          = document.getElementById('swId').value;
+  const fileEl        = document.getElementById('invFile');
+  const file          = fileEl.files[0];
+  const amount        = parseFloat(document.getElementById('invAmount').value) || 0;
+  const currency      = document.getElementById('invCurrency').value || 'USD';
+  const billingPeriod = document.getElementById('invBillingPeriod').value || '';
+  const periodFrom    = document.getElementById('invPeriodFrom').value || null;
+  const periodTo      = document.getElementById('invPeriodTo').value || null;
+  const note          = document.getElementById('invNote').value.trim();
+  const parseConfidence = fileEl.dataset.parseConfidence || '';
+  const parsedMeta    = safeParseJson(fileEl.dataset.parsedInvoiceMeta || '{}', {});
+  const swRecord      = findSoftwareById(swId) || {};
+  const softwareUpdate = deriveSoftwareUpdateFromInvoice({
+    amount,
+    billingPeriod,
+    parsed: parsedMeta,
+    currentSoftware: swRecord,
+    manualLicenseQuantity: Number(document.getElementById('invLicenseQty')?.value || 0),
+  });
+  const status        = document.getElementById('invUploadStatus');
+
+  if (!swId)   return showToast('Save the software record first.');
+  if (!file)   return showToast('Please select a file to upload.');
+  if (file.size > 5 * 1024 * 1024) return showToast('File too large — max 5 MB.');
+
+  status.textContent = 'Reading file…';
+  status.style.color = 'var(--gray-500)';
+
+  const reader = new FileReader();
+  reader.onload = async e => {
+    status.textContent = 'Uploading…';
+    try {
+      await apiFetch(`/api/software/${swId}/invoices`, {
+        method: 'POST',
+        body: JSON.stringify({
+          filename: file.name,
+          data:     e.target.result,
+          mimeType: file.type || 'application/pdf',
+          amount, currency, billingPeriod, periodFrom, periodTo, note, parseConfidence,
+          licenseQuantity: Number(document.getElementById('invLicenseQty')?.value || 0) || null,
+          softwareUpdate,
+        }),
+      });
+      // Reset form fields
+      fileEl.value = '';
+      fileEl.dataset.parseConfidence = '';
+      fileEl.dataset.parsedInvoiceMeta = '';
+      ['invAmount','invLicenseQty','invNote','invPeriodFrom','invPeriodTo'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('invBillingPeriod').value = '';
+      document.getElementById('invParseStatus').textContent = '';
+      ['invParseAmtHint','invParseQtyHint','invParsePeriodHint','invParseFromHint','invParseToHint'].forEach(id => {
+        document.getElementById(id).textContent = '';
+      });
+      status.textContent = '';
+      applyInvoiceDerivedFieldsToForm(softwareUpdate);
+      applyInvoiceDerivedFieldsToSoftwareRecord(swId, softwareUpdate);
+      await loadInvoices();
+      showToast('Invoice uploaded successfully.');
+    } catch(err) {
+      status.textContent = err.message;
+      status.style.color = '#ef4444';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function deleteInvoice(invId){
+  const swId = document.getElementById('swId').value;
+  if (!confirm('Delete this invoice?')) return;
+  try {
+    await apiFetch(`/api/software/${swId}/invoices/${invId}`, { method: 'DELETE' });
+    await loadInvoices();
+    showToast('Invoice deleted.');
+  } catch(e) { showToast(e.message); }
 }
 
 /* ── Advanced search toggle ── */
@@ -3800,9 +4273,11 @@ function openSoftwareModal(s=null){
   editingServices = JSON.parse(JSON.stringify(s?.services||[]));
   // Apply PAYG hint
   swTogglePaygHint('swCostLabel','swRecalcBtn','swLicPriceRow', s?.renewalPeriod||'');
-  // Always start on Details tab
+  // Always start on Details tab; reset invoice panel
   swSwitchTab('details');
   renderServicesTab();
+  document.getElementById('invList').innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>';
+  document.getElementById('swInvCount').textContent = '0';
   showOverlay('softwareModal');
 }
 
@@ -4114,10 +4589,24 @@ let _swDmCurrentId = null;
 function swDmTab(tab){
   /* 'services' is now merged into overview */
   if(tab === 'services') tab = 'overview';
-  const panels = { overview:'swDmPanelOverview', edit:'swDmPanelEdit' };
+  const panels = { overview:'swDmPanelOverview', edit:'swDmPanelEdit', invoices:'swDmPanelInvoices' };
   Object.keys(panels).forEach(t=>{
     document.getElementById(panels[t])?.classList.toggle('active', t===tab);
   });
+
+  // Overview tab highlight
+  const ovBtn = document.getElementById('swDmTabOverviewBtn');
+  if(ovBtn){
+    ovBtn.style.color = tab==='overview' ? 'var(--primary)' : 'var(--gray-400)';
+    ovBtn.style.borderBottom = tab==='overview' ? '2px solid var(--primary)' : '2px solid transparent';
+  }
+  // Invoices tab highlight
+  const invBtn = document.getElementById('swDmTabInvoicesBtn');
+  if(invBtn){
+    invBtn.style.color = tab==='invoices' ? 'var(--primary)' : 'var(--gray-400)';
+    invBtn.style.borderBottom = tab==='invoices' ? '2px solid var(--primary)' : '2px solid transparent';
+  }
+
   const editBtn = document.getElementById('swDmTabEditBtn');
   if(editBtn){
     if(tab === 'edit'){
@@ -4128,7 +4617,236 @@ function swDmTab(tab){
       editBtn.onclick = () => swDmTab('edit');
     }
   }
-  if(tab==='edit') swdePopulateForm();
+  if(tab==='edit')     swdePopulateForm();
+  if(tab==='invoices') swDmLoadInvoices();
+}
+
+// ── Invoice summary in Overview tab ───────────────────────────────────────────
+async function swDmLoadInvoiceSummary(id) {
+  const body = document.getElementById('swDrInvoicesBody');
+  if (!body) return;
+  try {
+    const invoices = await apiFetch(`/api/software/${id}/invoices`);
+    // Update badge count on Invoices tab
+    const badge = document.getElementById('swDmInvCount');
+    if (badge) { badge.textContent = invoices.length; badge.style.background = invoices.length ? 'var(--primary)' : 'var(--gray-300)'; }
+
+    if (!invoices.length) {
+      body.innerHTML = `<div style="font-size:12px;color:var(--gray-400);padding:6px 0">No invoices uploaded yet.
+        <span onclick="swDmTab('invoices')" style="color:var(--primary);cursor:pointer;font-weight:600;margin-left:4px">+ Attach one</span>
+      </div>`;
+      return;
+    }
+
+    const fmtD = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const totalSpend = invoices.reduce((s,i) => s + (i.amount||0), 0);
+    const latestInv = [...invoices].sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+
+    body.innerHTML = `
+      <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50)">
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:3px">Total Invoiced</div>
+          <div style="font-size:16px;font-weight:800;color:var(--primary)">$${totalSpend.toLocaleString('en-US',{minimumFractionDigits:2})}</div>
+        </div>
+        <div style="flex:1;min-width:120px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50)">
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:3px">Invoices</div>
+          <div style="font-size:16px;font-weight:800;color:var(--gray-700)">${invoices.length}</div>
+        </div>
+        <div style="flex:1;min-width:160px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50)">
+          <div style="font-size:11px;color:var(--gray-400);margin-bottom:3px">Latest Invoice</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--gray-700)">${latestInv.currency||'USD'} ${Number(latestInv.amount||0).toLocaleString('en-US',{minimumFractionDigits:2})}</div>
+          <div style="font-size:10.5px;color:var(--gray-400)">${fmtD(latestInv.periodFrom)}${latestInv.periodTo?' → '+fmtD(latestInv.periodTo):''}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;margin-bottom:6px;font-weight:600;color:var(--gray-500)">RECENT</div>
+      ${invoices.slice(0,3).map(inv => {
+        const bp = inv.billingPeriod ? `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'};margin-left:4px">${inv.billingPeriod}</span>` : '';
+        return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100)">
+          <span style="font-size:12px">📄</span>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:var(--gray-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${inv.filename}${bp}</div>
+            <div style="font-size:10.5px;color:var(--gray-400)">${fmtD(inv.periodFrom)}${inv.periodTo?' → '+fmtD(inv.periodTo):''}</div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--primary);white-space:nowrap">${inv.currency||'USD'} ${Number(inv.amount||0).toLocaleString('en-US',{minimumFractionDigits:2})}</div>
+        </div>`;
+      }).join('')}
+      <div style="margin-top:8px">
+        <span onclick="swDmTab('invoices')" style="font-size:11px;color:var(--primary);cursor:pointer;font-weight:600">View all invoices →</span>
+      </div>`;
+  } catch(e) {
+    const body2 = document.getElementById('swDrInvoicesBody');
+    if (body2) body2.innerHTML = `<div style="font-size:12px;color:var(--gray-400)">Could not load invoices.</div>`;
+  }
+}
+
+// ── Drawer invoice functions ───────────────────────────────────────────────────
+async function swDmLoadInvoices(){
+  const id   = _swDmCurrentId;
+  if(!id) return;
+  const list = document.getElementById('swDmInvList');
+  list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">Loading…</div>';
+  try {
+    const data = await apiFetch(`/api/software/${id}/invoices`);
+    swDmRenderInvoices(data);
+    document.getElementById('swDmInvCount').textContent = data.length;
+    document.getElementById('swDmInvCount').style.background = data.length ? 'var(--primary)' : 'var(--gray-300)';
+  } catch(e){
+    list.innerHTML = `<div style="color:#ef4444;font-size:12px;padding:8px">${e.message}</div>`;
+  }
+}
+
+function swDmRenderInvoices(invoices){
+  const id   = _swDmCurrentId;
+  const list = document.getElementById('swDmInvList');
+  if(!invoices.length){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>';
+    return;
+  }
+  list.innerHTML = invoices.map(inv => {
+    const uploaded  = new Date(inv.uploadedAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    const amt       = inv.amount ? `${inv.currency||'USD'} ${Number(inv.amount).toLocaleString('en-US',{minimumFractionDigits:2})}` : '—';
+    const fmtD      = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : null;
+    const periodStr = inv.periodFrom && inv.periodTo ? `${fmtD(inv.periodFrom)} → ${fmtD(inv.periodTo)}` : (inv.periodFrom ? `From ${fmtD(inv.periodFrom)}`:'');
+    const periodBadge = inv.billingPeriod
+      ? `<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'}">${inv.billingPeriod}</span>` : '';
+    const confDot   = inv.parseConfidence==='high'?'🟢':inv.parseConfidence==='medium'?'🟡':'';
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;margin-bottom:8px">
+      <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:16px">📄</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-size:12.5px;font-weight:600;color:var(--gray-800)">${inv.filename}</span>
+          ${periodBadge}
+          ${confDot?`<span title="Parse confidence: ${inv.parseConfidence}" style="font-size:11px">${confDot}</span>`:''}
+        </div>
+        <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
+          Uploaded ${uploaded}${periodStr?' · '+periodStr:''}${inv.note?' · '+inv.note:''}
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:700;color:var(--primary);white-space:nowrap">${amt}</div>
+      <a href="/api/software/${id}/invoices/${inv.id}/download"
+         style="font-size:11px;font-weight:600;color:var(--primary);text-decoration:none;padding:4px 10px;border:1px solid var(--primary);border-radius:6px;white-space:nowrap"
+         download="${inv.filename}">⬇ Download</a>
+      <button onclick="swDmDeleteInvoice('${inv.id}')" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:0 2px" title="Delete">×</button>
+    </div>`;
+  }).join('');
+}
+
+function onSwDmInvFileSelected(input){
+  const file = input.files[0];
+  if(!file || file.type !== 'application/pdf') return;
+  input.dataset.parseConfidence = '';
+  input.dataset.parsedInvoiceMeta = '';
+  const qtyField = document.getElementById('swDmInvLicenseQty');
+  if (qtyField) qtyField.value = '';
+  const status = document.getElementById('swDmInvParseStatus');
+  status.textContent = '🔍 Reading invoice…';
+  status.style.color = 'var(--gray-500)';
+  ['swDmInvAmtHint','swDmInvQtyHint','swDmInvPeriodHint','swDmInvFromHint','swDmInvToHint'].forEach(id=>{
+    const el = document.getElementById(id); if(el) el.textContent='';
+  });
+  const reader = new FileReader();
+  reader.onload = async e => {
+    status.textContent = '🔍 Analysing…';
+    try {
+      const swRecord = findSoftwareById(_swDmCurrentId);
+      const context = buildInvoiceParseContext(swRecord, document.getElementById('swdeBilledTo')?.value || '');
+      const result = await apiFetch('/api/software/parse-invoice',{
+        method:'POST', body:JSON.stringify({ data: e.target.result, context }),
+      });
+      if(result.amount)        { document.getElementById('swDmInvAmount').value = result.amount; document.getElementById('swDmInvAmtHint').textContent='✓ auto-filled'; }
+      if(result.licenseQuantity){ document.getElementById('swDmInvLicenseQty').value = result.licenseQuantity; document.getElementById('swDmInvQtyHint').textContent='✓ auto-filled'; }
+      if(result.currency)      { const s=document.getElementById('swDmInvCurrency'); if([...s.options].find(o=>o.value===result.currency)) s.value=result.currency; }
+      if(result.billingPeriod) { document.getElementById('swDmInvBillingPeriod').value=result.billingPeriod; document.getElementById('swDmInvPeriodHint').textContent='✓ auto-filled'; }
+      if(result.periodFrom)    { document.getElementById('swDmInvPeriodFrom').value=result.periodFrom; document.getElementById('swDmInvFromHint').textContent='✓ auto-filled'; }
+      if(result.periodTo)      { document.getElementById('swDmInvPeriodTo').value=result.periodTo; document.getElementById('swDmInvToHint').textContent='✓ auto-filled'; }
+      input.dataset.parseConfidence = result.confidence || '';
+      input.dataset.parsedInvoiceMeta = JSON.stringify(result || {});
+      const c = result.confidence;
+      status.textContent = c==='high'?'🟢 Fields auto-filled — please verify':c==='medium'?'🟡 Partially extracted — check the fields':'🔴 Could not extract — fill manually';
+      status.style.color = c==='high'?'#10b981':c==='medium'?'#f59e0b':'#ef4444';
+
+      const derivedUpdate = deriveSoftwareUpdateFromInvoice({
+        amount: result.amount || 0,
+        billingPeriod: result.billingPeriod || '',
+        parsed: result || {},
+        currentSoftware: swRecord || {},
+        manualLicenseQuantity: Number(document.getElementById('swDmInvLicenseQty')?.value || 0),
+      });
+      applyInvoiceDerivedFieldsToForm(derivedUpdate);
+      applyInvoiceDerivedFieldsToSoftwareRecord(_swDmCurrentId, derivedUpdate);
+    } catch(err){
+      status.textContent='⚠️ Parse failed — fill manually'; status.style.color='#ef4444';
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function swDmUploadInvoice(){
+  const id     = _swDmCurrentId;
+  const fileEl = document.getElementById('swDmInvFile');
+  const file   = fileEl.files[0];
+  const status = document.getElementById('swDmInvUploadStatus');
+  const amount = parseFloat(document.getElementById('swDmInvAmount').value) || 0;
+  const billingPeriod = document.getElementById('swDmInvBillingPeriod').value || '';
+  const parsedMeta = safeParseJson(fileEl.dataset.parsedInvoiceMeta || '{}', {});
+  const swRecord = findSoftwareById(id) || {};
+  const softwareUpdate = deriveSoftwareUpdateFromInvoice({
+    amount,
+    billingPeriod,
+    parsed: parsedMeta,
+    currentSoftware: swRecord,
+    manualLicenseQuantity: Number(document.getElementById('swDmInvLicenseQty')?.value || 0),
+  });
+  if(!id)   return showToast('No software record selected.');
+  if(!file) return showToast('Please select a file.');
+  if(file.size > 5*1024*1024) return showToast('File too large — max 5 MB.');
+  status.textContent='Reading file…'; status.style.color='var(--gray-500)';
+  const reader = new FileReader();
+  reader.onload = async e => {
+    status.textContent='Uploading…';
+    try {
+      await apiFetch(`/api/software/${id}/invoices`,{
+        method:'POST',
+        body:JSON.stringify({
+          filename: file.name, data: e.target.result, mimeType: file.type||'application/pdf',
+          amount,
+          currency:      document.getElementById('swDmInvCurrency').value||'USD',
+          billingPeriod,
+          periodFrom:    document.getElementById('swDmInvPeriodFrom').value||null,
+          periodTo:      document.getElementById('swDmInvPeriodTo').value||null,
+          note:          document.getElementById('swDmInvNote').value.trim(),
+          parseConfidence: fileEl.dataset.parseConfidence||'',
+          licenseQuantity: Number(document.getElementById('swDmInvLicenseQty')?.value || 0) || null,
+          softwareUpdate,
+        }),
+      });
+      // Reset form
+      fileEl.value=''; fileEl.dataset.parseConfidence='';
+      fileEl.dataset.parsedInvoiceMeta = '';
+      ['swDmInvAmount','swDmInvLicenseQty','swDmInvNote','swDmInvPeriodFrom','swDmInvPeriodTo'].forEach(i=>{ document.getElementById(i).value=''; });
+      document.getElementById('swDmInvBillingPeriod').value='';
+      document.getElementById('swDmInvParseStatus').textContent='';
+      ['swDmInvAmtHint','swDmInvQtyHint','swDmInvPeriodHint','swDmInvFromHint','swDmInvToHint'].forEach(i=>{ document.getElementById(i).textContent=''; });
+      status.textContent='';
+      applyInvoiceDerivedFieldsToForm(softwareUpdate);
+      applyInvoiceDerivedFieldsToSoftwareRecord(id, softwareUpdate);
+      openSwDm(id);
+      swDmTab('invoices');
+      showToast('Invoice uploaded successfully.');
+    } catch(err){ status.textContent=err.message; status.style.color='#ef4444'; }
+  };
+  reader.readAsDataURL(file);
+}
+
+async function swDmDeleteInvoice(invId){
+  const id = _swDmCurrentId;
+  if(!confirm('Delete this invoice?')) return;
+  try {
+    await apiFetch(`/api/software/${id}/invoices/${invId}`,{ method:'DELETE' });
+    await swDmLoadInvoices();
+    showToast('Invoice deleted.');
+  } catch(e){ showToast(e.message); }
 }
 
 function openSwDm(id){
@@ -4149,6 +4867,9 @@ function openSwDm(id){
 
   /* ─ Reset to Overview tab ─ */
   swDmTab('overview');
+
+  /* ─ Load invoice summary for Overview ─ */
+  swDmLoadInvoiceSummary(id);
 
   /* ─ Header ─ */
   document.getElementById('swDrCsvId').textContent   = s.csvId;
@@ -4194,7 +4915,8 @@ function openSwDm(id){
   document.getElementById('swDrPlanInfo').innerHTML = planParts.join('&nbsp;&nbsp;·&nbsp;&nbsp;');
 
   /* ─ Services & Costs tab: structured breakdown ─ */
-  const baseLicCost = (s.purchasedLicenses||0) * (s.licensePricePerUserMonth||0) * 12;
+  const derivedBaseCost = (s.purchasedLicenses||0) * (s.licensePricePerUserMonth||0) * 12;
+  const baseLicCost = (s.annualCost && s.annualCost > 0) ? s.annualCost : derivedBaseCost;
   const typeKey2    = (s.deploymentType||'SAAS').replace(' ','-');
 
   function planCard(sectionLabel, opts){
@@ -6538,7 +7260,12 @@ function toggleNotifCollapse() {
       </div>
       <!-- Single Tab Header -->
       <div class="sw-dm-tabs">
-        <span style="font-size:13px;font-weight:700;color:var(--primary);padding:10px 0;">ℹ️ Overview</span>
+        <div style="display:flex;gap:0;align-items:center">
+          <span id="swDmTabOverviewBtn" style="font-size:13px;font-weight:700;color:var(--primary);padding:10px 0;cursor:pointer;border-bottom:2px solid var(--primary);margin-right:16px" onclick="swDmTab('overview')">ℹ️ Overview</span>
+          <span id="swDmTabInvoicesBtn" style="font-size:13px;font-weight:600;color:var(--gray-400);padding:10px 0;cursor:pointer;border-bottom:2px solid transparent;margin-right:4px" onclick="swDmTab('invoices')">
+            📎 Invoices <span id="swDmInvCount" style="font-size:10px;background:var(--gray-300);color:#fff;padding:1px 6px;border-radius:9999px;margin-left:3px;vertical-align:middle">0</span>
+          </span>
+        </div>
         <button class="btn btn-secondary btn-sm rbac-write" id="swDmTabEditBtn" onclick="swDmTab('edit')" style="margin:4px 0;">✏️ Edit</button>
       </div>
       <!-- Body -->
@@ -6603,6 +7330,14 @@ function toggleNotifCollapse() {
           <!-- Services & Costs (merged) -->
           <div style="margin-bottom:22px">
             <div id="swDrServicesCostBody"></div>
+          </div>
+
+          <!-- Invoice History -->
+          <div style="margin-bottom:22px" id="swDrInvoicesSection">
+            <div class="sw-section-title">📋 INVOICE HISTORY</div>
+            <div id="swDrInvoicesBody" style="margin-top:10px">
+              <div style="font-size:12px;color:var(--gray-400);padding:8px 0">Loading invoices…</div>
+            </div>
           </div>
 
           <!-- Users with Access -->
@@ -6720,6 +7455,78 @@ function toggleNotifCollapse() {
 
           </div><!-- /swde-grid -->
         </div><!-- /edit panel -->
+
+        <!-- ══ INVOICES PANEL ══ -->
+        <div class="sw-dm-panel" id="swDmPanelInvoices">
+
+          <!-- Upload form -->
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+            <div style="font-size:12.5px;font-weight:600;color:var(--gray-700);margin-bottom:10px">📎 Attach Invoice</div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group" style="flex:2">
+                <label>Invoice File (PDF / image)</label>
+                <input type="file" id="swDmInvFile" accept=".pdf,.png,.jpg,.jpeg"
+                  style="font-size:12px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;width:100%"
+                  onchange="onSwDmInvFileSelected(this)">
+              </div>
+              <div class="form-group" style="flex:1;padding-top:22px">
+                <div id="swDmInvParseStatus" style="font-size:11px;color:var(--gray-400);padding:4px 0"></div>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group">
+                <label>Amount <span id="swDmInvAmtHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="number" id="swDmInvAmount" placeholder="0.00" min="0" step="0.01" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
+                <label>Currency</label>
+                <select id="swDmInvCurrency" style="font-size:12.5px">
+                  <option value="USD">USD</option><option value="CAD">CAD</option>
+                  <option value="INR">INR</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>License Quantity <span id="swDmInvQtyHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="number" id="swDmInvLicenseQty" placeholder="e.g. 7" min="0" step="1" style="font-size:12.5px">
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group">
+                <label>Billing Period <span id="swDmInvPeriodHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <select id="swDmInvBillingPeriod" style="font-size:12.5px">
+                  <option value="">— select —</option>
+                  <option value="Monthly">Monthly</option>
+                  <option value="Quarterly">Quarterly</option>
+                  <option value="Annual">Annual</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Period From <span id="swDmInvFromHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="date" id="swDmInvPeriodFrom" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
+                <label>Period To <span id="swDmInvToHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="date" id="swDmInvPeriodTo" style="font-size:12.5px">
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group">
+                <label>Note (optional)</label>
+                <input type="text" id="swDmInvNote" placeholder="e.g. March 2026 invoice" style="font-size:12.5px">
+              </div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
+              <span id="swDmInvUploadStatus" style="font-size:11px;color:var(--gray-400)"></span>
+              <button class="btn btn-primary btn-sm" onclick="swDmUploadInvoice()">Upload Invoice</button>
+            </div>
+          </div>
+
+          <!-- Invoice list -->
+          <div id="swDmInvList">
+            <div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>
+          </div>
+
+        </div><!-- /invoices panel -->
 
       </div><!-- /sw-dm-body -->
     </div><!-- /swDmViewMode -->
