@@ -879,19 +879,30 @@
             </div>
             <div>
               <div id="softDocsSummary" style="font-size:12px;color:var(--text-muted);margin-bottom:8px">—</div>
-              <div id="softDocsRuleEditor" style="margin-bottom:10px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)">
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-                  <div style="font-size:12px;font-weight:700;color:var(--text)">Sender IDs</div>
-                  <button class="btn btn-primary btn-sm" id="softDocsRuleSaveBtn" onclick="saveSoftDocsSelectedRule()">Save Rule</button>
+              <div id="softDocsRuleBar" style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+                <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1">
+                  <span style="font-size:12px;color:var(--text-muted)" id="softDocsRuleHint">Select a software to configure rules.</span>
+                  <span id="softDocsRuleBadge" style="display:none;font-size:10.5px;padding:3px 8px;border-radius:999px;background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.25);white-space:nowrap"></span>
                 </div>
-                <div style="font-size:11px;color:var(--text-muted);margin:6px 0 8px" id="softDocsRuleHint">Select a software to configure sender IDs.</div>
-                <textarea id="softDocsSenderIdsInput" rows="3" placeholder="billing@adobe.com\nadobe.com\nmicrosoft-noreply@microsoft.com" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;resize:vertical;min-height:76px"></textarea>
-                <div style="font-size:10.5px;color:var(--text-muted);margin-top:6px">One per line or comma-separated. Use full email or domain.</div>
-                <div style="margin-top:10px">
-                  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">Body Keywords</div>
-                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" id="softDocsBodyKeywordsHint">Words to match in email body &amp; attachment text. Matched emails get a higher score.</div>
-                  <textarea id="softDocsBodyKeywordsInput" rows="2" placeholder="invoice\nreceipt\npayment\ncost\nsubscription\nrenewal" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;resize:vertical;min-height:56px"></textarea>
-                  <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px">One per line or comma-separated. Matched against email body + PDF text. Each hit adds +7 to match score (max +22).</div>
+                <button class="btn btn-secondary btn-sm" id="softDocsConfigureBtn" onclick="toggleSoftDocsRuleEditor()" style="display:none">Configure</button>
+              </div>
+              <div id="softDocsRuleEditor" style="display:none;margin-bottom:10px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+                  <div style="font-size:13px;font-weight:700;color:var(--text)">Rule Configuration</div>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn btn-secondary btn-sm" onclick="toggleSoftDocsRuleEditor()">Cancel</button>
+                    <button class="btn btn-primary btn-sm" id="softDocsRuleSaveBtn" onclick="saveSoftDocsSelectedRule()">Save Rule</button>
+                  </div>
+                </div>
+                <div style="margin-bottom:12px">
+                  <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">Sender IDs</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">One per line. Use full email (billing@adobe.com) or domain (adobe.com).</div>
+                  <textarea id="softDocsSenderIdsInput" rows="3" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;resize:vertical;min-height:76px"></textarea>
+                </div>
+                <div style="margin-bottom:12px">
+                  <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">Body &amp; Subject Keywords</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">One per line. Matched against email body + PDF text. Each hit adds +7 to score (max +22).</div>
+                  <textarea id="softDocsBodyKeywordsInput" rows="2" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;resize:vertical;min-height:56px"></textarea>
                 </div>
               </div>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
@@ -2362,42 +2373,79 @@ function softDocsSenderIdsTextForRule(rule = null) {
   return rows.join('\n');
 }
 
-function renderSoftDocsRuleEditor() {
-  const hintEl = document.getElementById('softDocsRuleHint');
+function toggleSoftDocsRuleEditor() {
+  const editor = document.getElementById('softDocsRuleEditor');
+  if (!editor) return;
+  const isOpen = editor.style.display !== 'none';
+  editor.style.display = isOpen ? 'none' : 'block';
+  // Populate fields when opening
+  if (!isOpen) populateSoftDocsRuleFields();
+}
+
+function populateSoftDocsRuleFields() {
   const inputEl = document.getElementById('softDocsSenderIdsInput');
   const bodyKeywordsInputEl = document.getElementById('softDocsBodyKeywordsInput');
-  const btnEl = document.getElementById('softDocsRuleSaveBtn');
-  if (!hintEl || !inputEl || !btnEl) return;
+  if (!inputEl) return;
+
+  const selectedId = String(softDocsSelectedSoftwareId || '').trim();
+  const rule = softDocsRulesBySoftware.get(selectedId) || null;
+  const senderText = softDocsSenderIdsTextForRule(rule);
+  inputEl.value = senderText;
+  inputEl.placeholder = 'billing@adobe.com\nadobe.com\nmicrosoft-noreply@microsoft.com';
+
+  if (bodyKeywordsInputEl) {
+    const bodyKeywords = (rule && Array.isArray(rule.bodyKeywords)) ? rule.bodyKeywords.filter(Boolean).join('\n') : '';
+    bodyKeywordsInputEl.value = bodyKeywords;
+    bodyKeywordsInputEl.placeholder = 'invoice\nreceipt\npayment\ncost\nsubscription\nrenewal';
+  }
+}
+
+function renderSoftDocsRuleEditor() {
+  const hintEl = document.getElementById('softDocsRuleHint');
+  const badgeEl = document.getElementById('softDocsRuleBadge');
+  const configBtn = document.getElementById('softDocsConfigureBtn');
+  const editorEl = document.getElementById('softDocsRuleEditor');
+  if (!hintEl) return;
 
   const selectedId = String(softDocsSelectedSoftwareId || '').trim();
   const isSoftwareSelected = selectedId && !['__all__', '__unmatched__'].includes(selectedId);
+
+  // Always collapse editor when switching software
+  if (editorEl) editorEl.style.display = 'none';
+
   if (!isSoftwareSelected) {
-    hintEl.textContent = 'Select a software to configure sender IDs.';
-    inputEl.value = '';
-    if (bodyKeywordsInputEl) { bodyKeywordsInputEl.value = ''; bodyKeywordsInputEl.disabled = true; }
-    inputEl.disabled = true;
-    btnEl.disabled = true;
+    hintEl.textContent = 'Select a software to configure rules.';
+    if (badgeEl) { badgeEl.style.display = 'none'; badgeEl.textContent = ''; }
+    if (configBtn) configBtn.style.display = 'none';
     return;
   }
 
   const sw = softDocsSoftware.find((row) => String(row.id) === selectedId);
   const rule = softDocsRulesBySoftware.get(selectedId) || null;
   const hasRule = !!rule;
-  const senderText = softDocsSenderIdsTextForRule(rule);
-  inputEl.value = senderText;
-  inputEl.disabled = false;
-  btnEl.disabled = false;
+  const senderCount = hasRule
+    ? ((Array.isArray(rule.senderEmails) ? rule.senderEmails.filter(Boolean).length : 0) + (Array.isArray(rule.senderDomains) ? rule.senderDomains.filter(Boolean).length : 0))
+    : 0;
+  const bodyCount = hasRule && Array.isArray(rule.bodyKeywords) ? rule.bodyKeywords.filter(Boolean).length : 0;
 
-  // Populate body keywords
-  if (bodyKeywordsInputEl) {
-    const bodyKeywords = (rule && Array.isArray(rule.bodyKeywords)) ? rule.bodyKeywords.filter(Boolean).join('\n') : '';
-    bodyKeywordsInputEl.value = bodyKeywords;
-    bodyKeywordsInputEl.disabled = false;
+  if (configBtn) configBtn.style.display = '';
+
+  if (hasRule && senderCount > 0) {
+    hintEl.textContent = '';
+    if (badgeEl) {
+      const parts = [];
+      parts.push(`${senderCount} sender${senderCount !== 1 ? 's' : ''}`);
+      if (bodyCount > 0) parts.push(`${bodyCount} keyword${bodyCount !== 1 ? 's' : ''}`);
+      badgeEl.textContent = `✓ ${parts.join(' · ')}`;
+      badgeEl.style.display = '';
+      badgeEl.style.background = 'rgba(74,222,128,.12)';
+      badgeEl.style.color = '#4ade80';
+      badgeEl.style.borderColor = 'rgba(74,222,128,.25)';
+    }
+  } else {
+    hintEl.textContent = `No rules configured for ${String(sw?.name || 'software')} yet.`;
+    if (badgeEl) { badgeEl.style.display = 'none'; }
   }
-
-  hintEl.textContent = hasRule
-    ? `Configured sender IDs for ${String(sw?.name || 'software')}.`
-    : `No sender IDs configured for ${String(sw?.name || 'software')} yet. Add sender email/domain and save.`;
 }
 
 function renderSoftDocsSoftwareList() {
@@ -2693,12 +2741,12 @@ async function saveSoftDocsSelectedRule() {
       setSoftDocsStatus(data.error || 'Failed to save sender ID rule.', 'danger');
       return;
     }
-    showToast('Sender IDs saved');
+    showToast('Rule saved successfully');
     await loadSoftDocsData();
     renderSoftDocsSoftwareList();
-    renderSoftDocsRuleEditor();
+    renderSoftDocsRuleEditor(); // this will collapse the editor
     renderSoftDocsInvoices();
-    setSoftDocsStatus('Sender ID rules updated.', 'success');
+    setSoftDocsStatus('Rule saved.', 'success');
   } catch (error) {
     if (errEl) errEl.textContent = error.message || 'Failed to save sender ID rule.';
     setSoftDocsStatus(error.message || 'Failed to save sender ID rule.', 'danger');
