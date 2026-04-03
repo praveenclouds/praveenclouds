@@ -20,6 +20,7 @@ const { requireAuth }                    = require('../middleware/auth');
 const { JWT_SECRET, JWT_EXPIRES }        = require('../config');
 const { httpsGet, httpsPost }            = require('../utils/http');
 const { getResolvedPermissions, normalizeRoleForDisplay } = require('../services/role-permission.service');
+const { decryptSecret } = require('../utils/secret-crypto');
 
 function getPublicBaseUrl(req) {
   const host = req.get('x-forwarded-host') || req.get('host');
@@ -109,7 +110,8 @@ router.post('/logout', (req, res) => {
 router.get('/google/status', async (req, res) => {
   try {
     const s = await IntegrationSettings.findOne({ provider: 'google' });
-    res.json({ enabled: !!(s && s.enabled && s.clientId && s.clientSecret) });
+    const clientSecret = String(decryptSecret(s?.clientSecret || '') || '').trim();
+    res.json({ enabled: !!(s && s.enabled && s.clientId && clientSecret) });
   } catch { res.json({ enabled: false }); }
 });
 
@@ -168,7 +170,8 @@ router.get('/google/callback', async (req, res) => {
     // ──────────────────────────────────────────────────────────────────────────
 
     const s = await IntegrationSettings.findOne({ provider: 'google' });
-    if (!s || !s.enabled) return res.redirect('/login?sso_error=disabled');
+    const clientSecret = String(decryptSecret(s?.clientSecret || '') || '').trim();
+    if (!s || !s.enabled || !s.clientId || !clientSecret) return res.redirect('/login?sso_error=disabled');
 
     const redirectUri = `${getPublicBaseUrl(req)}/api/auth/google/callback`;
 
@@ -176,7 +179,7 @@ router.get('/google/callback', async (req, res) => {
     const tokenData = await httpsPost('oauth2.googleapis.com', '/token', {
       code,
       client_id:     s.clientId,
-      client_secret: s.clientSecret,
+      client_secret: clientSecret,
       redirect_uri:  redirectUri,
       grant_type:    'authorization_code',
     });

@@ -1575,7 +1575,7 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <select id="swType"><option>SAAS</option><option>On-premises</option><option>Freeware</option><option>Open Source</option></select>
         </div>
         <div class="form-group"><label>Renewal Period</label>
-          <select id="swRenewal" onchange="swTogglePaygHint('swCostLabel','swRecalcBtn','swLicPriceRow',this.value)"><option value="">—</option><option>Annual</option><option>Monthly</option><option>Quarterly</option><option>Freeware</option><option>Pay-as-you-go</option></select>
+          <select id="swRenewal" onchange="swTogglePaygHint('swCostLabel','swRecalcBtn','swLicPriceRow',this.value);syncMonthlyCostVisibility(this.value)"><option value="">—</option><option>Annual</option><option>Monthly</option><option>Quarterly</option><option>Freeware</option><option>Pay-as-you-go</option></select>
         </div>
       </div>
       <div class="form-row">
@@ -1615,11 +1615,17 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         <div class="form-group"><label>Purchased Licenses</label><input type="number" id="swPurchased" placeholder="0" min="0" oninput="calcSwAnnualCost()"></div>
         <div class="form-group"><label>Used Licenses</label><input type="number" id="swUsed" placeholder="0" min="0"></div>
       </div>
-      <div class="form-row">
+      <div class="form-row" id="swMonthlyCostRow" style="display:none">
+        <div class="form-group">
+          <label>Monthly Cost ($) <span style="font-size:10px;font-weight:400;color:var(--gray-400)">— Purchased × Price</span></label>
+          <input type="number" id="swMonthlyCost" placeholder="0.00" readonly style="background:var(--gray-50,#f9fafb);cursor:default" tabindex="-1">
+        </div>
         <div class="form-group">
           <label id="swCostLabel">Base Annual Cost ($) <span style="font-size:10px;font-weight:400;color:var(--gray-400)">— Purchased × Price × 12</span></label>
           <input type="number" id="swCost" placeholder="0" min="0" step="0.01">
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group" id="swRecalcBtn" style="justify-content:flex-end;padding-top:22px">
           <button type="button" class="btn btn-secondary btn-sm" onclick="calcSwAnnualCost()" style="width:100%">↻ Recalculate</button>
         </div>
@@ -1700,6 +1706,10 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
             <label>License Quantity <span id="invParseQtyHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
             <input type="number" id="invLicenseQty" placeholder="e.g. 7" min="0" step="1" style="font-size:12.5px">
           </div>
+          <div class="form-group">
+            <label>Unit Price / License <span id="invParseUnitHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <input type="number" id="invUnitPrice" placeholder="e.g. 12.50" min="0" step="0.01" style="font-size:12.5px">
+          </div>
         </div>
         <div class="form-row" style="margin-bottom:8px">
           <div class="form-group">
@@ -1722,10 +1732,15 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
         </div>
         <div class="form-row" style="margin-bottom:8px">
           <div class="form-group">
+            <label>Subscription Plan <span id="invParsePlanHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+            <input type="text" id="invSubscriptionPlan" placeholder="e.g. Full Seat" style="font-size:12.5px">
+          </div>
+          <div class="form-group">
             <label>Note (optional)</label>
             <input type="text" id="invNote" placeholder="e.g. March 2026 invoice" style="font-size:12.5px">
           </div>
         </div>
+        <div id="invAdditionalSvcPreview" style="display:none;margin:4px 0 10px;padding:10px 12px;border:1px dashed var(--gray-300);border-radius:8px;background:var(--gray-50)"></div>
         <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
           <span id="invUploadStatus" style="font-size:11px;color:var(--gray-400)"></span>
           <button class="btn btn-primary btn-sm" onclick="uploadInvoice()">Upload Invoice</button>
@@ -1755,6 +1770,62 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
       <button class="btn btn-danger" id="confirmOk">Delete</button>
+    </div>
+  </div>
+
+  <!-- Prorated Invoice Review Dialog -->
+  <div class="modal" id="proratedReviewModal" style="display:none;max-width:520px">
+    <div class="modal-header" style="background:linear-gradient(135deg,#78350f,#d97706);color:#fff;border-radius:10px 10px 0 0">
+      <h3 style="margin:0;font-size:1rem">⚠️ Prorated Invoice Detected — Review Before Updating</h3>
+    </div>
+    <div class="modal-body" style="padding:18px 20px">
+      <p style="font-size:12.5px;color:var(--gray-600);margin-bottom:14px" id="proratedReviewSubtitle"></p>
+
+      <!-- Seat / User changes -->
+      <div id="proratedSeatSection" style="display:none;margin-bottom:14px">
+        <div style="font-size:11.5px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">👥 Seat / User Change</div>
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--gray-50)">
+              <th style="padding:5px 8px;text-align:left;font-weight:600;color:var(--gray-500);font-size:11px">Field</th>
+              <th style="padding:5px 8px;text-align:right;font-weight:600;color:var(--gray-500);font-size:11px">Current</th>
+              <th style="padding:5px 8px;text-align:right;font-weight:600;color:var(--gray-500);font-size:11px">After Invoice</th>
+              <th style="padding:5px 8px;text-align:center;font-weight:600;color:var(--gray-500);font-size:11px">Change</th>
+            </tr>
+          </thead>
+          <tbody id="proratedSeatRows"></tbody>
+        </table>
+      </div>
+
+      <!-- Service add/remove changes -->
+      <div id="proratedServiceSection" style="display:none;margin-bottom:14px">
+        <div style="font-size:11.5px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">📦 Add-on Service Changes</div>
+        <table style="width:100%;font-size:12px;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--gray-50)">
+              <th style="padding:5px 8px;text-align:left;font-weight:600;color:var(--gray-500);font-size:11px">Service</th>
+              <th style="padding:5px 8px;text-align:center;font-weight:600;color:var(--gray-500);font-size:11px">Action</th>
+              <th style="padding:5px 8px;text-align:right;font-weight:600;color:var(--gray-500);font-size:11px">Seats</th>
+              <th style="padding:5px 8px;text-align:right;font-weight:600;color:var(--gray-500);font-size:11px">Annual Cost</th>
+            </tr>
+          </thead>
+          <tbody id="proratedServiceRows"></tbody>
+        </table>
+      </div>
+
+      <!-- No changes detected -->
+      <div id="proratedNoChange" style="display:none;font-size:12.5px;color:var(--gray-500);padding:10px 0">
+        No seat or service changes could be reliably identified from this prorated invoice.
+        The invoice will be saved but the Overview will not be updated.
+      </div>
+
+      <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:6px;padding:10px 12px;font-size:11.5px;color:#92400e;margin-top:6px">
+        <strong>Note:</strong> Prorated charges reflect a mid-cycle change. Confirm the numbers look right before applying — or choose <em>Save Invoice Only</em> to attach without touching the Overview.
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:flex-end;gap:8px">
+      <button class="btn btn-secondary" id="proratedSaveOnlyBtn">Save Invoice Only</button>
+      <button class="btn btn-primary" id="proratedApplyBtn" style="background:#d97706;border-color:#d97706">Apply to Overview</button>
     </div>
   </div>
 
@@ -2193,6 +2264,32 @@ async function loadData(){
   }
 }
 
+async function refreshSoftwareData({ requestKey = 'portal:software:refresh', render = true } = {}) {
+  try {
+    const resp = await authFetch(`${API}/software`, {
+      requestKey,
+      cancelPrevious: true,
+    });
+    if (!resp.ok) return false;
+    const fresh = await resp.json();
+    if (!Array.isArray(fresh)) return false;
+    portalStore.setState({
+      software: fresh.map(item => ({
+        ...item,
+        department: normalizeSoftwareDepartmentValue(item?.department),
+      })),
+    }, 'software:refreshed');
+    if (render) {
+      renderSoftware();
+      refreshOwnerBilledToDatalists();
+    }
+    return true;
+  } catch (e) {
+    console.warn('Software refresh skipped:', e?.message || e);
+    return false;
+  }
+}
+
 
 let currentPage='dashboard', userPage=1, assetPage=1, searchQ='';
 const PAGE_SIZE=10;
@@ -2406,7 +2503,26 @@ function navigate(page, el){
   else renderAll();
 }
 
-function handleSearch(v){ searchQ=v.toLowerCase(); userPage=1; assetPage=1; renderAll(); }
+function handleSearch(v){
+  searchQ = String(v || '').toLowerCase();
+  userPage = 1;
+  assetPage = 1;
+  swPage = 1;
+
+  if (currentPage === 'software') {
+    renderSoftware();
+    return;
+  }
+  if (currentPage === 'users') {
+    renderUsers();
+    return;
+  }
+  if (currentPage === 'assets') {
+    renderAssets();
+    return;
+  }
+  renderAll();
+}
 
 /* ══ RENDER ALL ══ */
 function renderAll(){ updateBadges(); renderDashboard(); renderUsers(); renderAssets(); renderAssignments(); populateSwAdvDropdowns(); updateDeptNavBadge(); }
@@ -2989,7 +3105,7 @@ function openAddModal(){
   else openAssetModal();
 }
 function showOverlay(mid){ document.getElementById('overlay').style.display='flex'; document.getElementById(mid).style.display='block'; }
-function closeModal(){ document.getElementById('overlay').style.display='none'; ['userModal','assetModal','softwareModal','confirmBox'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; }); }
+function closeModal(){ document.getElementById('overlay').style.display='none'; ['userModal','assetModal','softwareModal','confirmBox','proratedReviewModal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; }); }
 function closeModalOnOverlay(e){ if(e.target===document.getElementById('overlay')) closeModal(); }
 
 function toDateInputValue(value){
@@ -3526,6 +3642,164 @@ async function loadInvoices(){
   }
 }
 
+function invoiceBreakdownKey(name = '') {
+  const raw = String(name || '').toLowerCase();
+  return raw
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/\badditional\s+(?:users?|seats?|licenses?)\b/g, ' ')
+    .replace(/\bincludes?\b/g, ' ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(' ')
+    .map(v => v.trim())
+    .filter(Boolean)
+    .filter(v => !/^\d+$/.test(v))
+    .filter(v => !['the', 'for', 'and', 'with', 'hubspot', 'invoice'].includes(v))
+    .join('|');
+}
+
+function invoiceBreakdownLabel(name = '') {
+  return String(name || '')
+    .replace(/\([^)]*\)/g, '')
+    .replace(/\s+/g, ' ')
+    .replace(/^[\-:•\s]+|[\-:•\s]+$/g, '')
+    .trim();
+}
+
+function isDiscountLikeInvoiceLine(name = '', kind = '', amount = NaN) {
+  const low = String(name || '').toLowerCase();
+  if (String(kind || '').toLowerCase() === 'credit') return true;
+  if (Number.isFinite(Number(amount)) && Number(amount) < 0) return true;
+  return /\b(discount|coupon|promo|promotion|rebate|waiver|write[-\s]?off|credit|adjustment)\b/.test(low);
+}
+
+function buildInvoiceSubscriptionGroups(inv = {}) {
+  const rows = Array.isArray(inv?.lineItems) ? inv.lineItems : [];
+  if (!rows.length) return [];
+  const groups = new Map();
+  const ordered = [];
+
+  for (const li of rows) {
+    const name = invoiceBreakdownLabel(li?.name || '');
+    if (!name) continue;
+
+    let amountCandidate = [li?.total, li?.subtotal]
+      .map(v => Number(v))
+      .find(v => Number.isFinite(v));
+    if (!Number.isFinite(amountCandidate)) {
+      const qty = Number(li?.quantity);
+      const unit = Number(li?.unitPrice);
+      if (Number.isFinite(qty) && Number.isFinite(unit)) amountCandidate = qty * unit;
+    }
+    if (!Number.isFinite(amountCandidate)) continue;
+
+    const kind = String(li?.kind || '').toLowerCase();
+    const signed = kind === 'credit' ? -Math.abs(amountCandidate) : amountCandidate;
+    if (isDiscountLikeInvoiceLine(name, kind, signed)) continue;
+    if (!(Number.isFinite(signed) && signed > 0)) continue;
+
+    const key = invoiceBreakdownKey(name) || name.toLowerCase();
+    let targetKey = null;
+    if (groups.has(key)) {
+      targetKey = key;
+    } else {
+      const similarKey = ordered.find(existingKey => {
+        const existing = groups.get(existingKey);
+        return existing && isLikelySameInvoiceServiceName(name, existing.label);
+      });
+      targetKey = similarKey || key;
+      if (!groups.has(targetKey)) {
+        groups.set(targetKey, { key: targetKey, label: name, amount: 0, rows: [] });
+        ordered.push(targetKey);
+      }
+    }
+    const entry = groups.get(targetKey);
+    entry.amount += signed;
+    entry.rows.push({
+      name,
+      kind,
+      quantity: Number.isFinite(Number(li?.quantity)) ? Math.round(Number(li.quantity)) : null,
+      unitPrice: Number.isFinite(Number(li?.unitPrice)) ? Number(li.unitPrice) : null,
+      amount: signed,
+    });
+    if (name.length < entry.label.length) entry.label = name;
+  }
+
+  return ordered
+    .map(key => groups.get(key))
+    .filter(entry => Number.isFinite(Number(entry?.amount)) && Math.abs(Number(entry.amount)) > 0.0001);
+}
+
+function invoicePeriodMultiplier(period = '') {
+  const p = normalizeInvoicePeriod(period);
+  if (p === 'Monthly') return 12;
+  if (p === 'Quarterly') return 4;
+  if (p === 'Annual') return 1;
+  return 1;
+}
+
+function formatCompactCurrency(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '—';
+  const sign = n < 0 ? '-' : '';
+  const abs = Math.abs(n);
+  if (abs >= 1000) return `${sign}$${(abs / 1000).toFixed(abs % 1000 === 0 ? 0 : 1)}K`;
+  return `${sign}$${abs.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+}
+
+function deriveOverviewCostFromInvoice(sw = {}, inv = {}) {
+  const groups = buildInvoiceSubscriptionGroups(inv);
+  if (!groups.length) return null;
+  const planHint = String(sw?.subscriptionPlan || inv?.subscriptionPlan || '').trim();
+  let primary = null;
+  if (planHint) {
+    const planKey = invoiceBreakdownKey(planHint) || planHint.toLowerCase();
+    primary = groups.find(g => g.key === planKey || isLikelySameInvoiceServiceName(g.label, planHint)) || null;
+  }
+  if (!primary) {
+    primary = [...groups].sort((a, b) => Math.abs(Number(b.amount || 0)) - Math.abs(Number(a.amount || 0)))[0] || null;
+  }
+  if (!primary) return null;
+
+  const baseAmount = Number(primary.amount || 0);
+  const addonAmount = groups
+    .filter(g => g.key !== primary.key)
+    .reduce((sum, g) => sum + Number(g.amount || 0), 0);
+  const totalAmount = baseAmount + addonAmount;
+  const factor = invoicePeriodMultiplier(inv?.billingPeriod || sw?.renewalPeriod || '');
+
+  return {
+    groups,
+    primaryLabel: primary.label,
+    period: normalizeInvoicePeriod(inv?.billingPeriod || sw?.renewalPeriod || ''),
+    baseAnnual: Number((baseAmount * factor).toFixed(2)),
+    addonAnnual: Number((addonAmount * factor).toFixed(2)),
+    totalAnnual: Number((totalAmount * factor).toFixed(2)),
+  };
+}
+
+function renderInvoiceSubscriptionBreakdown(inv = {}) {
+  const groups = buildInvoiceSubscriptionGroups(inv);
+  if (!groups.length) return '';
+  const currency = String(inv?.currency || 'USD').trim() || 'USD';
+  const fmt = (n) => `${currency} ${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const lines = groups
+    .filter(entry => Number.isFinite(Number(entry?.amount)))
+    .map((entry) => `
+      <div style="display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--gray-600);margin-top:2px">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${entry.label}</span>
+        <span style="white-space:nowrap;font-weight:600">${fmt(entry.amount)}</span>
+      </div>
+    `);
+
+  if (!lines.length) return '';
+  return `
+    <div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--gray-200)">
+      <div style="font-size:10.5px;color:var(--gray-500);font-weight:600;margin-bottom:2px">Subscription Breakdown</div>
+      ${lines.join('')}
+    </div>
+  `;
+}
+
 function renderInvoiceList(invoices){
   const list = document.getElementById('invList');
   if (!invoices.length){
@@ -3541,9 +3815,10 @@ function renderInvoiceList(invoices){
       : (inv.periodFrom ? `From ${fmtDate(inv.periodFrom)}` : '');
     const periodBadge = inv.billingPeriod
       ? `<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'}">${inv.billingPeriod}</span>` : '';
-    const confDot = inv.parseConfidence === 'high' ? '🟢' : inv.parseConfidence === 'medium' ? '🟡' : '';
-    return `
-    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;background:#fff">
+	    const confDot = inv.parseConfidence === 'high' ? '🟢' : inv.parseConfidence === 'medium' ? '🟡' : '';
+      const breakdown = renderInvoiceSubscriptionBreakdown(inv);
+	    return `
+	    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;background:#fff">
       <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:16px">📄</div>
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
@@ -3551,10 +3826,11 @@ function renderInvoiceList(invoices){
           ${periodBadge}
           ${confDot ? `<span title="Parse confidence: ${inv.parseConfidence}" style="font-size:11px">${confDot}</span>` : ''}
         </div>
-        <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
-          Uploaded ${uploaded}${periodStr ? ' · ' + periodStr : ''}${inv.note ? ' · ' + inv.note : ''}
-        </div>
-      </div>
+	        <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
+	          Uploaded ${uploaded}${periodStr ? ' · ' + periodStr : ''}${inv.subscriptionPlan ? ` · Plan ${inv.subscriptionPlan}` : ''}${Number.isFinite(Number(inv.licenseQuantity)) && Number(inv.licenseQuantity) > 0 ? ` · Qty ${Math.round(Number(inv.licenseQuantity))}` : ''}${Number.isFinite(Number(inv.licenseUnitPrice)) && Number(inv.licenseUnitPrice) > 0 ? ` · Unit ${(inv.currency || 'USD')} ${Number(inv.licenseUnitPrice).toLocaleString('en-US',{ minimumFractionDigits:2, maximumFractionDigits:2 })}` : ''}${inv.note ? ' · ' + inv.note : ''}
+	        </div>
+          ${breakdown}
+	      </div>
       <div style="font-size:13px;font-weight:700;color:var(--primary);white-space:nowrap">${amt}</div>
       <a href="/api/software/${document.getElementById('swId').value}/invoices/${inv.id}/download"
          style="font-size:11px;font-weight:600;color:var(--primary);text-decoration:none;padding:4px 10px;border:1px solid var(--primary);border-radius:6px;white-space:nowrap"
@@ -3593,6 +3869,9 @@ function buildInvoiceParseContext(swRecord = null, fallbackBillingAddress = '') 
     countryCode,
     countryHints,
     defaultCurrency,
+    expectedLicenseQuantity: Number.isFinite(Number(rec.purchasedLicenses))
+      ? Math.max(0, Math.round(Number(rec.purchasedLicenses)))
+      : null,
   };
 }
 
@@ -3612,6 +3891,359 @@ function normalizeInvoicePeriod(value = '') {
   return '';
 }
 
+function toIsoDate(y, m, d) {
+  const yy = Number(y);
+  const mm = Number(m);
+  const dd = Number(d);
+  if (!Number.isFinite(yy) || !Number.isFinite(mm) || !Number.isFinite(dd)) return '';
+  if (yy < 1900 || yy > 2100 || mm < 1 || mm > 12 || dd < 1 || dd > 31) return '';
+  const dt = new Date(Date.UTC(yy, mm - 1, dd));
+  if (dt.getUTCFullYear() !== yy || (dt.getUTCMonth() + 1) !== mm || dt.getUTCDate() !== dd) return '';
+  return `${String(yy).padStart(4, '0')}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+}
+
+function parseDateTokenToIso(token = '') {
+  const text = String(token || '').trim().replace(/,/g, ' ').replace(/\s+/g, ' ');
+  if (!text) return '';
+
+  let m = text.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/);
+  if (m) {
+    let a = Number(m[1]);
+    let b = Number(m[2]);
+    let y = Number(m[3]);
+    if (y < 100) y += 2000;
+    let day = a;
+    let month = b;
+    if (a <= 12 && b > 12) {
+      month = a;
+      day = b;
+    }
+    return toIsoDate(y, month, day);
+  }
+
+  const monthMap = {
+    jan: 1, january: 1,
+    feb: 2, february: 2,
+    mar: 3, march: 3,
+    apr: 4, april: 4,
+    may: 5,
+    jun: 6, june: 6,
+    jul: 7, july: 7,
+    aug: 8, august: 8,
+    sep: 9, sept: 9, september: 9,
+    oct: 10, october: 10,
+    nov: 11, november: 11,
+    dec: 12, december: 12,
+  };
+
+  m = text.match(/^([A-Za-z]{3,9})\s+(\d{1,2})\s+(\d{2,4})$/);
+  if (m) {
+    const month = monthMap[String(m[1]).toLowerCase()];
+    const day = Number(m[2]);
+    let year = Number(m[3]);
+    if (year < 100) year += 2000;
+    return month ? toIsoDate(year, month, day) : '';
+  }
+
+  m = text.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\s+(\d{2,4})$/);
+  if (m) {
+    const day = Number(m[1]);
+    const month = monthMap[String(m[2]).toLowerCase()];
+    let year = Number(m[3]);
+    if (year < 100) year += 2000;
+    return month ? toIsoDate(year, month, day) : '';
+  }
+
+  const parsed = new Date(text);
+  if (!Number.isNaN(parsed.getTime())) {
+    return toIsoDate(parsed.getUTCFullYear(), parsed.getUTCMonth() + 1, parsed.getUTCDate());
+  }
+
+  return '';
+}
+
+function parseBillingPeriodDates(text = '') {
+  const src = String(text || '').trim();
+  if (!src) return { periodFrom: '', periodTo: '', spanDays: null };
+
+  const dateTokenRegex = /\b(?:\d{1,2}[\/.\-]\d{1,2}[\/.\-]\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{2,4}|\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*,?\s+\d{2,4})\b/gi;
+  const tokens = [];
+  let match;
+  while ((match = dateTokenRegex.exec(src))) {
+    const iso = parseDateTokenToIso(match[0]);
+    if (iso) tokens.push(iso);
+  }
+
+  const uniq = [...new Set(tokens)];
+  if (!uniq.length) return { periodFrom: '', periodTo: '', spanDays: null };
+
+  const periodFrom = uniq[0] || '';
+  const periodTo = uniq[1] || '';
+  if (!periodFrom || !periodTo) return { periodFrom, periodTo, spanDays: null };
+
+  const fromMs = Date.parse(`${periodFrom}T00:00:00Z`);
+  const toMs = Date.parse(`${periodTo}T00:00:00Z`);
+  if (!Number.isFinite(fromMs) || !Number.isFinite(toMs)) {
+    return { periodFrom, periodTo, spanDays: null };
+  }
+  if (fromMs > toMs) {
+    const spanDaysSwap = Math.round((fromMs - toMs) / 86400000) + 1;
+    return {
+      periodFrom: periodTo,
+      periodTo: periodFrom,
+      spanDays: Number.isFinite(spanDaysSwap) ? spanDaysSwap : null,
+    };
+  }
+  const spanDays = Math.round((toMs - fromMs) / 86400000) + 1;
+  return { periodFrom, periodTo, spanDays: Number.isFinite(spanDays) ? spanDays : null };
+}
+
+function inferBillingPeriodFromSpan(spanDays, renewalFallback = '') {
+  const fallback = normalizeInvoicePeriod(renewalFallback);
+  const days = Number(spanDays);
+  if (!Number.isFinite(days) || days <= 0) return fallback || '';
+  if (days <= 62 && fallback) return fallback; // User rule: short period can be proration; keep renewal cycle.
+  if (days <= 45) return 'Monthly';
+  if (days <= 120) return 'Quarterly';
+  if (days >= 250) return 'Annual';
+  return fallback || '';
+}
+
+function isProratedInvoiceLineName(name = '') {
+  const low = String(name || '').toLowerCase();
+  return /\bpro[\s-]?rat(?:ed|ion)\b/.test(low)
+    || /\bpro[\s-]?rata\b/.test(low)
+    || /\btrue[-\s]?up\b/.test(low)
+    || /\bco[\s-]?term(?:ed|ing)?\b/.test(low)
+    || /\bpartial\s+(?:month|period)\b/.test(low)
+    || /\badjustment\b/.test(low)
+    || /\bcredit\b/.test(low);
+}
+
+function isSeatLikeInvoiceLineName(name = '') {
+  const low = String(name || '').toLowerCase();
+  return /\b(seat|license|licensed|user|member|editor|viewer|full\s*seat|dev\s*seat)\b/.test(low);
+}
+
+function normalizeInvoiceServiceLabel(name = '') {
+  return String(name || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/^[\-:•\s]+|[\-:•\s]+$/g, '');
+}
+
+const INVOICE_SERVICE_NAME_STOPWORDS = new Set([
+  'additional', 'add', 'addon', 'users', 'user', 'seats', 'seat', 'license', 'licenses', 'licensed',
+  'member', 'members', 'qty', 'quantity', 'unit', 'price', 'plan', 'subscription',
+  'monthly', 'annual', 'quarterly', 'month', 'yearly', 'prorated', 'proration',
+  'credit', 'adjustment', 'true', 'up', 'term', 'period', 'sku',
+]);
+
+function isSeatModifierInvoiceLineName(name = '') {
+  const low = String(name || '').toLowerCase();
+  return /\badditional\s+(?:user|users|seat|seats|license|licenses)\b/.test(low)
+    || /\bextra\s+(?:user|users|seat|seats|license|licenses)\b/.test(low)
+    || /\bincluded\s+(?:user|users|seat|seats|license|licenses)\b/.test(low)
+    || /\badd[-\s]?on\b/.test(low);
+}
+
+function invoiceServiceNameTokens(name = '') {
+  return normalizeInvoiceServiceLabel(name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .split(' ')
+    .map(v => v.trim())
+    .filter(Boolean)
+    .filter(token => !INVOICE_SERVICE_NAME_STOPWORDS.has(token));
+}
+
+function invoiceServiceSimilarityKey(name = '') {
+  const tokens = invoiceServiceNameTokens(name);
+  if (tokens.length) return tokens.join('|');
+  return normalizeInvoiceServiceLabel(name).toLowerCase();
+}
+
+function isLikelySameInvoiceServiceName(a = '', b = '') {
+  const left = normalizeInvoiceServiceLabel(a).toLowerCase();
+  const right = normalizeInvoiceServiceLabel(b).toLowerCase();
+  if (!left || !right) return false;
+  if (left === right) return true;
+  if (left.includes(right) || right.includes(left)) return true;
+
+  const aSet = new Set(invoiceServiceNameTokens(left));
+  const bSet = new Set(invoiceServiceNameTokens(right));
+  if (!aSet.size || !bSet.size) return false;
+
+  let intersection = 0;
+  for (const token of aSet) {
+    if (bSet.has(token)) intersection += 1;
+  }
+  const minSize = Math.min(aSet.size, bSet.size);
+  return intersection >= 2 && intersection === minSize;
+}
+
+function summarizeNonProratedSeatLines(lineItems = []) {
+  const rows = Array.isArray(lineItems) ? lineItems : [];
+  const positiveChargeRows = rows
+    .filter(li => String(li?.kind || '').toLowerCase() !== 'credit')
+    .map((li, idx) => ({ ...li, _idx: idx }));
+  const seatLines = positiveChargeRows.filter(li => {
+    const name = normalizeInvoiceServiceLabel(li?.name || '');
+    if (isProratedInvoiceLineName(name)) return false;
+    const qty = Number(li?.quantity);
+    const unit = Number(li?.unitPrice);
+    const looksSeatName = isSeatLikeInvoiceLineName(name);
+    const hasNumericPair = Number.isFinite(qty) && qty > 0 && Number.isFinite(unit) && unit > 0;
+    return looksSeatName || hasNumericPair;
+  });
+
+  const enriched = seatLines.map(li => ({
+    _idx: li._idx,
+    name: normalizeInvoiceServiceLabel(li?.name || '') || `Service ${li._idx + 1}`,
+    quantity: Number.isFinite(Number(li?.quantity)) ? Math.round(Number(li.quantity)) : null,
+    unitPrice: Number.isFinite(Number(li?.unitPrice)) ? Number(li.unitPrice) : null,
+    subtotal: Number.isFinite(Number(li?.subtotal)) ? Number(li.subtotal) : null,
+    total: Number.isFinite(Number(li?.total)) ? Number(li.total) : null,
+  }));
+
+  const primaryLine = [...enriched].sort((a, b) => {
+    const aModifier = isSeatModifierInvoiceLineName(a?.name) ? 1 : 0;
+    const bModifier = isSeatModifierInvoiceLineName(b?.name) ? 1 : 0;
+    if (aModifier !== bModifier) return aModifier - bModifier;
+    const aq = Number(a?.quantity || 0);
+    const bq = Number(b?.quantity || 0);
+    if (bq !== aq) return bq - aq;
+    const at = Number(a?.total || a?.subtotal || 0);
+    const bt = Number(b?.total || b?.subtotal || 0);
+    if (bt !== at) return bt - at;
+    return a._idx - b._idx;
+  })[0] || null;
+
+  const additionalCandidates = enriched
+    .filter(li => primaryLine && li._idx !== primaryLine._idx)
+    .filter(li => !isLikelySameInvoiceServiceName(li?.name, primaryLine?.name));
+  const additionalByKey = new Map();
+  for (const li of additionalCandidates) {
+    const key = invoiceServiceSimilarityKey(li?.name);
+    if (!key) continue;
+    const existing = additionalByKey.get(key);
+    if (!existing) {
+      additionalByKey.set(key, li);
+      continue;
+    }
+    const liQty = Number(li?.quantity || 0);
+    const exQty = Number(existing?.quantity || 0);
+    const liAmt = Number(li?.total || li?.subtotal || 0);
+    const exAmt = Number(existing?.total || existing?.subtotal || 0);
+    if (liQty > exQty || (liQty === exQty && liAmt > exAmt)) {
+      additionalByKey.set(key, li);
+    }
+  }
+  const additionalLines = [...additionalByKey.values()];
+
+  const quantities = enriched
+    .map(li => Number(li?.quantity))
+    .filter(v => Number.isFinite(v) && v > 0 && v <= 10000)
+    .map(v => Math.round(v));
+  const totalQuantity = quantities.reduce((sum, v) => sum + v, 0);
+
+  const weightedNumerator = enriched.reduce((sum, li) => {
+    const q = Number(li?.quantity);
+    const u = Number(li?.unitPrice);
+    if (!Number.isFinite(q) || q <= 0 || !Number.isFinite(u) || u <= 0) return sum;
+    return sum + (q * u);
+  }, 0);
+  const weightedDenominator = enriched.reduce((sum, li) => {
+    const q = Number(li?.quantity);
+    return Number.isFinite(q) && q > 0 ? sum + q : sum;
+  }, 0);
+  const blendedUnitPrice = weightedDenominator > 0 ? (weightedNumerator / weightedDenominator) : null;
+
+  const distinctUnits = [...new Set(enriched
+    .map(li => Number(li?.unitPrice))
+    .filter(v => Number.isFinite(v) && v > 0)
+    .map(v => Number(v.toFixed(4))))];
+
+  return {
+    primaryLine,
+    primaryQuantity: Number.isFinite(Number(primaryLine?.quantity)) ? Math.round(Number(primaryLine.quantity)) : 0,
+    primaryUnitPrice: Number.isFinite(Number(primaryLine?.unitPrice)) ? Number(primaryLine.unitPrice) : null,
+    primaryName: primaryLine?.name || '',
+    additionalLines,
+    quantities,
+    totalQuantity,
+    lineCount: enriched.length,
+    blendedUnitPrice: Number.isFinite(blendedUnitPrice) && blendedUnitPrice > 0 ? blendedUnitPrice : null,
+    hasMixedUnitPrices: distinctUnits.length > 1,
+  };
+}
+
+function sanitizeInvoiceLicenseQuantity(rawQty, { lineItems = [], currentQuantity = 0, fallback = null } = {}) {
+  let qty = Number(rawQty);
+  const seatSummary = summarizeNonProratedSeatLines(lineItems);
+  if (!Number.isFinite(qty)) {
+    qty = Number.isFinite(Number(fallback)) ? Number(fallback) : Number(seatSummary.primaryQuantity || 0);
+  }
+  qty = Math.round(qty);
+  if (qty <= 0 || qty > 10000) {
+    return seatSummary.primaryQuantity > 0 ? seatSummary.primaryQuantity : null;
+  }
+  if ((qty >= 1900 && qty <= 2100) || /^\d{8}$/.test(String(qty))) {
+    return seatSummary.primaryQuantity > 0 ? seatSummary.primaryQuantity : null;
+  }
+
+  if (seatSummary.lineCount >= 2 && seatSummary.primaryQuantity > 0 && seatSummary.primaryQuantity !== qty) {
+    if (qty === seatSummary.totalQuantity || seatSummary.quantities.includes(qty) || qty > seatSummary.primaryQuantity) {
+      qty = seatSummary.primaryQuantity;
+    }
+  }
+
+  const lineQtys = (Array.isArray(lineItems) ? lineItems : [])
+    .filter(li => String(li?.kind || '').toLowerCase() !== 'credit')
+    .map(li => Number(li?.quantity))
+    .filter(v => Number.isFinite(v) && v > 0 && v <= 10000)
+    .map(v => Math.round(v));
+
+  if (lineQtys.length && !lineQtys.includes(qty)) {
+    const nearest = lineQtys.reduce((best, v) => (Math.abs(v - qty) < Math.abs(best - qty) ? v : best), lineQtys[0]);
+    if (qty > (nearest * 3) || Math.abs(qty - nearest) >= 250) {
+      qty = nearest;
+    }
+  }
+
+  const current = Number(currentQuantity);
+  if (Number.isFinite(current) && current > 0) {
+    const isExtremeSpike = qty > (current * 20) && (qty - current) >= 1000;
+    if (isExtremeSpike) {
+      qty = lineQtys.length ? lineQtys[0] : Math.round(current);
+    }
+  }
+
+  return Number.isFinite(qty) && qty > 0 ? Math.round(qty) : null;
+}
+
+function sanitizeInvoiceUnitPrice(rawUnitPrice, { lineItems = [], isProrated = false } = {}) {
+  let unit = Number(rawUnitPrice);
+  const seatSummary = summarizeNonProratedSeatLines(lineItems);
+  const primaryUnit = Number(seatSummary.primaryUnitPrice);
+  const blended = Number(seatSummary.blendedUnitPrice);
+
+  if (!(Number.isFinite(unit) && unit > 0) && Number.isFinite(primaryUnit) && primaryUnit > 0) {
+    unit = primaryUnit;
+  }
+  if (!(Number.isFinite(unit) && unit > 0) && Number.isFinite(blended) && blended > 0) {
+    unit = blended;
+  }
+  if (isProrated && Number.isFinite(primaryUnit) && primaryUnit > 0) {
+    if (!(Number.isFinite(unit) && unit > 0) || (Math.abs(unit - primaryUnit) / primaryUnit) > 0.1) {
+      unit = primaryUnit;
+    }
+  }
+
+  if (!(Number.isFinite(unit) && unit > 0)) return null;
+  return Number(unit.toFixed(2));
+}
+
 function annualizeInvoiceAmount(amount, period = '') {
   const n = Number(amount);
   if (!Number.isFinite(n) || n <= 0) return 0;
@@ -3622,25 +4254,726 @@ function annualizeInvoiceAmount(amount, period = '') {
   return n;
 }
 
+function inspectInvoiceComplexity(parsed = {}) {
+  const warnings = Array.isArray(parsed?.warnings) ? parsed.warnings : [];
+  const complexityReasons = Array.isArray(parsed?.complexityReasons) ? parsed.complexityReasons : [];
+  const lineItems = Array.isArray(parsed?.lineItems) ? parsed.lineItems : [];
+  const text = [
+    parsed?.raw || '',
+    parsed?.subscriptionPlan || '',
+    parsed?.renewalPeriod || '',
+    parsed?.billingPeriod || '',
+    ...warnings,
+    ...complexityReasons,
+  ].join(' ').toLowerCase();
+
+  const isProrated = Boolean(parsed?.isProrated)
+    || /\bpro[\s-]?rat(?:ed|ion)\b/.test(text)
+    || /\bpartial\s+(month|period)\b/.test(text)
+    || /\btrue[-\s]?up\b/.test(text)
+    || /\bcredit\s+memo\b/.test(text)
+    || /\bmid[-\s]?cycle\b/.test(text);
+
+  const isUsageBased = /\bpay[\s-]?as[\s-]?you[\s-]?go\b/.test(text)
+    || /\busage[-\s]?based\b/.test(text)
+    || /\bmetered\b/.test(text);
+
+  const hasMultipleSubscriptions = Boolean(parsed?.hasMultipleSubscriptions)
+    || /\badd[-\s]?on\b/.test(text)
+    || /\bline\s+items?\b/.test(text)
+    || /\bmultiple\s+subscriptions?\b/.test(text)
+    || /\bbundle|package\b/.test(text)
+    || lineItems.length > 1;
+
+  const reasons = [];
+  if (isProrated) reasons.push('prorated/adjustment terms');
+  if (isUsageBased) reasons.push('usage-based/pay-as-you-go charge');
+  if (hasMultipleSubscriptions) reasons.push('multiple subscription line items');
+  if (!reasons.length && complexityReasons.length) reasons.push(...complexityReasons);
+
+  const isComplex = Boolean(parsed?._complexInvoice) || isProrated || isUsageBased || hasMultipleSubscriptions;
+  return { isComplex, isProrated, hasMultipleSubscriptions, reasons };
+}
+
+function pickInvoiceAmount(parsed = {}, fallback = null) {
+  const candidates = [
+    parsed?.totalIncludingTaxes,
+    parsed?.amount,
+    parsed?.subtotal,
+    parsed?.invoiceBalance,
+    fallback,
+  ];
+  for (const candidate of candidates) {
+    const n = Number(candidate);
+    if (Number.isFinite(n)) return Number(n.toFixed(2));
+  }
+  return null;
+}
+
+function downgradeInvoiceConfidence(confidence = '', isComplex = false) {
+  const c = String(confidence || '').trim().toLowerCase();
+  if (!isComplex) return c || '';
+  if (c === 'high') return 'medium';
+  if (c === 'medium') return 'low';
+  return c || 'low';
+}
+
+function complexInvoiceStatusMessage(info = {}) {
+  const reasonText = Array.isArray(info.reasons) && info.reasons.length
+    ? ` (${info.reasons.join(', ')})`
+    : '';
+  return `🟠 Complex invoice detected${reasonText}. Review fields manually; software overview won't auto-update.`;
+}
+
+function hasAnnualLicenseUpdate(update = {}) {
+  if (!update || typeof update !== 'object') return false;
+  return Number.isFinite(Number(update?.annualCost))
+    || Number.isFinite(Number(update?.purchasedLicenses))
+    || Number.isFinite(Number(update?.licensePricePerUserMonth));
+}
+
+function isSeatIncreaseUpdate(update = {}, currentSoftware = null) {
+  const nextQty = Number(update?.purchasedLicenses);
+  if (!(Number.isFinite(nextQty) && nextQty > 0)) return false;
+  const currentQty = Number((currentSoftware || {})?.purchasedLicenses);
+  if (!(Number.isFinite(currentQty) && currentQty > 0)) return true;
+  return nextQty > currentQty;
+}
+
+function toMonthlyUnitFromBilling(unitPrice, billingPeriod = '') {
+  const unit = Number(unitPrice);
+  if (!(Number.isFinite(unit) && unit > 0)) return null;
+  const period = normalizeInvoicePeriod(billingPeriod);
+  if (period === 'Annual') return unit / 12;
+  if (period === 'Quarterly') return unit / 3;
+  return unit;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   PRORATED INVOICE REVIEW HELPERS
+   Analyses a prorated invoice's line items against the current software record
+   and builds a structured change summary to show in the review dialog.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Builds a diff summary for a prorated invoice.
+ * Returns { seatChanges: [...], serviceChanges: [...] }
+ *
+ * seatChange row: { field, current, proposed, delta, deltaSign }
+ * serviceChange row: { name, action:'added'|'removed'|'changed', seats, annualCost }
+ */
+function buildProratedChangeSummary(parsed = {}, currentSoftware = {}, softwareUpdate = {}) {
+  const current = currentSoftware || {};
+  const seatChanges = [];
+  const serviceChanges = [];
+  const fmtN = n => (Number.isFinite(Number(n)) && Number(n) > 0)
+    ? '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+    : '—';
+
+  // ── Seat / user change ──────────────────────────────────────────────────
+  const currentQty = Number(current.purchasedLicenses);
+  const proposedQty = Number(softwareUpdate?.purchasedLicenses);
+  const lineItems = Array.isArray(parsed?.lineItems) ? parsed.lineItems : [];
+
+  // Check credit lines: negative/credit items likely mean seats were removed
+  const creditLines = lineItems.filter(li =>
+    String(li?.kind || '').toLowerCase() === 'credit' ||
+    (Number.isFinite(Number(li?.total)) && Number(li.total) < 0) ||
+    (Number.isFinite(Number(li?.subtotal)) && Number(li.subtotal) < 0)
+  );
+  const chargeLines = lineItems.filter(li =>
+    String(li?.kind || '').toLowerCase() !== 'credit' &&
+    (Number.isFinite(Number(li?.total)) ? Number(li.total) > 0 : true)
+  );
+
+  // Determine seat count change
+  const hasSeatsProposed = Number.isFinite(proposedQty) && proposedQty > 0;
+  const hasCurrentSeats = Number.isFinite(currentQty) && currentQty > 0;
+
+  if (hasSeatsProposed) {
+    const delta = hasCurrentSeats ? proposedQty - currentQty : null;
+    const deltaSign = delta === null ? null : (delta > 0 ? 'added' : delta < 0 ? 'removed' : 'unchanged');
+    const deltaLabel = delta === null ? '—'
+      : delta > 0 ? `+${delta} added`
+      : delta < 0 ? `${delta} removed`
+      : 'no change';
+    seatChanges.push({
+      field: 'Purchased Licenses',
+      current: hasCurrentSeats ? String(Math.round(currentQty)) : '—',
+      proposed: String(Math.round(proposedQty)),
+      delta: deltaLabel,
+      deltaSign,
+    });
+  }
+
+  if (Number.isFinite(Number(softwareUpdate?.annualCost)) && Number(softwareUpdate.annualCost) > 0) {
+    const curAnnual = Number(current.annualCost);
+    const propAnnual = Number(softwareUpdate.annualCost);
+    const delta = Number.isFinite(curAnnual) && curAnnual > 0 ? propAnnual - curAnnual : null;
+    const deltaSign = delta === null ? null : (delta > 0 ? 'added' : delta < 0 ? 'removed' : 'unchanged');
+    const deltaLabel = delta === null ? '—'
+      : delta > 0 ? `+${fmtN(delta)}`
+      : delta < 0 ? `-${fmtN(Math.abs(delta))}`
+      : 'no change';
+    seatChanges.push({
+      field: 'Annual Cost',
+      current: fmtN(curAnnual),
+      proposed: fmtN(propAnnual),
+      delta: deltaLabel,
+      deltaSign,
+    });
+  }
+
+  // ── Service add/remove ──────────────────────────────────────────────────
+  const currentServices = Array.isArray(current.services) ? current.services : [];
+  const proposedServices = Array.isArray(softwareUpdate?.additionalServices)
+    ? softwareUpdate.additionalServices : [];
+
+  // Credit-line service names = likely removals
+  const creditServiceNames = creditLines
+    .map(li => normalizeInvoiceServiceLabel(li?.name || ''))
+    .filter(Boolean);
+
+  for (const svc of proposedServices) {
+    const name = String(svc?.name || '').trim();
+    if (!name) continue;
+    const existing = currentServices.find(s =>
+      String(s?.name || '').trim().toLowerCase() === name.toLowerCase());
+    const isCreditName = creditServiceNames.some(cn =>
+      isLikelySameInvoiceServiceName(cn, name));
+    const action = isCreditName ? 'removed'
+      : existing ? 'changed' : 'added';
+    serviceChanges.push({
+      name,
+      action,
+      seats: Number.isFinite(Number(svc?.purchasedLicenses)) ? Math.round(Number(svc.purchasedLicenses)) : 0,
+      annualCost: Number.isFinite(Number(svc?.annualCost)) ? Number(svc.annualCost) : 0,
+    });
+  }
+
+  // Also check for services mentioned in credit lines that are in currentServices (removals)
+  for (const creditName of creditServiceNames) {
+    const already = serviceChanges.find(s => isLikelySameInvoiceServiceName(s.name, creditName));
+    if (already) continue;
+    const existing = currentServices.find(s =>
+      isLikelySameInvoiceServiceName(String(s?.name || '').trim(), creditName));
+    if (existing) {
+      serviceChanges.push({
+        name: existing.name,
+        action: 'removed',
+        seats: existing.purchasedLicenses || 0,
+        annualCost: existing.annualCost || 0,
+      });
+    }
+  }
+
+  return { seatChanges, serviceChanges };
+}
+
+/**
+ * Opens the prorated review dialog.
+ * onApply(softwareUpdate) is called if user clicks "Apply to Overview".
+ * onSaveOnly() is called if user clicks "Save Invoice Only".
+ */
+function showProratedReviewDialog({ parsed, currentSoftware, softwareUpdate, onApply, onSaveOnly }) {
+  const { seatChanges, serviceChanges } = buildProratedChangeSummary(
+    parsed, currentSoftware, softwareUpdate
+  );
+  const hasChanges = seatChanges.length > 0 || serviceChanges.length > 0;
+  const swName = String(currentSoftware?.name || 'this software').trim();
+
+  // Subtitle
+  const subtitle = document.getElementById('proratedReviewSubtitle');
+  subtitle.textContent = `This invoice for ${swName} contains prorated charges, which typically reflect a mid-cycle seat or service change. Review the detected changes before deciding whether to update the Overview.`;
+
+  // Seat section
+  const seatSection = document.getElementById('proratedSeatSection');
+  const seatRows = document.getElementById('proratedSeatRows');
+  if (seatChanges.length > 0) {
+    seatSection.style.display = 'block';
+    const colorMap = { added: '#059669', removed: '#dc2626', unchanged: '#6b7280' };
+    seatRows.innerHTML = seatChanges.map(row => `
+      <tr style="border-top:1px solid #f0f0f0">
+        <td style="padding:6px 8px;font-weight:500">${row.field}</td>
+        <td style="padding:6px 8px;text-align:right;color:var(--gray-500)">${row.current}</td>
+        <td style="padding:6px 8px;text-align:right;font-weight:600">${row.proposed}</td>
+        <td style="padding:6px 8px;text-align:center;font-size:11px;font-weight:600;color:${colorMap[row.deltaSign] || '#6b7280'}">${row.delta}</td>
+      </tr>`).join('');
+  } else {
+    seatSection.style.display = 'none';
+  }
+
+  // Service section
+  const svcSection = document.getElementById('proratedServiceSection');
+  const svcRows = document.getElementById('proratedServiceRows');
+  if (serviceChanges.length > 0) {
+    svcSection.style.display = 'block';
+    const actionStyle = { added: 'color:#059669;background:#d1fae5', removed: 'color:#dc2626;background:#fee2e2', changed: 'color:#1e40af;background:#dbeafe' };
+    svcRows.innerHTML = serviceChanges.map(row => `
+      <tr style="border-top:1px solid #f0f0f0">
+        <td style="padding:6px 8px;font-weight:500">${row.name}</td>
+        <td style="padding:6px 8px;text-align:center">
+          <span style="font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:10px;${actionStyle[row.action] || ''}">${row.action.toUpperCase()}</span>
+        </td>
+        <td style="padding:6px 8px;text-align:right">${row.seats > 0 ? row.seats : '—'}</td>
+        <td style="padding:6px 8px;text-align:right">${row.annualCost > 0 ? '$' + row.annualCost.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) : '—'}</td>
+      </tr>`).join('');
+  } else {
+    svcSection.style.display = 'none';
+  }
+
+  // No changes fallback
+  document.getElementById('proratedNoChange').style.display = hasChanges ? 'none' : 'block';
+
+  // Disable Apply button if nothing to apply
+  const applyBtn = document.getElementById('proratedApplyBtn');
+  applyBtn.disabled = !hasChanges || Object.keys(softwareUpdate || {}).length === 0;
+  applyBtn.style.opacity = applyBtn.disabled ? '0.4' : '1';
+
+  // Wire buttons
+  document.getElementById('proratedApplyBtn').onclick = () => {
+    closeModal();
+    onApply(softwareUpdate);
+  };
+  document.getElementById('proratedSaveOnlyBtn').onclick = () => {
+    closeModal();
+    onSaveOnly();
+  };
+
+  // Show dialog
+  const overlay = document.getElementById('overlay');
+  overlay.style.display = 'flex';
+  document.getElementById('proratedReviewModal').style.display = 'block';
+}
+
+function extractAdditionalServiceUpdates({
+  parsed = {},
+  billingPeriod = '',
+  currentSoftware = null,
+} = {}) {
+  const complexity = inspectInvoiceComplexity(parsed || {});
+  if (Boolean(parsed?.isProrated) || complexity.isProrated) {
+    return [];
+  }
+
+  const lineItems = Array.isArray(parsed?.lineItems) ? parsed.lineItems : [];
+  const seatSummary = summarizeNonProratedSeatLines(lineItems);
+  const current = currentSoftware || {};
+  const renewal = normalizeInvoicePeriod(parsed?.renewalPeriod || parsed?.billingPeriod || billingPeriod || '');
+  const currentMainPlan = String(current?.subscriptionPlan || '').trim();
+  const primaryPlan = normalizeInvoiceServiceLabel(parsed?.subscriptionPlan || seatSummary.primaryName || currentMainPlan || '');
+  const rows = Array.isArray(seatSummary.additionalLines) ? seatSummary.additionalLines : [];
+  const updatesByKey = new Map();
+
+  const upsertUpdate = (entry = {}) => {
+    const name = normalizeInvoiceServiceLabel(entry?.name || '');
+    if (!name) return;
+    if (primaryPlan && isLikelySameInvoiceServiceName(name, primaryPlan)) return;
+    if (currentMainPlan && isLikelySameInvoiceServiceName(name, currentMainPlan)) return;
+
+    const key = invoiceServiceSimilarityKey(name);
+    const existing = updatesByKey.get(key);
+    const next = {
+      name,
+      plan: name,
+      purchasedLicenses: Number.isFinite(Number(entry?.purchasedLicenses)) ? Math.max(0, Math.round(Number(entry.purchasedLicenses))) : 0,
+      licensePricePerUserMonth: Number.isFinite(Number(entry?.licensePricePerUserMonth)) ? Number(Number(entry.licensePricePerUserMonth).toFixed(2)) : 0,
+      annualCost: Number.isFinite(Number(entry?.annualCost)) ? Number(Number(entry.annualCost).toFixed(2)) : 0,
+      renewalPeriod: renewal,
+    };
+    if (!existing) {
+      updatesByKey.set(key, next);
+      return;
+    }
+    const merged = { ...existing };
+    merged.annualCost = Math.max(Number(existing.annualCost || 0), Number(next.annualCost || 0));
+    if (Number(next.purchasedLicenses || 0) > Number(existing.purchasedLicenses || 0)) {
+      merged.purchasedLicenses = next.purchasedLicenses;
+    }
+    if (!(Number(existing.licensePricePerUserMonth || 0) > 0) && Number(next.licensePricePerUserMonth || 0) > 0) {
+      merged.licensePricePerUserMonth = next.licensePricePerUserMonth;
+    }
+    updatesByKey.set(key, merged);
+  };
+
+  for (const li of rows) {
+    const name = normalizeInvoiceServiceLabel(li?.name || '');
+    if (!name) continue;
+
+    const qty = Number(li?.quantity);
+    const unit = Number(li?.unitPrice);
+    if (!(Number.isFinite(qty) && qty > 0 && Number.isFinite(unit) && unit > 0)) continue;
+
+    const monthlyUnit = toMonthlyUnitFromBilling(unit, renewal);
+    if (!(Number.isFinite(monthlyUnit) && monthlyUnit > 0)) continue;
+
+    const annualCost = monthlyUnit * Math.round(qty) * 12;
+    upsertUpdate({
+      name,
+      purchasedLicenses: Math.round(qty),
+      licensePricePerUserMonth: Number(monthlyUnit.toFixed(2)),
+      annualCost: Number(annualCost.toFixed(2)),
+    });
+  }
+
+  // Also derive add-on services from grouped non-discount line items so non-seat products
+  // (e.g. Marketing Hub / Operations Hub) update the additional-services table.
+  const grouped = buildInvoiceSubscriptionGroups({ lineItems });
+  for (const group of grouped) {
+    const groupName = normalizeInvoiceServiceLabel(group?.label || '');
+    if (!groupName) continue;
+    if (primaryPlan && isLikelySameInvoiceServiceName(groupName, primaryPlan)) continue;
+    if (currentMainPlan && isLikelySameInvoiceServiceName(groupName, currentMainPlan)) continue;
+
+    const periodAmount = Number(group?.amount);
+    const annualCost = annualizeInvoiceAmount(periodAmount, renewal || billingPeriod);
+    if (!(Number.isFinite(annualCost) && annualCost > 0)) continue;
+
+    const groupRows = Array.isArray(group?.rows) ? group.rows : [];
+    const qtyCandidates = groupRows
+      .map(row => Number(row?.quantity))
+      .filter(v => Number.isFinite(v) && v > 0)
+      .map(v => Math.round(v));
+    const qty = qtyCandidates.length ? Math.max(...qtyCandidates) : 0;
+    const monthlyUnit = qty > 0 ? Number((annualCost / (qty * 12)).toFixed(2)) : 0;
+
+    upsertUpdate({
+      name: groupName,
+      purchasedLicenses: qty,
+      licensePricePerUserMonth: monthlyUnit,
+      annualCost,
+    });
+  }
+
+  return [...updatesByKey.values()].filter((row) => Number(row.annualCost || 0) > 0);
+}
+
+function clearAdditionalServicePreview(previewId = '') {
+  const box = document.getElementById(previewId);
+  if (!box) return;
+  box.style.display = 'none';
+  box.innerHTML = '';
+}
+
+function renderAdditionalServicePreview(previewId = '', {
+  parsed = {},
+  billingPeriod = '',
+  currentSoftware = null,
+} = {}) {
+  const box = document.getElementById(previewId);
+  if (!box) return;
+
+  const services = extractAdditionalServiceUpdates({
+    parsed,
+    billingPeriod,
+    currentSoftware,
+  });
+  if (!services.length) {
+    clearAdditionalServicePreview(previewId);
+    return;
+  }
+
+  const currency = String(parsed?.currency || 'USD').trim() || 'USD';
+  box.style.display = 'block';
+  box.innerHTML = '';
+
+  const title = document.createElement('div');
+  title.style.fontSize = '11px';
+  title.style.fontWeight = '700';
+  title.style.color = 'var(--gray-700)';
+  title.style.marginBottom = '6px';
+  title.textContent = `Additional Services Detected (${services.length})`;
+  box.appendChild(title);
+
+  const info = document.createElement('div');
+  info.style.fontSize = '10.5px';
+  info.style.color = 'var(--gray-500)';
+  info.style.marginBottom = '6px';
+  info.textContent = 'Primary service stays in Subscription Plan. Secondary service lines are saved as additional services.';
+  box.appendChild(info);
+
+  for (const svc of services) {
+    const row = document.createElement('div');
+    row.style.fontSize = '11px';
+    row.style.color = 'var(--gray-700)';
+    row.style.padding = '4px 0';
+
+    const qty = Number(svc?.purchasedLicenses);
+    const unit = Number(svc?.licensePricePerUserMonth);
+    const annual = Number(svc?.annualCost);
+    const parts = [String(svc?.name || 'Additional Service').trim()];
+    if (Number.isFinite(qty) && qty > 0) parts.push(`Qty ${Math.round(qty)}`);
+    if (Number.isFinite(unit) && unit > 0) parts.push(`Unit ${currency} ${unit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/mo`);
+    if (Number.isFinite(annual) && annual > 0) parts.push(`Annual ${currency} ${annual.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+    row.textContent = `• ${parts.join(' · ')}`;
+    box.appendChild(row);
+  }
+}
+
+/**
+ * For a prorated invoice, derives the new base-plan seat count and cost.
+ *
+ * Vendors like HubSpot issue prorated charges when users are added mid-cycle.
+ * The invoice may express seats as the NEW TOTAL (e.g. "15 users") or a DELTA
+ * (e.g. "5 additional users added"). This function resolves that ambiguity:
+ *   - parsedQty > currentQty  →  treat as new total (already the right number)
+ *   - parsedQty ≤ currentQty  →  treat as delta (add to current seats)
+ *
+ * Cost is derived from the existing per-seat price rather than from the prorated
+ * unit prices on the invoice (which reflect only the remainder of the billing
+ * cycle and would produce a wildly wrong annual cost).
+ *
+ * Returns { purchasedLicenses, annualCost?, licensePricePerUserMonth? } or {}.
+ */
+function extractProratedSeatChange(parsed = {}, currentSoftware = null, manualLicenseQuantity = null) {
+  const current = currentSoftware || {};
+  const currentQty = Number(current.purchasedLicenses);
+  const hasCurrentQty = Number.isFinite(currentQty) && currentQty > 0;
+
+  // Resolve the best raw quantity from available sources:
+  //   1. manualLicenseQuantity — only used as a hard override if it is LARGER than the
+  //      current seat count, meaning the user explicitly entered the new total. If it is
+  //      ≤ current, it is treated the same as a parser-extracted delta (see note below).
+  //   2. parsed.licenseQuantity — the value extracted by the invoice parser; may be the
+  //      new total OR the delta depending on how the vendor formats the invoice.
+  //   3. Largest positive-charge line item quantity — tertiary fallback.
+  //
+  // Note on delta vs total: for prorated user-addition invoices, vendors like HubSpot
+  // sometimes print only the ADDED seat count ("3 additional users") rather than the
+  // new total ("8 users"). We disambiguate using the heuristic:
+  //   rawQty > currentQty  →  new total  (use directly)
+  //   rawQty ≤ currentQty  →  delta      (add to current: currentQty + rawQty)
+  // This heuristic is safe because you cannot receive a prorated charge for fewer seats
+  // than you currently have on an addition invoice.
+
+  const manualQty = Number(manualLicenseQuantity);
+  const parsedQty = Number(parsed?.licenseQuantity);
+
+  // Secondary candidate: largest positive-charge line item quantity.
+  const lineItems = Array.isArray(parsed?.lineItems) ? parsed.lineItems : [];
+  const proratedQtyCandidates = lineItems
+    .filter(li => {
+      const kind = String(li?.kind || '').toLowerCase();
+      const total = Number(li?.total);
+      if (kind === 'credit' || (Number.isFinite(total) && total < 0)) return false;
+      const qty = Number(li?.quantity);
+      return Number.isFinite(qty) && qty > 0 && qty <= 10000;
+    })
+    .map(li => Math.round(Number(li.quantity)));
+  const maxLineQty = proratedQtyCandidates.length ? Math.max(...proratedQtyCandidates) : 0;
+
+  // Pick the best candidate — prefer manual if it clearly represents a new total.
+  let rawQty = 0;
+  if (Number.isFinite(manualQty) && manualQty > 0 && hasCurrentQty && manualQty > currentQty) {
+    // User explicitly typed a value larger than the current count — treat as new total directly.
+    rawQty = manualQty;
+  } else if (Number.isFinite(parsedQty) && parsedQty > 0) {
+    rawQty = parsedQty;
+  } else if (Number.isFinite(manualQty) && manualQty > 0) {
+    // Manual value ≤ current — treat as a delta below, same as parsed.
+    rawQty = manualQty;
+  } else {
+    rawQty = maxLineQty;
+  }
+  if (!(rawQty > 0)) return {};
+
+  // Resolve total vs delta using three-way comparison against the current seat count:
+  //
+  //   rawQty > currentQty  →  new total  (parser gave us the post-addition count)
+  //   rawQty < currentQty  →  delta      (parser gave us only the newly added seats)
+  //   rawQty == currentQty →  no change  (parser likely read the existing count from the
+  //                                       plan name, e.g. "Includes 5 Users" — skip update)
+  //   !hasCurrentQty       →  treat as new total (no prior baseline to compare against)
+  //
+  // You cannot receive a prorated charge for fewer seats than you currently have on an
+  // addition invoice, so the rawQty < currentQty case can safely be treated as a delta.
+  let newTotal;
+  if (!hasCurrentQty) {
+    newTotal = Math.round(rawQty);
+  } else if (rawQty > currentQty) {
+    newTotal = Math.round(rawQty);              // parser gave us the new total
+  } else if (rawQty < currentQty) {
+    newTotal = Math.round(currentQty + rawQty); // parser gave us the delta
+  } else {
+    // rawQty === currentQty: parser echoed the existing count — nothing changed for seats
+    return {};
+  }
+  if (!(newTotal > 0)) return {};
+
+  const result = { purchasedLicenses: newTotal };
+
+  // Derive annual cost from the existing per-user price, not from prorated amounts.
+  // Prorated unit prices only cover the remainder of the billing cycle and would
+  // produce a wildly wrong annualised cost.
+  const currentMonthly = Number(current.licensePricePerUserMonth);
+  const currentAnnual  = Number(current.annualCost);
+  if (Number.isFinite(currentMonthly) && currentMonthly > 0) {
+    result.annualCost = Number((newTotal * currentMonthly * 12).toFixed(2));
+    result.licensePricePerUserMonth = currentMonthly;
+  } else if (hasCurrentQty && Number.isFinite(currentAnnual) && currentAnnual > 0) {
+    const impliedMonthly = currentAnnual / (currentQty * 12);
+    if (Number.isFinite(impliedMonthly) && impliedMonthly > 0) {
+      result.annualCost = Number((newTotal * impliedMonthly * 12).toFixed(2));
+      result.licensePricePerUserMonth = Number(impliedMonthly.toFixed(2));
+    }
+  }
+
+  return result;
+}
+
+function deriveAnnualSeatIncreaseUpdate({
+  parsed = {},
+  currentSoftware = null,
+  manualLicenseQuantity = null,
+  billingPeriod = '',
+} = {}) {
+  const current = currentSoftware || {};
+  const currentRenewal = normalizeInvoicePeriod(current?.renewalPeriod || '');
+  const parsedRenewal = normalizeInvoicePeriod(parsed?.renewalPeriod || parsed?.billingPeriod || billingPeriod || '');
+  const isAnnualContext = currentRenewal === 'Annual' || parsedRenewal === 'Annual';
+  if (!isAnnualContext) return {};
+
+  const currentQty = Number(current?.purchasedLicenses);
+  const manualQty = Number(manualLicenseQuantity);
+  const parsedQty = Number(parsed?.licenseQuantity);
+  const lineItems = Array.isArray(parsed?.lineItems) ? parsed.lineItems : [];
+  const seatSummary = summarizeNonProratedSeatLines(lineItems);
+  const hasManualQty = Number.isFinite(manualQty) && manualQty > 0;
+  const targetCandidates = (hasManualQty ? [manualQty] : [parsedQty, seatSummary.primaryQuantity])
+    .filter(q => Number.isFinite(q) && q > 0);
+  if (!targetCandidates.length) return {};
+
+  const targetQty = Math.round(Math.max(...targetCandidates));
+  if (!(Number.isFinite(targetQty) && targetQty > 0)) return {};
+  if (Number.isFinite(currentQty) && currentQty > 0 && targetQty === currentQty) return {};
+  const isIncrease = !(Number.isFinite(currentQty) && currentQty > 0) || targetQty > currentQty;
+  const allowQuantityChange = isIncrease || hasManualQty;
+  if (!allowQuantityChange) return {};
+
+  const targetLine = seatSummary.primaryLine || null;
+  const lineUnitCandidates = [seatSummary.primaryUnitPrice]
+    .map(v => Number(v))
+    .filter(v => Number.isFinite(v) && v > 0);
+  const parsedUnit = Number(parsed?.licenseUnitPrice);
+  const currentAnnual = Number(current?.annualCost);
+  const currentMonthlyUnit = Number(current?.licensePricePerUserMonth);
+
+  let annualUnitPrice = Number(seatSummary.primaryUnitPrice);
+  if (!(Number.isFinite(annualUnitPrice) && annualUnitPrice > 0)) {
+    annualUnitPrice = Number(targetLine?.unitPrice);
+  }
+  if (!(Number.isFinite(annualUnitPrice) && annualUnitPrice > 0) && Number.isFinite(parsedUnit) && parsedUnit > 0) {
+    annualUnitPrice = parsedUnit;
+  }
+  if (!(Number.isFinite(annualUnitPrice) && annualUnitPrice > 0) && lineUnitCandidates.length) {
+    annualUnitPrice = lineUnitCandidates[0];
+  }
+  if (!(Number.isFinite(annualUnitPrice) && annualUnitPrice > 0)
+    && Number.isFinite(currentAnnual) && currentAnnual > 0
+    && Number.isFinite(currentQty) && currentQty > 0) {
+    annualUnitPrice = currentAnnual / currentQty;
+  }
+  if (!(Number.isFinite(annualUnitPrice) && annualUnitPrice > 0)
+    && Number.isFinite(currentMonthlyUnit) && currentMonthlyUnit > 0) {
+    annualUnitPrice = currentMonthlyUnit * 12;
+  }
+
+  const update = {
+    renewalPeriod: 'Annual',
+    purchasedLicenses: targetQty,
+  };
+  const primaryPlan = normalizeInvoiceServiceLabel(parsed?.subscriptionPlan || seatSummary.primaryName || '');
+  if (primaryPlan) update.subscriptionPlan = primaryPlan;
+
+  // For non-increase changes, keep cost unchanged unless user explicitly drove quantity change.
+  if ((isIncrease || hasManualQty) && Number.isFinite(annualUnitPrice) && annualUnitPrice > 0) {
+    const annualCost = targetQty * annualUnitPrice;
+    if (Number.isFinite(annualCost) && annualCost > 0) {
+      update.annualCost = Number(annualCost.toFixed(2));
+    }
+    update.licensePricePerUserMonth = Number((annualUnitPrice / 12).toFixed(2));
+  }
+
+  const additionalServices = extractAdditionalServiceUpdates({
+    parsed,
+    billingPeriod: billingPeriod || parsedRenewal || '',
+    currentSoftware: current,
+  });
+  if (additionalServices.length) {
+    update.additionalServices = additionalServices;
+  }
+
+  return update;
+}
+
 function deriveSoftwareUpdateFromInvoice({
   amount = 0,
   billingPeriod = '',
   parsed = {},
   currentSoftware = null,
   manualLicenseQuantity = null,
+  manualSubscriptionPlan = '',
 } = {}) {
+  const complexity = inspectInvoiceComplexity(parsed || {});
+  if (complexity.isComplex) {
+    const annualUpdate = deriveAnnualSeatIncreaseUpdate({
+      parsed,
+      currentSoftware,
+      manualLicenseQuantity,
+      billingPeriod,
+    });
+    if (Object.keys(annualUpdate || {}).length) {
+      return annualUpdate;
+    }
+
+    const summary = summarizeNonProratedSeatLines(Array.isArray(parsed?.lineItems) ? parsed.lineItems : []);
+    const fallbackUpdate = {};
+    const primaryPlan = String(manualSubscriptionPlan || parsed?.subscriptionPlan || summary.primaryName || '').trim();
+    if (primaryPlan) fallbackUpdate.subscriptionPlan = primaryPlan;
+
+    // For prorated invoices (e.g. HubSpot mid-cycle user additions), try to extract the
+    // new base-plan seat count. deriveAnnualSeatIncreaseUpdate won't have caught this because
+    // it only handles annual billing; extractProratedSeatChange covers the monthly case and
+    // also handles the delta-vs-total ambiguity.
+    if (complexity.isProrated) {
+      const seatChange = extractProratedSeatChange(parsed, currentSoftware, manualLicenseQuantity);
+      if (Object.keys(seatChange).length) {
+        Object.assign(fallbackUpdate, seatChange);
+      }
+    }
+
+    const additionalServices = extractAdditionalServiceUpdates({
+      parsed,
+      billingPeriod: normalizeInvoicePeriod(parsed?.renewalPeriod || parsed?.billingPeriod || billingPeriod || ''),
+      currentSoftware,
+    });
+    if (additionalServices.length) {
+      fallbackUpdate.additionalServices = additionalServices;
+    }
+    return fallbackUpdate;
+  }
+
   const update = {};
   const current = currentSoftware || {};
+  const safetyText = [
+    parsed?.subscriptionPlan || '',
+    parsed?.renewalPeriod || '',
+    parsed?.billingPeriod || '',
+    parsed?.raw || '',
+    ...(Array.isArray(parsed?.warnings) ? parsed.warnings : []),
+  ].join(' ').toLowerCase();
+  const isCreditLike = /\bcredit|refund|reversal|adjustment\b/.test(safetyText);
+  const isUsageBased = /\bpay[\s-]?as[\s-]?you[\s-]?go\b|\busage[-\s]?based\b|\bmetered\b/.test(safetyText);
   const renewal = normalizeInvoicePeriod(parsed.renewalPeriod || billingPeriod);
-  if (renewal) update.renewalPeriod = renewal;
+  if (renewal && !isCreditLike && !isUsageBased) update.renewalPeriod = renewal;
 
   const annualizedCost = annualizeInvoiceAmount(amount, renewal || billingPeriod);
-  if (annualizedCost > 0) {
+  if (annualizedCost > 0 && !isCreditLike && !isUsageBased) {
     update.annualCost = Number(annualizedCost.toFixed(2));
   }
 
   const manualQty = Number(manualLicenseQuantity);
-  const parsedQty = Number(parsed.licenseQuantity);
+  const parsedQty = (!isCreditLike && !isUsageBased) ? Number(parsed.licenseQuantity) : NaN;
   const currentQty = Number(current.purchasedLicenses);
   const effectiveQty = (Number.isFinite(manualQty) && manualQty > 0)
     ? manualQty
@@ -3651,17 +4984,31 @@ function deriveSoftwareUpdateFromInvoice({
     update.purchasedLicenses = Math.round(effectiveQty);
   }
 
-  const plan = String(parsed.subscriptionPlan || '').trim();
-  if (plan) {
-    update.subscriptionPlan = plan;
+  const plan = String(manualSubscriptionPlan || parsed.subscriptionPlan || '').trim();
+  const summary = summarizeNonProratedSeatLines(Array.isArray(parsed?.lineItems) ? parsed.lineItems : []);
+  const primaryPlan = plan || summary.primaryName || '';
+  if (primaryPlan && !isCreditLike && !isUsageBased) {
+    update.subscriptionPlan = primaryPlan;
   }
 
-  let unitPrice = Number(parsed.licenseUnitPrice);
+  let unitPrice = (!isCreditLike && !isUsageBased) ? Number(parsed.licenseUnitPrice) : NaN;
   if (!(Number.isFinite(unitPrice) && unitPrice > 0) && effectiveQty > 0 && annualizedCost > 0) {
     unitPrice = annualizedCost / (effectiveQty * 12);
   }
+  if (Number.isFinite(unitPrice) && unitPrice > 0 && renewal === 'Annual') {
+    unitPrice = unitPrice / 12;
+  }
   if (Number.isFinite(unitPrice) && unitPrice > 0 && renewal !== 'Freeware' && renewal !== 'Pay-as-you-go') {
     update.licensePricePerUserMonth = Number(unitPrice.toFixed(2));
+  }
+
+  const additionalServices = extractAdditionalServiceUpdates({
+    parsed,
+    billingPeriod: renewal || billingPeriod,
+    currentSoftware: current,
+  });
+  if (additionalServices.length) {
+    update.additionalServices = additionalServices;
   }
 
   return update;
@@ -3681,6 +5028,7 @@ function applyInvoiceDerivedFieldsToForm(update = {}) {
       renewalEdit.value = update.renewalPeriod;
       swTogglePaygHint('swdeCostLabel', 'swdeRecalcBtn', 'swdeLicPriceRow', renewalEdit.value);
     }
+    syncMonthlyCostVisibility(update.renewalPeriod);
   }
 
   if (Number.isFinite(update.purchasedLicenses)) {
@@ -3708,6 +5056,46 @@ function applyInvoiceDerivedFieldsToForm(update = {}) {
     if (elEdit) elEdit.value = update.annualCost;
   }
 
+  // Recompute monthly cost whenever price or seat count changes.
+  // For monthly billing: monthly cost = price × qty  =  invoice amount (since annualCost = amount×12).
+  // For annual billing + prorated seat update: reveal the monthly cost row temporarily so the
+  //   user can see the new recurring monthly spend after the seat change.
+  {
+    const currentRenewal = document.getElementById('swRenewal')?.value || '';
+    const currentRenewalE = document.getElementById('swdeRenewal')?.value || '';
+
+    const price  = parseFloat(document.getElementById('swLicPrice')?.value) || 0;
+    const qty    = parseInt(document.getElementById('swPurchased')?.value) || 0;
+    const priceE = parseFloat(document.getElementById('swdeLicPrice')?.value) || 0;
+    const qtyE   = parseInt(document.getElementById('swdePurchased')?.value) || 0;
+
+    const elMC  = document.getElementById('swMonthlyCost');
+    const elMCE = document.getElementById('swdeMonthlyCost');
+
+    // Primary calculation: price × qty
+    let mcVal  = (price > 0 && qty > 0)   ? (price * qty).toFixed(2)   : '';
+    let mcValE = (priceE > 0 && qtyE > 0) ? (priceE * qtyE).toFixed(2) : '';
+
+    // Fallback for monthly billing: if price/qty aren't extracted but annualCost is set,
+    // derive monthly cost as annualCost / 12 so the field always shows the correct amount.
+    if (!mcVal && currentRenewal === 'Monthly' && Number.isFinite(update.annualCost) && update.annualCost > 0) {
+      mcVal = (update.annualCost / 12).toFixed(2);
+    }
+    if (!mcValE && currentRenewalE === 'Monthly' && Number.isFinite(update.annualCost) && update.annualCost > 0) {
+      mcValE = (update.annualCost / 12).toFixed(2);
+    }
+
+    if (elMC)  elMC.value  = mcVal;
+    if (elMCE) elMCE.value = mcValE;
+
+    // For annual software with a prorated seat update, temporarily reveal the monthly cost
+    // row so the user can confirm the new recurring spend — matches user requirement:
+    // "no need monthly cost until prorated billing invoice [is] generated".
+    const hasSeatUpdate = Number.isFinite(update.purchasedLicenses);
+    if (currentRenewal  === 'Annual' && hasSeatUpdate && mcVal)  syncMonthlyCostVisibility('Annual',  true);
+    if (currentRenewalE === 'Annual' && hasSeatUpdate && mcValE) syncMonthlyCostVisibility('Annual',  true);
+  }
+
   if (typeof update.subscriptionPlan === 'string' && update.subscriptionPlan.trim()) {
     const elMain = document.getElementById('swPlan');
     const elEdit = document.getElementById('swdePlan');
@@ -3719,25 +5107,65 @@ function applyInvoiceDerivedFieldsToForm(update = {}) {
 function applyInvoiceDerivedFieldsToSoftwareRecord(swId, update = {}) {
   const rec = findSoftwareById(swId);
   if (!rec || !update || typeof update !== 'object') return;
-  Object.assign(rec, update);
+  const additionalServices = Array.isArray(update.additionalServices) ? update.additionalServices : [];
+  const directUpdate = { ...update };
+  delete directUpdate.additionalServices;
+  Object.assign(rec, directUpdate);
+
+  if (additionalServices.length) {
+    if (!Array.isArray(rec.services)) rec.services = [];
+    for (const svc of additionalServices) {
+      const name = normalizeInvoiceServiceLabel(svc?.name || '');
+      if (!name) continue;
+      const key = name.toLowerCase();
+      const existing = rec.services.find(row => String(row?.name || '').trim().toLowerCase() === key);
+      const next = {
+        name,
+        plan: String(svc?.plan || name).trim(),
+        annualCost: Number.isFinite(Number(svc?.annualCost)) ? Number(svc.annualCost) : 0,
+        licensePricePerUserMonth: Number.isFinite(Number(svc?.licensePricePerUserMonth)) ? Number(svc.licensePricePerUserMonth) : 0,
+        purchasedLicenses: Number.isFinite(Number(svc?.purchasedLicenses)) ? Math.round(Number(svc.purchasedLicenses)) : 0,
+        usedLicenses: 0,
+        renewalPeriod: normalizeInvoicePeriod(svc?.renewalPeriod || ''),
+        status: 'Active',
+      };
+      if (existing) {
+        Object.assign(existing, next);
+      } else {
+        rec.services.push(next);
+      }
+    }
+  }
+}
+
+function isLikelyPdfFile(file) {
+  if (!file) return false;
+  const type = String(file.type || '').toLowerCase();
+  const name = String(file.name || '').toLowerCase();
+  return type.includes('pdf') || name.endsWith('.pdf');
 }
 
 // Called when user picks a file — reads it as base64, sends to parse endpoint
 function onInvFileSelected(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.type !== 'application/pdf') return; // only parse PDFs
+  if (!isLikelyPdfFile(file)) return; // only parse PDFs
   input.dataset.parseConfidence = '';
   input.dataset.parsedInvoiceMeta = '';
+  clearAdditionalServicePreview('invAdditionalSvcPreview');
   const qtyField = document.getElementById('invLicenseQty');
   if (qtyField) qtyField.value = '';
+  const unitField = document.getElementById('invUnitPrice');
+  if (unitField) unitField.value = '';
+  const planField = document.getElementById('invSubscriptionPlan');
+  if (planField) planField.value = '';
 
   const status = document.getElementById('invParseStatus');
   status.textContent = '🔍 Reading invoice…';
   status.style.color = 'var(--gray-500)';
 
   // Clear previous hints
-  ['invParseAmtHint','invParseQtyHint','invParsePeriodHint','invParseFromHint','invParseToHint'].forEach(id => {
+  ['invParseAmtHint','invParseQtyHint','invParseUnitHint','invParsePlanHint','invParsePeriodHint','invParseFromHint','invParseToHint'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.textContent = '';
   });
@@ -3759,13 +5187,32 @@ function onInvFileSelected(input) {
         if (el && text) { el.textContent = `✓ auto-filled`; }
       };
 
-      if (result.amount) {
-        document.getElementById('invAmount').value = result.amount;
+      const parsedAmount = pickInvoiceAmount(result || null);
+      if (Number.isFinite(parsedAmount)) {
+        document.getElementById('invAmount').value = parsedAmount;
         hint('invParseAmtHint', true);
       }
-      if (result.licenseQuantity) {
-        document.getElementById('invLicenseQty').value = result.licenseQuantity;
+      const safeQty = sanitizeInvoiceLicenseQuantity(result.licenseQuantity, {
+        lineItems: Array.isArray(result?.lineItems) ? result.lineItems : [],
+        currentQuantity: Number(swRecord?.purchasedLicenses || 0),
+      });
+      const safeUnitPrice = sanitizeInvoiceUnitPrice(result.licenseUnitPrice, {
+        lineItems: Array.isArray(result?.lineItems) ? result.lineItems : [],
+        isProrated: Boolean(result?.isProrated),
+      });
+      const seatSummary = summarizeNonProratedSeatLines(Array.isArray(result?.lineItems) ? result.lineItems : []);
+      const parsedPlan = String(result.subscriptionPlan || seatSummary.primaryName || '').trim();
+      if (Number.isFinite(safeQty) && safeQty > 0) {
+        document.getElementById('invLicenseQty').value = safeQty;
         hint('invParseQtyHint', true);
+      }
+      if (Number.isFinite(safeUnitPrice) && safeUnitPrice > 0) {
+        document.getElementById('invUnitPrice').value = safeUnitPrice;
+        hint('invParseUnitHint', true);
+      }
+      if (parsedPlan) {
+        document.getElementById('invSubscriptionPlan').value = parsedPlan;
+        hint('invParsePlanHint', true);
       }
       if (result.currency) {
         const sel = document.getElementById('invCurrency');
@@ -3785,28 +5232,74 @@ function onInvFileSelected(input) {
         hint('invParseToHint', true);
       }
 
-      const conf = result.confidence;
-      status.textContent = conf === 'high' ? '🟢 Fields auto-filled — please verify'
-                         : conf === 'medium' ? '🟡 Partially extracted — check the fields'
-                         : '🔴 Could not extract — please fill manually';
-      status.style.color = conf === 'high' ? '#10b981' : conf === 'medium' ? '#f59e0b' : '#ef4444';
+      const complexity = inspectInvoiceComplexity(result || {});
+      const conf = downgradeInvoiceConfidence(result.confidence || '', complexity.isComplex);
 
-      // Store confidence for saving
+      // Store confidence + complexity for saving
+      const parsedMeta = {
+        ...(result || {}),
+        subscriptionPlan: parsedPlan || result?.subscriptionPlan || null,
+        licenseQuantity: Number.isFinite(safeQty) ? safeQty : null,
+        licenseUnitPrice: Number.isFinite(safeUnitPrice) ? safeUnitPrice : null,
+        _complexInvoice: complexity.isComplex,
+        isProrated: complexity.isProrated,
+        hasMultipleSubscriptions: complexity.hasMultipleSubscriptions,
+        complexityReasons: complexity.reasons,
+      };
       document.getElementById('invFile').dataset.parseConfidence = conf || '';
-      document.getElementById('invFile').dataset.parsedInvoiceMeta = JSON.stringify(result || {});
+      document.getElementById('invFile').dataset.parsedInvoiceMeta = JSON.stringify(parsedMeta);
+      renderAdditionalServicePreview('invAdditionalSvcPreview', {
+        parsed: parsedMeta,
+        billingPeriod: normalizeInvoicePeriod(parsedMeta?.renewalPeriod || parsedMeta?.billingPeriod || result?.billingPeriod || ''),
+        currentSoftware: swRecord || {},
+      });
 
       const derivedUpdate = deriveSoftwareUpdateFromInvoice({
-        amount: result.amount || 0,
+        amount: Number.isFinite(parsedAmount) ? parsedAmount : 0,
         billingPeriod: result.billingPeriod || '',
-        parsed: result || {},
+        parsed: parsedMeta,
         currentSoftware: swRecord || {},
         manualLicenseQuantity: Number(document.getElementById('invLicenseQty')?.value || 0),
+        manualSubscriptionPlan: String(document.getElementById('invSubscriptionPlan')?.value || '').trim(),
       });
-      applyInvoiceDerivedFieldsToForm(derivedUpdate);
-      applyInvoiceDerivedFieldsToSoftwareRecord(swId, derivedUpdate);
+      const hasDerivedUpdate = Object.keys(derivedUpdate || {}).length > 0;
+      const hasAnnualUpdate = hasAnnualLicenseUpdate(derivedUpdate);
+      const isSeatIncrease = isSeatIncreaseUpdate(derivedUpdate, swRecord || {});
+
+      if (complexity.isComplex) {
+        if (hasDerivedUpdate && complexity.isProrated && Number.isFinite(derivedUpdate.purchasedLicenses)) {
+          // Prorated invoice with a detected seat change — show a clear diff message.
+          const newSeats = derivedUpdate.purchasedLicenses;
+          const currentSeats = Number(swRecord?.purchasedLicenses || 0);
+          const delta = currentSeats > 0 ? newSeats - currentSeats : null;
+          const deltaLabel = delta !== null
+            ? (delta > 0 ? ` (+${delta} added)` : delta < 0 ? ` (${delta} removed)` : '')
+            : '';
+          status.textContent = `🟡 Prorated invoice detected. License count update prepared: ${newSeats} seats${deltaLabel} — a confirmation dialog will appear before applying to Overview.`;
+          status.style.color = '#f59e0b';
+        } else if (hasDerivedUpdate && !complexity.isProrated && hasAnnualUpdate) {
+          status.textContent = isSeatIncrease
+            ? '🟡 Complex invoice detected. Annual license increase was identified and prepared for update — please verify.'
+            : '🟡 Complex invoice detected. Annual license quantity change was identified and prepared for update — please verify.';
+          status.style.color = '#f59e0b';
+        } else {
+          status.textContent = complexInvoiceStatusMessage(complexity);
+          status.style.color = '#f59e0b';
+        }
+      } else {
+        status.textContent = conf === 'high' ? '🟢 Fields auto-filled — please verify'
+                           : conf === 'medium' ? '🟡 Partially extracted — check the fields'
+                           : '🔴 Could not extract — please fill manually';
+        status.style.color = conf === 'high' ? '#10b981' : conf === 'medium' ? '#f59e0b' : '#ef4444';
+      }
+
+      if (hasDerivedUpdate) {
+        applyInvoiceDerivedFieldsToForm(derivedUpdate);
+      }
     } catch(err) {
       status.textContent = '⚠️ Parse failed — fill manually';
       status.style.color = '#ef4444';
+      clearAdditionalServicePreview('invAdditionalSvcPreview');
     }
   };
   reader.readAsDataURL(file);
@@ -3816,7 +5309,8 @@ async function uploadInvoice(){
   const swId          = document.getElementById('swId').value;
   const fileEl        = document.getElementById('invFile');
   const file          = fileEl.files[0];
-  const amount        = parseFloat(document.getElementById('invAmount').value) || 0;
+  const manualLicenseQty = Number(document.getElementById('invLicenseQty')?.value || 0);
+  const amountInput   = parseFloat(document.getElementById('invAmount').value);
   const currency      = document.getElementById('invCurrency').value || 'USD';
   const billingPeriod = document.getElementById('invBillingPeriod').value || '';
   const periodFrom    = document.getElementById('invPeriodFrom').value || null;
@@ -3824,14 +5318,30 @@ async function uploadInvoice(){
   const note          = document.getElementById('invNote').value.trim();
   const parseConfidence = fileEl.dataset.parseConfidence || '';
   const parsedMeta    = safeParseJson(fileEl.dataset.parsedInvoiceMeta || '{}', {});
+  const parsedLineItems = Array.isArray(parsedMeta?.lineItems) ? parsedMeta.lineItems : [];
+  const unitPriceInput = parseFloat(document.getElementById('invUnitPrice').value);
+  const subscriptionPlanInput = String(document.getElementById('invSubscriptionPlan').value || '').trim();
+  const subscriptionPlan = subscriptionPlanInput || String(parsedMeta?.subscriptionPlan || '').trim();
+  const unitPrice = Number.isFinite(unitPriceInput)
+    ? unitPriceInput
+    : (Number.isFinite(Number(parsedMeta?.licenseUnitPrice)) ? Number(parsedMeta.licenseUnitPrice) : null);
+  const parsedAmount  = pickInvoiceAmount(parsedMeta, null);
+  const amount        = Number.isFinite(amountInput)
+    ? amountInput
+    : (Number.isFinite(parsedAmount) ? parsedAmount : 0);
+  const parsedComplexity = inspectInvoiceComplexity(parsedMeta);
   const swRecord      = findSoftwareById(swId) || {};
   const softwareUpdate = deriveSoftwareUpdateFromInvoice({
     amount,
     billingPeriod,
     parsed: parsedMeta,
     currentSoftware: swRecord,
-    manualLicenseQuantity: Number(document.getElementById('invLicenseQty')?.value || 0),
+    manualLicenseQuantity: manualLicenseQty,
+    manualSubscriptionPlan: String(document.getElementById('invSubscriptionPlan')?.value || '').trim(),
   });
+  if (Number.isFinite(manualLicenseQty) && manualLicenseQty > 0) {
+    softwareUpdate.purchasedLicenses = Math.round(manualLicenseQty);
+  }
   const status        = document.getElementById('invUploadStatus');
 
   if (!swId)   return showToast('Save the software record first.');
@@ -3845,14 +5355,17 @@ async function uploadInvoice(){
   reader.onload = async e => {
     status.textContent = 'Uploading…';
     try {
-      await apiFetch(`/api/software/${swId}/invoices`, {
+      const invResponse = await apiFetch(`/api/software/${swId}/invoices`, {
         method: 'POST',
         body: JSON.stringify({
           filename: file.name,
           data:     e.target.result,
           mimeType: file.type || 'application/pdf',
           amount, currency, billingPeriod, periodFrom, periodTo, note, parseConfidence,
-          licenseQuantity: Number(document.getElementById('invLicenseQty')?.value || 0) || null,
+          licenseQuantity: Number.isFinite(manualLicenseQty) && manualLicenseQty > 0 ? Math.round(manualLicenseQty) : null,
+          licenseUnitPrice: Number.isFinite(unitPrice) ? Number(unitPrice.toFixed(2)) : null,
+          subscriptionPlan,
+          lineItems: parsedLineItems,
           softwareUpdate,
         }),
       });
@@ -3860,19 +5373,95 @@ async function uploadInvoice(){
       fileEl.value = '';
       fileEl.dataset.parseConfidence = '';
       fileEl.dataset.parsedInvoiceMeta = '';
-      ['invAmount','invLicenseQty','invNote','invPeriodFrom','invPeriodTo'].forEach(id => {
+      clearAdditionalServicePreview('invAdditionalSvcPreview');
+      ['invAmount','invLicenseQty','invUnitPrice','invSubscriptionPlan','invNote','invPeriodFrom','invPeriodTo'].forEach(id => {
         document.getElementById(id).value = '';
       });
       document.getElementById('invBillingPeriod').value = '';
       document.getElementById('invParseStatus').textContent = '';
-      ['invParseAmtHint','invParseQtyHint','invParsePeriodHint','invParseFromHint','invParseToHint'].forEach(id => {
+      ['invParseAmtHint','invParseQtyHint','invParseUnitHint','invParsePlanHint','invParsePeriodHint','invParseFromHint','invParseToHint'].forEach(id => {
         document.getElementById(id).textContent = '';
       });
       status.textContent = '';
-      applyInvoiceDerivedFieldsToForm(softwareUpdate);
-      applyInvoiceDerivedFieldsToSoftwareRecord(swId, softwareUpdate);
-      await loadInvoices();
-      showToast('Invoice uploaded successfully.');
+
+      // Immediately sync Services tab from the API response services array (no extra fetch needed).
+      // Use serverServices only when it is a non-empty array (empty means no add-ons derived).
+      const serverServices = Array.isArray(invResponse?.services) && invResponse.services.length > 0
+        ? invResponse.services : null;
+
+      // Helper: apply overview update + services sync + navigation (used by both paths below)
+      const applyMainOverviewUpdate = async (update) => {
+        applyInvoiceDerivedFieldsToForm(update);
+        applyInvoiceDerivedFieldsToSoftwareRecord(swId, update);
+        if (serverServices) {
+          editingServices = JSON.parse(JSON.stringify(serverServices));
+          renderServicesTab();
+          const storeRec = findSoftwareById(swId);
+          if (storeRec) storeRec.services = serverServices;
+        }
+        await loadInvoices();
+        await refreshSoftwareData({ requestKey: 'portal:software:invoice-upload-main', render: true });
+        if (!serverServices) {
+          const freshRec = findSoftwareById(swId);
+          if (freshRec && Array.isArray(freshRec.services)) {
+            editingServices = JSON.parse(JSON.stringify(freshRec.services));
+            renderServicesTab();
+          }
+        }
+        const newAddOnCount = serverServices ? serverServices.filter(s => s.status !== 'Inactive').length : 0;
+        const hasAddOnServices = newAddOnCount > 0 ||
+          (Array.isArray(update?.additionalServices) && update.additionalServices.length > 0);
+        if (newAddOnCount > 0) swSwitchTab('services');
+        const hasSWUpdate = Object.keys(update || {}).length > 0;
+        if (parsedComplexity.isComplex && !hasSWUpdate) {
+          showToast("Invoice uploaded. Complex billing detected — software overview wasn't auto-updated.");
+        } else if (parsedComplexity.isComplex && hasSWUpdate) {
+          showToast('Invoice uploaded. Complex annual adjustment detected; license and annual cost updated.');
+        } else if (hasAddOnServices) {
+          const addOnLabel = newAddOnCount > 0
+            ? newAddOnCount
+            : (update.additionalServices ? update.additionalServices.length : 0);
+          showToast(`Invoice uploaded. ${addOnLabel} add-on service(s) detected — check the Services tab.`);
+        } else {
+          showToast('Invoice uploaded. Overview has been updated.');
+        }
+      };
+
+      // Helper: save-only path — sync services without touching the overview fields
+      const saveMainInvoiceOnly = async () => {
+        if (serverServices) {
+          editingServices = JSON.parse(JSON.stringify(serverServices));
+          renderServicesTab();
+          const storeRec = findSoftwareById(swId);
+          if (storeRec) storeRec.services = serverServices;
+        }
+        await loadInvoices();
+        await refreshSoftwareData({ requestKey: 'portal:software:invoice-upload-main', render: true });
+        if (!serverServices) {
+          const freshRec = findSoftwareById(swId);
+          if (freshRec && Array.isArray(freshRec.services)) {
+            editingServices = JSON.parse(JSON.stringify(freshRec.services));
+            renderServicesTab();
+          }
+        }
+        showToast('Invoice saved. Overview was not changed — review the prorated changes manually.');
+      };
+
+      // If the invoice is prorated and produced overview-level changes, gate behind a review dialog.
+      const hasOverviewFields = softwareUpdate &&
+        (softwareUpdate.annualCost != null || softwareUpdate.purchasedLicenses != null ||
+         softwareUpdate.subscriptionPlan != null);
+      if (parsedComplexity.isProrated && hasOverviewFields) {
+        showProratedReviewDialog({
+          parsed: parsedMeta,
+          currentSoftware: findSoftwareById(swId) || {},
+          softwareUpdate,
+          onApply: async (update) => { await applyMainOverviewUpdate(update); },
+          onSaveOnly: async () => { await saveMainInvoiceOnly(); },
+        });
+      } else {
+        await applyMainOverviewUpdate(softwareUpdate);
+      }
     } catch(err) {
       status.textContent = err.message;
       status.style.color = '#ef4444';
@@ -4260,6 +5849,9 @@ function openSoftwareModal(s=null){
   document.getElementById('swPlan').value     = s?.subscriptionPlan||'';
   document.getElementById('swPurchased').value= s?.purchasedLicenses||0;
   document.getElementById('swUsed').value     = s?.usedLicenses||0;
+  // Auto-compute monthly cost on modal open
+  const _swMc = document.getElementById('swMonthlyCost');
+  if (_swMc) { const _p = Number(s?.licensePricePerUserMonth||0), _n = Number(s?.purchasedLicenses||0); _swMc.value = (_p > 0 && _n > 0) ? (_p * _n).toFixed(2) : ''; }
   document.getElementById('swOwner').value    = s?.owner||'';
   document.getElementById('swBilledTo').value = s?.billedTo||'';
   document.getElementById('swStatus').value   = s?.status||'Active';
@@ -4271,8 +5863,9 @@ function openSoftwareModal(s=null){
   document.getElementById('swDeleteBtn').style.display = s ? 'inline-flex' : 'none';
   // Load services for editing (deep copy)
   editingServices = JSON.parse(JSON.stringify(s?.services||[]));
-  // Apply PAYG hint
+  // Apply PAYG hint + monthly cost visibility
   swTogglePaygHint('swCostLabel','swRecalcBtn','swLicPriceRow', s?.renewalPeriod||'');
+  syncMonthlyCostVisibility(s?.renewalPeriod||'');
   // Always start on Details tab; reset invoice panel
   swSwitchTab('details');
   renderServicesTab();
@@ -4358,10 +5951,32 @@ function swTogglePaygHint(labelId, recalcId, licRowId, renewal){
   if(licRowEl) licRowEl.style.opacity = isPayg ? '0.45' : '1';
 }
 
+/**
+ * Show or hide the Monthly Cost row based on the renewal period.
+ *  - Monthly  : always visible — the invoice IS the monthly charge.
+ *  - Annual   : hidden by default; only revealed temporarily when a prorated
+ *               billing invoice is detected (caller passes force=true).
+ *  - Others   : hidden (Quarterly, Freeware, PAYG, empty).
+ *
+ * @param {string}  renewal      — normalised renewal period string
+ * @param {boolean} [force=false] — override: show even for Annual (prorated case)
+ */
+function syncMonthlyCostVisibility(renewal, force = false) {
+  const showMonthly = renewal === 'Monthly' || force;
+  const rowMain = document.getElementById('swMonthlyCostRow');
+  const rowEdit = document.getElementById('swdeMonthlyCostRow');
+  if (rowMain) rowMain.style.display = showMonthly ? '' : 'none';
+  if (rowEdit) rowEdit.style.display = showMonthly ? '' : 'none';
+}
+
 function calcSwAnnualCost(){
-  if((document.getElementById('swRenewal')?.value||'') === 'Pay-as-you-go') return; // PAYG: manual entry only
+  const renewal = (document.getElementById('swRenewal')?.value||'');
+  const isPayg = renewal === 'Pay-as-you-go';
   const price = parseFloat(document.getElementById('swLicPrice').value)||0;
   const qty   = parseInt(document.getElementById('swPurchased').value)||0;
+  const monthly = document.getElementById('swMonthlyCost');
+  if (monthly) monthly.value = (price > 0 && qty > 0) ? (qty * price).toFixed(2) : '';
+  if (isPayg) return; // PAYG: manual entry only for annual cost
   if(price > 0 && qty > 0){
     document.getElementById('swCost').value = (qty * price * 12).toFixed(2);
   }
@@ -4618,12 +6233,16 @@ function swDmTab(tab){
     }
   }
   if(tab==='edit')     swdePopulateForm();
-  if(tab==='invoices') swDmLoadInvoices();
+  if(tab==='invoices') {
+    swDmLoadInvoices();
+  }
 }
 
 // ── Invoice summary in Overview tab ───────────────────────────────────────────
 async function swDmLoadInvoiceSummary(id) {
   const body = document.getElementById('swDrInvoicesBody');
+  const sw = findSoftwareById(id) || {};
+  const costSource = document.getElementById('swDrCostSource');
   if (!body) return;
   try {
     const invoices = await apiFetch(`/api/software/${id}/invoices`);
@@ -4632,6 +6251,7 @@ async function swDmLoadInvoiceSummary(id) {
     if (badge) { badge.textContent = invoices.length; badge.style.background = invoices.length ? 'var(--primary)' : 'var(--gray-300)'; }
 
     if (!invoices.length) {
+      if (costSource) costSource.textContent = '';
       body.innerHTML = `<div style="font-size:12px;color:var(--gray-400);padding:6px 0">No invoices uploaded yet.
         <span onclick="swDmTab('invoices')" style="color:var(--primary);cursor:pointer;font-weight:600;margin-left:4px">+ Attach one</span>
       </div>`;
@@ -4641,6 +6261,44 @@ async function swDmLoadInvoiceSummary(id) {
     const fmtD = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
     const totalSpend = invoices.reduce((s,i) => s + (i.amount||0), 0);
     const latestInv = [...invoices].sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+    const latestWithBreakdown = [...invoices]
+      .sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
+      .find(inv => Array.isArray(inv?.lineItems) && inv.lineItems.length) || null;
+    const derived = latestWithBreakdown ? deriveOverviewCostFromInvoice(sw, latestWithBreakdown) : null;
+    if (derived) {
+      document.getElementById('swDrBaseCost').textContent = formatCompactCurrency(derived.baseAnnual);
+      document.getElementById('swDrSvcCost').textContent = Math.abs(Number(derived.addonAnnual || 0)) > 0.0001
+        ? formatCompactCurrency(derived.addonAnnual)
+        : '—';
+      document.getElementById('swDrTotalCost').textContent = formatCompactCurrency(derived.totalAnnual);
+      if (costSource) {
+        const periodLabel = derived.period || 'Invoice';
+        costSource.textContent = `Derived from latest ${periodLabel.toLowerCase()} invoice line items (${latestWithBreakdown.filename || 'invoice'})`;
+      }
+    } else if (costSource) {
+      costSource.textContent = '';
+    }
+
+    const mixInv = latestWithBreakdown || latestInv;
+    const mixGroups = buildInvoiceSubscriptionGroups(mixInv || {});
+    const mixCurrency = String(mixInv?.currency || latestInv?.currency || 'USD').trim() || 'USD';
+    const mixFmt = (n) => `${mixCurrency} ${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const mixTotal = mixGroups.reduce((sum, row) => sum + Number(row?.amount || 0), 0);
+    const mixHtml = mixGroups.length ? `
+      <div style="margin-bottom:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;background:#fff">
+        <div style="font-size:11px;color:var(--gray-500);font-weight:700;margin-bottom:4px">LATEST SUBSCRIPTION MIX (${mixInv?.billingPeriod || 'Invoice'})</div>
+        ${mixGroups.map((row) => `
+          <div style="display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--gray-700);padding:2px 0">
+            <span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row.label}</span>
+            <strong style="white-space:nowrap">${mixFmt(row.amount)}</strong>
+          </div>
+        `).join('')}
+        <div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--gray-800);padding-top:6px;margin-top:6px;border-top:1px dashed var(--gray-200)">
+          <span style="font-weight:700">Invoice Total</span>
+          <span style="font-weight:800">${mixFmt(mixTotal)}</span>
+        </div>
+      </div>
+    ` : '';
 
     body.innerHTML = `
       <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
@@ -4658,6 +6316,7 @@ async function swDmLoadInvoiceSummary(id) {
           <div style="font-size:10.5px;color:var(--gray-400)">${fmtD(latestInv.periodFrom)}${latestInv.periodTo?' → '+fmtD(latestInv.periodTo):''}</div>
         </div>
       </div>
+      ${mixHtml}
       <div style="font-size:11px;margin-bottom:6px;font-weight:600;color:var(--gray-500)">RECENT</div>
       ${invoices.slice(0,3).map(inv => {
         const bp = inv.billingPeriod ? `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'};margin-left:4px">${inv.billingPeriod}</span>` : '';
@@ -4674,6 +6333,7 @@ async function swDmLoadInvoiceSummary(id) {
         <span onclick="swDmTab('invoices')" style="font-size:11px;color:var(--primary);cursor:pointer;font-weight:600">View all invoices →</span>
       </div>`;
   } catch(e) {
+    if (costSource) costSource.textContent = '';
     const body2 = document.getElementById('swDrInvoicesBody');
     if (body2) body2.innerHTML = `<div style="font-size:12px;color:var(--gray-400)">Could not load invoices.</div>`;
   }
@@ -4695,6 +6355,171 @@ async function swDmLoadInvoices(){
   }
 }
 
+function swDmQueueStatus(text = '', tone = 'muted'){
+  const el = document.getElementById('swDmMailQueueStatus');
+  if(!el) return;
+  el.textContent = text || '';
+  const toneMap = {
+    muted: 'var(--gray-400)',
+    success: '#10b981',
+    warn: '#f59e0b',
+    danger: '#ef4444',
+  };
+  el.style.color = toneMap[tone] || toneMap.muted;
+}
+
+function swDmQueueMatchesCurrentSoftware(event = {}, sw = {}){
+  const currentId = String(_swDmCurrentId || '').trim();
+  const matchedId = String(event?.matchedSoftwareId || '').trim();
+  if (matchedId) return matchedId === currentId;
+
+  const name = String(sw?.name || '').trim().toLowerCase();
+  const csvId = String(sw?.csvId || '').trim().toLowerCase();
+  const haystack = [
+    event?.subject,
+    event?.attachmentName,
+    event?.fromEmail,
+    event?.from,
+    event?.extraction?.subscriptionPlan,
+  ].map(v => String(v || '').toLowerCase()).join(' ');
+
+  if (name && haystack.includes(name)) return true;
+  if (csvId && haystack.includes(csvId)) return true;
+  return false;
+}
+
+function swDmRenderMailQueue(events = []){
+  const list = document.getElementById('swDmMailQueueList');
+  if(!list) return;
+  const sw = findSoftwareById(_swDmCurrentId) || {};
+  const currentId = String(_swDmCurrentId || '').trim();
+
+  const filtered = (Array.isArray(events) ? events : [])
+    .filter(ev => swDmQueueMatchesCurrentSoftware(ev, sw))
+    .slice(0, 25);
+
+  if(!filtered.length){
+    list.innerHTML = '<div style="text-align:center;padding:10px;color:var(--gray-400);font-size:12px">No review-required inbox invoices for this app.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(ev => {
+    const eventId = esc(ev.id || '');
+    const filename = esc(ev.attachmentName || 'invoice');
+    const fromEmail = esc(ev.fromEmail || ev.from || 'Unknown sender');
+    const subject = esc(ev.subject || 'No subject');
+    const score = Number.isFinite(Number(ev.matchScore)) ? Math.round(Number(ev.matchScore)) : 0;
+    const receivedAt = ev.receivedAt
+      ? new Date(ev.receivedAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+      : '—';
+    const mappedId = String(ev.matchedSoftwareId || '').trim();
+    const mappedTag = mappedId
+      ? (mappedId === currentId
+        ? '<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:#dcfce7;color:#166534">Matched to this app</span>'
+        : '<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:#fef3c7;color:#92400e">Matched to another app</span>')
+      : '<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:9999px;background:#eff6ff;color:#1e40af">Unmatched</span>';
+    const scoreColor = score >= 80 ? '#166534' : score >= 50 ? '#92400e' : '#6b7280';
+    const scoreBg = score >= 80 ? '#dcfce7' : score >= 50 ? '#fef3c7' : '#f3f4f6';
+    return `
+    <div style="border:1px solid var(--gray-200);border-radius:8px;background:#fff;padding:9px 10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0">
+          <span style="font-size:12px">📧</span>
+          <span style="font-size:12px;font-weight:700;color:var(--gray-800);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px">${filename}</span>
+          ${mappedTag}
+          <span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:9999px;background:${scoreBg};color:${scoreColor}">Score ${score}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="swDmAttachMailEvent('${eventId}')">Attach Here</button>
+          <button class="btn btn-secondary btn-sm" onclick="swDmIgnoreMailEvent('${eventId}')">Ignore</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--gray-500);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${subject}</div>
+      <div style="font-size:10.5px;color:var(--gray-400);margin-top:2px">${fromEmail} · ${receivedAt}</div>
+    </div>`;
+  }).join('');
+}
+
+async function swDmLoadMailQueue(){
+  const id = _swDmCurrentId;
+  if(!id) return;
+  const list = document.getElementById('swDmMailQueueList');
+  if(list){
+    list.innerHTML = '<div style="text-align:center;padding:10px;color:var(--gray-400);font-size:12px">Loading queue…</div>';
+  }
+  swDmQueueStatus('');
+  try{
+    const data = await apiFetch('/api/invoice-mail/review?status=review_required&page=1&limit=60');
+    const events = Array.isArray(data?.events) ? data.events : [];
+    swDmRenderMailQueue(events);
+    swDmQueueStatus(`Loaded ${events.length} review-required inbox event${events.length===1?'':'s'}.`);
+  } catch(e){
+    if(list){
+      list.innerHTML = `<div style="text-align:center;padding:10px;color:#ef4444;font-size:12px">${esc(e.message)}</div>`;
+    }
+    swDmQueueStatus('Could not load inbox queue.', 'danger');
+  }
+}
+
+async function swDmSyncInvoiceInbox(){
+  const btn = document.getElementById('swDmMailSyncBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Syncing…'; }
+  swDmQueueStatus('Syncing Gmail inbox…');
+  try{
+    const summary = await apiFetch('/api/invoice-mail/sync', {
+      method: 'POST',
+      body: JSON.stringify({ provider: 'gmail', limit: 50, dryRun: false }),
+    });
+    const msg = `Scanned ${summary.scanned||0}, created ${summary.created||0}, auto-matched ${summary.autoMatched||0}, review ${summary.reviewRequired||0}.`;
+    swDmQueueStatus(msg, 'success');
+    showToast(`Inbox sync complete. ${msg}`);
+    await swDmLoadMailQueue();
+    await swDmLoadInvoices();
+  } catch(e){
+    swDmQueueStatus(e.message || 'Sync failed.', 'danger');
+    showToast(`Inbox sync failed: ${e.message}`);
+  } finally {
+    if(btn){ btn.disabled = false; btn.textContent = 'Sync Inbox'; }
+  }
+}
+
+async function swDmAttachMailEvent(eventId){
+  const id = _swDmCurrentId;
+  if(!id || !eventId) return;
+  swDmQueueStatus('Attaching inbox invoice to this software…');
+  try{
+    await apiFetch(`/api/invoice-mail/${encodeURIComponent(eventId)}/attach`, {
+      method: 'POST',
+      body: JSON.stringify({
+        softwareId: id,
+        note: 'Attached from inbox review queue',
+      }),
+    });
+    showToast('Inbox invoice attached and parsed successfully.');
+    await swDmLoadMailQueue();
+    await swDmLoadInvoices();
+    await swDmLoadInvoiceSummary(id);
+    swDmQueueStatus('Invoice attached successfully.', 'success');
+  } catch(e){
+    swDmQueueStatus(e.message || 'Attach failed.', 'danger');
+    showToast(`Attach failed: ${e.message}`);
+  }
+}
+
+async function swDmIgnoreMailEvent(eventId){
+  if(!eventId) return;
+  try{
+    await apiFetch(`/api/invoice-mail/${encodeURIComponent(eventId)}/ignore`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: 'Ignored from software invoice tab' }),
+    });
+    showToast('Inbox event ignored.');
+    await swDmLoadMailQueue();
+  } catch(e){
+    showToast(`Ignore failed: ${e.message}`);
+  }
+}
+
 function swDmRenderInvoices(invoices){
   const id   = _swDmCurrentId;
   const list = document.getElementById('swDmInvList');
@@ -4710,6 +6535,7 @@ function swDmRenderInvoices(invoices){
     const periodBadge = inv.billingPeriod
       ? `<span style="font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'}">${inv.billingPeriod}</span>` : '';
     const confDot   = inv.parseConfidence==='high'?'🟢':inv.parseConfidence==='medium'?'🟡':'';
+    const breakdown = renderInvoiceSubscriptionBreakdown(inv);
     return `
     <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--gray-200);border-radius:8px;background:#fff;margin-bottom:8px">
       <div style="flex-shrink:0;width:32px;height:32px;border-radius:8px;background:#fee2e2;display:flex;align-items:center;justify-content:center;font-size:16px">📄</div>
@@ -4720,8 +6546,9 @@ function swDmRenderInvoices(invoices){
           ${confDot?`<span title="Parse confidence: ${inv.parseConfidence}" style="font-size:11px">${confDot}</span>`:''}
         </div>
         <div style="font-size:11px;color:var(--gray-400);margin-top:2px">
-          Uploaded ${uploaded}${periodStr?' · '+periodStr:''}${inv.note?' · '+inv.note:''}
+          Uploaded ${uploaded}${periodStr?' · '+periodStr:''}${inv.subscriptionPlan ? ` · Plan ${inv.subscriptionPlan}` : ''}${Number.isFinite(Number(inv.licenseQuantity)) && Number(inv.licenseQuantity) > 0 ? ` · Qty ${Math.round(Number(inv.licenseQuantity))}` : ''}${Number.isFinite(Number(inv.licenseUnitPrice)) && Number(inv.licenseUnitPrice) > 0 ? ` · Unit ${(inv.currency || 'USD')} ${Number(inv.licenseUnitPrice).toLocaleString('en-US',{ minimumFractionDigits:2, maximumFractionDigits:2 })}` : ''}${inv.note?' · '+inv.note:''}
         </div>
+        ${breakdown}
       </div>
       <div style="font-size:13px;font-weight:700;color:var(--primary);white-space:nowrap">${amt}</div>
       <a href="/api/software/${id}/invoices/${inv.id}/download"
@@ -4734,49 +6561,149 @@ function swDmRenderInvoices(invoices){
 
 function onSwDmInvFileSelected(input){
   const file = input.files[0];
-  if(!file || file.type !== 'application/pdf') return;
+  if(!file || !isLikelyPdfFile(file)) return;
   input.dataset.parseConfidence = '';
   input.dataset.parsedInvoiceMeta = '';
+  clearAdditionalServicePreview('swDmInvAdditionalSvcPreview');
   const qtyField = document.getElementById('swDmInvLicenseQty');
   if (qtyField) qtyField.value = '';
+  const unitField = document.getElementById('swDmInvUnitPrice');
+  if (unitField) unitField.value = '';
+  const planField = document.getElementById('swDmInvSubscriptionPlan');
+  if (planField) planField.value = '';
   const status = document.getElementById('swDmInvParseStatus');
   status.textContent = '🔍 Reading invoice…';
   status.style.color = 'var(--gray-500)';
-  ['swDmInvAmtHint','swDmInvQtyHint','swDmInvPeriodHint','swDmInvFromHint','swDmInvToHint'].forEach(id=>{
+  ['swDmInvAmtHint','swDmInvQtyHint','swDmInvUnitHint','swDmInvPlanHint','swDmInvPeriodHint','swDmInvFromHint','swDmInvToHint'].forEach(id=>{
     const el = document.getElementById(id); if(el) el.textContent='';
   });
   const reader = new FileReader();
   reader.onload = async e => {
-    status.textContent = '🔍 Analysing…';
+    const swRecord = findSoftwareById(_swDmCurrentId);
+    const context = buildInvoiceParseContext(swRecord, document.getElementById('swdeBilledTo')?.value || '');
+    status.textContent = '🔍 Extracting via Claude…';
     try {
-      const swRecord = findSoftwareById(_swDmCurrentId);
-      const context = buildInvoiceParseContext(swRecord, document.getElementById('swdeBilledTo')?.value || '');
       const result = await apiFetch('/api/software/parse-invoice',{
         method:'POST', body:JSON.stringify({ data: e.target.result, context }),
       });
-      if(result.amount)        { document.getElementById('swDmInvAmount').value = result.amount; document.getElementById('swDmInvAmtHint').textContent='✓ auto-filled'; }
-      if(result.licenseQuantity){ document.getElementById('swDmInvLicenseQty').value = result.licenseQuantity; document.getElementById('swDmInvQtyHint').textContent='✓ auto-filled'; }
-      if(result.currency)      { const s=document.getElementById('swDmInvCurrency'); if([...s.options].find(o=>o.value===result.currency)) s.value=result.currency; }
-      if(result.billingPeriod) { document.getElementById('swDmInvBillingPeriod').value=result.billingPeriod; document.getElementById('swDmInvPeriodHint').textContent='✓ auto-filled'; }
-      if(result.periodFrom)    { document.getElementById('swDmInvPeriodFrom').value=result.periodFrom; document.getElementById('swDmInvFromHint').textContent='✓ auto-filled'; }
-      if(result.periodTo)      { document.getElementById('swDmInvPeriodTo').value=result.periodTo; document.getElementById('swDmInvToHint').textContent='✓ auto-filled'; }
-      input.dataset.parseConfidence = result.confidence || '';
-      input.dataset.parsedInvoiceMeta = JSON.stringify(result || {});
-      const c = result.confidence;
-      status.textContent = c==='high'?'🟢 Fields auto-filled — please verify':c==='medium'?'🟡 Partially extracted — check the fields':'🔴 Could not extract — fill manually';
-      status.style.color = c==='high'?'#10b981':c==='medium'?'#f59e0b':'#ef4444';
+      const parsedAmount = pickInvoiceAmount(result || null);
+      if (Number.isFinite(parsedAmount)) {
+        document.getElementById('swDmInvAmount').value = parsedAmount;
+        document.getElementById('swDmInvAmtHint').textContent='✓ auto-filled';
+      }
+	      const safeQty = sanitizeInvoiceLicenseQuantity(result.licenseQuantity, {
+	        lineItems: Array.isArray(result?.lineItems) ? result.lineItems : [],
+	        currentQuantity: Number(swRecord?.purchasedLicenses || 0),
+	      });
+	      const safeUnitPrice = sanitizeInvoiceUnitPrice(result.licenseUnitPrice, {
+	        lineItems: Array.isArray(result?.lineItems) ? result.lineItems : [],
+	        isProrated: Boolean(result?.isProrated),
+	      });
+	      const seatSummary = summarizeNonProratedSeatLines(Array.isArray(result?.lineItems) ? result.lineItems : []);
+	      const parsedPlan = String(result.subscriptionPlan || seatSummary.primaryName || '').trim();
+	      if (Number.isFinite(safeQty) && safeQty > 0) {
+	        document.getElementById('swDmInvLicenseQty').value = safeQty;
+	        document.getElementById('swDmInvQtyHint').textContent='✓ auto-filled';
+	      }
+	      if (Number.isFinite(safeUnitPrice) && safeUnitPrice > 0) {
+	        document.getElementById('swDmInvUnitPrice').value = safeUnitPrice;
+	        document.getElementById('swDmInvUnitHint').textContent='✓ auto-filled';
+	      }
+	      if (parsedPlan) {
+	        document.getElementById('swDmInvSubscriptionPlan').value = parsedPlan;
+	        document.getElementById('swDmInvPlanHint').textContent='✓ auto-filled';
+	      }
+	      if(result.currency)      { const s=document.getElementById('swDmInvCurrency'); if([...s.options].find(o=>o.value===result.currency)) s.value=result.currency; }
+	      const parsedBillingPeriod = normalizeInvoicePeriod(result.billingPeriod || '');
+	      if(parsedBillingPeriod) { document.getElementById('swDmInvBillingPeriod').value=parsedBillingPeriod; document.getElementById('swDmInvPeriodHint').textContent='✓ auto-filled'; }
+	      if(result.periodFrom)    { document.getElementById('swDmInvPeriodFrom').value=result.periodFrom; document.getElementById('swDmInvFromHint').textContent='✓ auto-filled'; }
+	      if(result.periodTo)      { document.getElementById('swDmInvPeriodTo').value=result.periodTo; document.getElementById('swDmInvToHint').textContent='✓ auto-filled'; }
+
+	      const complexity = inspectInvoiceComplexity(result || {});
+	      const confidence = downgradeInvoiceConfidence(result.confidence || '', complexity.isComplex);
+	      const parserUsedClaude = String(result.source || '').toLowerCase().startsWith('claude');
+	      input.dataset.parseConfidence = confidence || '';
+		      input.dataset.parsedInvoiceMeta = JSON.stringify({
+		        ...(result || {}),
+		        subscriptionPlan: parsedPlan || result?.subscriptionPlan || null,
+		        billingPeriod: parsedBillingPeriod || result.billingPeriod || null,
+		        licenseQuantity: Number.isFinite(safeQty) ? safeQty : null,
+		        licenseUnitPrice: Number.isFinite(safeUnitPrice) ? safeUnitPrice : null,
+		        _complexInvoice: complexity.isComplex,
+		        isProrated: complexity.isProrated,
+		        hasMultipleSubscriptions: complexity.hasMultipleSubscriptions,
+	        complexityReasons: complexity.reasons,
+      });
+      renderAdditionalServicePreview('swDmInvAdditionalSvcPreview', {
+        parsed: {
+          ...(result || {}),
+          subscriptionPlan: parsedPlan || result?.subscriptionPlan || null,
+          billingPeriod: parsedBillingPeriod || result?.billingPeriod || null,
+          licenseQuantity: Number.isFinite(safeQty) ? safeQty : null,
+          licenseUnitPrice: Number.isFinite(safeUnitPrice) ? safeUnitPrice : null,
+          renewalPeriod: result?.renewalPeriod || parsedBillingPeriod || '',
+        },
+        billingPeriod: normalizeInvoicePeriod(result?.renewalPeriod || parsedBillingPeriod || ''),
+        currentSoftware: swRecord || {},
+      });
 
       const derivedUpdate = deriveSoftwareUpdateFromInvoice({
-        amount: result.amount || 0,
-        billingPeriod: result.billingPeriod || '',
-        parsed: result || {},
+        amount: Number.isFinite(parsedAmount) ? parsedAmount : 0,
+        billingPeriod: parsedBillingPeriod || '',
+        parsed: {
+          ...(result || {}),
+          subscriptionPlan: parsedPlan || result?.subscriptionPlan || null,
+          billingPeriod: parsedBillingPeriod || result.billingPeriod || null,
+          licenseQuantity: Number.isFinite(safeQty) ? safeQty : null,
+          licenseUnitPrice: Number.isFinite(safeUnitPrice) ? safeUnitPrice : null,
+          _complexInvoice: complexity.isComplex,
+          isProrated: complexity.isProrated,
+          hasMultipleSubscriptions: complexity.hasMultipleSubscriptions,
+          complexityReasons: complexity.reasons,
+        },
         currentSoftware: swRecord || {},
         manualLicenseQuantity: Number(document.getElementById('swDmInvLicenseQty')?.value || 0),
+        manualSubscriptionPlan: String(document.getElementById('swDmInvSubscriptionPlan')?.value || '').trim(),
       });
-      applyInvoiceDerivedFieldsToForm(derivedUpdate);
-      applyInvoiceDerivedFieldsToSoftwareRecord(_swDmCurrentId, derivedUpdate);
+      const hasDerivedUpdate = Object.keys(derivedUpdate || {}).length > 0;
+      const hasAnnualUpdate = hasAnnualLicenseUpdate(derivedUpdate);
+      const isSeatIncrease = isSeatIncreaseUpdate(derivedUpdate, swRecord || {});
+
+      // Set status message — must come after derivedUpdate is computed so we can show seat change details.
+      if (complexity.isComplex) {
+        if (hasDerivedUpdate && complexity.isProrated && Number.isFinite(derivedUpdate.purchasedLicenses)) {
+          const newSeats = derivedUpdate.purchasedLicenses;
+          const currentSeats = Number(swRecord?.purchasedLicenses || 0);
+          const delta = currentSeats > 0 ? newSeats - currentSeats : null;
+          const deltaLabel = delta !== null
+            ? (delta > 0 ? ` (+${delta} added)` : delta < 0 ? ` (${delta} removed)` : '')
+            : '';
+          status.textContent = `🟡 Prorated invoice detected. License count update prepared: ${newSeats} seats${deltaLabel} — a confirmation dialog will appear before applying to Overview.`;
+          status.style.color = '#f59e0b';
+        } else if (hasDerivedUpdate && !complexity.isProrated && hasAnnualUpdate) {
+          status.textContent = isSeatIncrease
+            ? '🟡 Complex invoice detected. Annual license increase was identified and prepared for update — please verify.'
+            : '🟡 Complex invoice detected. Annual license quantity change was identified and prepared for update — please verify.';
+          status.style.color = '#f59e0b';
+        } else {
+          status.textContent = complexInvoiceStatusMessage(complexity);
+          status.style.color = '#f59e0b';
+        }
+      } else {
+        status.textContent = confidence==='high'
+          ? (parserUsedClaude ? '🟢 Extracted via Claude — verify fields' : '🟢 Fields auto-filled — please verify')
+          : confidence==='medium'
+            ? (parserUsedClaude ? '🟡 Claude extracted partially — check fields' : '🟡 Partially extracted — check the fields')
+            : '🔴 Could not extract — fill manually';
+        status.style.color = confidence==='high'?'#10b981':confidence==='medium'?'#f59e0b':'#ef4444';
+      }
+
+      if (hasDerivedUpdate) {
+        applyInvoiceDerivedFieldsToForm(derivedUpdate);
+      }
     } catch(err){
       status.textContent='⚠️ Parse failed — fill manually'; status.style.color='#ef4444';
+      clearAdditionalServicePreview('swDmInvAdditionalSvcPreview');
     }
   };
   reader.readAsDataURL(file);
@@ -4787,17 +6714,34 @@ async function swDmUploadInvoice(){
   const fileEl = document.getElementById('swDmInvFile');
   const file   = fileEl.files[0];
   const status = document.getElementById('swDmInvUploadStatus');
-  const amount = parseFloat(document.getElementById('swDmInvAmount').value) || 0;
+  const manualLicenseQty = Number(document.getElementById('swDmInvLicenseQty')?.value || 0);
+  const amountInput = parseFloat(document.getElementById('swDmInvAmount').value);
   const billingPeriod = document.getElementById('swDmInvBillingPeriod').value || '';
   const parsedMeta = safeParseJson(fileEl.dataset.parsedInvoiceMeta || '{}', {});
+  const parsedLineItems = Array.isArray(parsedMeta?.lineItems) ? parsedMeta.lineItems : [];
+  const unitPriceInput = parseFloat(document.getElementById('swDmInvUnitPrice').value);
+  const subscriptionPlanInput = String(document.getElementById('swDmInvSubscriptionPlan').value || '').trim();
+  const subscriptionPlan = subscriptionPlanInput || String(parsedMeta?.subscriptionPlan || '').trim();
+  const unitPrice = Number.isFinite(unitPriceInput)
+    ? unitPriceInput
+    : (Number.isFinite(Number(parsedMeta?.licenseUnitPrice)) ? Number(parsedMeta.licenseUnitPrice) : null);
+  const parsedAmount = pickInvoiceAmount(parsedMeta, null);
+  const amount = Number.isFinite(amountInput)
+    ? amountInput
+    : (Number.isFinite(parsedAmount) ? parsedAmount : 0);
+  const parsedComplexity = inspectInvoiceComplexity(parsedMeta);
   const swRecord = findSoftwareById(id) || {};
   const softwareUpdate = deriveSoftwareUpdateFromInvoice({
     amount,
     billingPeriod,
     parsed: parsedMeta,
     currentSoftware: swRecord,
-    manualLicenseQuantity: Number(document.getElementById('swDmInvLicenseQty')?.value || 0),
+    manualLicenseQuantity: manualLicenseQty,
+    manualSubscriptionPlan: String(document.getElementById('swDmInvSubscriptionPlan')?.value || '').trim(),
   });
+  if (Number.isFinite(manualLicenseQty) && manualLicenseQty > 0) {
+    softwareUpdate.purchasedLicenses = Math.round(manualLicenseQty);
+  }
   if(!id)   return showToast('No software record selected.');
   if(!file) return showToast('Please select a file.');
   if(file.size > 5*1024*1024) return showToast('File too large — max 5 MB.');
@@ -4806,7 +6750,7 @@ async function swDmUploadInvoice(){
   reader.onload = async e => {
     status.textContent='Uploading…';
     try {
-      await apiFetch(`/api/software/${id}/invoices`,{
+      const dmInvResponse = await apiFetch(`/api/software/${id}/invoices`,{
         method:'POST',
         body:JSON.stringify({
           filename: file.name, data: e.target.result, mimeType: file.type||'application/pdf',
@@ -4817,23 +6761,83 @@ async function swDmUploadInvoice(){
           periodTo:      document.getElementById('swDmInvPeriodTo').value||null,
           note:          document.getElementById('swDmInvNote').value.trim(),
           parseConfidence: fileEl.dataset.parseConfidence||'',
-          licenseQuantity: Number(document.getElementById('swDmInvLicenseQty')?.value || 0) || null,
+          licenseQuantity: Number.isFinite(manualLicenseQty) && manualLicenseQty > 0 ? Math.round(manualLicenseQty) : null,
+          licenseUnitPrice: Number.isFinite(unitPrice) ? Number(unitPrice.toFixed(2)) : null,
+          subscriptionPlan,
+          lineItems: parsedLineItems,
           softwareUpdate,
         }),
       });
       // Reset form
       fileEl.value=''; fileEl.dataset.parseConfidence='';
       fileEl.dataset.parsedInvoiceMeta = '';
-      ['swDmInvAmount','swDmInvLicenseQty','swDmInvNote','swDmInvPeriodFrom','swDmInvPeriodTo'].forEach(i=>{ document.getElementById(i).value=''; });
+      clearAdditionalServicePreview('swDmInvAdditionalSvcPreview');
+      ['swDmInvAmount','swDmInvLicenseQty','swDmInvUnitPrice','swDmInvSubscriptionPlan','swDmInvNote','swDmInvPeriodFrom','swDmInvPeriodTo'].forEach(i=>{ document.getElementById(i).value=''; });
       document.getElementById('swDmInvBillingPeriod').value='';
       document.getElementById('swDmInvParseStatus').textContent='';
-      ['swDmInvAmtHint','swDmInvQtyHint','swDmInvPeriodHint','swDmInvFromHint','swDmInvToHint'].forEach(i=>{ document.getElementById(i).textContent=''; });
+      ['swDmInvAmtHint','swDmInvQtyHint','swDmInvUnitHint','swDmInvPlanHint','swDmInvPeriodHint','swDmInvFromHint','swDmInvToHint'].forEach(i=>{ document.getElementById(i).textContent=''; });
       status.textContent='';
-      applyInvoiceDerivedFieldsToForm(softwareUpdate);
-      applyInvoiceDerivedFieldsToSoftwareRecord(id, softwareUpdate);
-      openSwDm(id);
-      swDmTab('invoices');
-      showToast('Invoice uploaded successfully.');
+
+      // Patch the store record with server-confirmed services before re-opening modal.
+      const dmServerServices = Array.isArray(dmInvResponse?.services) && dmInvResponse.services.length > 0
+        ? dmInvResponse.services : null;
+
+      // Helper: apply overview update + refresh + reopen modal (used by both paths below)
+      const applyDmOverviewUpdate = async (update) => {
+        applyInvoiceDerivedFieldsToForm(update);
+        applyInvoiceDerivedFieldsToSoftwareRecord(id, update);
+        if (dmServerServices) {
+          const storeRec = findSoftwareById(id);
+          if (storeRec) storeRec.services = dmServerServices;
+        }
+        await refreshSoftwareData({ requestKey: 'portal:software:invoice-upload-dm', render: false });
+        openSwDm(id);
+        const dmNewAddOnCount = dmServerServices ? dmServerServices.filter(s => s.status !== 'Inactive').length : 0;
+        swDmTab(dmNewAddOnCount > 0 ? 'overview' : 'invoices');
+        const hasDmUpdate = Object.keys(update || {}).length > 0;
+        const dmHasAddOns = dmNewAddOnCount > 0 ||
+          (Array.isArray(update?.additionalServices) && update.additionalServices.length > 0);
+        if (parsedComplexity.isComplex && !hasDmUpdate) {
+          showToast("Invoice uploaded. Complex billing detected — software overview wasn't auto-updated.");
+        } else if (parsedComplexity.isComplex && hasDmUpdate) {
+          showToast('Invoice uploaded. Complex annual adjustment detected; license and annual cost updated.');
+        } else if (dmHasAddOns) {
+          const dmLabel = dmNewAddOnCount > 0
+            ? dmNewAddOnCount
+            : (update.additionalServices ? update.additionalServices.length : 0);
+          showToast(`Invoice uploaded. ${dmLabel} add-on service(s) detected — see the Overview tab.`);
+        } else {
+          showToast('Invoice uploaded. Overview has been updated.');
+        }
+      };
+
+      // Helper: save-only path — refresh + reopen modal without touching overview fields
+      const saveDmInvoiceOnly = async () => {
+        if (dmServerServices) {
+          const storeRec = findSoftwareById(id);
+          if (storeRec) storeRec.services = dmServerServices;
+        }
+        await refreshSoftwareData({ requestKey: 'portal:software:invoice-upload-dm', render: false });
+        openSwDm(id);
+        swDmTab('invoices');
+        showToast('Invoice saved. Overview was not changed — review the prorated changes manually.');
+      };
+
+      // If the invoice is prorated and produced overview-level changes, gate behind a review dialog.
+      const dmHasOverviewFields = softwareUpdate &&
+        (softwareUpdate.annualCost != null || softwareUpdate.purchasedLicenses != null ||
+         softwareUpdate.subscriptionPlan != null);
+      if (parsedComplexity.isProrated && dmHasOverviewFields) {
+        showProratedReviewDialog({
+          parsed: parsedMeta,
+          currentSoftware: findSoftwareById(id) || {},
+          softwareUpdate,
+          onApply: async (update) => { await applyDmOverviewUpdate(update); },
+          onSaveOnly: async () => { await saveDmInvoiceOnly(); },
+        });
+      } else {
+        await applyDmOverviewUpdate(softwareUpdate);
+      }
     } catch(err){ status.textContent=err.message; status.style.color='#ef4444'; }
   };
   reader.readAsDataURL(file);
@@ -4885,6 +6889,8 @@ function openSwDm(id){
   document.getElementById('swDrBaseCost').textContent  = fmtN(s.annualCost||0);
   document.getElementById('swDrSvcCost').textContent   = svcCostSum>0 ? fmtN(svcCostSum) : '—';
   document.getElementById('swDrTotalCost').textContent = fmtN(totalCost);
+  const costSource = document.getElementById('swDrCostSource');
+  if (costSource) costSource.textContent = '';
 
   /* Site cost chips */
 
@@ -5240,6 +7246,9 @@ function swdePopulateForm(){
   document.getElementById('swdePurchased').value= s.purchasedLicenses||0;
   document.getElementById('swdeUsed').value     = s.usedLicenses||0;
   document.getElementById('swdeCost').value     = s.annualCost||0;
+  // Auto-compute monthly cost on load
+  const _mc = document.getElementById('swdeMonthlyCost');
+  if (_mc) { const _p = Number(s.licensePricePerUserMonth||0), _n = Number(s.purchasedLicenses||0); _mc.value = (_p > 0 && _n > 0) ? (_p * _n).toFixed(2) : ''; }
   document.getElementById('swdeOwner').value    = s.owner||'';
   document.getElementById('swdeBilledTo').value = s.billedTo||'';
   document.getElementById('swdeDeleteBtn').style.display = 'inline-flex';
@@ -5251,15 +7260,19 @@ function swdePopulateForm(){
   // Services (deep copy)
   _swdeServices = JSON.parse(JSON.stringify(s.services||[]));
   swdeRenderServices();
-  // Apply PAYG hint based on current renewal
+  // Apply PAYG hint + monthly cost visibility based on current renewal
   swTogglePaygHint('swdeCostLabel','swdeRecalcBtn','swdeLicPriceRow', s.renewalPeriod||'');
+  syncMonthlyCostVisibility(s.renewalPeriod||'');
 }
 
 /* ── Annual cost auto-calc ── */
 function swdeCalcCost(){
-  if((document.getElementById('swdeRenewal')?.value||'') === 'Pay-as-you-go') return; // PAYG: manual entry only
+  const isPayg = (document.getElementById('swdeRenewal')?.value||'') === 'Pay-as-you-go';
   const p = parseFloat(document.getElementById('swdeLicPrice')?.value)||0;
   const n = parseInt(document.getElementById('swdePurchased')?.value)||0;
+  const mc = document.getElementById('swdeMonthlyCost');
+  if (mc) mc.value = (p > 0 && n > 0) ? (p * n).toFixed(2) : '';
+  if (isPayg) return; // PAYG: manual entry only for annual cost
   const c = document.getElementById('swdeCost');
   if(c) c.value = (p*n*12).toFixed(2);
 }
@@ -7291,6 +9304,7 @@ function toggleNotifCollapse() {
                 <div class="cl">Total Annual Cost</div>
               </div>
             </div>
+            <div id="swDrCostSource" style="margin-top:6px;font-size:10.5px;color:var(--gray-500)"></div>
           </div>
 
           <!-- License Details -->
@@ -7362,7 +9376,7 @@ function toggleNotifCollapse() {
               <select id="swdeType"><option>SAAS</option><option>On-premises</option><option>Freeware</option><option>Open Source</option></select>
             </div>
             <div class="form-group"><label>Renewal Period</label>
-              <select id="swdeRenewal" onchange="swTogglePaygHint('swdeCostLabel','swdeRecalcBtn','swdeLicPriceRow',this.value)"><option value="">—</option><option>Annual</option><option>Monthly</option><option>Quarterly</option><option>Freeware</option><option>Pay-as-you-go</option></select>
+              <select id="swdeRenewal" onchange="swTogglePaygHint('swdeCostLabel','swdeRecalcBtn','swdeLicPriceRow',this.value);syncMonthlyCostVisibility(this.value)"><option value="">—</option><option>Annual</option><option>Monthly</option><option>Quarterly</option><option>Freeware</option><option>Pay-as-you-go</option></select>
             </div>
 
             <div class="form-group">
@@ -7399,6 +9413,10 @@ function toggleNotifCollapse() {
 
             <div class="form-group" id="swdeLicPriceRow"><label>License Price / User / Month ($)</label><input type="number" id="swdeLicPrice" placeholder="0.00" min="0" step="0.01" oninput="swdeCalcCost()"></div>
             <div class="form-group"><label>Purchased Licenses</label><input type="number" id="swdePurchased" placeholder="0" min="0" oninput="swdeCalcCost()"></div>
+            <div class="form-group" id="swdeMonthlyCostRow" style="display:none">
+              <label>Monthly Cost ($) <span style="font-size:10px;font-weight:400;color:var(--gray-400)">— Purchased × Price</span></label>
+              <input type="number" id="swdeMonthlyCost" placeholder="0.00" readonly style="background:var(--gray-50,#f9fafb);cursor:default" tabindex="-1">
+            </div>
             <div class="form-group"><label>Used Licenses</label><input type="number" id="swdeUsed" placeholder="0" min="0"></div>
             <div class="form-group">
               <label id="swdeCostLabel">Base Annual Cost ($) <span style="font-size:10px;font-weight:400;color:var(--gray-400)">— Purchased × Price × 12</span></label>
@@ -7489,6 +9507,10 @@ function toggleNotifCollapse() {
                 <label>License Quantity <span id="swDmInvQtyHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
                 <input type="number" id="swDmInvLicenseQty" placeholder="e.g. 7" min="0" step="1" style="font-size:12.5px">
               </div>
+              <div class="form-group">
+                <label>Unit Price / License <span id="swDmInvUnitHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="number" id="swDmInvUnitPrice" placeholder="e.g. 12.50" min="0" step="0.01" style="font-size:12.5px">
+              </div>
             </div>
             <div class="form-row" style="margin-bottom:8px">
               <div class="form-group">
@@ -7511,11 +9533,16 @@ function toggleNotifCollapse() {
             </div>
             <div class="form-row" style="margin-bottom:8px">
               <div class="form-group">
+                <label>Subscription Plan <span id="swDmInvPlanHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="text" id="swDmInvSubscriptionPlan" placeholder="e.g. Full Seat" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
                 <label>Note (optional)</label>
                 <input type="text" id="swDmInvNote" placeholder="e.g. March 2026 invoice" style="font-size:12.5px">
               </div>
             </div>
-            <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
+            <div id="swDmInvAdditionalSvcPreview" style="display:none;margin:4px 0 10px;padding:10px 12px;border:1px dashed var(--gray-300);border-radius:8px;background:var(--gray-50)"></div>
+          <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
               <span id="swDmInvUploadStatus" style="font-size:11px;color:var(--gray-400)"></span>
               <button class="btn btn-primary btn-sm" onclick="swDmUploadInvoice()">Upload Invoice</button>
             </div>

@@ -5,6 +5,7 @@ const { AppConnector, IntegrationSettings, Software, SupportRequest, User } = re
 const { JWT_SECRET } = require('../config');
 const { apiPost } = require('../utils/http');
 const { createSupportRequest, listWorkflowOptions } = require('../services/support-request.service');
+const { decryptSecret } = require('../utils/secret-crypto');
 const {
   logSupportCommentAdded,
   logSupportRequestCreated,
@@ -46,7 +47,8 @@ function safeCompare(a, b) {
 
 async function verifySlackRequest(req) {
   const settings = await IntegrationSettings.findOne({ provider: 'slack' }).lean();
-  if (!settings?.signingSecret) {
+  const signingSecret = String(decryptSecret(settings?.signingSecret || '') || '').trim();
+  if (!signingSecret) {
     throw Object.assign(new Error('Slack signing secret is not configured.'), { status: 503 });
   }
 
@@ -64,7 +66,7 @@ async function verifySlackRequest(req) {
   }
 
   const baseString = `v0:${timestamp}:${rawBody}`;
-  const expected = `v0=${crypto.createHmac('sha256', settings.signingSecret).update(baseString).digest('hex')}`;
+  const expected = `v0=${crypto.createHmac('sha256', signingSecret).update(baseString).digest('hex')}`;
   if (!safeCompare(expected, signature)) {
     throw Object.assign(new Error('Slack request signature verification failed.'), { status: 401 });
   }

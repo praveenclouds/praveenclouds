@@ -12,6 +12,11 @@ const IntegrationSettingsSchema = new mongoose.Schema({
   clientSecret:   { type: String,  default: '' },
   allowedDomain:  { type: String,  default: '' },  // e.g. "terzocloud.com"
   signingSecret:  { type: String,  default: '' },  // Slack request verification
+  gmailMailbox:   { type: String,  default: '' },
+  gmailRefreshToken: { type: String, default: '' },
+  gmailQuery:     { type: String, default: '(invoice OR receipt OR "tax invoice" OR billing OR statement)' },
+  gmailLastSyncedAt: { type: Date, default: null },
+  gmailLastHistoryId: { type: String, default: '' },
   smtpHost:       { type: String,  default: '' },
   smtpPort:       { type: Number,  default: 587 },
   smtpSecure:     { type: Boolean, default: false },

@@ -275,6 +275,28 @@
     .channel-pill:hover { border-color:rgba(99,66,255,.4);color:var(--text); }
     .channel-pill.ch-active { background:rgba(99,66,255,.18);border-color:rgba(99,66,255,.5);color:#c4b5fd; }
     .channel-pill svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
+
+    /* ── SOFT DOCS ── */
+    .softdocs-layout { display:grid; grid-template-columns: 300px minmax(0,1fr); gap:14px; }
+    .softdocs-list { border:1px solid var(--border); border-radius:10px; background:var(--surface2); max-height:520px; overflow:auto; }
+    .softdocs-list-item { padding:10px 12px; border-bottom:1px solid rgba(153,102,255,0.08); cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .softdocs-list-item:last-child { border-bottom:none; }
+    .softdocs-list-item:hover { background:rgba(153,102,255,0.08); }
+    .softdocs-list-item.active { background:rgba(99,66,255,0.16); border-left:3px solid #a78bfa; }
+    .softdocs-pill { display:inline-flex; align-items:center; justify-content:center; min-width:20px; padding:2px 7px; border-radius:99px; font-size:10px; font-weight:700; border:1px solid var(--border); color:var(--text-muted); }
+    .softdocs-events { display:grid; gap:10px; max-height:520px; overflow:auto; }
+    .softdocs-event { border:1px solid var(--border); border-radius:10px; background:var(--surface2); padding:12px; }
+    .softdocs-event-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:8px; }
+    .softdocs-tag { font-size:10px; font-weight:700; padding:3px 7px; border-radius:999px; border:1px solid var(--border); color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+    .softdocs-tag.review_required { color:#fbbf24; border-color:rgba(251,191,36,.35); background:rgba(251,191,36,.08); }
+    .softdocs-tag.matched, .softdocs-tag.parsed, .softdocs-tag.attached { color:#4ade80; border-color:rgba(74,222,128,.35); background:rgba(74,222,128,.08); }
+    .softdocs-tag.failed { color:#f87171; border-color:rgba(248,113,113,.35); background:rgba(248,113,113,.08); }
+    .softdocs-meta { font-size:11px; color:var(--text-muted); line-height:1.55; margin-top:5px; }
+    .softdocs-actions { display:flex; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap; }
+    .softdocs-empty { text-align:center; padding:28px 14px; font-size:12px; color:var(--text-muted); border:1px dashed var(--border); border-radius:10px; background:rgba(153,102,255,.03); }
+    @media (max-width: 1080px) {
+      .softdocs-layout { grid-template-columns: 1fr; }
+    }
   </style>
   <link rel="stylesheet" href="/portal-theme.css" />
   <script src="/portal-api-client.js"></script>
@@ -329,6 +351,10 @@
     <div class="nav-item" id="nav-integrations" onclick="showPage('integrations',this)">
       <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       Integrations
+    </div>
+    <div class="nav-item" id="nav-softdocs" onclick="showPage('softdocs',this)">
+      <svg viewBox="0 0 24 24"><path d="M4 4h11l5 5v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M14 4v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/></svg>
+      Soft Docs
     </div>
     <div class="nav-item" id="nav-departments" onclick="showPage('departments',this)">
       <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -774,6 +800,124 @@
       </div>
     </div>
 
+    <!-- ── SOFT DOCS PAGE ── -->
+    <div class="page" id="page-softdocs">
+      <div class="integration-card" style="max-width:980px">
+        <div class="integration-header">
+          <div class="integration-logo" style="background:#fff;color:#111827;font-weight:800;font-size:15px">SD</div>
+          <div style="flex:1">
+            <div class="integration-title">Soft Docs Gmail Ingestion</div>
+            <div class="integration-desc">Configure Gmail invoice fetch and review software-wise fetched invoices before attaching to Software Inventory.</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="status-dot inactive" id="softDocsGmailStatusDot"></span>
+            <span style="font-size:12px;color:var(--text-muted)" id="softDocsGmailStatusLabel">Disabled</span>
+          </div>
+        </div>
+        <div style="padding:0 20px 8px">
+          <div id="softDocsHealthBadge" style="display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface2);font-size:11px;color:var(--text-muted)">
+            <span id="softDocsBadgeGmail">Gmail: Disabled</span>
+            <span style="opacity:.5">|</span>
+            <span id="softDocsBadgeRules">Rules Saved: 0</span>
+          </div>
+        </div>
+        <div class="integration-body" style="display:grid;gap:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(153,102,255,0.06);border-radius:9px;border:1px solid var(--border)">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Enable Gmail Invoice Import</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:3px">When enabled, Soft Docs can fetch invoice attachments and route them by software.</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="softDocsGmailEnabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Mailbox</label>
+              <input type="text" id="softDocsMailbox" placeholder="me or finance@company.com" />
+            </div>
+            <div class="form-group">
+              <label>Gmail Query</label>
+              <input type="text" id="softDocsQuery" placeholder='(invoice OR receipt OR "tax invoice" OR billing OR statement)' />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Refresh Token</label>
+              <input type="password" id="softDocsRefreshToken" placeholder="Stored securely — enter a new one to replace" />
+            </div>
+            <div class="form-group">
+              <label>OAuth Client ID (optional override)</label>
+              <input type="text" id="softDocsClientId" placeholder="Uses Google SSO client if empty" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>OAuth Client Secret (optional override)</label>
+            <input type="password" id="softDocsClientSecret" placeholder="Uses Google SSO secret if empty" />
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px">Tip: keep Client ID/Secret empty if you want to reuse Google SSO credentials.</div>
+          </div>
+        </div>
+        <div class="integration-footer">
+          <span style="font-size:12px;color:rgba(220,38,38,0.8);flex:1" id="softDocsErr"></span>
+          <button class="btn btn-secondary btn-sm" id="softDocsSyncBtn" onclick="softDocsSyncInbox()">Sync Gmail Now</button>
+          <button class="btn btn-primary btn-sm" id="softDocsSaveBtn" onclick="saveSoftDocsSettings()">Save Soft Docs</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px">
+        <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div class="card-title">Software-wise Fetched Invoices</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="softDocsSoftwareSearch" type="text" placeholder="Search software list..." oninput="renderSoftDocsSoftwareList()" style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;min-width:200px" />
+            <button class="btn btn-secondary btn-sm" onclick="loadSoftDocsPage(true)">Refresh</button>
+          </div>
+        </div>
+        <div style="padding:14px">
+          <div class="softdocs-layout">
+            <div>
+              <div class="softdocs-list" id="softDocsSoftwareList">
+                <div class="softdocs-empty">Loading software list…</div>
+              </div>
+            </div>
+            <div>
+              <div id="softDocsSummary" style="font-size:12px;color:var(--text-muted);margin-bottom:8px">—</div>
+              <div id="softDocsRuleEditor" style="margin-bottom:10px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface2)">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+                  <div style="font-size:12px;font-weight:700;color:var(--text)">Sender IDs</div>
+                  <button class="btn btn-primary btn-sm" id="softDocsRuleSaveBtn" onclick="saveSoftDocsSelectedRule()">Save Rule</button>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);margin:6px 0 8px" id="softDocsRuleHint">Select a software to configure sender IDs.</div>
+                <textarea id="softDocsSenderIdsInput" rows="3" placeholder="billing@adobe.com\nadobe.com\nmicrosoft-noreply@microsoft.com" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;resize:vertical;min-height:76px"></textarea>
+                <div style="font-size:10.5px;color:var(--text-muted);margin-top:6px">One per line or comma-separated. Use full email or domain.</div>
+                <div style="margin-top:10px">
+                  <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">Body Keywords</div>
+                  <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" id="softDocsBodyKeywordsHint">Words to match in email body &amp; attachment text. Matched emails get a higher score.</div>
+                  <textarea id="softDocsBodyKeywordsInput" rows="2" placeholder="invoice\nreceipt\npayment\ncost\nsubscription\nrenewal" style="width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;resize:vertical;min-height:56px"></textarea>
+                  <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px">One per line or comma-separated. Matched against email body + PDF text. Each hit adds +7 to match score (max +22).</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px">
+                <select id="softDocsStatusFilter" onchange="renderSoftDocsInvoices()" style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;min-width:170px">
+                  <option value="all">Status: All</option>
+                  <option value="queued">queued</option>
+                  <option value="downloaded">downloaded</option>
+                  <option value="matched">matched</option>
+                  <option value="review_required">review_required</option>
+                  <option value="attached">attached</option>
+                  <option value="parsed">parsed</option>
+                  <option value="failed">failed</option>
+                  <option value="ignored">ignored</option>
+                </select>
+                <input id="softDocsInvoiceSoftwareSearch" type="text" placeholder="Search invoices by software name..." oninput="renderSoftDocsInvoices()" style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:12px;min-width:240px" />
+              </div>
+              <div class="softdocs-events" id="softDocsInvoicesList">
+                <div class="softdocs-empty">Select a software to view fetched invoices.</div>
+              </div>
+            </div>
+          </div>
+          <div id="softDocsStatus" style="font-size:11.5px;color:var(--text-muted);margin-top:10px">Ready.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── DEPARTMENTS PAGE ── -->
     <div class="page" id="page-departments">
       <div class="card">
@@ -1187,6 +1331,13 @@ let emailHasSmtpPass = false;
 let slackWorkflowImports = [];
 let rolePermissionConfigs = [];
 let rolePermissionDrafts = [];
+let softDocsHasRefreshToken = false;
+let softDocsGmailEnabled = false;
+let softDocsSelectedSoftwareId = '__all__';
+let softDocsSoftware = [];
+let softDocsEvents = [];
+let softDocsRules = [];
+let softDocsRulesBySoftware = new Map();
 
 (async function init() {
   if (!token) { location.href = '/login'; return; }
@@ -1205,6 +1356,8 @@ let rolePermissionDrafts = [];
 })();
 
 function authFetch(url, opts = {}) {
+  const requestedTimeout = Number(opts.timeoutMs);
+  const timeoutMs = Number.isFinite(requestedTimeout) && requestedTimeout > 0 ? requestedTimeout : 30000;
   const h = {
     'Authorization': 'Bearer ' + token,
     'Content-Type': 'application/json',
@@ -1213,7 +1366,7 @@ function authFetch(url, opts = {}) {
   return window.tcApi.request(url, {
     ...opts,
     headers: h,
-    timeoutMs: 30000,
+    timeoutMs,
     retries: 2,
     cancelPrevious: !!opts.cancelPrevious,
     cancelKey: opts.requestKey || '',
@@ -1254,13 +1407,13 @@ function applyAdminAccessState() {
          <div style="font-size:13px">This role cannot edit role permissions.</div>
        </div>`;
   }
-  ['nav-users','nav-permissions','nav-scim','nav-integrations'].forEach(id => {
+  ['nav-users','nav-permissions','nav-scim','nav-integrations','nav-softdocs'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     let allowed = true;
     if (id === 'nav-users') allowed = hasPermission('managePortalUsers');
     if (id === 'nav-permissions') allowed = hasPermission('manageRolePermissions');
-    if (id === 'nav-scim' || id === 'nav-integrations') allowed = hasPermission('manageIntegrations');
+    if (id === 'nav-scim' || id === 'nav-integrations' || id === 'nav-softdocs') allowed = hasPermission('manageIntegrations');
     el.style.display = allowed ? '' : 'none';
   });
 }
@@ -1269,6 +1422,7 @@ function openInitialAdminPage() {
   const preferredPages = [
     ['users', hasPermission('managePortalUsers')],
     ['permissions', hasPermission('manageRolePermissions')],
+    ['softdocs', hasPermission('manageIntegrations')],
     ['integrations', hasPermission('manageIntegrations')],
     ['scim', hasPermission('manageIntegrations')],
     ['system', true],
@@ -1291,11 +1445,11 @@ function updateSidebar(u) {
 }
 
 /* ── Page navigation ── */
-const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations', departments: 'Departments', alerts: 'Alerts' };
+const PAGE_TITLES = { users: 'Portal Users', permissions: 'Roles & Permissions', system: 'System Info', scim: 'SCIM Provisioning', integrations: 'Integrations', softdocs: 'Soft Docs', departments: 'Departments', alerts: 'Alerts' };
 function showPage(name, el) {
   if ((name === 'users' && !hasPermission('managePortalUsers'))
     || (name === 'permissions' && !hasPermission('manageRolePermissions'))
-    || ((name === 'scim' || name === 'integrations') && !hasPermission('manageIntegrations'))) {
+    || ((name === 'scim' || name === 'integrations' || name === 'softdocs') && !hasPermission('manageIntegrations'))) {
     showToast('This role does not have access to that page.', 'danger');
     return;
   }
@@ -1306,6 +1460,7 @@ function showPage(name, el) {
   document.getElementById('pageTitle').textContent = PAGE_TITLES[name] || name;
   if (name === 'scim') loadSCIMConfig();
   if (name === 'integrations') loadIntegrations();
+  if (name === 'softdocs') loadSoftDocsPage();
   if (name === 'permissions') loadRolePermissions();
   if (name === 'departments') {
     loadDepartmentsMgmt()
@@ -1746,6 +1901,16 @@ function escapeHtml(value) {
     .replace(/`/g, '&#96;');
 }
 
+function sanitizeHttpUrl(value) {
+  try {
+    const u = new URL(String(value || '').trim());
+    if (!['http:', 'https:'].includes(u.protocol)) return '';
+    return u.toString();
+  } catch {
+    return '';
+  }
+}
+
 function updateSlackWorkflowStatus(imports = []) {
   const total = imports.reduce((sum, item) => sum + (item.workflowCount || 0), 0);
   const dot = document.getElementById('slackWorkflowStatusDot');
@@ -2048,6 +2213,640 @@ async function saveEmailSettings() {
   } finally {
     btn.disabled = false;
     btn.textContent = 'Save Email Setup';
+  }
+}
+
+/* ── Soft Docs ── */
+function setSoftDocsStatus(message, tone = 'muted') {
+  const el = document.getElementById('softDocsStatus');
+  if (!el) return;
+  const colors = {
+    muted: 'var(--text-muted)',
+    success: '#4ade80',
+    danger: '#f87171',
+    warning: '#fbbf24',
+  };
+  el.style.color = colors[tone] || colors.muted;
+  el.textContent = message || '';
+}
+
+function updateSoftDocsGmailStatus(gmail = {}) {
+  const enabled = !!gmail.enabled;
+  const ready = enabled && (gmail.hasRefreshToken || !!document.getElementById('softDocsRefreshToken')?.value.trim());
+  softDocsGmailEnabled = ready;
+  const dot = document.getElementById('softDocsGmailStatusDot');
+  const label = document.getElementById('softDocsGmailStatusLabel');
+  if (dot) dot.className = 'status-dot ' + (ready ? 'active' : 'inactive');
+  if (label) label.textContent = ready ? 'Enabled' : (enabled ? 'Missing token' : 'Disabled');
+  renderSoftDocsHealthBadge();
+}
+
+function countSoftDocsConfiguredRules(rules = []) {
+  let count = 0;
+  for (const rule of (Array.isArray(rules) ? rules : [])) {
+    if (rule?.enabled === false) continue;
+    const hasEmails = Array.isArray(rule?.senderEmails) && rule.senderEmails.some((v) => String(v || '').trim());
+    const hasDomains = Array.isArray(rule?.senderDomains) && rule.senderDomains.some((v) => String(v || '').trim());
+    if (hasEmails || hasDomains) count += 1;
+  }
+  return count;
+}
+
+function renderSoftDocsHealthBadge() {
+  const host = document.getElementById('softDocsHealthBadge');
+  const gmailEl = document.getElementById('softDocsBadgeGmail');
+  const rulesEl = document.getElementById('softDocsBadgeRules');
+  if (!host || !gmailEl || !rulesEl) return;
+
+  const rulesCount = countSoftDocsConfiguredRules(softDocsRules);
+  const gmailLabel = softDocsGmailEnabled ? 'Enabled' : 'Disabled';
+  gmailEl.textContent = `Gmail: ${gmailLabel}`;
+  rulesEl.textContent = `Rules Saved: ${rulesCount}`;
+
+  const borderColor = softDocsGmailEnabled ? 'rgba(74,222,128,.45)' : 'var(--border)';
+  host.style.borderColor = borderColor;
+  host.style.color = softDocsGmailEnabled ? '#4ade80' : 'var(--text-muted)';
+}
+
+function softDocsStatusLabel(status = '') {
+  const low = String(status || '').trim().toLowerCase();
+  if (!low) return 'unknown';
+  return low.replace(/_/g, ' ');
+}
+
+function softDocsSelectedSoftwareName() {
+  if (softDocsSelectedSoftwareId === '__all__') return 'All Software';
+  if (softDocsSelectedSoftwareId === '__unmatched__') return 'Unmatched';
+  const hit = softDocsSoftware.find((s) => String(s.id) === String(softDocsSelectedSoftwareId));
+  return hit ? String(hit.name || hit.csvId || 'Software') : 'Software';
+}
+
+function rebuildSoftDocsRulesIndex() {
+  softDocsRulesBySoftware = new Map();
+  const rows = Array.isArray(softDocsRules) ? softDocsRules : [];
+  for (const rule of rows) {
+    const sid = String(rule?.softwareId || '').trim();
+    if (!sid) continue;
+    if (!softDocsRulesBySoftware.has(sid)) {
+      softDocsRulesBySoftware.set(sid, rule);
+      continue;
+    }
+    const existing = softDocsRulesBySoftware.get(sid);
+    const currentPriority = Number(rule?.priority || 0);
+    const existingPriority = Number(existing?.priority || 0);
+    if (currentPriority > existingPriority) softDocsRulesBySoftware.set(sid, rule);
+  }
+}
+
+function normalizeSenderIdentifier(rawValue = '') {
+  const raw = String(rawValue || '').trim().toLowerCase();
+  if (!raw) return { email: '', domain: '' };
+  const angle = raw.match(/<([^>]+)>/);
+  let value = angle ? String(angle[1] || '').trim() : raw;
+  value = value.replace(/^mailto:/, '').trim();
+  if (!value) return { email: '', domain: '' };
+
+  if (value.includes('://')) {
+    try {
+      const parsed = new URL(value);
+      value = String(parsed.hostname || '').trim().toLowerCase();
+    } catch {
+      return { email: '', domain: '' };
+    }
+  }
+
+  value = value.replace(/^@+/, '').replace(/^\*\./, '').replace(/\s+/g, '');
+  if (!value) return { email: '', domain: '' };
+
+  if (value.includes('@')) {
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    return { email: emailOk ? value : '', domain: '' };
+  }
+
+  const domain = value.replace(/^https?:\/\//, '').replace(/\/.*$/, '');
+  const domainOk = /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain);
+  return { email: '', domain: domainOk ? domain : '' };
+}
+
+function parseSenderIdentifiersInput(rawText = '') {
+  const tokens = String(rawText || '')
+    .split(/[\n,;]+/g)
+    .map((v) => String(v || '').trim())
+    .filter(Boolean);
+  const emails = [];
+  const domains = [];
+  for (const token of tokens) {
+    const normalized = normalizeSenderIdentifier(token);
+    if (normalized.email && !emails.includes(normalized.email)) emails.push(normalized.email);
+    if (normalized.domain && !domains.includes(normalized.domain)) domains.push(normalized.domain);
+  }
+  return {
+    senderEmails: emails,
+    senderDomains: domains,
+  };
+}
+
+function softDocsSenderIdsTextForRule(rule = null) {
+  if (!rule) return '';
+  const rows = [];
+  const emails = Array.isArray(rule.senderEmails) ? rule.senderEmails : [];
+  const domains = Array.isArray(rule.senderDomains) ? rule.senderDomains : [];
+  for (const email of emails) {
+    const value = String(email || '').trim().toLowerCase();
+    if (value && !rows.includes(value)) rows.push(value);
+  }
+  for (const domain of domains) {
+    const value = String(domain || '').trim().toLowerCase();
+    if (value && !rows.includes(value)) rows.push(value);
+  }
+  return rows.join('\n');
+}
+
+function renderSoftDocsRuleEditor() {
+  const hintEl = document.getElementById('softDocsRuleHint');
+  const inputEl = document.getElementById('softDocsSenderIdsInput');
+  const bodyKeywordsInputEl = document.getElementById('softDocsBodyKeywordsInput');
+  const btnEl = document.getElementById('softDocsRuleSaveBtn');
+  if (!hintEl || !inputEl || !btnEl) return;
+
+  const selectedId = String(softDocsSelectedSoftwareId || '').trim();
+  const isSoftwareSelected = selectedId && !['__all__', '__unmatched__'].includes(selectedId);
+  if (!isSoftwareSelected) {
+    hintEl.textContent = 'Select a software to configure sender IDs.';
+    inputEl.value = '';
+    if (bodyKeywordsInputEl) { bodyKeywordsInputEl.value = ''; bodyKeywordsInputEl.disabled = true; }
+    inputEl.disabled = true;
+    btnEl.disabled = true;
+    return;
+  }
+
+  const sw = softDocsSoftware.find((row) => String(row.id) === selectedId);
+  const rule = softDocsRulesBySoftware.get(selectedId) || null;
+  const hasRule = !!rule;
+  const senderText = softDocsSenderIdsTextForRule(rule);
+  inputEl.value = senderText;
+  inputEl.disabled = false;
+  btnEl.disabled = false;
+
+  // Populate body keywords
+  if (bodyKeywordsInputEl) {
+    const bodyKeywords = (rule && Array.isArray(rule.bodyKeywords)) ? rule.bodyKeywords.filter(Boolean).join('\n') : '';
+    bodyKeywordsInputEl.value = bodyKeywords;
+    bodyKeywordsInputEl.disabled = false;
+  }
+
+  hintEl.textContent = hasRule
+    ? `Configured sender IDs for ${String(sw?.name || 'software')}.`
+    : `No sender IDs configured for ${String(sw?.name || 'software')} yet. Add sender email/domain and save.`;
+}
+
+function renderSoftDocsSoftwareList() {
+  const host = document.getElementById('softDocsSoftwareList');
+  if (!host) return;
+  const search = String(document.getElementById('softDocsSoftwareSearch')?.value || '').trim().toLowerCase();
+
+  const counts = new Map();
+  let unmatchedCount = 0;
+  for (const ev of softDocsEvents) {
+    const sid = String(ev?.matchedSoftwareId || '').trim();
+    if (sid) counts.set(sid, (counts.get(sid) || 0) + 1);
+    else unmatchedCount += 1;
+  }
+
+  const rows = [];
+  rows.push({ id: '__all__', label: 'All Software', count: softDocsEvents.length });
+  rows.push({ id: '__unmatched__', label: 'Unmatched', count: unmatchedCount });
+  for (const sw of softDocsSoftware) {
+    const id = String(sw.id || '').trim();
+    if (!id) continue;
+    const name = String(sw.name || sw.csvId || id).trim();
+    if (search) {
+      const hay = `${name} ${(sw.csvId || '')}`.toLowerCase();
+      if (!hay.includes(search)) continue;
+    }
+    rows.push({ id, label: name, count: Number(counts.get(id) || 0), csvId: sw.csvId || '' });
+  }
+
+  host.innerHTML = rows.map((row) => {
+    const active = String(softDocsSelectedSoftwareId) === String(row.id);
+    const label = escapeHtml(row.label || 'Software');
+    const csv = row.csvId ? `<span style="font-size:10px;color:var(--text-muted)">${escapeHtml(row.csvId)}</span>` : '';
+    return `<div class="softdocs-list-item${active ? ' active' : ''}" onclick="softDocsSelectSoftware('${String(row.id)}')">
+      <div style="min-width:0">
+        <div style="font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
+        ${csv}
+      </div>
+      <span class="softdocs-pill">${Number(row.count || 0)}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderSoftDocsInvoices() {
+  const listEl = document.getElementById('softDocsInvoicesList');
+  const summaryEl = document.getElementById('softDocsSummary');
+  if (!listEl || !summaryEl) return;
+
+  let filtered = softDocsEvents.slice();
+  if (softDocsSelectedSoftwareId === '__unmatched__') {
+    filtered = filtered.filter((ev) => !String(ev?.matchedSoftwareId || '').trim());
+  } else if (softDocsSelectedSoftwareId !== '__all__') {
+    filtered = filtered.filter((ev) => String(ev?.matchedSoftwareId || '') === String(softDocsSelectedSoftwareId));
+  }
+
+  const statusFilter = String(document.getElementById('softDocsStatusFilter')?.value || 'all').trim().toLowerCase();
+  if (statusFilter && statusFilter !== 'all') {
+    filtered = filtered.filter((ev) => String(ev?.status || '').trim().toLowerCase() === statusFilter);
+  }
+
+  const invoiceSoftwareSearch = String(document.getElementById('softDocsInvoiceSoftwareSearch')?.value || '').trim().toLowerCase();
+  if (invoiceSoftwareSearch) {
+    filtered = filtered.filter((ev) => {
+      const sid = String(ev?.matchedSoftwareId || '').trim();
+      if (!sid) return 'unmatched'.includes(invoiceSoftwareSearch);
+      const sw = softDocsSoftware.find((s) => String(s.id) === sid);
+      const hay = `${String(sw?.name || '')} ${String(sw?.csvId || '')}`.toLowerCase();
+      return hay.includes(invoiceSoftwareSearch);
+    });
+  }
+
+  summaryEl.textContent = `${softDocsSelectedSoftwareName()} · ${filtered.length} fetched invoice${filtered.length === 1 ? '' : 's'}`;
+
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="softdocs-empty">No fetched invoices for ${escapeHtml(softDocsSelectedSoftwareName())}.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map((ev) => {
+    const ex = ev.extraction || {};
+    const amount = Number(ex.amount);
+    const amountText = Number.isFinite(amount) ? `${String(ex.currency || 'USD').toUpperCase()} ${amount.toFixed(2)}` : '—';
+    const qty = Number(ex.licenseQuantity);
+    const qtyText = Number.isFinite(qty) ? String(Math.round(qty)) : '—';
+    const unit = Number(ex.licenseUnitPrice);
+    const unitText = Number.isFinite(unit) ? unit.toFixed(2) : '—';
+    const periodText = `${ex.periodFrom ? String(ex.periodFrom).slice(0, 10) : '—'} → ${ex.periodTo ? String(ex.periodTo).slice(0, 10) : '—'}`;
+    const softwareHint = (() => {
+      if (ev.matchedSoftwareId) {
+        const sw = softDocsSoftware.find((s) => String(s.id) === String(ev.matchedSoftwareId));
+        return sw ? sw.name : 'Matched software';
+      }
+      return 'Unmatched';
+    })();
+    const imported = ['parsed', 'attached'].includes(String(ev.status || '').toLowerCase()) || !!ev.softwareInvoiceId;
+    const attachSoftwareId = String(ev.matchedSoftwareId || (softDocsSelectedSoftwareId && !['__all__', '__unmatched__'].includes(softDocsSelectedSoftwareId) ? softDocsSelectedSoftwareId : '') || '');
+    const attachDisabled = imported || !attachSoftwareId;
+    const attachTitle = imported ? 'Already imported' : (attachSoftwareId ? 'Attach to software invoice tab' : 'Select a software first');
+    const createdAt = ev.createdAt ? new Date(ev.createdAt).toLocaleString('en-IN') : '—';
+    const canViewStoredInvoice = !!ev.storedFileAvailable;
+
+    return `<div class="softdocs-event">
+      <div class="softdocs-event-head">
+        <div style="min-width:0">
+          <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(ev.attachmentName || ev.subject || 'Invoice')}</div>
+          <div class="softdocs-meta">${escapeHtml(ev.subject || 'No subject')}</div>
+          <div class="softdocs-meta">${escapeHtml(ev.fromEmail || ev.from || 'Unknown sender')} · ${createdAt}</div>
+        </div>
+        <span class="softdocs-tag ${escapeHtml(String(ev.status || '').toLowerCase())}">${escapeHtml(softDocsStatusLabel(ev.status))}</span>
+      </div>
+      <div class="softdocs-meta">Software: <strong style="color:var(--text)">${escapeHtml(softwareHint || 'Unmatched')}</strong> · Match score: ${Number(ev.matchScore || 0)}</div>
+      <div class="softdocs-meta">Extracted: Amount ${escapeHtml(amountText)} · Qty ${escapeHtml(qtyText)} · Unit ${escapeHtml(unitText)} · Period ${escapeHtml(periodText)}</div>
+      <div class="softdocs-actions">
+        <button class="btn btn-primary btn-sm" ${attachDisabled ? 'disabled' : ''} title="${escapeHtml(attachTitle)}" onclick="softDocsAttachEvent('${String(ev.id)}','${escapeHtml(attachSoftwareId)}')">${imported ? 'Imported' : 'Attach to Software'}</button>
+        ${canViewStoredInvoice ? `<button class="btn btn-secondary btn-sm" onclick="softDocsViewStoredInvoice('${String(ev.id)}')">View Invoice</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="softDocsIgnoreEvent('${String(ev.id)}')">Ignore</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function softDocsSelectSoftware(softwareId) {
+  softDocsSelectedSoftwareId = String(softwareId || '__all__');
+  renderSoftDocsSoftwareList();
+  renderSoftDocsRuleEditor();
+  renderSoftDocsInvoices();
+}
+
+async function loadSoftDocsSettings() {
+  const errEl = document.getElementById('softDocsErr');
+  if (errEl) errEl.textContent = '';
+  const r = await authFetch('/api/admin/integrations');
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error || 'Failed to load integration settings');
+  const gmail = data.gmail || {};
+  softDocsHasRefreshToken = !!gmail.hasRefreshToken;
+  document.getElementById('softDocsGmailEnabled').checked = !!gmail.enabled;
+  document.getElementById('softDocsMailbox').value = gmail.mailbox || 'me';
+  document.getElementById('softDocsQuery').value = gmail.query || '(invoice OR receipt OR "tax invoice" OR billing OR statement)';
+  document.getElementById('softDocsRefreshToken').value = '';
+  document.getElementById('softDocsClientId').value = '';
+  document.getElementById('softDocsClientSecret').value = '';
+  document.getElementById('softDocsRefreshToken').placeholder = softDocsHasRefreshToken
+    ? 'Stored securely — enter a new token to replace it'
+    : 'Paste Gmail refresh token';
+  updateSoftDocsGmailStatus(gmail);
+}
+
+async function loadSoftDocsData() {
+  const [swResp, evResp, ruleResp] = await Promise.all([
+    authFetch('/api/software'),
+    authFetch('/api/invoice-mail/review?status=all&page=1&limit=100'),
+    authFetch('/api/invoice-mail/rules'),
+  ]);
+  const swData = await swResp.json();
+  const evData = await evResp.json();
+  const ruleData = await ruleResp.json();
+  if (!swResp.ok) throw new Error(swData.error || 'Failed to load software list');
+  if (!evResp.ok) throw new Error(evData.error || 'Failed to load fetched invoices');
+  if (!ruleResp.ok) throw new Error(ruleData.error || 'Failed to load sender ID rules');
+
+  softDocsSoftware = (Array.isArray(swData) ? swData : (swData.software || []))
+    .map((sw) => ({ id: String(sw.id || sw._id || ''), name: String(sw.name || ''), csvId: String(sw.csvId || '') }))
+    .filter((sw) => sw.id)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  softDocsEvents = Array.isArray(evData.events) ? evData.events : [];
+  softDocsRules = Array.isArray(ruleData) ? ruleData : [];
+  rebuildSoftDocsRulesIndex();
+  renderSoftDocsHealthBadge();
+  if (!softDocsSelectedSoftwareId) softDocsSelectedSoftwareId = '__all__';
+  setSoftDocsStatus(`Loaded ${softDocsEvents.length} fetched invoice event${softDocsEvents.length === 1 ? '' : 's'}.`, 'muted');
+}
+
+async function loadSoftDocsPage(force = false) {
+  if (!hasPermission('manageIntegrations')) return;
+  setSoftDocsStatus('Loading Soft Docs data…', 'muted');
+  try {
+    await loadSoftDocsSettings();
+    await loadSoftDocsData();
+    renderSoftDocsSoftwareList();
+    renderSoftDocsRuleEditor();
+    renderSoftDocsInvoices();
+    if (force) showToast('Soft Docs refreshed');
+  } catch (error) {
+    const errEl = document.getElementById('softDocsErr');
+    if (errEl) errEl.textContent = error.message || 'Failed to load Soft Docs';
+    setSoftDocsStatus(error.message || 'Failed to load Soft Docs', 'danger');
+  }
+}
+
+async function saveSoftDocsSettings() {
+  const btn = document.getElementById('softDocsSaveBtn');
+  const errEl = document.getElementById('softDocsErr');
+  const enabled = !!document.getElementById('softDocsGmailEnabled')?.checked;
+  const mailbox = String(document.getElementById('softDocsMailbox')?.value || '').trim().toLowerCase();
+  const query = String(document.getElementById('softDocsQuery')?.value || '').trim();
+  const refreshToken = String(document.getElementById('softDocsRefreshToken')?.value || '').trim();
+  const clientId = String(document.getElementById('softDocsClientId')?.value || '').trim();
+  const clientSecret = String(document.getElementById('softDocsClientSecret')?.value || '').trim();
+
+  if (enabled && !mailbox) {
+    if (errEl) errEl.textContent = 'Mailbox is required when Gmail ingestion is enabled.';
+    return;
+  }
+  if (enabled && !refreshToken && !softDocsHasRefreshToken) {
+    if (errEl) errEl.textContent = 'Refresh token is required when enabling Gmail ingestion.';
+    return;
+  }
+
+  if (errEl) errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  try {
+    const r = await authFetch('/api/admin/integrations', {
+      method: 'PUT',
+      body: JSON.stringify({
+        gmail: {
+          enabled,
+          mailbox: mailbox || 'me',
+          query: query || '(invoice OR receipt OR "tax invoice" OR billing OR statement)',
+          refreshToken,
+          clientId,
+          clientSecret,
+        },
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Failed to save Soft Docs settings.';
+      return;
+    }
+    showToast('Soft Docs Gmail settings saved');
+    await loadSoftDocsPage();
+  } catch (error) {
+    if (errEl) errEl.textContent = error.message || 'Failed to save Soft Docs settings.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Soft Docs';
+  }
+}
+
+async function saveSoftDocsSelectedRule() {
+  const selectedId = String(softDocsSelectedSoftwareId || '').trim();
+  if (!selectedId || ['__all__', '__unmatched__'].includes(selectedId)) {
+    showToast('Select a specific software to save sender IDs.', 'danger');
+    return;
+  }
+  const inputEl = document.getElementById('softDocsSenderIdsInput');
+  const bodyKeywordsInputEl = document.getElementById('softDocsBodyKeywordsInput');
+  const btnEl = document.getElementById('softDocsRuleSaveBtn');
+  const errEl = document.getElementById('softDocsErr');
+  const raw = String(inputEl?.value || '').trim();
+  const parsed = parseSenderIdentifiersInput(raw);
+  const bodyKeywordsRaw = String(bodyKeywordsInputEl?.value || '').trim();
+  const bodyKeywords = bodyKeywordsRaw
+    .split(/[\n,;]+/g)
+    .map(v => String(v || '').trim().toLowerCase())
+    .filter(Boolean);
+  const payload = {
+    softwareId: selectedId,
+    enabled: true,
+    senderEmails: parsed.senderEmails,
+    senderDomains: parsed.senderDomains,
+    bodyKeywords,
+  };
+
+  const existing = softDocsRulesBySoftware.get(selectedId) || null;
+  if (existing) {
+    payload.priority = Number(existing.priority || 100);
+    payload.autoAttachThreshold = Number(existing.autoAttachThreshold || 80);
+    payload.reviewThreshold = Number(existing.reviewThreshold || 50);
+  }
+
+  if (errEl) errEl.textContent = '';
+  if (btnEl) {
+    btnEl.disabled = true;
+    btnEl.textContent = 'Saving…';
+  }
+  setSoftDocsStatus('Saving sender ID rules…', 'warning');
+  try {
+    const url = existing
+      ? `/api/invoice-mail/rules/${encodeURIComponent(String(existing.id || existing._id || '').trim())}`
+      : '/api/invoice-mail/rules';
+    const method = existing ? 'PUT' : 'POST';
+    const r = await authFetch(url, {
+      method,
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Failed to save sender ID rule.';
+      setSoftDocsStatus(data.error || 'Failed to save sender ID rule.', 'danger');
+      return;
+    }
+    showToast('Sender IDs saved');
+    await loadSoftDocsData();
+    renderSoftDocsSoftwareList();
+    renderSoftDocsRuleEditor();
+    renderSoftDocsInvoices();
+    setSoftDocsStatus('Sender ID rules updated.', 'success');
+  } catch (error) {
+    if (errEl) errEl.textContent = error.message || 'Failed to save sender ID rule.';
+    setSoftDocsStatus(error.message || 'Failed to save sender ID rule.', 'danger');
+  } finally {
+    if (btnEl) {
+      btnEl.disabled = false;
+      btnEl.textContent = 'Save Rule';
+    }
+  }
+}
+
+async function softDocsSyncInbox() {
+  const btn = document.getElementById('softDocsSyncBtn');
+  const errEl = document.getElementById('softDocsErr');
+  if (errEl) errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'Syncing…';
+  setSoftDocsStatus('Syncing Gmail inbox…', 'warning');
+  try {
+    const r = await authFetch('/api/invoice-mail/sync', {
+      method: 'POST',
+      timeoutMs: 180000,
+      body: JSON.stringify({ provider: 'gmail', limit: 100, dryRun: false, strictSenderRules: true }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      if (errEl) errEl.textContent = data.error || 'Gmail sync failed.';
+      setSoftDocsStatus(data.error || 'Gmail sync failed.', 'danger');
+      return;
+    }
+    showToast(`Gmail sync done: scanned ${Number(data.scanned || 0)}, created ${Number(data.created || 0)}`);
+    await loadSoftDocsData();
+    renderSoftDocsSoftwareList();
+    renderSoftDocsRuleEditor();
+    renderSoftDocsInvoices();
+  } catch (error) {
+    if (errEl) errEl.textContent = error.message || 'Gmail sync failed.';
+    setSoftDocsStatus(error.message || 'Gmail sync failed.', 'danger');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sync Gmail Now';
+  }
+}
+
+async function softDocsViewStoredInvoice(eventId) {
+  const eventIdText = String(eventId || '').trim();
+  if (!eventIdText) return;
+
+  let popup = null;
+  try {
+    popup = window.open('about:blank', '_blank', 'noopener,noreferrer');
+  } catch {
+    popup = null;
+  }
+
+  try {
+    const r = await authFetch(`/api/invoice-mail/events/${encodeURIComponent(eventIdText)}/file`, {
+      method: 'GET',
+      timeoutMs: 120000,
+    });
+
+    if (!r.ok) {
+      let msg = 'Unable to open stored invoice';
+      try {
+        const data = await r.json();
+        if (data && data.error) msg = data.error;
+      } catch {}
+      throw new Error(msg);
+    }
+
+    const blob = await r.blob();
+    if (!blob || !blob.size) throw new Error('Stored invoice is empty');
+    const objectUrl = URL.createObjectURL(blob);
+
+    if (popup && !popup.closed) {
+      popup.location.href = objectUrl;
+    } else {
+      window.open(objectUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 120000);
+  } catch (error) {
+    if (popup && !popup.closed) {
+      try { popup.close(); } catch {}
+    }
+    showToast(error.message || 'Unable to open invoice', 'danger');
+  }
+}
+
+async function softDocsAttachEvent(eventId, softwareId) {
+  const eventIdText = String(eventId || '').trim();
+  const resolvedSoftwareId = String(
+    softwareId
+    || (!['__all__', '__unmatched__'].includes(String(softDocsSelectedSoftwareId || '')) ? softDocsSelectedSoftwareId : '')
+    || ''
+  ).trim();
+  if (!eventIdText) return;
+  if (!resolvedSoftwareId) {
+    showToast('Select a software before attaching invoice.', 'danger');
+    return;
+  }
+
+  setSoftDocsStatus('Attaching invoice to software…', 'warning');
+  try {
+    const r = await authFetch(`/api/invoice-mail/${encodeURIComponent(eventIdText)}/attach`, {
+      method: 'POST',
+      body: JSON.stringify({
+        softwareId: resolvedSoftwareId,
+        note: 'Attached from Soft Docs',
+      }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      showToast(data.error || 'Attach failed', 'danger');
+      setSoftDocsStatus(data.error || 'Attach failed', 'danger');
+      return;
+    }
+    showToast('Invoice attached to software inventory');
+    await loadSoftDocsData();
+    renderSoftDocsSoftwareList();
+    renderSoftDocsRuleEditor();
+    renderSoftDocsInvoices();
+  } catch (error) {
+    showToast(error.message || 'Attach failed', 'danger');
+    setSoftDocsStatus(error.message || 'Attach failed', 'danger');
+  }
+}
+
+async function softDocsIgnoreEvent(eventId) {
+  const eventIdText = String(eventId || '').trim();
+  if (!eventIdText) return;
+  try {
+    const r = await authFetch(`/api/invoice-mail/${encodeURIComponent(eventIdText)}/ignore`, {
+      method: 'POST',
+      body: JSON.stringify({ reason: 'Ignored from Soft Docs' }),
+    });
+    const data = await r.json();
+    if (!r.ok) {
+      showToast(data.error || 'Ignore failed', 'danger');
+      return;
+    }
+    showToast('Invoice event ignored');
+    await loadSoftDocsData();
+    renderSoftDocsSoftwareList();
+    renderSoftDocsRuleEditor();
+    renderSoftDocsInvoices();
+  } catch (error) {
+    showToast(error.message || 'Ignore failed', 'danger');
   }
 }
 
@@ -3321,6 +4120,8 @@ async function saveAlert() {
 
 // Initialise alerts badge on page load
 updateAlertStats();
+
+// Vendor template builder removed: invoice extraction is now Claude-first only.
 
 </script>
 </body>

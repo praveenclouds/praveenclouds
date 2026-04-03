@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const { IntegrationSettings } = require('../db');
 const { PORT } = require('../config');
+const { decryptSecret } = require('../utils/secret-crypto');
 
 function sanitizeBaseUrl(value) {
   return String(value || '')
@@ -16,7 +17,7 @@ async function loadEmailSettings() {
     smtpPort: Number(settings?.smtpPort || 587),
     smtpSecure: !!settings?.smtpSecure,
     smtpUser: String(settings?.smtpUser || '').trim(),
-    smtpPass: String(settings?.smtpPass || '').trim(),
+    smtpPass: String(decryptSecret(settings?.smtpPass || '') || '').trim(),
     fromEmail: String(settings?.fromEmail || '').trim(),
     fromName: String(settings?.fromName || 'Terzo Support').trim(),
     appBaseUrl: sanitizeBaseUrl(settings?.appBaseUrl || process.env.APP_BASE_URL || `http://localhost:${PORT}`),

@@ -33,7 +33,14 @@
     if (!secondary) return primary;
     if (!primary) return secondary;
     const controller = new AbortController();
-    const forward = () => controller.abort();
+    const forward = (event) => {
+      const source = event && event.target;
+      const reason = source && Object.prototype.hasOwnProperty.call(source, 'reason')
+        ? source.reason
+        : undefined;
+      if (reason !== undefined) controller.abort(reason);
+      else controller.abort(new DOMException('Request canceled', 'AbortError'));
+    };
     primary.addEventListener('abort', forward, { once: true });
     secondary.addEventListener('abort', forward, { once: true });
     return controller.signal;
@@ -45,7 +52,7 @@
 
   function shouldRetryError(error) {
     if (!error) return false;
-    if (error.name === 'AbortError') return false;
+    if (error.name === 'AbortError' || error.name === 'TimeoutError' || error.name === 'CanceledError') return false;
     return true;
   }
 
@@ -60,7 +67,7 @@
 
     if (cancelPrevious && cancelKey) {
       const previous = abortByKey.get(cancelKey);
-      if (previous) previous.abort();
+      if (previous) previous.abort(new DOMException('Canceled by newer request', 'CanceledError'));
     }
 
     if (dedupeEnabled && inFlightByKey.has(dedupeKey)) {
@@ -85,7 +92,11 @@
     const run = async () => {
       for (let attempt = 0; attempt <= retries; attempt++) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        let timedOut = false;
+        const timeoutId = setTimeout(() => {
+          timedOut = true;
+          controller.abort(new DOMException(`Request timed out after ${timeoutMs} ms`, 'TimeoutError'));
+        }, timeoutMs);
         const signal = mergeSignals(controller.signal, fetchOptions.signal);
         if (cancelKey) abortByKey.set(cancelKey, controller);
         try {
@@ -104,6 +115,24 @@
           return response;
         } catch (error) {
           clearTimeout(timeoutId);
+          if (timedOut) {
+            const timeoutError = new Error(`Request timed out after ${Math.round(timeoutMs / 1000)}s. Please retry.`);
+            timeoutError.name = 'TimeoutError';
+            if (attempt < retries && shouldRetryError(timeoutError)) {
+              await sleep(250 * (attempt + 1));
+              continue;
+            }
+            throw timeoutError;
+          }
+          if (error && (error.name === 'AbortError' || error.name === 'CanceledError')) {
+            const msg = String(error.message || '').trim();
+            const pretty = (!msg || /without reason/i.test(msg))
+              ? 'Request was canceled. Please retry.'
+              : msg;
+            const abortError = new Error(pretty);
+            abortError.name = error.name || 'AbortError';
+            throw abortError;
+          }
           if (attempt < retries && shouldRetryError(error)) {
             await sleep(250 * (attempt + 1));
             continue;
@@ -163,4 +192,3 @@
     createStore,
   };
 })(window);
-

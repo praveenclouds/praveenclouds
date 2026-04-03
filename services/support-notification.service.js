@@ -95,6 +95,18 @@ function compactNotes(value, max = 500) {
   return normalized.length <= max ? normalized : `${normalized.slice(0, Math.max(0, max - 3))}...`;
 }
 
+function formatRequestedApplications(request = {}, max = 6) {
+  const rows = Array.isArray(request?.applications) ? request.applications : [];
+  const names = rows
+    .map((app) => (typeof app === 'string' ? app : app?.name))
+    .map((v) => String(v || '').trim())
+    .filter(Boolean);
+  const unique = [...new Set(names)];
+  if (!unique.length) return '—';
+  if (unique.length <= max) return unique.join(', ');
+  return `${unique.slice(0, max).join(', ')} +${unique.length - max} more`;
+}
+
 function toDateOrNull(value) {
   if (!value) return null;
   const parsed = new Date(value);
@@ -290,44 +302,102 @@ async function sendAssignmentEmail({ to, templateKey, request, stepLabel = '' })
 
 function buildAssigneeSlackMessage(request, detailUrl) {
   const notes = compactNotes(request.notes);
-  const lines = [
-    '*Alert: Support request assigned to you*',
-    `Request: ${fallbackValue(request.requestId, '-')}`,
-    `Type: ${fallbackValue(request.workflowLabel || request.workflowType, 'Support Request')}`,
-    `Employee: ${fallbackValue(request.employeeName, '-')} (${fallbackValue(request.employeeEmail, '-')})`,
-    `Priority: ${fallbackValue(request.priority, '-')}`,
-    `Status: ${fallbackValue(request.status, '-')}`,
-  ];
-  if (notes) lines.push(`Notes: ${notes}`);
-
-  if (detailUrl) lines.push(`<${detailUrl}|Open Support Center>`);
-  return lines.join('\n');
-}
-
-function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, completeToken = '') {
-  const stepLabel = step?.label || '';
-  const notes = compactNotes(request.notes);
-  const lines = [
-    '*Alert: Workflow task assigned*',
-    `Request: ${fallbackValue(request.requestId, '-')}`,
-    `Type: ${fallbackValue(request.workflowLabel || request.workflowType, 'Support Request')}`,
-    `Task: ${fallbackValue(stepLabel, '-')}`,
-    `Employee: ${fallbackValue(request.employeeName, '-')} (${fallbackValue(request.employeeEmail, '-')})`,
-    `Priority: ${fallbackValue(request.priority, '-')}`,
-    `Status: ${fallbackValue(request.status, '-')}`,
-  ];
-  if (notes) lines.push(`Notes: ${notes}`);
-
-  const text = lines.join('\n');
+  const requestId = fallbackValue(request.requestId, '-');
+  const requestType = fallbackValue(request.workflowLabel || request.workflowType, 'Support Request');
+  const employee = fallbackValue(request.employeeName, '-');
+  const employeeEmail = fallbackValue(request.employeeEmail, '-');
+  const priority = humanizeLabel(request.priority, '-');
+  const currentStatus = humanizeLabel(request.status, '-');
+  const text = `Support assignment • ${requestId} • ${requestType}`;
   const blocks = [
     {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text,
+        text: '*📌 Support Request Assigned*\nPlease take ownership of this request.',
       },
     },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Request:* \`${requestId}\`  •  *Type:* ${requestType}`,
+      },
+    },
+    {
+      type: 'section',
+      fields: [
+        { type: 'mrkdwn', text: `*Employee*\n${employee}` },
+        { type: 'mrkdwn', text: `*Email*\n${employeeEmail}` },
+        { type: 'mrkdwn', text: `*Priority*\n${priority}` },
+        { type: 'mrkdwn', text: `*Current Status*\n${currentStatus}` },
+      ],
+    },
   ];
+  if (notes) {
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: `Notes: ${notes}` }],
+    });
+  }
+  if (detailUrl) {
+    blocks.push({
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Open Support Center', emoji: true },
+          style: 'primary',
+          url: detailUrl,
+        },
+      ],
+    });
+  }
+  return { text, blocks };
+}
+
+function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, completeToken = '') {
+  const stepLabel = step?.label || '';
+  const notes = compactNotes(request.notes);
+  const requestId = fallbackValue(request.requestId, '-');
+  const requestType = fallbackValue(request.workflowLabel || request.workflowType, 'Support Request');
+  const task = fallbackValue(stepLabel, '-');
+  const employee = fallbackValue(request.employeeName, '-');
+  const employeeEmail = fallbackValue(request.employeeEmail, '-');
+  const priority = humanizeLabel(request.priority, '-');
+  const currentStatus = humanizeLabel(request.status, '-');
+  const text = `Workflow task assigned • ${requestId} • ${task}`;
+  const blocks = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*🧩 Workflow Task Assigned*\nA checklist task is ready for your action.',
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Request:* \`${requestId}\`  •  *Type:* ${requestType}\n*Task:* ${task}`,
+      },
+    },
+    {
+      type: 'section',
+      fields: [
+        { type: 'mrkdwn', text: `*Employee*\n${employee}` },
+        { type: 'mrkdwn', text: `*Email*\n${employeeEmail}` },
+        { type: 'mrkdwn', text: `*Priority*\n${priority}` },
+        { type: 'mrkdwn', text: `*Current Status*\n${currentStatus}` },
+      ],
+    },
+  ];
+  if (notes) {
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: `Notes: ${notes}` }],
+    });
+  }
 
   const actionButtons = [];
   if (completeToken) {
@@ -350,6 +420,75 @@ function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, complete
     blocks.push({
       type: 'actions',
       elements: actionButtons,
+    });
+  }
+
+  return { text, blocks };
+}
+
+function buildManagerApprovalSlackMessage(request, step, approveUrl, rejectUrl) {
+  const notes = compactNotes(request.notes);
+  const requestId = fallbackValue(request.requestId, '-');
+  const requestType = fallbackValue(request.workflowLabel || request.workflowType, 'Support Request');
+  const approvalStep = fallbackValue(step?.label, '-');
+  const employee = fallbackValue(request.employeeName, '-');
+  const employeeEmail = fallbackValue(request.employeeEmail, '-');
+  const priority = humanizeLabel(request.priority, '-');
+  const applications = formatRequestedApplications(request);
+  const text = `Manager approval needed • ${requestId} • ${approvalStep}`;
+  const blocks = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: '*✅ Manager Approval Needed*\nPlease review and choose an action.',
+      },
+    },
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*Request:* \`${requestId}\`  •  *Type:* ${requestType}\n*Approval Step:* ${approvalStep}`,
+      },
+    },
+    {
+      type: 'section',
+      fields: [
+        { type: 'mrkdwn', text: `*Employee*\n${employee}` },
+        { type: 'mrkdwn', text: `*Email*\n${employeeEmail}` },
+        { type: 'mrkdwn', text: `*Priority*\n${priority}` },
+        { type: 'mrkdwn', text: `*Applications*\n${applications}` },
+      ],
+    },
+  ];
+  if (notes) {
+    blocks.push({
+      type: 'context',
+      elements: [{ type: 'mrkdwn', text: `Notes: ${notes}` }],
+    });
+  }
+
+  const elements = [];
+  if (approveUrl) {
+    elements.push({
+      type: 'button',
+      text: { type: 'plain_text', text: 'Approve', emoji: true },
+      style: 'primary',
+      url: approveUrl,
+    });
+  }
+  if (rejectUrl) {
+    elements.push({
+      type: 'button',
+      text: { type: 'plain_text', text: 'Reject', emoji: true },
+      style: 'danger',
+      url: rejectUrl,
+    });
+  }
+  if (elements.length) {
+    blocks.push({
+      type: 'actions',
+      elements,
     });
   }
 
@@ -427,22 +566,6 @@ async function sendManagerApprovalEmail(request, step, token) {
   return !!result.ok;
 }
 
-function buildManagerApprovalSlackMessage(request, step, approveUrl, rejectUrl) {
-  const notes = compactNotes(request.notes);
-  const lines = [
-    '*Alert: Manager approval needed*',
-    `Request: ${fallbackValue(request.requestId, '-')}`,
-    `Type: ${fallbackValue(request.workflowLabel || request.workflowType, 'Support Request')}`,
-    `Employee: ${fallbackValue(request.employeeName, '-')} (${fallbackValue(request.employeeEmail, '-')})`,
-    `Approval step: ${fallbackValue(step?.label, '-')}`,
-  ];
-  if (notes) lines.push(`Notes: ${notes}`);
-
-  if (approveUrl) lines.push(`<${approveUrl}|Approve>`);
-  if (rejectUrl) lines.push(`<${rejectUrl}|Reject>`);
-  return lines.join('\n');
-}
-
 async function sendAssigneeSlackInboxMessage(request, assigneeEmail) {
   const recipient = String(assigneeEmail || '').trim().toLowerCase();
   if (!recipient) return { sent: false, reason: 'missing_assignee_email' };
@@ -516,38 +639,103 @@ function formatSlaDateTime(value) {
   });
 }
 
+function humanizeLabel(value, fallback = '—') {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) return fallback;
+  return normalized
+    .split(/[_\-\s]+/)
+    .filter(Boolean)
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 function buildSlaSlackMessage(request = {}, detailUrl = '', context = {}) {
   const event = String(context.event || 'alert').trim().toLowerCase();
   const headingMap = {
-    at_risk: '*SLA Alert: Request is at risk*',
-    breach: '*SLA Breach: Action required now*',
-    reminder: '*SLA Breach Reminder*',
-    escalation: '*SLA Escalation triggered*',
+    at_risk: '⚠️ SLA At-Risk Alert',
+    breach: '🚨 SLA Breach Alert',
+    reminder: '🔁 SLA Breach Reminder',
+    escalation: '⬆️ SLA Escalation Triggered',
   };
-  const heading = headingMap[event] || '*SLA Alert*';
+  const heading = headingMap[event] || 'ℹ️ SLA Alert';
   const responseDueAt = formatSlaDateTime(request?.slaResponseDueAt);
   const resolutionDueAt = formatSlaDateTime(request?.slaResolutionDueAt);
   const reminderMinutes = clampMinutes(context.reminderMinutes, 10, 1, 1440);
+  const includeDueDates = event !== 'reminder';
+  const requestId = fallbackValue(request.requestId, '-');
+  const requestType = fallbackValue(request.workflowLabel || request.workflowType, 'Support Request');
+  const priority = humanizeLabel(request.priority, '-');
+  const currentStatus = humanizeLabel(request.status, '-');
+  const slaStatus = humanizeLabel(request.slaStatus, '-');
 
-  const lines = [
+  const summaryText = [
     heading,
-    `Request: ${fallbackValue(request.requestId, '-')}`,
-    `Type: ${fallbackValue(request.workflowLabel || request.workflowType, 'Support Request')}`,
-    `Priority: ${fallbackValue(request.priority, '-')}`,
-    `Current status: ${fallbackValue(request.status, '-')}`,
-    `SLA status: ${fallbackValue(request.slaStatus, '-')}`,
-    `Response due: ${responseDueAt}`,
-    `Resolution due: ${resolutionDueAt}`,
+    `Request ${requestId}`,
+    `${requestType}`,
+    `Priority ${priority}`,
+    `Status ${currentStatus}`,
+    `SLA ${slaStatus}`,
+    ...(includeDueDates ? [`Resolution due ${resolutionDueAt}`] : []),
+  ].join(' • ');
+
+  const blocks = [
+    {
+      type: 'section',
+      text: {
+        type: 'mrkdwn',
+        text: `*${heading}*\n*Request:* \`${requestId}\`  •  *Type:* ${requestType}`,
+      },
+    },
+    {
+      type: 'section',
+      fields: (
+        [
+        { type: 'mrkdwn', text: `*Priority*\n${priority}` },
+        { type: 'mrkdwn', text: `*Current Status*\n${currentStatus}` },
+        { type: 'mrkdwn', text: `*SLA Status*\n${slaStatus}` },
+        ]
+          .concat(includeDueDates ? [
+            { type: 'mrkdwn', text: `*Response Due*\n${responseDueAt}` },
+            { type: 'mrkdwn', text: `*Resolution Due*\n${resolutionDueAt}` },
+          ] : [])
+      ),
+    },
   ];
 
   if (event === 'reminder') {
-    lines.push(`Reminder cadence: every ${reminderMinutes} minute(s) until the request is completed.`);
+    blocks.push({
+      type: 'context',
+      elements: [{
+        type: 'mrkdwn',
+        text: `Reminder cadence: every *${reminderMinutes} minute(s)* until the request is completed.`,
+      }],
+    });
   }
   if (context.escalationTarget) {
-    lines.push(`Escalated to: ${context.escalationTarget}`);
+    blocks.push({
+      type: 'context',
+      elements: [{
+        type: 'mrkdwn',
+        text: `Escalated to: *${fallbackValue(context.escalationTarget, '-') }*`,
+      }],
+    });
   }
-  if (detailUrl) lines.push(`<${detailUrl}|Open Support Center>`);
-  return lines.join('\n');
+
+  if (detailUrl) {
+    blocks.push({
+      type: 'actions',
+      elements: [
+        {
+          type: 'button',
+          text: { type: 'plain_text', text: 'Open Support Center', emoji: true },
+          style: 'primary',
+          url: detailUrl,
+        },
+      ],
+    });
+  }
+
+  return { text: summaryText, blocks };
 }
 
 async function sendSlaEmail(recipients = [], request = {}, context = {}) {

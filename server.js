@@ -34,6 +34,7 @@ const logRoutes              = require('./routes/logs.routes');
 const supportRoutes          = require('./routes/support.routes');
 const slackRoutes            = require('./routes/slack.routes');
 const scimRoutes             = require('./routes/scim.routes');
+const invoiceMailRoutes      = require('./routes/invoice-mail.routes');
 const adminUserRoutes        = require('./routes/admin/users.routes');
 const adminIntegrationRoutes = require('./routes/admin/integrations.routes');
 const adminScimRoutes        = require('./routes/admin/scim.routes');
@@ -185,6 +186,7 @@ function mountApiRoutes(base = '/api') {
   app.use(`${base}/logs`, logRoutes);
   app.use(`${base}/support`, supportRoutes);
   app.use(`${base}/slack`, slackRoutes);
+  app.use(`${base}/invoice-mail`, invoiceMailRoutes);
   app.use(`${base}/admin/users`, adminUserRoutes);
   app.use(`${base}/admin/integrations`, adminIntegrationRoutes);
   app.use(`${base}/admin/scim`, adminScimRoutes);
