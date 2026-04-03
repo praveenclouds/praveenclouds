@@ -585,17 +585,33 @@ function extractInvoiceDetailsFromEmailText({ subject = '', bodyText = '' } = {}
   const warnings = ['Extracted from email content (no PDF attachment found)'];
   const currency = normalizeCurrencyCode(haystack) || 'USD';
 
-  const totalMatch = haystack.match(/(?:invoice\s+total|total\s+due|amount\s+due|amount|total)[^\d$€£₹\-]{0,24}([$€£₹]?\s*-?\d[\d,]*(?:\.\d{2})?)/i);
-  const anyMoneyMatches = [...haystack.matchAll(/([$€£₹]?\s*-?\d[\d,]*(?:\.\d{2})?)/g)]
+  // Look for amount near invoice-related keywords first (most reliable)
+  const totalMatch = haystack.match(/(?:invoice\s+total|total\s+due|amount\s+due|amount\s+charged|charge|billed|payment\s+of)[^\d$€£₹\-]{0,24}([$€£₹]?\s*\d[\d,]*\.\d{2})/i);
+
+  // Fallback: look for currency-prefixed amounts with decimals (e.g. $119.95, €50.00)
+  const currencyPrefixedMatches = [...haystack.matchAll(/([$€£₹]\s*\d[\d,]*\.\d{2})/g)]
     .map((m) => parseMoneyNumber(m[1]))
-    .filter((n) => Number.isFinite(n) && n >= 0);
-  const amount = parseMoneyNumber(totalMatch?.[1] || '') || (anyMoneyMatches.length ? Math.max(...anyMoneyMatches) : null);
+    .filter((n) => Number.isFinite(n) && n > 0 && n < 1000000); // sanity: < $1M
+
+  let amount = parseMoneyNumber(totalMatch?.[1] || '');
+
+  // Only use fallback if primary match failed, and cap at reasonable invoice amounts
+  if (!Number.isFinite(amount) || amount <= 0) {
+    amount = currencyPrefixedMatches.length ? Math.max(...currencyPrefixedMatches) : null;
+  }
+
+  // Sanity check: email-body amounts above $500k are almost certainly garbage (phone numbers, IDs)
+  const EMAIL_BODY_MAX_AMOUNT = 500000;
+  if (Number.isFinite(amount) && amount > EMAIL_BODY_MAX_AMOUNT) {
+    warnings.push(`Extracted amount ${amount} exceeds sanity threshold (${EMAIL_BODY_MAX_AMOUNT}); discarded`);
+    amount = null;
+  }
 
   const qtyMatch = haystack.match(/(?:qty|quantity|licenses?|licence|seats?|users?)\s*[:\-]?\s*(\d{1,6})/i);
   const qty = Number(qtyMatch?.[1]);
-  const licenseQuantity = Number.isFinite(qty) && qty > 0 ? Math.round(qty) : null;
+  const licenseQuantity = Number.isFinite(qty) && qty > 0 && qty < 100000 ? Math.round(qty) : null;
 
-  const unitMatch = haystack.match(/(?:unit\s*price|price\s*per\s*(?:user|seat|license|licen[cs]e)|\/\s*(?:user|seat|license|licen[cs]e))(?:\s*[:\-])?\s*([$€£₹]?\s*-?\d[\d,]*(?:\.\d{2})?)/i);
+  const unitMatch = haystack.match(/(?:unit\s*price|price\s*per\s*(?:user|seat|license|licen[cs]e)|\/\s*(?:user|seat|license|licen[cs]e))(?:\s*[:\-])?\s*([$€£₹]?\s*\d[\d,]*\.\d{2})/i);
   const unitPrice = parseMoneyNumber(unitMatch?.[1] || '');
 
   const fromToMatch = haystack.match(/([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})\s*(?:-|–|to)\s*([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/i);
@@ -607,9 +623,17 @@ function extractInvoiceDetailsFromEmailText({ subject = '', bodyText = '' } = {}
   else if (/\bquarterly|quarter\b/i.test(lower)) billingPeriod = 'Quarterly';
   else if (/\bannual|annually|yearly|year\b/i.test(lower)) billingPeriod = 'Annual';
 
-  const planMatch = subjectText.match(/invoice\s+(?:for|of)\s+(.+)$/i)
-    || body.match(/(?:plan|subscription)\s*[:\-]\s*([^\n]+)/i);
+  // Extract subscription plan — avoid grabbing company names from "invoice for COMPANY"
+  const planMatch = body.match(/(?:plan|subscription)\s*[:\-]\s*([^\n]+)/i);
   const subscriptionPlan = String(planMatch?.[1] || '').trim() || '';
+
+  // Determine confidence based on what was extracted
+  const hasAmount = Number.isFinite(amount) && amount > 0;
+  const hasPeriod = !!(periodFrom || periodTo || billingPeriod);
+  const hasQty = Number.isFinite(licenseQuantity) && licenseQuantity > 0;
+  const confidence = (hasAmount && hasPeriod) ? 'medium'
+    : (hasAmount || (hasQty && hasPeriod)) ? 'low'
+    : 'very-low';
 
   return {
     amount: Number.isFinite(Number(amount)) ? Number(amount) : null,
@@ -620,7 +644,7 @@ function extractInvoiceDetailsFromEmailText({ subject = '', bodyText = '' } = {}
     licenseQuantity: Number.isFinite(Number(licenseQuantity)) ? Number(licenseQuantity) : null,
     licenseUnitPrice: Number.isFinite(Number(unitPrice)) ? Number(unitPrice) : null,
     subscriptionPlan,
-    parseConfidence: 'low',
+    parseConfidence: confidence,
     source: 'email-body-heuristic',
     warnings,
     needsReview: true,
