@@ -623,7 +623,23 @@ function extractInvoiceDetailsFromEmailText({ subject = '', bodyText = '' } = {}
   const unitMatch = haystack.match(/(?:unit\s*price|price\s*per\s*(?:user|seat|license|licen[cs]e)|\/\s*(?:user|seat|license|licen[cs]e))(?:\s*[:\-])?\s*([$€£₹]?\s*\d[\d,]*\.\d{2})/i);
   const unitPrice = parseMoneyNumber(unitMatch?.[1] || '');
 
-  const fromToMatch = haystack.match(/([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})\s*(?:-|–|to)\s*([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/i);
+  // Date range extraction — support multiple formats:
+  //   "Jan 24, 2026 - Feb 23, 2026"  |  "01/24/2026 - 02/23/2026"  |  "2026-01-24 to 2026-02-23"
+  const datePatterns = [
+    // "Month DD, YYYY - Month DD, YYYY"
+    /([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})\s*(?:-|–|—|to)\s*([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/i,
+    // "MM/DD/YYYY - MM/DD/YYYY" or "DD/MM/YYYY - DD/MM/YYYY"
+    /(\d{1,2}\/\d{1,2}\/\d{4})\s*(?:-|–|—|to)\s*(\d{1,2}\/\d{1,2}\/\d{4})/i,
+    // "YYYY-MM-DD to YYYY-MM-DD"
+    /(\d{4}-\d{2}-\d{2})\s*(?:-|–|—|to)\s*(\d{4}-\d{2}-\d{2})/i,
+    // "billing period: Month DD - Month DD, YYYY" (shared year)
+    /(?:billing\s*period|period|service\s*date)[^\n]{0,10}?([A-Za-z]{3,9}\s+\d{1,2})\s*(?:-|–|—|to)\s*([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/i,
+  ];
+  let fromToMatch = null;
+  for (const pat of datePatterns) {
+    fromToMatch = haystack.match(pat);
+    if (fromToMatch) break;
+  }
   const periodFrom = parseIsoDateFromText(fromToMatch?.[1] || '');
   const periodTo = parseIsoDateFromText(fromToMatch?.[2] || '');
 
@@ -632,9 +648,13 @@ function extractInvoiceDetailsFromEmailText({ subject = '', bodyText = '' } = {}
   else if (/\bquarterly|quarter\b/i.test(lower)) billingPeriod = 'Quarterly';
   else if (/\bannual|annually|yearly|year\b/i.test(lower)) billingPeriod = 'Annual';
 
-  // Extract subscription plan — avoid grabbing company names from "invoice for COMPANY"
-  const planMatch = body.match(/(?:plan|subscription)\s*[:\-]\s*([^\n]+)/i);
-  const subscriptionPlan = String(planMatch?.[1] || '').trim() || '';
+  // Extract subscription plan — only from body, avoid grabbing company names
+  const planMatch = body.match(/(?:plan|subscription|product)\s*[:\-]\s*([^\n]{3,60})/i);
+  let subscriptionPlan = String(planMatch?.[1] || '').trim();
+  // Reject plan names that look like company/account names from subject lines
+  if (/\b(?:is available|invoice for|thank|order)\b/i.test(subscriptionPlan)) {
+    subscriptionPlan = '';
+  }
 
   // Determine confidence based on what was extracted
   const hasAmount = Number.isFinite(amount) && amount > 0;
@@ -877,8 +897,14 @@ async function attachEventToSoftware({ event, softwareId, note = '', requestId =
   applyAdditionalServicesToSoftware(sw, derivedAdditionalServices);
 
   // Update top-level software fields from latest invoice extraction
+  // Only update plan from high/medium confidence sources; skip email-body-heuristic low-confidence plans
   const parsedPlan = String(parsed?.subscriptionPlan || '').trim();
-  if (parsedPlan) sw.subscriptionPlan = parsedPlan;
+  const parsedConfidence = String(parsed?.confidence || parsed?.parseConfidence || '').toLowerCase();
+  const isLowConfidencePlan = parsedConfidence === 'low' || parsedConfidence === 'very-low'
+    || String(parsed?.source || '').includes('email-body');
+  if (parsedPlan && (!isLowConfidencePlan || !sw.subscriptionPlan)) {
+    sw.subscriptionPlan = parsedPlan;
+  }
 
   // Count total licenses: base + additional users from line items
   const seatLineItems = (lineItems || []).filter((li) => {
@@ -931,29 +957,38 @@ async function attachEventToSoftware({ event, softwareId, note = '', requestId =
     }
   }
 
-  sw.invoices.push({
-    filename: attachment.filename,
-    data: attachment.dataUrl,
-    mimeType: attachment.mimeType,
-    amount: Number.isFinite(Number(parsed?.amount)) ? Number(parsed.amount) : 0,
-    currency: String(parsed?.currency || 'USD').trim() || 'USD',
-    note: String(note || '').trim() || `Imported from Gmail (${event.mailbox || 'mailbox'})`,
-    licenseQuantity: Number.isFinite(Number(parsed?.licenseQuantity)) ? Math.round(Number(parsed.licenseQuantity)) : null,
-    licenseUnitPrice: Number.isFinite(Number(parsed?.licenseUnitPrice)) ? Number(Number(parsed.licenseUnitPrice).toFixed(2)) : null,
-    subscriptionPlan: String(parsed?.subscriptionPlan || '').trim(),
-    billingPeriod,
-    periodFrom: periodFromIso ? toDateOrNull(periodFromIso) : null,
-    periodTo: periodToIso ? toDateOrNull(periodToIso) : null,
-    parseConfidence: ['high', 'medium', 'low'].includes(String(parsed?.confidence || '')) ? String(parsed.confidence) : '',
-    source: 'email_ingestion',
-    sourceProvider: event.provider || 'gmail',
-    sourceMessageId: event.messageId || '',
-    attachmentHashSha256: attachment.hashSha256 || event.attachmentHashSha256 || '',
-    reviewRequired: Boolean(parsed?.needsReview || event.reviewRequired),
-    matchScore: Number.isFinite(Number(event.matchScore)) ? Math.round(Number(event.matchScore)) : 0,
-    extractionSource: String(parsed?.source || '').trim(),
-    lineItems,
-  });
+  // Deduplicate: skip if an invoice from the same Gmail message is already attached
+  const srcMsgId = String(event.messageId || '').trim();
+  const alreadyAttached = srcMsgId && sw.invoices.some(
+    (inv) => String(inv.sourceMessageId || '').trim() === srcMsgId,
+  );
+  if (alreadyAttached) {
+    console.log(`[SoftDocs] Skipping duplicate invoice attach — messageId ${srcMsgId} already on software ${sw.name}`);
+  } else {
+    sw.invoices.push({
+      filename: attachment.filename,
+      data: attachment.dataUrl,
+      mimeType: attachment.mimeType,
+      amount: Number.isFinite(Number(parsed?.amount)) ? Number(parsed.amount) : 0,
+      currency: String(parsed?.currency || 'USD').trim() || 'USD',
+      note: String(note || '').trim() || `Imported from Gmail (${event.mailbox || 'mailbox'})`,
+      licenseQuantity: Number.isFinite(Number(parsed?.licenseQuantity)) ? Math.round(Number(parsed.licenseQuantity)) : null,
+      licenseUnitPrice: Number.isFinite(Number(parsed?.licenseUnitPrice)) ? Number(Number(parsed.licenseUnitPrice).toFixed(2)) : null,
+      subscriptionPlan: String(parsed?.subscriptionPlan || '').trim(),
+      billingPeriod,
+      periodFrom: periodFromIso ? toDateOrNull(periodFromIso) : null,
+      periodTo: periodToIso ? toDateOrNull(periodToIso) : null,
+      parseConfidence: ['high', 'medium', 'low'].includes(String(parsed?.confidence || '')) ? String(parsed.confidence) : '',
+      source: 'email_ingestion',
+      sourceProvider: event.provider || 'gmail',
+      sourceMessageId: srcMsgId,
+      attachmentHashSha256: attachment.hashSha256 || event.attachmentHashSha256 || '',
+      reviewRequired: Boolean(parsed?.needsReview || event.reviewRequired),
+      matchScore: Number.isFinite(Number(event.matchScore)) ? Math.round(Number(event.matchScore)) : 0,
+      extractionSource: String(parsed?.source || '').trim(),
+      lineItems,
+    });
+  }
 
   await sw.save();
 
