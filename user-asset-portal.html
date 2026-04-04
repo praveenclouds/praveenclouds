@@ -3646,7 +3646,6 @@ function invoiceBreakdownKey(name = '') {
   const raw = String(name || '').toLowerCase();
   return raw
     .replace(/\([^)]*\)/g, ' ')
-    .replace(/\badditional\s+(?:users?|seats?|licenses?)\b/g, ' ')
     .replace(/\bincludes?\b/g, ' ')
     .replace(/[^a-z0-9]+/g, ' ')
     .split(' ')
@@ -4573,12 +4572,15 @@ function extractAdditionalServiceUpdates({
 
     const key = invoiceServiceSimilarityKey(name);
     const existing = updatesByKey.get(key);
+    const nextQtyRaw = Number(entry?.purchasedLicenses);
+    const nextUnitRaw = Number(entry?.licensePricePerUserMonth);
+    const nextAnnualRaw = Number(entry?.annualCost);
     const next = {
       name,
       plan: name,
-      purchasedLicenses: Number.isFinite(Number(entry?.purchasedLicenses)) ? Math.max(0, Math.round(Number(entry.purchasedLicenses))) : 0,
-      licensePricePerUserMonth: Number.isFinite(Number(entry?.licensePricePerUserMonth)) ? Number(Number(entry.licensePricePerUserMonth).toFixed(2)) : 0,
-      annualCost: Number.isFinite(Number(entry?.annualCost)) ? Number(Number(entry.annualCost).toFixed(2)) : 0,
+      purchasedLicenses: Number.isFinite(nextQtyRaw) && nextQtyRaw > 0 ? Math.round(nextQtyRaw) : null,
+      licensePricePerUserMonth: Number.isFinite(nextUnitRaw) && nextUnitRaw > 0 ? Number(nextUnitRaw.toFixed(2)) : null,
+      annualCost: Number.isFinite(nextAnnualRaw) && nextAnnualRaw > 0 ? Number(nextAnnualRaw.toFixed(2)) : 0,
       renewalPeriod: renewal,
     };
     if (!existing) {
@@ -4590,7 +4592,7 @@ function extractAdditionalServiceUpdates({
     if (Number(next.purchasedLicenses || 0) > Number(existing.purchasedLicenses || 0)) {
       merged.purchasedLicenses = next.purchasedLicenses;
     }
-    if (!(Number(existing.licensePricePerUserMonth || 0) > 0) && Number(next.licensePricePerUserMonth || 0) > 0) {
+    if (Number(next.licensePricePerUserMonth || 0) > Number(existing.licensePricePerUserMonth || 0)) {
       merged.licensePricePerUserMonth = next.licensePricePerUserMonth;
     }
     updatesByKey.set(key, merged);
@@ -4634,8 +4636,17 @@ function extractAdditionalServiceUpdates({
       .map(row => Number(row?.quantity))
       .filter(v => Number.isFinite(v) && v > 0)
       .map(v => Math.round(v));
-    const qty = qtyCandidates.length ? Math.max(...qtyCandidates) : 0;
-    const monthlyUnit = qty > 0 ? Number((annualCost / (qty * 12)).toFixed(2)) : 0;
+    const qty = qtyCandidates.length ? Math.max(...qtyCandidates) : null;
+    const explicitUnitCandidates = groupRows
+      .map(row => Number(row?.unitPrice))
+      .filter(v => Number.isFinite(v) && v > 0)
+      .map(v => Number(toMonthlyUnitFromBilling(v, renewal).toFixed(2)));
+    const explicitUnit = explicitUnitCandidates.length ? Math.max(...explicitUnitCandidates) : null;
+    const monthlyUnit = (Number.isFinite(qty) && qty > 0)
+      ? Number((annualCost / (qty * 12)).toFixed(2))
+      : (Number.isFinite(explicitUnit) && explicitUnit > 0
+        ? explicitUnit
+        : Number((annualCost / 12).toFixed(2)));
 
     upsertUpdate({
       name: groupName,
@@ -5119,18 +5130,31 @@ function applyInvoiceDerivedFieldsToSoftwareRecord(swId, update = {}) {
       if (!name) continue;
       const key = name.toLowerCase();
       const existing = rec.services.find(row => String(row?.name || '').trim().toLowerCase() === key);
+      const nextQtyRaw = Number(svc?.purchasedLicenses);
+      const nextAnnualRaw = Number(svc?.annualCost);
+      let nextUnitRaw = Number(svc?.licensePricePerUserMonth);
+      const nextQty = Number.isFinite(nextQtyRaw) && nextQtyRaw > 0 ? Math.round(nextQtyRaw) : null;
+      const nextAnnual = Number.isFinite(nextAnnualRaw) && nextAnnualRaw > 0 ? Number(nextAnnualRaw) : 0;
+      if (!(Number.isFinite(nextUnitRaw) && nextUnitRaw > 0) && nextAnnual > 0 && Number.isFinite(nextQty) && nextQty > 0) {
+        nextUnitRaw = Number((nextAnnual / (nextQty * 12)).toFixed(2));
+      }
       const next = {
         name,
         plan: String(svc?.plan || name).trim(),
-        annualCost: Number.isFinite(Number(svc?.annualCost)) ? Number(svc.annualCost) : 0,
-        licensePricePerUserMonth: Number.isFinite(Number(svc?.licensePricePerUserMonth)) ? Number(svc.licensePricePerUserMonth) : 0,
-        purchasedLicenses: Number.isFinite(Number(svc?.purchasedLicenses)) ? Math.round(Number(svc.purchasedLicenses)) : 0,
+        annualCost: nextAnnual,
+        licensePricePerUserMonth: Number.isFinite(nextUnitRaw) && nextUnitRaw > 0 ? Number(nextUnitRaw) : 0,
+        purchasedLicenses: Number.isFinite(nextQty) && nextQty > 0 ? nextQty : 0,
         usedLicenses: 0,
         renewalPeriod: normalizeInvoicePeriod(svc?.renewalPeriod || ''),
         status: 'Active',
       };
       if (existing) {
-        Object.assign(existing, next);
+        if (next.plan) existing.plan = next.plan;
+        if (next.annualCost > 0) existing.annualCost = next.annualCost;
+        if (next.licensePricePerUserMonth > 0) existing.licensePricePerUserMonth = next.licensePricePerUserMonth;
+        if (next.purchasedLicenses > 0) existing.purchasedLicenses = next.purchasedLicenses;
+        if (next.renewalPeriod) existing.renewalPeriod = next.renewalPeriod;
+        if (!existing.status) existing.status = 'Active';
       } else {
         rec.services.push(next);
       }
@@ -7047,7 +7071,11 @@ function openSwDm(id){
 }
 
 /* backward-compat alias used by the table row onclick */
-function openSwDrawer(id){ openSwDm(id); }
+function openSwDrawer(id){
+  const swId = String(id || '').trim();
+  if (!swId) return;
+  window.location.href = `/software-details?id=${encodeURIComponent(swId)}`;
+}
 
 function closeSwDm(){
   document.getElementById('swDmOverlay').classList.remove('open');

@@ -175,6 +175,7 @@ app.get('/api/v1/csrf-token', (req, res) => {
 app.get('/login', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 app.get('/support', (req, res) => res.sendFile(path.join(__dirname, 'support.html')));
+app.get('/software-details', (req, res) => res.sendFile(path.join(__dirname, 'software-details.html')));
 app.get('/',      (req, res) => res.sendFile(path.join(__dirname, 'user-asset-portal.html')));
 
 // ── API routes ─────────────────────────────────────────────────────────────────

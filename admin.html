@@ -2768,8 +2768,8 @@ async function softDocsSyncInbox() {
   try {
     const r = await authFetch('/api/invoice-mail/sync', {
       method: 'POST',
-      timeoutMs: 180000,
-      body: JSON.stringify({ provider: 'gmail', limit: 100, dryRun: false, strictSenderRules: true }),
+      timeoutMs: 300000,
+      body: JSON.stringify({ provider: 'gmail', limit: 30, dryRun: false, strictSenderRules: true }),
     });
     const data = await r.json();
     if (!r.ok) {
@@ -2795,12 +2795,10 @@ async function softDocsViewStoredInvoice(eventId) {
   const eventIdText = String(eventId || '').trim();
   if (!eventIdText) return;
 
-  let popup = null;
-  try {
-    popup = window.open('about:blank', '_blank', 'noopener,noreferrer');
-  } catch {
-    popup = null;
-  }
+  // Show loading state on the button
+  const btn = event && event.target ? event.target : null;
+  const originalText = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = 'Loading…'; btn.disabled = true; }
 
   try {
     const r = await authFetch(`/api/invoice-mail/events/${encodeURIComponent(eventIdText)}/file`, {
@@ -2821,18 +2819,25 @@ async function softDocsViewStoredInvoice(eventId) {
     if (!blob || !blob.size) throw new Error('Stored invoice is empty');
     const objectUrl = URL.createObjectURL(blob);
 
-    if (popup && !popup.closed) {
-      popup.location.href = objectUrl;
-    } else {
-      window.open(objectUrl, '_blank', 'noopener,noreferrer');
+    // Use an invisible <a> link click to avoid popup blocker
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    // For PDFs, open in new tab; for others, download
+    const isPdf = blob.type && blob.type.includes('pdf');
+    if (!isPdf) {
+      a.download = `invoice-${eventIdText}.pdf`;
     }
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
 
     setTimeout(() => URL.revokeObjectURL(objectUrl), 120000);
   } catch (error) {
-    if (popup && !popup.closed) {
-      try { popup.close(); } catch {}
-    }
     showToast(error.message || 'Unable to open invoice', 'danger');
+  } finally {
+    if (btn) { btn.textContent = originalText || 'View Invoice'; btn.disabled = false; }
   }
 }
 

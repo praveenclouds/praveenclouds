@@ -103,15 +103,24 @@ function applyAdditionalServicesToSoftware(sw, services = []) {
     if (!name) continue;
     const key = name.toLowerCase();
     const existing = sw.services.find((row) => String(row?.name || '').trim().toLowerCase() === key);
-    const qty = Number(svc?.purchasedLicenses);
-    const price = Number(svc?.licensePricePerUserMonth);
-    const annual = Number(svc?.annualCost);
+    const qtyRaw = Number(svc?.purchasedLicenses);
+    const priceRaw = Number(svc?.licensePricePerUserMonth);
+    const annualRaw = Number(svc?.annualCost);
+    const qty = Number.isFinite(qtyRaw) && qtyRaw > 0 ? Math.round(qtyRaw) : null;
+    const annual = Number.isFinite(annualRaw) && annualRaw > 0 ? Number(annualRaw) : null;
+    let price = Number.isFinite(priceRaw) && priceRaw > 0 ? Number(priceRaw) : null;
+    if (!(Number.isFinite(price) && price > 0) && Number.isFinite(annual) && annual > 0 && Number.isFinite(qty) && qty > 0) {
+      price = Number((annual / (qty * 12)).toFixed(2));
+    }
+    if (!(Number.isFinite(price) && price > 0) && Number.isFinite(annual) && annual > 0) {
+      price = Number((annual / 12).toFixed(2));
+    }
     const plan = String(svc?.plan || '').trim();
     const renewal = String(svc?.renewalPeriod || '').trim();
     if (existing) {
-      if (Number.isFinite(qty) && qty >= 0) existing.purchasedLicenses = Math.round(qty);
-      if (Number.isFinite(price) && price >= 0) existing.licensePricePerUserMonth = price;
-      if (Number.isFinite(annual) && annual >= 0) existing.annualCost = annual;
+      if (Number.isFinite(qty) && qty > 0) existing.purchasedLicenses = qty;
+      if (Number.isFinite(price) && price > 0) existing.licensePricePerUserMonth = price;
+      if (Number.isFinite(annual) && annual > 0) existing.annualCost = annual;
       if (plan) existing.plan = plan;
       if (['Annual', 'Monthly', 'Quarterly', 'Freeware', 'Pay-as-you-go', ''].includes(renewal)) {
         existing.renewalPeriod = renewal;
@@ -121,9 +130,9 @@ function applyAdditionalServicesToSoftware(sw, services = []) {
       sw.services.push({
         name,
         plan,
-        annualCost: Number.isFinite(annual) && annual >= 0 ? annual : 0,
-        licensePricePerUserMonth: Number.isFinite(price) && price >= 0 ? price : 0,
-        purchasedLicenses: Number.isFinite(qty) && qty >= 0 ? Math.round(qty) : 0,
+        annualCost: Number.isFinite(annual) && annual > 0 ? annual : 0,
+        licensePricePerUserMonth: Number.isFinite(price) && price > 0 ? price : 0,
+        purchasedLicenses: Number.isFinite(qty) && qty > 0 ? qty : 0,
         usedLicenses: 0,
         renewalPeriod: ['Annual', 'Monthly', 'Quarterly', 'Freeware', 'Pay-as-you-go', ''].includes(renewal) ? renewal : '',
         status: 'Active',
@@ -670,7 +679,8 @@ function eventDto(doc = {}) {
     attachmentHashSha256: o.attachmentHashSha256,
     invoiceLinks: Array.isArray(o.invoiceLinks) ? o.invoiceLinks : [],
     preferredInvoiceUrl: String(o.preferredInvoiceUrl || '').trim(),
-    storedFileAvailable: String(o.storageProvider || '').trim() === 'mongo_blob' && Boolean(String(o.storageKey || '').trim()),
+    storedFileAvailable: (String(o.storageProvider || '').trim() === 'mongo_blob' && Boolean(String(o.storageKey || '').trim()))
+      || Boolean(String(o.gmailAttachmentId || '').trim()),
     matchedSoftwareId: o.matchedSoftwareId || null,
     matchedRuleId: o.matchedRuleId || null,
     matchScore: o.matchScore || 0,
@@ -865,6 +875,61 @@ async function attachEventToSoftware({ event, softwareId, note = '', requestId =
     parsedMainPlan: String(parsed?.subscriptionPlan || '').trim(),
   });
   applyAdditionalServicesToSoftware(sw, derivedAdditionalServices);
+
+  // Update top-level software fields from latest invoice extraction
+  const parsedPlan = String(parsed?.subscriptionPlan || '').trim();
+  if (parsedPlan) sw.subscriptionPlan = parsedPlan;
+
+  // Count total licenses: base + additional users from line items
+  const seatLineItems = (lineItems || []).filter((li) => {
+    const name = String(li?.name || '').toLowerCase();
+    const qty = Number(li?.quantity);
+    return Number.isFinite(qty) && qty > 0 && /\b(user|seat|license)\b/i.test(name);
+  });
+  const totalSeatsFromLineItems = seatLineItems.reduce((sum, li) => sum + Math.round(Number(li.quantity)), 0);
+
+  const parsedQty = Number(parsed?.licenseQuantity);
+  if (totalSeatsFromLineItems > 0) {
+    sw.purchasedLicenses = totalSeatsFromLineItems;
+  } else if (Number.isFinite(parsedQty) && parsedQty > 0) {
+    sw.purchasedLicenses = Math.round(parsedQty);
+  }
+
+  const parsedUnit = Number(parsed?.licenseUnitPrice);
+  if (Number.isFinite(parsedUnit) && parsedUnit > 0) sw.licensePricePerUserMonth = Number(parsedUnit.toFixed(2));
+
+  const parsedCurrency = String(parsed?.currency || '').trim().toUpperCase();
+  if (parsedCurrency) sw.currency = parsedCurrency;
+
+  if (billingPeriod) sw.renewalPeriod = billingPeriod;
+
+  // Recalculate BASE annual cost (excludes add-on services).
+  // Strategy: annualise the invoice total, then subtract add-on service costs.
+  const invoiceAmount = Number(parsed?.amount);
+  if (Number.isFinite(invoiceAmount) && invoiceAmount > 0 && billingPeriod) {
+    let totalAnnualised;
+    if (billingPeriod === 'Monthly') totalAnnualised = invoiceAmount * 12;
+    else if (billingPeriod === 'Quarterly') totalAnnualised = invoiceAmount * 4;
+    else totalAnnualised = invoiceAmount;
+
+    const addonTotal = (derivedAdditionalServices || []).reduce(
+      (sum, s) => sum + Number(s.annualCost || 0), 0,
+    );
+    const baseCost = Math.max(totalAnnualised - addonTotal, 0);
+    sw.annualCost = Number(baseCost.toFixed(2));
+  } else {
+    // Fallback: use base seat count × unit price (exclude additional-user seats)
+    const baseSeatItems = seatLineItems.filter((li) => {
+      const name = String(li?.name || '').toLowerCase();
+      return !/\b(additional|extra|added)\b/.test(name);
+    });
+    const baseSeats = baseSeatItems.reduce((sum, li) => sum + Math.round(Number(li.quantity)), 0);
+    const effectiveQty = baseSeats > 0 ? baseSeats : Number(sw.purchasedLicenses || 0);
+    const effectivePrice = Number(sw.licensePricePerUserMonth || 0);
+    if (effectiveQty > 0 && effectivePrice > 0) {
+      sw.annualCost = Number((effectiveQty * effectivePrice * 12).toFixed(2));
+    }
+  }
 
   sw.invoices.push({
     filename: attachment.filename,
@@ -1104,16 +1169,19 @@ router.post('/sync', requireAuth, canManageIntegrations, async (req, res) => {
       // best-effort cleanup
     }
 
+    console.log(`[SoftDocs Sync] Starting — ${listed.messages.length} messages to process, strict=${enforceSenderRules}`);
     for (const msg of listed.messages) {
       let envelope;
       try {
-        const message = await getGmailMessage({
-          accessToken,
-          mailbox: resolvedMailbox,
-          messageId: msg.id,
-        });
+        const msgStart = Date.now();
+        const message = await Promise.race([
+          getGmailMessage({ accessToken, mailbox: resolvedMailbox, messageId: msg.id }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Gmail message fetch timeout (30s)')), 30000)),
+        ]);
         envelope = parseMessageEnvelope(message);
+        console.log(`[SoftDocs Sync] Message ${msg.id} fetched in ${Date.now() - msgStart}ms — from: ${envelope.fromEmail}, subject: ${(envelope.subject || '').slice(0, 60)}`);
       } catch (err) {
+        console.error(`[SoftDocs Sync] Failed to fetch message ${msg.id}: ${err.message}`);
         summary.failed += 1;
         continue;
       }
@@ -1274,11 +1342,10 @@ router.post('/sync', requireAuth, canManageIntegrations, async (req, res) => {
             part,
             buffer,
           });
-          const docText = await extractAttachmentTextForMatching({
-            buffer,
-            mimeType: attachment.mimeType,
-            filename: attachment.filename,
-          });
+          const docText = await Promise.race([
+            extractAttachmentTextForMatching({ buffer, mimeType: attachment.mimeType, filename: attachment.filename }),
+            new Promise((resolve) => setTimeout(() => resolve(''), 45000)),
+          ]);
           const combinedDocText = [docText, emailBodyText].filter(Boolean).join('\n');
           const best = pickBestRule(rules, {
             senderEmail: envelope.fromEmail,
@@ -1443,8 +1510,10 @@ router.post('/sync', requireAuth, canManageIntegrations, async (req, res) => {
       { upsert: true }
     );
 
+    console.log(`[SoftDocs Sync] Done — scanned: ${summary.scanned}, created: ${summary.created}, duplicates: ${summary.duplicates}, skipped: ${summary.skipped}, failed: ${summary.failed}`);
     res.json(summary);
   } catch (e) {
+    console.error(`[SoftDocs Sync] Fatal error: ${e.message}`);
     res.status(500).json({ error: e.message });
   }
 });

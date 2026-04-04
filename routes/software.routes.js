@@ -312,8 +312,9 @@ function cleanServiceName(name = '') {
 function serviceGroupKey(name = '') {
   return cleanServiceName(name)
     .toLowerCase()
-    .replace(/\badditional\s+(?:users?|seats?|licenses?)\b/g, ' ')
     .replace(/\bincludes?\b/g, ' ')
+    // Strip transactional suffixes so "Product - License change +2" groups with "Product"
+    .replace(/\s*[-–]\s*(license\s+change|prorat|prepay|monthly\s+subscription\s+charges?)\b.*/i, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .split(' ')
     .map((v) => v.trim())
@@ -329,7 +330,10 @@ function isDiscountLikeLineItem(li = {}) {
   const subtotal = Number(li?.subtotal);
   if (kind === 'credit') return true;
   if ((Number.isFinite(total) && total < 0) || (Number.isFinite(subtotal) && subtotal < 0)) return true;
-  return /\b(discount|coupon|promo|promotion|rebate|waiver|write[-\s]?off|credit|adjustment)\b/.test(name);
+  if (/\b(discount|coupon|promo|promotion|rebate|waiver|write[-\s]?off|credit|adjustment)\b/.test(name)) return true;
+  // Filter out transactional/prorated line items — these are billing adjustments, not actual services
+  if (/\b(prorat|charges?\s+(?:before|after)\s+license|license\s+change|one[-\s]?time|refund)\b/i.test(name)) return true;
+  return false;
 }
 
 function annualizeAmountForPeriod(amount = 0, period = '') {
@@ -433,14 +437,23 @@ function deriveAdditionalServicesFromLineItems({
         .map((r) => Number(r?.quantity))
         .filter((v) => Number.isFinite(v) && v > 0)
         .map((v) => Math.round(v));
-      const qty = qtyCandidates.length ? Math.max(...qtyCandidates) : 0;
-      const monthlyUnit = qty > 0 ? Number((annualCost / (qty * 12)).toFixed(2)) : 0;
+      const qty = qtyCandidates.length ? Math.max(...qtyCandidates) : null;
+      const explicitUnitCandidates = (entry.rows || [])
+        .map((r) => Number(r?.unitPrice))
+        .filter((v) => Number.isFinite(v) && v > 0)
+        .map((v) => Number(v.toFixed(2)));
+      const inferredFromRows = explicitUnitCandidates.length ? Math.max(...explicitUnitCandidates) : null;
+      const monthlyUnit = (Number.isFinite(qty) && qty > 0)
+        ? Number((annualCost / (qty * 12)).toFixed(2))
+        : (Number.isFinite(inferredFromRows) && inferredFromRows > 0
+          ? inferredFromRows
+          : Number((annualCost / 12).toFixed(2)));
 
       return {
         name: entry.name,
         plan: entry.name,
-        purchasedLicenses: qty,
-        licensePricePerUserMonth: monthlyUnit,
+        purchasedLicenses: Number.isFinite(qty) && qty > 0 ? qty : null,
+        licensePricePerUserMonth: Number.isFinite(monthlyUnit) && monthlyUnit > 0 ? monthlyUnit : null,
         annualCost: Number(annualCost.toFixed(2)),
         renewalPeriod: renewal,
       };
@@ -955,8 +968,10 @@ router.get('/', requireAuth, async (req, res) => {
   try {
     const page  = Math.max(1, parseInt(req.query.page)  || 1);
     const limit = Math.max(0, parseInt(req.query.limit) || 0); // 0 = no limit (default)
-
-    const query = Software.find().sort({ csvId: 1 });
+    const includeInvoicesRaw = String(req.query.includeInvoices || '').trim().toLowerCase();
+    const includeInvoices = ['1', 'true', 'yes'].includes(includeInvoicesRaw);
+    const projection = includeInvoices ? '' : '-invoices';
+    const query = Software.find().select(projection).sort({ csvId: 1 }).lean();
     if (limit > 0) {
       const total = await Software.countDocuments();
       const list  = await query.skip((page - 1) * limit).limit(limit);
@@ -970,7 +985,9 @@ router.get('/', requireAuth, async (req, res) => {
 // ── GET /api/software/budget — dashboard stats ─────────────────────────────────
 router.get('/budget', requireAuth, async (req, res) => {
   try {
-    const all = await Software.find().lean();
+    const all = await Software.find()
+      .select('name deploymentType status annualCost services purchasedLicenses usedLicenses')
+      .lean();
 
     const totalSpend = all.reduce((s, x) => s + totalCost(x), 0);
     const saasSpend  = all.filter(x => x.deploymentType === 'SAAS').reduce((s, x) => s + totalCost(x), 0);
@@ -990,6 +1007,22 @@ router.get('/budget', requireAuth, async (req, res) => {
     all.forEach(x => { const t = x.deploymentType; byType[t] = (byType[t] || 0) + totalCost(x); });
 
     res.json({ totalSpend, saasSpend, freeCount, paidCount, totalApps: all.length, totalLic, usedLic, topApps, byType });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ── GET /api/software/:id — single software details ───────────────────────────
+router.get('/:id', requireAuth, async (req, res) => {
+  try {
+    const softwareId = String(req.params.id || '').trim();
+    if (!/^[a-f\d]{24}$/i.test(softwareId)) {
+      return res.status(400).json({ error: 'Invalid software id' });
+    }
+    const includeInvoicesRaw = String(req.query.includeInvoices || '').trim().toLowerCase();
+    const includeInvoices = ['1', 'true', 'yes'].includes(includeInvoicesRaw);
+    const projection = includeInvoices ? '-invoices.data' : '-invoices';
+    const sw = await Software.findById(softwareId).select(projection).lean();
+    if (!sw) return res.status(404).json({ error: 'Software not found' });
+    res.json(fmtSw(sw));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -1220,15 +1253,24 @@ router.post('/:id/invoices', requireAuth, canWriteSoftware, async (req, res) => 
         if (!name) continue;
         const normName = name.toLowerCase();
         const existing = (sw.services || []).find((row) => String(row?.name || '').trim().toLowerCase() === normName);
-        const svcQty = Number(svc?.purchasedLicenses);
-        const svcPrice = Number(svc?.licensePricePerUserMonth);
-        const svcAnnual = Number(svc?.annualCost);
+        const svcQtyRaw = Number(svc?.purchasedLicenses);
+        const svcPriceRaw = Number(svc?.licensePricePerUserMonth);
+        const svcAnnualRaw = Number(svc?.annualCost);
+        const svcQty = Number.isFinite(svcQtyRaw) && svcQtyRaw > 0 ? Math.round(svcQtyRaw) : null;
+        const svcAnnual = Number.isFinite(svcAnnualRaw) && svcAnnualRaw > 0 ? Number(svcAnnualRaw) : null;
+        let svcPrice = Number.isFinite(svcPriceRaw) && svcPriceRaw > 0 ? Number(svcPriceRaw) : null;
+        if (!(Number.isFinite(svcPrice) && svcPrice > 0) && Number.isFinite(svcAnnual) && svcAnnual > 0 && Number.isFinite(svcQty) && svcQty > 0) {
+          svcPrice = Number((svcAnnual / (svcQty * 12)).toFixed(2));
+        }
+        if (!(Number.isFinite(svcPrice) && svcPrice > 0) && Number.isFinite(svcAnnual) && svcAnnual > 0) {
+          svcPrice = Number((svcAnnual / 12).toFixed(2));
+        }
         const svcPlan = String(svc?.plan || '').trim();
         const svcRenewal = String(svc?.renewalPeriod || '').trim();
         if (existing) {
-          if (Number.isFinite(svcQty) && svcQty >= 0) existing.purchasedLicenses = Math.round(svcQty);
-          if (Number.isFinite(svcPrice) && svcPrice >= 0) existing.licensePricePerUserMonth = svcPrice;
-          if (Number.isFinite(svcAnnual) && svcAnnual >= 0) existing.annualCost = svcAnnual;
+          if (Number.isFinite(svcQty) && svcQty > 0) existing.purchasedLicenses = svcQty;
+          if (Number.isFinite(svcPrice) && svcPrice > 0) existing.licensePricePerUserMonth = svcPrice;
+          if (Number.isFinite(svcAnnual) && svcAnnual > 0) existing.annualCost = svcAnnual;
           if (svcPlan) existing.plan = svcPlan;
           if (['Annual', 'Monthly', 'Quarterly', 'Freeware', 'Pay-as-you-go', ''].includes(svcRenewal)) {
             existing.renewalPeriod = svcRenewal;
@@ -1238,9 +1280,9 @@ router.post('/:id/invoices', requireAuth, canWriteSoftware, async (req, res) => 
           sw.services.push({
             name,
             plan: svcPlan,
-            annualCost: Number.isFinite(svcAnnual) && svcAnnual >= 0 ? svcAnnual : 0,
-            licensePricePerUserMonth: Number.isFinite(svcPrice) && svcPrice >= 0 ? svcPrice : 0,
-            purchasedLicenses: Number.isFinite(svcQty) && svcQty >= 0 ? Math.round(svcQty) : 0,
+            annualCost: Number.isFinite(svcAnnual) && svcAnnual > 0 ? svcAnnual : 0,
+            licensePricePerUserMonth: Number.isFinite(svcPrice) && svcPrice > 0 ? svcPrice : 0,
+            purchasedLicenses: Number.isFinite(svcQty) && svcQty > 0 ? svcQty : 0,
             usedLicenses: 0,
             renewalPeriod: ['Annual', 'Monthly', 'Quarterly', 'Freeware', 'Pay-as-you-go', ''].includes(svcRenewal) ? svcRenewal : '',
             status: 'Active',
