@@ -624,10 +624,12 @@ function extractInvoiceDetailsFromEmailText({ subject = '', bodyText = '' } = {}
   const unitPrice = parseMoneyNumber(unitMatch?.[1] || '');
 
   // Date range extraction — support multiple formats:
-  //   "Jan 24, 2026 - Feb 23, 2026"  |  "01/24/2026 - 02/23/2026"  |  "2026-01-24 to 2026-02-23"
+  //   "Jan 24, 2026 - Feb 23, 2026"  |  "24-March-2026 – 23-April-2026"  |  "01/24/2026 - 02/23/2026"
   const datePatterns = [
     // "Month DD, YYYY - Month DD, YYYY"
     /([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})\s*(?:-|–|—|to)\s*([A-Za-z]{3,9}\s+\d{1,2},?\s+\d{4})/i,
+    // "DD-Month-YYYY ... – DD-Month-YYYY ..." (Adobe format: "24-March-2026 PDT – 23-April-2026 PDT")
+    /(\d{1,2}-[A-Za-z]{3,9}-\d{4})\s*[A-Z]{0,5}\s*(?:-|–|—|to)\s*(\d{1,2}-[A-Za-z]{3,9}-\d{4})/i,
     // "MM/DD/YYYY - MM/DD/YYYY" or "DD/MM/YYYY - DD/MM/YYYY"
     /(\d{1,2}\/\d{1,2}\/\d{4})\s*(?:-|–|—|to)\s*(\d{1,2}\/\d{1,2}\/\d{4})/i,
     // "YYYY-MM-DD to YYYY-MM-DD"
