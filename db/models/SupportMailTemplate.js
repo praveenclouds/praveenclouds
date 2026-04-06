@@ -21,7 +21,7 @@ const DEFAULT_SUPPORT_MAIL_TEMPLATES = [
     label: 'Task Assignment',
     audience: 'Task owner / software admins',
     description: 'Sent when a workflow step is assigned, including software access tasks routed to app admins.',
-    tokens: ['requestId', 'workflowLabel', 'employeeName', 'employeeEmail', 'department', 'priority', 'requestedByName', 'applications', 'stepLabel', 'detailUrl'],
+    tokens: ['requestId', 'workflowLabel', 'employeeName', 'employeeEmail', 'department', 'priority', 'requestedByName', 'applications', 'stepLabel', 'handoffMessage', 'detailUrl'],
     subjectTemplate: 'Task assigned — {{stepLabel}} for {{employeeName}}',
     introTemplate: 'A workflow task has been assigned to you.',
     bodyTemplate: 'Request ID: {{requestId}}\nRequest Type: {{workflowLabel}}\nEmployee: {{employeeName}} ({{employeeEmail}})\nDepartment: {{department}}\nPriority: {{priority}}\nTask: {{stepLabel}}\nApplications: {{applications}}',

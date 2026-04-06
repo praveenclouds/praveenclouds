@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software Details</title>
+  <link rel="stylesheet" href="/portal-theme.css" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #7c3aed;
+      --success: #16a34a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .page {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .back-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+    }
+    .sub {
+      margin-top: 4px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      margin-left: 8px;
+    }
+    .pill.success {
+      color: var(--success);
+      background: #ecfdf3;
+      border-color: #bbf7d0;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    .tab-btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .tab-btn.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #f5f3ff;
+    }
+    .panel {
+      display: none;
+    }
+    .panel.active {
+      display: block;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .card .k {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 700;
+    }
+    .card .v {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .info-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .info-item .label {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    .info-item .value {
+      font-size: 14px;
+      font-weight: 600;
+      word-break: break-word;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    th {
+      border-top: none;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      font-weight: 700;
+      background: #f9fafb;
+    }
+    .invoice-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .invoice-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      padding: 12px;
+    }
+    .invoice-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .invoice-name {
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .invoice-meta {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+    .btn {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .msg {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .error {
+      color: #b91c1c;
+      border-color: #fecaca;
+      background: #fef2f2;
+    }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <script src="/portal-api-client.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="top">
+      <button class="back-btn" onclick="window.location.href='/'">← Back To Software Inventory</button>
+    </div>
+
+    <div id="loading" class="msg">Loading software details...</div>
+    <div id="error" class="msg error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div class="title-wrap">
+        <h1>
+          <span id="swName">Software</span>
+          <span class="pill" id="swType">SAAS</span>
+          <span class="pill success" id="swStatus">Active</span>
+        </h1>
+        <div class="sub"><span id="swPurpose">—</span> · <strong id="swCsv">—</strong></div>
+      </div>
+
+      <div class="tabs">
+        <button id="tabOverviewBtn" class="tab-btn active" onclick="switchTab('overview')">Overview</button>
+        <button id="tabInvoicesBtn" class="tab-btn" onclick="switchTab('invoices')">Invoices</button>
+      </div>
+
+      <div id="panelOverview" class="panel active">
+        <div class="grid">
+          <div class="card"><div class="k">Base Annual Cost</div><div class="v" id="baseCost">$0</div></div>
+          <div class="card"><div class="k">Add-on Services</div><div class="v" id="addonCost">$0</div></div>
+          <div class="card"><div class="k">Total Annual Cost</div><div class="v" id="totalCost">$0</div></div>
+        </div>
+
+        <div class="grid">
+          <div class="card"><div class="k">Purchased Licenses</div><div class="v" id="purchasedLic">0</div></div>
+          <div class="card"><div class="k">Used Licenses</div><div class="v" id="usedLic">0</div></div>
+          <div class="card"><div class="k">$/User/Month</div><div class="v" id="unitPrice">$0</div></div>
+        </div>
+
+        <div class="info-grid" id="infoGrid"></div>
+
+        <h3 style="margin-top:16px">Add-on Services</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Service Name</th>
+              <th>Plan</th>
+              <th>$/User/Mo</th>
+              <th>Purch.</th>
+              <th>Used</th>
+              <th>Annual Cost</th>
+              <th>Renewal</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="serviceRows"></tbody>
+        </table>
+      </div>
+
+      <div id="panelInvoices" class="panel">
+        <div class="grid">
+          <div class="card"><div class="k">Total Invoiced</div><div class="v" id="invTotal">$0</div></div>
+          <div class="card"><div class="k">Invoices</div><div class="v" id="invCount">0</div></div>
+          <div class="card"><div class="k">Latest Invoice</div><div class="v" id="invLatest">$0</div></div>
+        </div>
+        <div id="invoiceList" class="invoice-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin + '/api';
+    const token = () => localStorage.getItem('tcToken');
+    const params = new URLSearchParams(window.location.search);
+    const softwareId = String(params.get('id') || '').trim();
+
+    let sw = null;
+    let invoices = [];
+
+    function authFetch(url, opts = {}) {
+      const h = {
+        'Content-Type': 'application/json',
+        ...(opts.headers || {}),
+        ...(token() ? { Authorization: 'Bearer ' + token() } : {}),
+      };
+      return window.tcApi.request(url, {
+        ...opts,
+        headers: h,
+        timeoutMs: 30000,
+        retries: 1,
+      });
+    }
+
+    async function apiFetch(url, opts = {}) {
+      const res = await authFetch(url, opts);
+      const isJson = String(res.headers.get('content-type') || '').toLowerCase().includes('application/json');
+      const payload = isJson ? await res.json() : await res.text();
+      if (!res.ok) {
+        const msg = payload && typeof payload === 'object' ? (payload.error || payload.message || 'Request failed') : String(payload || 'Request failed');
+        throw new Error(msg);
+      }
+      return payload;
+    }
+
+    function money(value, currency = 'USD') {
+      const n = Number(value || 0);
+      if (!Number.isFinite(n)) return '—';
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(n);
+    }
+
+    function text(v) {
+      return String(v == null || v === '' ? '—' : v);
+    }
+
+    function switchTab(tab) {
+      const ov = tab === 'overview';
+      document.getElementById('tabOverviewBtn').classList.toggle('active', ov);
+      document.getElementById('tabInvoicesBtn').classList.toggle('active', !ov);
+      document.getElementById('panelOverview').classList.toggle('active', ov);
+      document.getElementById('panelInvoices').classList.toggle('active', !ov);
+    }
+
+    function invoiceSortDateMs(value) {
+      if (!value) return 0;
+      const ms = Date.parse(String(value));
+      return Number.isFinite(ms) ? ms : 0;
+    }
+
+    function sortInvoicesByBillingPeriodDesc(rows = []) {
+      const list = Array.isArray(rows) ? [...rows] : [];
+      return list.sort((a, b) => {
+        const bEnd = invoiceSortDateMs(b?.periodTo) || invoiceSortDateMs(b?.periodFrom) || invoiceSortDateMs(b?.uploadedAt);
+        const aEnd = invoiceSortDateMs(a?.periodTo) || invoiceSortDateMs(a?.periodFrom) || invoiceSortDateMs(a?.uploadedAt);
+        if (bEnd !== aEnd) return bEnd - aEnd;
+
+        const bStart = invoiceSortDateMs(b?.periodFrom) || invoiceSortDateMs(b?.periodTo) || invoiceSortDateMs(b?.uploadedAt);
+        const aStart = invoiceSortDateMs(a?.periodFrom) || invoiceSortDateMs(a?.periodTo) || invoiceSortDateMs(a?.uploadedAt);
+        if (bStart !== aStart) return bStart - aStart;
+
+        const bUp = invoiceSortDateMs(b?.uploadedAt);
+        const aUp = invoiceSortDateMs(a?.uploadedAt);
+        return bUp - aUp;
+      });
+    }
+
+    function renderOverview() {
+      const currency = String(sw.currency || invoices[0]?.currency || 'USD').toUpperCase();
+      const activeServices = (Array.isArray(sw.services) ? sw.services : []).filter(s => String(s.status || 'Active') !== 'Inactive');
+      const addonAnnual = activeServices.reduce((sum, s) => sum + Number(s.annualCost || 0), 0);
+      const baseAnnual = Number(sw.annualCost || 0);
+
+      document.getElementById('swName').textContent = text(sw.name);
+      document.getElementById('swPurpose').textContent = text(sw.purpose);
+      document.getElementById('swCsv').textContent = text(sw.csvId);
+      document.getElementById('swType').textContent = text(sw.deploymentType || 'SAAS');
+      document.getElementById('swStatus').textContent = text(sw.status || 'Active');
+
+      document.getElementById('baseCost').textContent = money(baseAnnual, currency);
+      document.getElementById('addonCost').textContent = money(addonAnnual, currency);
+      document.getElementById('totalCost').textContent = money(baseAnnual + addonAnnual, currency);
+
+      document.getElementById('purchasedLic').textContent = String(Number(sw.purchasedLicenses || 0));
+      document.getElementById('usedLic').textContent = String(Number(sw.usedLicenses || 0));
+      document.getElementById('unitPrice').textContent = money(Number(sw.licensePricePerUserMonth || 0), currency);
+
+      const infoPairs = [
+        ['Subscription Plan', text(sw.subscriptionPlan)],
+        ['Renewal', text(sw.renewalPeriod)],
+        ['Owner', text(sw.owner)],
+        ['Admin(s)', text(sw.admins)],
+        ['Billed To', text(sw.billedTo)],
+        ['Department', text(sw.department)],
+        ['Provisioning', text(sw.provisioningMethod || 'Manual')],
+        ['Connector', text(sw.connectorType)],
+      ];
+      document.getElementById('infoGrid').innerHTML = infoPairs.map(([label, value]) => `
+        <div class="info-item">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </div>
+      `).join('');
+
+      const rows = activeServices.map((svc) => `
+        <tr>
+          <td>${text(svc.name)}</td>
+          <td>${text(svc.plan)}</td>
+          <td>${money(svc.licensePricePerUserMonth, currency)}</td>
+          <td>${text(svc.purchasedLicenses)}</td>
+          <td>${text(svc.usedLicenses)}</td>
+          <td>${money(svc.annualCost, currency)}</td>
+          <td>${text(svc.renewalPeriod)}</td>
+          <td>${text(svc.status || 'Active')}</td>
+        </tr>
+      `).join('');
+      document.getElementById('serviceRows').innerHTML = rows || '<tr><td colspan="8" style="color:#6b7280;text-align:center">No add-on services.</td></tr>';
+    }
+
+    function renderInvoices() {
+      const currency = String(sw.currency || invoices[0]?.currency || 'USD').toUpperCase();
+      const sorted = sortInvoicesByBillingPeriodDesc(invoices);
+      const total = sorted.reduce((sum, inv) => sum + Number(inv.amount || 0), 0);
+      const latest = sorted[0] || null;
+
+      document.getElementById('invTotal').textContent = money(total, currency);
+      document.getElementById('invCount').textContent = String(sorted.length);
+      document.getElementById('invLatest').textContent = latest ? money(latest.amount || 0, latest.currency || currency) : '—';
+
+      const list = document.getElementById('invoiceList');
+      if (!sorted.length) {
+        list.innerHTML = '<div class="msg">No invoices attached yet.</div>';
+        return;
+      }
+
+      list.innerHTML = sorted.map((inv) => {
+        const from = inv.periodFrom ? String(inv.periodFrom).slice(0, 10) : '—';
+        const to = inv.periodTo ? String(inv.periodTo).slice(0, 10) : '—';
+        const uploaded = inv.uploadedAt ? new Date(inv.uploadedAt).toLocaleString('en-IN') : '—';
+        return `
+          <div class="invoice-item">
+            <div class="invoice-head">
+              <div class="invoice-name">${text(inv.filename)}</div>
+              <button class="btn" onclick="downloadInvoice('${inv.id}', '${(inv.filename || 'invoice.pdf').replace(/'/g, '')}')">Download</button>
+            </div>
+            <div class="invoice-meta">
+              Amount: <strong>${money(inv.amount || 0, inv.currency || currency)}</strong> · Billing: ${text(inv.billingPeriod)} · Plan: ${text(inv.subscriptionPlan)}<br>
+              Qty: ${text(inv.licenseQuantity)} · Unit: ${money(inv.licenseUnitPrice || 0, inv.currency || currency)} · Period: ${from} → ${to}<br>
+              Uploaded: ${uploaded}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function downloadInvoice(invId, filename) {
+      const safeName = String(filename || 'invoice.pdf').replace(/[\\/:*?"<>|]+/g, '_');
+      const res = await authFetch(`/api/software/${encodeURIComponent(softwareId)}/invoices/${encodeURIComponent(invId)}/download`, {
+        method: 'GET',
+        timeoutMs: 120000,
+      });
+      if (!res.ok) {
+        let message = 'Download failed';
+        try {
+          const j = await res.json();
+          if (j?.error) message = j.error;
+        } catch {}
+        throw new Error(message);
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = safeName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    async function load() {
+      const loading = document.getElementById('loading');
+      const error = document.getElementById('error');
+      const content = document.getElementById('content');
+      try {
+        if (!softwareId) throw new Error('Missing software id in URL');
+        if (!token()) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const [softwareDetails, invoiceRows] = await Promise.all([
+          apiFetch(`/api/software/${encodeURIComponent(softwareId)}`),
+          apiFetch(`/api/software/${encodeURIComponent(softwareId)}/invoices`),
+        ]);
+
+        sw = softwareDetails;
+        invoices = Array.isArray(invoiceRows) ? invoiceRows : [];
+        renderOverview();
+        renderInvoices();
+
+        loading.style.display = 'none';
+        error.style.display = 'none';
+        content.style.display = '';
+      } catch (e) {
+        loading.style.display = 'none';
+        error.textContent = e.message || 'Failed to load software details';
+        error.style.display = '';
+        if (/authentication required|invalid or expired token/i.test(String(e.message || ''))) {
+          setTimeout(() => { window.location.href = '/login'; }, 600);
+        }
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

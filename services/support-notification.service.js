@@ -267,25 +267,28 @@ function templateContext(request = {}, extra = {}) {
     managerName: fallbackValue(request.managerName),
     applications: (request.applications || []).map(app => app?.name).filter(Boolean).join(', ') || '—',
     stepLabel: fallbackValue(extra.stepLabel, ''),
+    handoffMessage: fallbackValue(extra.handoffMessage, ''),
     detailUrl: extra.detailUrl || '',
     approveUrl: extra.approveUrl || '',
     rejectUrl: extra.rejectUrl || '',
   };
 }
 
-async function sendAssignmentEmail({ to, templateKey, request, stepLabel = '' }) {
+async function sendAssignmentEmail({ to, templateKey, request, stepLabel = '', handoffMessage = '' }) {
   const recipients = Array.isArray(to) ? to.filter(Boolean) : [to].filter(Boolean);
   if (!recipients.length) return;
   const settings = await loadEmailSettings();
   const detailUrl = requestDetailUrl(settings.appBaseUrl);
-  const rendered = await renderSupportMailTemplate(templateKey, templateContext(request, { stepLabel, detailUrl }));
+  const rendered = await renderSupportMailTemplate(templateKey, templateContext(request, { stepLabel, handoffMessage, detailUrl }));
   const actionLabel = rendered.ctaLabel || 'Open Support Center';
+  const handoffBlock = String(handoffMessage || '').trim();
   await sendMail({
     to: recipients,
     subject: rendered.subject,
     text: [
       rendered.intro,
       rendered.body,
+      handoffBlock ? `Handoff message from previous step:\n${handoffBlock}` : '',
       detailUrl ? `${actionLabel}: ${detailUrl}` : '',
       rendered.footerNote,
     ].filter(Boolean).join('\n\n'),
@@ -293,6 +296,7 @@ async function sendAssignmentEmail({ to, templateKey, request, stepLabel = '' })
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
         ${rendered.intro ? `<p>${escapeHtml(rendered.intro)}</p>` : ''}
         ${bodyToHtml(rendered.body)}
+        ${handoffBlock ? `<p><strong>Handoff message from previous step:</strong><br>${escapeHtml(handoffBlock).replace(/\n/g, '<br>')}</p>` : ''}
         ${detailUrl ? `<p><a href="${escapeHtml(detailUrl)}" style="display:inline-block;padding:10px 16px;background:#3757e6;color:#fff;text-decoration:none;border-radius:8px">${escapeHtml(actionLabel)}</a></p>` : ''}
         ${rendered.footerNote ? `<p style="font-size:12px;color:#6b7280">${escapeHtml(rendered.footerNote)}</p>` : ''}
       </div>
@@ -356,7 +360,7 @@ function buildAssigneeSlackMessage(request, detailUrl) {
   return { text, blocks };
 }
 
-function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, completeToken = '') {
+function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, completeToken = '', handoffMessage = '') {
   const stepLabel = step?.label || '';
   const notes = compactNotes(request.notes);
   const requestId = fallbackValue(request.requestId, '-');
@@ -366,6 +370,7 @@ function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, complete
   const employeeEmail = fallbackValue(request.employeeEmail, '-');
   const priority = humanizeLabel(request.priority, '-');
   const currentStatus = humanizeLabel(request.status, '-');
+  const handoffText = String(handoffMessage || '').trim();
   const text = `Workflow task assigned • ${requestId} • ${task}`;
   const blocks = [
     {
@@ -396,6 +401,12 @@ function buildTaskAssignmentSlackMessage(request, step = {}, detailUrl, complete
     blocks.push({
       type: 'context',
       elements: [{ type: 'mrkdwn', text: `Notes: ${notes}` }],
+    });
+  }
+  if (handoffText) {
+    blocks.push({
+      type: 'section',
+      text: { type: 'mrkdwn', text: `*Handoff message from previous step*\n${escapeMrkdwn(handoffText)}` },
     });
   }
 
@@ -608,7 +619,7 @@ function buildTaskCompleteToken(request = {}, step = {}, recipientEmail = '') {
   );
 }
 
-async function sendTaskAssigneeSlackInboxMessages(request, step = {}, recipients = []) {
+async function sendTaskAssigneeSlackInboxMessages(request, step = {}, recipients = [], options = {}) {
   const targetEmails = uniqueEmails((recipients || []).map(email => ({ email })));
   if (!targetEmails.length) return false;
 
@@ -618,9 +629,10 @@ async function sendTaskAssigneeSlackInboxMessages(request, step = {}, recipients
     String(step?.approvalMode || 'none') !== 'manager'
     && String(step?.status || 'pending') !== 'done'
   );
+  const handoffMessage = String(options.handoffMessage || '').trim();
   const results = await Promise.all(targetEmails.map(email => {
     const completeToken = canAddCompleteButton ? buildTaskCompleteToken(request, step, email) : '';
-    const message = buildTaskAssignmentSlackMessage(request, step, detailUrl, completeToken);
+    const message = buildTaskAssignmentSlackMessage(request, step, detailUrl, completeToken, handoffMessage);
     return sendSlackInboxMessageByEmail(email, message);
   }));
   return results.some(result => result?.sent);
@@ -1116,13 +1128,19 @@ async function notifySupportRequestChanges(previousRequest, currentRequest) {
       );
 
       if (shouldNotifyTaskAssignee) {
+        const dependencyKey = String(step?.dependsOn || '').trim();
+        const dependencyStep = dependencyKey
+          ? (currentRequest.checklist || []).find(item => String(item?.key || '').trim() === dependencyKey)
+          : null;
+        const handoffMessage = String(dependencyStep?.handoffMessage || '').trim();
         await sendAssignmentEmail({
           to: stepRecipients,
           templateKey: 'task_assignment',
           request: currentRequest,
           stepLabel: step.label,
+          handoffMessage,
         });
-        await sendTaskAssigneeSlackInboxMessages(currentRequest, step, stepRecipients);
+        await sendTaskAssigneeSlackInboxMessages(currentRequest, step, stepRecipients, { handoffMessage });
       }
 
       if (step.approvalMode !== 'manager' || !currentRequest.managerEmail || step.status === 'done') continue;

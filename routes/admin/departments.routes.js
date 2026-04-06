@@ -18,6 +18,12 @@ function fmtDepartment(doc) {
 }
 
 async function ensureDepartmentsSeededFromUsers() {
+  // Bootstrap only when departments are empty.
+  // If we seed on every read, a deleted department can reappear immediately
+  // from existing user.dept values, which makes delete look broken.
+  const existingCount = await Department.estimatedDocumentCount();
+  if (existingCount > 0) return;
+
   const rows = await User.aggregate([
     { $match: { dept: { $exists: true, $ne: null, $ne: '' } } },
     { $group: { _id: '$dept' } },
@@ -35,7 +41,13 @@ async function ensureDepartmentsSeededFromUsers() {
 
 router.get('/', requireAuth, async (req, res) => {
   try {
-    await ensureDepartmentsSeededFromUsers();
+    // Prevent deleted departments from auto-reappearing.
+    // Run bootstrap seeding only when explicitly requested.
+    const bootstrapRaw = String(req.query.bootstrapFromUsers || '').trim().toLowerCase();
+    const shouldBootstrap = ['1', 'true', 'yes'].includes(bootstrapRaw);
+    if (shouldBootstrap) {
+      await ensureDepartmentsSeededFromUsers();
+    }
     const departments = await Department.find({}).sort({ name: 1 }).lean();
     res.json(departments.map(fmtDepartment));
   } catch (error) {
@@ -114,4 +126,3 @@ router.delete('/:id', requireAuth, canWriteUsers, async (req, res) => {
 });
 
 module.exports = router;
-

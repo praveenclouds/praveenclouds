@@ -1,10 +1,35 @@
 const router = require('express').Router();
-const { AlertRule } = require('../../db');
+const { AlertRule, AlertConfig } = require('../../db');
 const { requireAuth, canManageIntegrations } = require('../../middleware/auth');
 const { writeLog } = require('../../services/log.service');
 
 const ALLOWED_CHANNELS = new Set(['inApp', 'email', 'slack']);
 const ALLOWED_CATEGORIES = new Set(['users', 'software', 'assets']);
+const ALERT_CONFIG_KEY = 'default';
+
+function normalizeInventory(value = {}) {
+  return {
+    users: value?.users !== false,
+    software: value?.software !== false,
+    assets: value?.assets !== false,
+  };
+}
+
+function normalizeNotificationOptions(value = {}) {
+  return {
+    inApp: value?.inApp !== false,
+    email: value?.email === true,
+    slack: value?.slack === true,
+  };
+}
+
+function channelsFromNotifications(notifications = {}) {
+  const channels = [];
+  if (notifications.inApp) channels.push('inApp');
+  if (notifications.email) channels.push('email');
+  if (notifications.slack) channels.push('slack');
+  return normalizeChannels(channels);
+}
 
 function normalizeChannels(value) {
   const raw = Array.isArray(value) ? value : [];
@@ -34,12 +59,168 @@ function formatAlertRule(doc) {
   };
 }
 
+function formatAlertConfig(doc) {
+  const inventory = normalizeInventory(doc?.inventory || {});
+  const notifications = normalizeNotificationOptions(doc?.notifications || {});
+  return {
+    key: ALERT_CONFIG_KEY,
+    inventory,
+    notifications,
+    updatedAt: doc?.updatedAt || null,
+    createdAt: doc?.createdAt || null,
+  };
+}
+
 router.get('/', requireAuth, async (req, res) => {
   try {
     const rules = await AlertRule.find({}).sort({ createdAt: -1 }).lean();
     res.json(rules.map(formatAlertRule));
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/config', requireAuth, async (req, res) => {
+  try {
+    const doc = await AlertConfig.findOne({ key: ALERT_CONFIG_KEY }).lean();
+    res.json(formatAlertConfig(doc || {}));
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/config', requireAuth, canManageIntegrations, async (req, res) => {
+  try {
+    const actor = req.user?.name || req.user?.email || 'unknown';
+    const inventory = normalizeInventory(req.body?.inventory || {});
+    const notifications = normalizeNotificationOptions(req.body?.notifications || {});
+
+    const doc = await AlertConfig.findOneAndUpdate(
+      { key: ALERT_CONFIG_KEY },
+      {
+        $set: {
+          key: ALERT_CONFIG_KEY,
+          inventory,
+          notifications,
+          updatedBy: actor,
+        },
+        $setOnInsert: { createdBy: actor },
+      },
+      { upsert: true, new: true }
+    );
+
+    await writeLog({
+      eventType: 'alert_config_updated',
+      entityType: 'alert_config',
+      entityId: ALERT_CONFIG_KEY,
+      entityLabel: 'Alerts Configuration',
+      actorName: actor,
+      summary: `Alerts configuration updated (inventory: users=${inventory.users}, software=${inventory.software}, assets=${inventory.assets})`,
+    });
+
+    res.json(formatAlertConfig(doc));
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+router.post('/sync', requireAuth, canManageIntegrations, async (req, res) => {
+  try {
+    const actor = req.user?.name || req.user?.email || 'unknown';
+    const inventory = normalizeInventory(req.body?.inventory || {});
+    const notifications = normalizeNotificationOptions(req.body?.notifications || {});
+    const channels = channelsFromNotifications(notifications);
+    const conditions = Array.isArray(req.body?.conditions) ? req.body.conditions : [];
+
+    const normalizedConditions = [];
+    for (const row of conditions) {
+      const category = String(row?.category || '').trim();
+      const condition = String(row?.condition || '').trim();
+      if (!ALLOWED_CATEGORIES.has(category) || !condition) continue;
+      normalizedConditions.push({
+        category,
+        condition,
+        enabled: row?.enabled === true,
+        threshold: toNumberOrNull(row?.threshold),
+        name: String(row?.name || '').trim(),
+        description: String(row?.description || '').trim(),
+      });
+    }
+
+    // Upsert every passed condition as a managed rule.
+    for (const row of normalizedConditions) {
+      const categoryEnabled = inventory[row.category] !== false;
+      const finalEnabled = categoryEnabled && row.enabled;
+      const autoName = `${row.category[0].toUpperCase()}${row.category.slice(1)}: ${row.condition}`;
+      const preferredName = row.name || autoName;
+
+      const rule = await AlertRule.findOneAndUpdate(
+        { category: row.category, condition: row.condition },
+        {
+          $set: {
+            name: preferredName,
+            description: row.description,
+            threshold: row.threshold,
+            channels,
+            enabled: finalEnabled,
+            updatedBy: actor,
+          },
+          $setOnInsert: {
+            createdBy: actor,
+          },
+        },
+        { upsert: true, new: true, runValidators: true }
+      );
+
+      // Defensive cleanup if there are legacy duplicates with same category+condition.
+      await AlertRule.updateMany(
+        { category: row.category, condition: row.condition, _id: { $ne: rule._id } },
+        { $set: { enabled: false, updatedBy: actor } }
+      );
+    }
+
+    // If an inventory is disabled, force-disable all rules in that category.
+    const disabledCategories = Object.entries(inventory)
+      .filter(([, enabled]) => enabled === false)
+      .map(([category]) => category);
+    if (disabledCategories.length) {
+      await AlertRule.updateMany(
+        { category: { $in: disabledCategories } },
+        { $set: { enabled: false, updatedBy: actor } }
+      );
+    }
+
+    const configDoc = await AlertConfig.findOneAndUpdate(
+      { key: ALERT_CONFIG_KEY },
+      {
+        $set: {
+          key: ALERT_CONFIG_KEY,
+          inventory,
+          notifications,
+          updatedBy: actor,
+        },
+        $setOnInsert: { createdBy: actor },
+      },
+      { upsert: true, new: true }
+    );
+
+    const rules = await AlertRule.find({}).sort({ createdAt: -1 }).lean();
+    await writeLog({
+      eventType: 'alert_config_updated',
+      entityType: 'alert_config',
+      entityId: ALERT_CONFIG_KEY,
+      entityLabel: 'Alerts Configuration',
+      actorName: actor,
+      summary: `Alert sync applied (${normalizedConditions.length} conditions, channels=${channels.join(',')})`,
+    });
+
+    res.json({
+      ok: true,
+      config: formatAlertConfig(configDoc),
+      rules: rules.map(formatAlertRule),
+    });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -135,4 +316,3 @@ router.delete('/:id', requireAuth, canManageIntegrations, async (req, res) => {
 });
 
 module.exports = router;
-

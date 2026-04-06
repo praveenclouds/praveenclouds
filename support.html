@@ -330,25 +330,22 @@
       overflow-y: auto;
     }
     .logo {
-      display: flex;
-      align-items: center;
-      gap: 11px;
+      display: block;
       padding: 20px 18px 16px;
       border-bottom: 1px solid var(--border);
     }
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: var(--accent);
+    .logo-brand { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .logo-image-wrap {
+      width: 170px; height: 48px; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border); background: #fff;
     }
-    .logo-icon svg { width: 18px; height: 18px; fill: #fff; }
-    .logo-title { font-size: 15px; font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
-    .logo-sub { color: #9f82dd; margin-top: 1px; font-size: 11px; }
+    .logo-image { width: 100%; height: 100%; display: none; }
+    .logo-image--light { object-fit: contain; object-position: left center; padding: 3px 8px; box-sizing: border-box; background: #fff; }
+    .logo-image--dark { object-fit: cover; object-position: center; }
+    body[data-portal-theme="white"] .logo-image--light { display: block; }
+    body[data-portal-theme="dark"] .logo-image--dark { display: block; }
+    body[data-portal-theme="dark"] .logo-image-wrap { background: #140f24; border-color: rgba(153,102,255,0.3); }
+    .logo-sub { color: #9f82dd; margin-top: 0; font-size: 11px; }
     .nav-title {
       color: rgba(153,102,255,0.55);
       text-transform: uppercase;
@@ -1407,6 +1404,37 @@
       justify-content:space-between;
       gap: 12px;
     }
+    .workflow-step-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .step-order-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(130,96,185,.35);
+      background: rgba(130,96,185,.08);
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: .16s ease;
+    }
+    .step-order-btn:hover:not(:disabled) {
+      border-color: rgba(130,96,185,.65);
+      background: rgba(130,96,185,.18);
+    }
+    .step-order-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
     .workflow-step-grid {
       display:grid;
       grid-template-columns: 1.2fr 1fr 1fr;
@@ -1594,10 +1622,8 @@
     /* Align Support Center sizing with the Asset Management portal */
     .shell { grid-template-columns: 240px 1fr; }
     .sidebar { padding: 18px 18px 14px; }
-    .logo { gap: 10px; margin-bottom: 18px; }
-    .logo-icon { width: 34px; height: 34px; border-radius: 8px; }
-    .logo-icon svg { width: 18px; height: 18px; }
-    .logo-title { font-size: 13px; font-weight: 700; line-height: 1.2; }
+    .logo { margin-bottom: 18px; }
+    .logo-image-wrap { width: 160px; height: 44px; border-radius: 8px; }
     .logo-sub { margin-top: 2px; font-size: 10px; }
     .nav-title { font-size: 10px; font-weight: 600; letter-spacing: .08em; margin: 18px 0 8px; }
     .nav-link { padding: 8px 11px; border-radius: 8px; margin-bottom: 1px; font-size: 13px; font-weight: 500; }
@@ -1719,11 +1745,11 @@
   <div class="shell">
     <aside class="sidebar">
       <div class="logo">
-        <div class="logo-icon">
-          <svg viewBox="0 0 64 64"><path d="M32 4L4 56h16l12-28 12 28h16L32 4z" /><rect x="18" y="38" width="28" height="8" rx="2" opacity=".5"/></svg>
-        </div>
-        <div>
-          <div class="logo-title">Terzo</div>
+        <div class="logo-brand">
+          <div class="logo-image-wrap">
+            <img class="logo-image logo-image--light" src="/assets/branding/terzo_logo_light.jpg" alt="Terzo logo light theme" />
+            <img class="logo-image logo-image--dark" src="/assets/branding/terzo_logo_dark.jpg" alt="Terzo logo dark theme" />
+          </div>
           <div class="logo-sub">Support Workflows</div>
         </div>
       </div>
@@ -2632,7 +2658,7 @@
           required: ['priority', 'employeeName', 'employeeEmail', 'department'].includes(key),
         })),
         checklist: [
-          { key: 'step_1', label: '', area: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' },
+          { key: 'step_1', label: '', area: '', handoffMessage: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' },
         ],
       };
     }
@@ -2948,6 +2974,7 @@
         key: step.key,
         label: step.label,
         area: step.area || '',
+        handoffMessage: step.handoffMessage || '',
         dependsOn: step.dependsOn || '',
         status: 'pending',
         owner: step.defaultOwner || '',
@@ -2971,6 +2998,7 @@
             dependsOn: dependencyKey,
             status: 'pending',
             owner: softwareDefaultOwner(software),
+            handoffMessage: '',
             notes: '',
             approvalMode: 'none',
           };
@@ -2992,6 +3020,7 @@
           dependsOn: dependencyKey,
           status: 'pending',
           owner: softwareDefaultOwner(app),
+          handoffMessage: '',
           notes: '',
           approvalMode: 'none',
         })),
@@ -3403,9 +3432,11 @@
 
     function captureRequestTypeEditorState() {
       const editor = document.getElementById('requestTypeEditor');
+      const main = document.querySelector('.main');
       const activeElement = document.activeElement;
       const state = {
         pageScrollY: window.scrollY,
+        mainScrollTop: main?.scrollTop || 0,
         editorScrollTop: editor?.scrollTop || 0,
         editorKey: '',
         selectionStart: null,
@@ -3423,12 +3454,17 @@
     function restoreRequestTypeEditorState(state) {
       if (!state) return;
       const editor = document.getElementById('requestTypeEditor');
+      const main = document.querySelector('.main');
       const selector = state.editorKey
         ? (state.editorKey.startsWith('requestType')
           ? `#${state.editorKey}`
           : `[data-editor-key="${state.editorKey}"]`)
         : '';
-      window.scrollTo({ top: state.pageScrollY });
+      if (main) {
+        main.scrollTop = state.mainScrollTop || 0;
+      } else {
+        window.scrollTo({ top: state.pageScrollY });
+      }
       if (editor) editor.scrollTop = state.editorScrollTop || 0;
       if (!selector) return;
       const field = document.querySelector(selector);
@@ -3673,7 +3709,7 @@
         </div>
 
         <div class="builder-section-title" style="margin-top:12px">Workflow Steps</div>
-        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">Define the checklist tasks IT runs when this request is created. Each step can have a default assignee, dependencies, and optional manager approval.</div>
+        <div style="color:var(--muted);font-size:.85rem;margin-bottom:8px">Define the checklist tasks IT runs when this request is created. You can reorder steps with arrows, set dependencies, and add an optional handoff message to the next step assignee.</div>
         <div class="workflow-step-list">
           ${checklist.map((step, index) => `
             <div class="workflow-step-card">
@@ -3683,20 +3719,30 @@
                   ${step.approvalMode === 'manager' ? `<span style="font-size:.75rem;padding:2px 8px;border-radius:999px;background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);font-weight:700">Approval</span>` : ''}
                   ${step.dependsOn ? `<span style="font-size:.75rem;color:var(--muted)">after: ${escapeHtml(step.dependsOn)}</span>` : ''}
                 </div>
-                ${editable ? `<button class="btn btn-secondary" type="button" onclick="removeRequestTypeStep(${index})">Remove</button>` : ''}
+                ${editable ? `
+                  <div class="workflow-step-actions">
+                    <button class="step-order-btn" type="button" onclick="moveRequestTypeStep(${index}, -1)" title="Move step up" ${index === 0 ? 'disabled' : ''}>↑</button>
+                    <button class="step-order-btn" type="button" onclick="moveRequestTypeStep(${index}, 1)" title="Move step down" ${index === checklist.length - 1 ? 'disabled' : ''}>↓</button>
+                    <button class="btn btn-secondary" type="button" onclick="removeRequestTypeStep(${index})">Remove</button>
+                  </div>
+                ` : ''}
               </div>
               <div class="workflow-step-grid">
                 <div class="full">
                   <label>Step Label</label>
-                  <input data-editor-key="step-${index}-label" value="${escapeHtml(step.label || '')}" placeholder="Create user account" oninput="updateRequestTypeStep(${index}, 'label', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="step-${index}-label" value="${escapeHtml(step.label || '')}" placeholder="Create user account" oninput="updateRequestTypeStep(${index}, 'label', this.value, false)" onblur="updateRequestTypeStep(${index}, 'label', this.value, true)" ${editable ? '' : 'disabled'} />
+                </div>
+                <div class="full">
+                  <label>Message To Next Step Assignee</label>
+                  <textarea data-editor-key="step-${index}-handoffMessage" rows="2" placeholder="Example: Access review complete. Please record approval and continue provisioning." oninput="updateRequestTypeStep(${index}, 'handoffMessage', this.value, false)" ${editable ? '' : 'disabled'}>${escapeHtml(step.handoffMessage || '')}</textarea>
                 </div>
                 <div>
                   <label>Area / Team</label>
-                  <input data-editor-key="step-${index}-area" value="${escapeHtml(step.area || '')}" placeholder="Identity" oninput="updateRequestTypeStep(${index}, 'area', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="step-${index}-area" value="${escapeHtml(step.area || '')}" placeholder="Identity" oninput="updateRequestTypeStep(${index}, 'area', this.value, false)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
                   <label>Step Key</label>
-                  <input data-editor-key="step-${index}-key" value="${escapeHtml(step.key || '')}" placeholder="account_created" oninput="updateRequestTypeStep(${index}, 'key', this.value)" ${editable ? '' : 'disabled'} />
+                  <input data-editor-key="step-${index}-key" value="${escapeHtml(step.key || '')}" placeholder="account_created" oninput="updateRequestTypeStep(${index}, 'key', this.value, false)" onblur="updateRequestTypeStep(${index}, 'key', this.value, true)" ${editable ? '' : 'disabled'} />
                 </div>
                 <div>
                   <label>Default Step Assignee</label>
@@ -3753,14 +3799,16 @@
       renderRequestTypeEditor();
     }
 
-    function updateRequestTypeStep(index, field, value) {
+    function updateRequestTypeStep(index, field, value, shouldRerender = true) {
       const definition = currentRequestTypeDefinition();
       if (!definition?.checklist?.[index]) return;
       definition.checklist[index][field] = value;
       if (field === 'label' && !definition.checklist[index].key) {
         definition.checklist[index].key = slugify(value) || `step_${index + 1}`;
       }
-      renderRequestTypeEditor({ preserveState: true });
+      if (shouldRerender) {
+        renderRequestTypeEditor({ preserveState: true });
+      }
     }
 
     function updateRequestTypeStepOwner(index, userId) {
@@ -3883,6 +3931,7 @@
         key: `step_${definition.checklist.length + 1}`,
         label: '',
         area: '',
+        handoffMessage: '',
         dependsOn: '',
         defaultOwner: '',
         defaultOwnerUserId: '',
@@ -3897,8 +3946,18 @@
       if (!definition) return;
       definition.checklist.splice(index, 1);
       if (!definition.checklist.length) {
-        definition.checklist.push({ key: 'step_1', label: '', area: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' });
+        definition.checklist.push({ key: 'step_1', label: '', area: '', handoffMessage: '', dependsOn: '', defaultOwner: '', defaultOwnerUserId: '', defaultOwnerEmail: '', approvalMode: 'none' });
       }
+      renderRequestTypeEditor({ preserveState: true });
+    }
+
+    function moveRequestTypeStep(index, direction) {
+      const definition = currentRequestTypeDefinition();
+      if (!definition || !Array.isArray(definition.checklist)) return;
+      const nextIndex = index + Number(direction || 0);
+      if (nextIndex < 0 || nextIndex >= definition.checklist.length) return;
+      const [moved] = definition.checklist.splice(index, 1);
+      definition.checklist.splice(nextIndex, 0, moved);
       renderRequestTypeEditor({ preserveState: true });
     }
 
@@ -3982,6 +4041,7 @@
           key: String(step.key || '').trim(),
           label: String(step.label || '').trim(),
           area: String(step.area || '').trim(),
+          handoffMessage: String(step.handoffMessage || '').trim(),
           dependsOn: String(step.dependsOn || '').trim(),
           defaultOwner: String(step.defaultOwner || '').trim(),
           defaultOwnerUserId: String(step.defaultOwnerUserId || '').trim(),

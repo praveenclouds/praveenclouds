@@ -19,11 +19,19 @@
 
     /* SIDEBAR */
     .sidebar { width: var(--sidebar-w); background: #fff; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
-    .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 11px; }
-    .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .logo-icon svg { width: 18px; height: 18px; fill: #fff; }
-    .logo-text { font-size: 15px; font-weight: 700; color: var(--primary-dark); line-height: 1.2; letter-spacing: -0.01em; }
-    .logo-sub { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+    .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--gray-200); display: block; }
+    .logo-brand { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .logo-image-wrap {
+      width: 170px; height: 48px; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--gray-200); background: #fff;
+    }
+    .logo-image { width: 100%; height: 100%; display: none; }
+    .logo-image--light { object-fit: contain; object-position: left center; padding: 3px 8px; box-sizing: border-box; background: #fff; }
+    .logo-image--dark { object-fit: cover; object-position: center; }
+    body[data-portal-theme="white"] .logo-image--light { display: block; }
+    body[data-portal-theme="dark"] .logo-image--dark { display: block; }
+    body[data-portal-theme="dark"] .logo-image-wrap { background: #140f24; border-color: rgba(153,102,255,0.3); }
+    .logo-sub { font-size: 11px; color: var(--gray-400); margin-top: 0; }
     nav { padding: 16px 10px; flex: 1; }
     .nav-label { font-size: 10px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: .06em; padding: 12px 10px 5px; opacity: 0.75; }
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; cursor: pointer; color: var(--gray-600); font-size: 13.5px; font-weight: 500; transition: all .14s; margin-bottom: 2px; user-select: none; }
@@ -45,12 +53,13 @@
     body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo {
       border-bottom: 1px solid #e5e7eb !important;
     }
-    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo-text {
-      color: #111827 !important;
-    }
     body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo-sub,
     body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-label {
       color: #6b7280 !important;
+    }
+    body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .logo-image-wrap {
+      border-color: #d1d5db !important;
+      background: #ffffff !important;
     }
     body.support-theme[data-portal-theme="white"]:not(.support-theme-portal) .nav-item {
       color: #374151 !important;
@@ -218,6 +227,247 @@
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(124,58,237,.1); }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
 
+    /* SCIM AUDIT MODAL */
+    .scim-audit-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.45);
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+      backdrop-filter: blur(6px);
+    }
+    .scim-audit-panel {
+      background: #ffffff;
+      border: 1px solid var(--gray-200);
+      border-radius: 18px;
+      width: min(1100px, 100%);
+      box-shadow: 0 22px 70px rgba(15, 23, 42, 0.22);
+      margin: auto;
+      color: var(--gray-800);
+    }
+    .scim-audit-head {
+      padding: 20px 26px 16px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .scim-audit-head-left { display: flex; align-items: center; gap: 12px; }
+    .scim-audit-head-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(124,58,237,.14), rgba(124,92,255,.12));
+      border: 1px solid rgba(124,92,255,.24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #7c3aed;
+    }
+    .scim-audit-head-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .scim-audit-title { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+    .scim-audit-subtitle { font-size: 11.5px; color: var(--gray-400); margin-top: 1px; }
+    .scim-audit-close {
+      background: rgba(124,92,255,.08);
+      border: 1px solid rgba(124,92,255,.2);
+      cursor: pointer;
+      color: #6d28d9;
+      font-size: 22px;
+      line-height: 1;
+      padding: 4px 10px;
+      border-radius: 8px;
+      transition: all .14s;
+    }
+    .scim-audit-close:hover { background: rgba(124,92,255,.18); }
+    #scimAuditSummary {
+      display: flex;
+      gap: 12px;
+      padding: 16px 26px;
+      border-bottom: 1px solid var(--gray-200);
+      flex-wrap: wrap;
+    }
+    .scim-audit-sum-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 12px;
+      flex: 1;
+      min-width: 160px;
+      border: 1px solid transparent;
+    }
+    .scim-audit-sum-card .icon { font-size: 20px; }
+    .scim-audit-sum-card .value { font-size: 22px; font-weight: 800; line-height: 1; }
+    .scim-audit-sum-card .label { font-size: 11px; font-weight: 600; }
+    .scim-audit-sum-card.ready { background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.26); color: #15803d; }
+    .scim-audit-sum-card.upgrade { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.26); color: #b45309; }
+    .scim-audit-sum-card.unknown { background: rgba(148,163,184,.14); border-color: rgba(148,163,184,.28); color: #475569; }
+    .scim-audit-sum-card.delta { min-width: 180px; background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.26); color: #b91c1c; }
+    .scim-audit-sum-card.delta .value { font-size: 18px; }
+    .scim-audit-filters {
+      padding: 10px 26px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .scim-audit-filters .label { font-size: 12px; color: var(--gray-400); font-weight: 600; }
+    .scim-filter-btn { border: 1px solid var(--gray-200); background: var(--gray-50); color: var(--gray-700); }
+    .scim-filter-btn.scim-filter-ready { background: rgba(34,197,94,.08); border-color: rgba(34,197,94,.22); color: #15803d; }
+    .scim-filter-btn.scim-filter-upgrade { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.24); color: #b45309; }
+    .scim-filter-btn.scim-filter-unknown { background: rgba(148,163,184,.1); border-color: rgba(148,163,184,.24); color: #475569; }
+    .scim-filter-btn.is-active { background: linear-gradient(135deg,#3757e6,#7c5cff); border-color: transparent; color: #fff; box-shadow: 0 4px 14px rgba(124,92,255,.3); }
+    .scim-audit-table-wrap { overflow-x: auto; }
+    .scim-audit-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .scim-audit-table thead tr { background: var(--gray-50); }
+    .scim-audit-table th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      white-space: nowrap;
+    }
+    .scim-audit-table th.col-money, .scim-audit-table td.col-money { text-align: right; }
+    .scim-audit-table th.col-delta { color: #a16207; background: rgba(245,158,11,.08); }
+    .scim-audit-table th.col-connector { color: #7c3aed; background: rgba(124,58,237,.08); text-align: center; }
+    .scim-audit-row td { padding: 12px 16px; border-top: 1px solid var(--gray-100); }
+    .scim-audit-row:hover td { background: rgba(124,92,255,.06); }
+    .scim-audit-app-name { font-weight: 700; font-size: 13px; color: var(--gray-800); }
+    .scim-audit-app-sub { font-size: 11px; color: var(--gray-400); }
+    .scim-audit-plan-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .scim-audit-plan-chip.current { background: rgba(124,92,255,.12); color: #6d28d9; border-color: rgba(124,92,255,.25); }
+    .scim-audit-plan-chip.required { background: rgba(245,158,11,.14); color: #92400e; border-color: rgba(245,158,11,.3); }
+    .scim-audit-licenses-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      padding: 2px 9px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(124,92,255,.12);
+      border: 1px solid rgba(124,92,255,.24);
+      color: #6d28d9;
+    }
+    .scim-audit-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .scim-audit-status.ready { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .scim-audit-status.upgrade { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+    .scim-audit-status.unknown { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+    .scim-audit-money { color: var(--gray-700); font-size: 12.5px; }
+    .scim-audit-muted { color: var(--gray-400); }
+    .scim-audit-italic { font-style: italic; }
+    .scim-audit-delta-cell { text-align: right; background: rgba(245,158,11,.05); }
+    .scim-audit-delta-plus { font-weight: 700; color: #b91c1c; }
+    .scim-audit-no-cost { color: #15803d; font-weight: 600; }
+    .scim-audit-connector-cell { text-align: center; background: rgba(124,58,237,.06); }
+    .scim-audit-conn-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .scim-audit-conn-badge {
+      background: rgba(34,197,94,.12);
+      color: #15803d;
+      border: 1px solid rgba(34,197,94,.28);
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .scim-audit-link-btn { background: none; border: none; color: #6d28d9; font-size: 11px; cursor: pointer; text-decoration: underline; padding: 0; }
+    .scim-audit-setup-btn {
+      background: linear-gradient(135deg,#3757e6,#7c5cff);
+      color: #fff;
+      border: none;
+      padding: 5px 13px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(124,92,255,.35);
+    }
+    .scim-audit-empty { text-align: center; padding: 40px; color: var(--gray-400); }
+    .scim-audit-foot {
+      padding: 14px 26px;
+      border-top: 1px solid var(--gray-200);
+      font-size: 11px;
+      color: var(--gray-400);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-50);
+      border-radius: 0 0 18px 18px;
+    }
+    .scim-audit-foot svg { width: 13px; height: 13px; flex-shrink: 0; stroke: var(--primary); fill: none; stroke-width: 2; }
+
+    body.support-theme-portal .scim-audit-modal { background: rgba(8,4,16,.72); }
+    body.support-theme-portal .scim-audit-panel { background: rgba(22,14,34,.97); border-color: rgba(130,96,185,.3); box-shadow: 0 32px 90px rgba(0,0,0,.6), 0 0 0 1px rgba(124,92,255,.12); color: #f5efff; }
+    body.support-theme-portal .scim-audit-head { border-bottom-color: rgba(130,96,185,.2); }
+    body.support-theme-portal .scim-audit-head-icon { background: linear-gradient(135deg,rgba(124,58,237,.35),rgba(124,92,255,.35)); border-color: rgba(124,92,255,.4); color: #a78bfa; }
+    body.support-theme-portal .scim-audit-title { color: #f5efff; }
+    body.support-theme-portal .scim-audit-subtitle { color: #9b8ab9; }
+    body.support-theme-portal .scim-audit-close { background: rgba(124,92,255,.12); border-color: rgba(124,92,255,.22); color: #b8a9cf; }
+    body.support-theme-portal .scim-audit-close:hover { background: rgba(124,92,255,.22); }
+    body.support-theme-portal #scimAuditSummary,
+    body.support-theme-portal .scim-audit-filters { border-bottom-color: rgba(130,96,185,.2); }
+    body.support-theme-portal .scim-audit-filters .label { color: #9b8ab9; }
+    body.support-theme-portal .scim-filter-btn { background: rgba(124,92,255,.1); border-color: rgba(130,96,185,.28); color: #d8ccec; }
+    body.support-theme-portal .scim-filter-btn.scim-filter-ready { background: rgba(52,211,153,.12); border-color: rgba(52,211,153,.3); color: #a3ffd3; }
+    body.support-theme-portal .scim-filter-btn.scim-filter-upgrade { background: rgba(245,158,11,.12); border-color: rgba(245,158,11,.3); color: #fcd34d; }
+    body.support-theme-portal .scim-filter-btn.scim-filter-unknown { background: rgba(148,163,184,.1); border-color: rgba(130,96,185,.28); color: #d8ccec; }
+    body.support-theme-portal .scim-filter-btn.is-active { background: linear-gradient(135deg,#3757e6,#7c5cff); border-color: transparent; color: #fff; }
+    body.support-theme-portal .scim-audit-table thead tr { background: rgba(31,20,46,.9); }
+    body.support-theme-portal .scim-audit-table th { color: #9b8ab9; }
+    body.support-theme-portal .scim-audit-table th.col-delta { color: #fcd34d; background: rgba(245,158,11,.08); }
+    body.support-theme-portal .scim-audit-table th.col-connector { color: #c4b5fd; background: rgba(124,58,237,.12); }
+    body.support-theme-portal .scim-audit-row td { border-top-color: rgba(130,96,185,.18); }
+    body.support-theme-portal .scim-audit-row:hover td { background: rgba(124,92,255,.07); }
+    body.support-theme-portal .scim-audit-app-name { color: #f5efff; }
+    body.support-theme-portal .scim-audit-app-sub { color: #9b8ab9; }
+    body.support-theme-portal .scim-audit-plan-chip.current { background: rgba(124,92,255,.18); color: #c4b5fd; border-color: rgba(124,92,255,.35); }
+    body.support-theme-portal .scim-audit-plan-chip.required { background: rgba(245,158,11,.15); color: #fcd34d; border-color: rgba(245,158,11,.3); }
+    body.support-theme-portal .scim-audit-licenses-chip { background: rgba(124,92,255,.18); color: #c4b5fd; border-color: rgba(124,92,255,.3); }
+    body.support-theme-portal .scim-audit-status.ready { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
+    body.support-theme-portal .scim-audit-status.upgrade { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    body.support-theme-portal .scim-audit-status.unknown { background: rgba(148,163,184,.12); color: #d8ccec; border-color: rgba(130,96,185,.24); }
+    body.support-theme-portal .scim-audit-money { color: #d8ccec; }
+    body.support-theme-portal .scim-audit-muted { color: #9b8ab9; }
+    body.support-theme-portal .scim-audit-delta-cell { background: rgba(245,158,11,.07); }
+    body.support-theme-portal .scim-audit-delta-plus { color: #ffb6b6; }
+    body.support-theme-portal .scim-audit-no-cost { color: #a3ffd3; }
+    body.support-theme-portal .scim-audit-connector-cell { background: rgba(124,58,237,.07); }
+    body.support-theme-portal .scim-audit-conn-badge { background: rgba(52,211,153,.14); color: #a3ffd3; border-color: rgba(52,211,153,.3); }
+    body.support-theme-portal .scim-audit-link-btn { color: #c4b5fd; }
+    body.support-theme-portal .scim-audit-empty { color: #9b8ab9; }
+    body.support-theme-portal .scim-audit-foot { border-top-color: rgba(130,96,185,.2); color: #9b8ab9; background: rgba(31,20,46,.5); }
+    body.support-theme-portal .scim-audit-foot svg { stroke: #a78bfa; }
+
     /* CONFIRM */
     .confirm-box { background: #fff; border-radius: 12px; padding: 22px; max-width: 340px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
     .confirm-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 7px; }
@@ -233,6 +483,57 @@
     /* PAGE */
     .page { display: none; }
     .page.active { display: block; }
+    #page-software-details { padding: 2px 6px 12px; }
+    #page-software-details .card { max-width: 1120px; margin: 0 auto; padding: 18px 20px 20px; border-radius: 14px; overflow: visible; }
+    .swd-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+    .swd-title { font-size:24px; font-weight:800; line-height:1.12; letter-spacing:-0.01em; color:var(--gray-800); }
+    .swd-sub { margin-top:3px; color:var(--gray-400); font-size:12px; font-weight:500; }
+    .swd-pills { display:flex; align-items:center; gap:7px; flex-wrap:wrap; margin-top:6px; }
+    .swd-pill { border:1px solid var(--gray-200); border-radius:999px; padding:3px 9px; font-size:11px; font-weight:700; color:var(--gray-700); background:var(--gray-50); }
+    .swd-pill.success { color:var(--success); background:var(--success-bg); border-color:transparent; }
+    .swd-tabs { display:flex; gap:8px; margin:10px 0 12px; }
+    .swd-tab-btn { border:1px solid var(--gray-200); background:var(--gray-50); color:var(--gray-700); border-radius:9px; padding:7px 12px; font-size:12px; font-weight:700; cursor:pointer; }
+    .swd-tab-btn.active { border-color:var(--primary); color:var(--primary); background:var(--primary-lighter); }
+    .swd-panel { display:none; }
+    .swd-panel.active { display:block; }
+    .swd-grid3 { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+    .swd-card { border:1px solid var(--gray-200); border-radius:12px; background:var(--gray-50); padding:12px 14px; }
+    .swd-k { color:var(--gray-400); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+    .swd-v { color:var(--gray-800); font-size:22px; line-height:1.08; font-weight:800; }
+    .swd-info-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+    .swd-info-item { border:1px solid var(--gray-200); border-radius:10px; background:var(--gray-50); padding:10px 12px; }
+    .swd-info-label { color:var(--gray-400); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+    .swd-info-value { color:var(--gray-800); font-size:13px; font-weight:600; }
+    .swd-section-title { font-size:13px; font-weight:700; color:var(--gray-800); margin:8px 0 8px; }
+    .swd-table-wrap { border:1px solid var(--gray-200); border-radius:10px; overflow:hidden; }
+    .swd-table-wrap table { border:0; margin:0; width:100%; }
+    .swd-table-wrap th { padding:8px 10px; font-size:10px; }
+    .swd-table-wrap td { padding:9px 10px; font-size:12px; }
+    .swd-inv-list { display:grid; gap:10px; margin-top:10px; }
+    .swd-inv-item { border:1px solid var(--gray-200); border-radius:10px; padding:11px 12px; background:var(--gray-50); }
+    .swd-inv-head { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+    .swd-inv-name { font-size:12.5px; font-weight:700; color:var(--gray-800); }
+    .swd-inv-meta { margin-top:6px; color:var(--gray-500); font-size:11.5px; line-height:1.45; }
+    .swd-msg { border:1px solid var(--gray-200); border-radius:9px; padding:11px 12px; font-size:13px; color:var(--gray-500); background:var(--gray-50); }
+    .swd-msg.error { border-color:#fecaca; color:#b91c1c; background:#fef2f2; }
+    .swd-edit-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px 12px; }
+    .swd-edit-grid .form-group { margin:0; }
+    .swd-edit-grid .form-group label { font-size:11px; font-weight:700; color:var(--gray-500); margin-bottom:4px; display:block; }
+    .swd-edit-grid .form-group input, .swd-edit-grid .form-group select {
+      width:100%; padding:8px 10px; border:1px solid var(--gray-200); border-radius:8px; font-size:12.5px;
+      background:#fff; color:var(--gray-800);
+    }
+    .swd-edit-grid .full { grid-column:1 / -1; }
+    .swd-edit-actions { margin-top:12px; display:flex; justify-content:flex-end; gap:8px; }
+    .swd-edit-note { margin-top:8px; font-size:11px; color:var(--gray-400); }
+    @media (max-width: 1000px){
+      #page-software-details .card { max-width: 100%; padding: 14px 14px 16px; }
+      .swd-grid3 { grid-template-columns:1fr; }
+      .swd-info-grid { grid-template-columns:1fr; }
+      .swd-title { font-size:20px; }
+      .swd-v { font-size:20px; }
+      .swd-edit-grid { grid-template-columns:1fr; }
+    }
 
     /* PAGINATION */
     .pagination { display: flex; align-items: center; gap: 3px; justify-content: flex-end; padding: 12px 18px; border-top: 1px solid var(--gray-100); }
@@ -298,7 +599,7 @@
     body.support-theme-portal .sidebar, body.support-theme-portal .topbar, body.support-theme-portal .modal,
     body.support-theme-portal .confirm-box, body.support-theme-portal #deptModalBox { background: #16101a !important; }
     body.support-theme-portal .stat-card, body.support-theme-portal .card, body.support-theme-portal .dept-card { background: #16101a !important; }
-    body.support-theme-portal .logo-text { color: #faf9fa !important; }
+    body.support-theme-portal .logo-image-wrap { border-color: rgba(153,102,255,0.3) !important; }
     body.support-theme-portal .search-wrap input, body.support-theme-portal #logSearch { background: #1e1525 !important; color: #faf9fa !important; }
     body.support-theme-portal .search-wrap input:focus, body.support-theme-portal #logSearch:focus { background: #231930 !important; }
     body.support-theme-portal .filter-select { background: #1e1525 !important; color: #cdc8d0 !important; }
@@ -881,11 +1182,11 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 64 64"><path d="M32 4L4 56h16l12-28 12 28h16L32 4z" /><rect x="18" y="38" width="28" height="8" rx="2" opacity=".5"/></svg>
-    </div>
-    <div>
-      <div class="logo-text">Terzo</div>
+    <div class="logo-brand">
+      <div class="logo-image-wrap">
+        <img class="logo-image logo-image--light" src="/assets/branding/terzo_logo_light.jpg" alt="Terzo logo light theme" />
+        <img class="logo-image logo-image--dark" src="/assets/branding/terzo_logo_dark.jpg" alt="Terzo logo dark theme" />
+      </div>
       <div class="logo-sub">Asset Management Portal</div>
     </div>
   </div>
@@ -907,10 +1208,6 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
     <div class="nav-item" onclick="navigate('assets',this)">
       <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
       Asset Inventory <span class="nav-badge" id="navAssetsCount">42</span>
-    </div>
-    <div class="nav-item" onclick="navigate('assignments',this)">
-      <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-      Assignments
     </div>
     <div class="nav-item" onclick="navigate('software',this)">
       <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
@@ -1241,17 +1538,6 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
       </div>
     </div>
 
-    <!-- ASSIGNMENTS -->
-    <div class="page" id="page-assignments">
-      <div class="card">
-        <div class="card-header"><div class="card-title">Current Asset Assignments</div></div>
-        <table>
-          <thead><tr><th>Asset ID</th><th>Asset Name</th><th>Assigned To</th><th>Department</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
-          <tbody id="assignmentTableBody"></tbody>
-        </table>
-      </div>
-    </div>
-
     <!-- SOFTWARE INVENTORY -->
     <div class="page" id="page-software">
 
@@ -1330,6 +1616,111 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
           <tbody id="swTableBody"></tbody>
         </table>
         <div class="pagination" id="swPagination"></div>
+      </div>
+    </div>
+
+    <!-- SOFTWARE DETAILS (IN-PAGE VIEW) -->
+    <div class="page" id="page-software-details">
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <button class="btn btn-secondary btn-sm" onclick="closeSoftwareDetailsPage()">✕ Close</button>
+          <button id="swdTopEditBtn" class="btn btn-primary btn-sm rbac-sw-write" onclick="openSoftwareDetailsEdit()" style="margin-left:auto">✏️ Edit</button>
+        </div>
+
+        <div id="swdError" class="swd-msg error" style="display:none;margin-bottom:10px"></div>
+
+        <div class="swd-head">
+          <div>
+            <div class="swd-title" id="swdName">Software</div>
+            <div class="swd-sub"><span id="swdPurpose">—</span> · <span id="swdCsvId">—</span></div>
+            <div class="swd-pills">
+              <span class="swd-pill" id="swdType">SAAS</span>
+              <span class="swd-pill success" id="swdStatus">Active</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="swd-tabs">
+          <button id="swdTabOverviewBtn" class="swd-tab-btn active" onclick="swdSwitchTab('overview')">Overview</button>
+          <button id="swdTabInvoicesBtn" class="swd-tab-btn" onclick="swdSwitchTab('invoices')">Invoices</button>
+        </div>
+
+        <div id="swdPanelOverview" class="swd-panel active">
+          <div class="swd-grid3">
+            <div class="swd-card"><div class="swd-k">Base Annual Cost</div><div class="swd-v" id="swdBaseCost">$0.00</div></div>
+            <div class="swd-card"><div class="swd-k">Add-on Services</div><div class="swd-v" id="swdAddonCost">$0.00</div></div>
+            <div class="swd-card"><div class="swd-k">Total Annual Cost</div><div class="swd-v" id="swdTotalCost">$0.00</div></div>
+          </div>
+          <div class="swd-grid3">
+            <div class="swd-card"><div class="swd-k">Purchased Licenses</div><div class="swd-v" id="swdPurchased">0</div></div>
+            <div class="swd-card"><div class="swd-k">Used Licenses</div><div class="swd-v" id="swdUsed">0</div></div>
+            <div class="swd-card"><div class="swd-k">$/User/Month</div><div class="swd-v" id="swdUnitPrice">$0.00</div></div>
+          </div>
+
+          <div class="swd-info-grid" id="swdInfoGrid"></div>
+
+          <div class="swd-section-title">Add-on Services</div>
+          <div class="swd-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Service Name</th>
+                  <th>Plan</th>
+                  <th>$/User/Mo</th>
+                  <th>Purch.</th>
+                  <th>Used</th>
+                  <th>Annual Cost</th>
+                  <th>Renewal</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="swdServiceRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="swdPanelInvoices" class="swd-panel">
+          <div class="swd-grid3">
+            <div class="swd-card"><div class="swd-k">Total Invoiced</div><div class="swd-v" id="swdInvTotal">$0.00</div></div>
+            <div class="swd-card"><div class="swd-k">Invoices</div><div class="swd-v" id="swdInvCount">0</div></div>
+            <div class="swd-card"><div class="swd-k">Latest Invoice</div><div class="swd-v" id="swdInvLatest">—</div></div>
+          </div>
+          <div id="swdInvoiceList" class="swd-inv-list"></div>
+        </div>
+
+        <div id="swdPanelEdit" class="swd-panel">
+          <div id="swdEditMsg" class="swd-msg" style="display:none;margin-bottom:10px"></div>
+          <div class="swd-edit-grid">
+            <div class="form-group"><label>App ID *</label><input type="text" id="swdEditCsvId" placeholder="A-11"></div>
+            <div class="form-group"><label>Name *</label><input type="text" id="swdEditName" placeholder="Software name"></div>
+            <div class="form-group">
+              <label>Type</label>
+              <select id="swdEditType"><option>SAAS</option><option>On-premises</option><option>Freeware</option><option>Open Source</option></select>
+            </div>
+            <div class="form-group">
+              <label>Renewal</label>
+              <select id="swdEditRenewal" onchange="swdCalcCost()">
+                <option value="">—</option><option>Annual</option><option>Monthly</option><option>Quarterly</option><option>Freeware</option><option>Pay-as-you-go</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Purpose</label><input type="text" id="swdEditPurpose" placeholder="e.g. CRM"></div>
+            <div class="form-group"><label>Subscription Plan</label><input type="text" id="swdEditPlan" placeholder="e.g. Business Plus"></div>
+            <div class="form-group"><label>Status</label><select id="swdEditStatus"><option>Active</option><option>Inactive</option></select></div>
+            <div class="form-group"><label>Owner</label><input type="text" id="swdEditOwner" placeholder="Owner name"></div>
+            <div class="form-group"><label>Billed To</label><input type="text" id="swdEditBilledTo" placeholder="Billing contact"></div>
+            <div class="form-group"><label>Admin(s)</label><input type="text" id="swdEditAdmins" placeholder="Comma-separated admin names"></div>
+            <div class="form-group"><label>License Price / User / Month ($)</label><input type="number" id="swdEditLicPrice" min="0" step="0.01" oninput="swdCalcCost()"></div>
+            <div class="form-group"><label>Purchased Licenses</label><input type="number" id="swdEditPurchased" min="0" step="1" oninput="swdCalcCost()"></div>
+            <div class="form-group"><label>Used Licenses</label><input type="number" id="swdEditUsed" min="0" step="1"></div>
+            <div class="form-group"><label>Base Annual Cost ($)</label><input type="number" id="swdEditCost" min="0" step="0.01"></div>
+            <div class="form-group full"><label>Department</label><input type="text" id="swdEditDept" readonly></div>
+          </div>
+          <div class="swd-edit-note">Edit from this page updates overview immediately after save.</div>
+          <div class="swd-edit-actions">
+            <button class="btn btn-secondary" onclick="swdSwitchTab('overview')">Cancel</button>
+            <button class="btn btn-primary rbac-sw-write" onclick="swdSaveEdit()">💾 Save Changes</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2478,7 +2869,7 @@ function navigate(page, el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   currentPage=page;
-  const titles={dashboard:'Dashboard',users:'User Management',offboarding:'Offboarding',assets:'Asset Inventory',assignments:'Assignments',software:'Software Inventory',logs:'Activity Log',departments:'Departments'};
+  const titles={dashboard:'Dashboard',users:'User Management',offboarding:'Offboarding',assets:'Asset Inventory',software:'Software Inventory',logs:'Activity Log',departments:'Departments'};
   document.getElementById('pageTitle').textContent=titles[page]||page;
   const showAdd=page==='users'||page==='assets'||page==='software';
   // Only show Add button if role allows it
@@ -2525,7 +2916,7 @@ function handleSearch(v){
 }
 
 /* ══ RENDER ALL ══ */
-function renderAll(){ updateBadges(); renderDashboard(); renderUsers(); renderAssets(); renderAssignments(); populateSwAdvDropdowns(); updateDeptNavBadge(); }
+function renderAll(){ updateBadges(); renderDashboard(); renderUsers(); renderAssets(); populateSwAdvDropdowns(); updateDeptNavBadge(); }
 function updateDeptNavBadge(){ const b=document.getElementById('navDeptsCount'); if(b) b.textContent=departmentsMgmt.length; }
 
 /* ── Populate Software Adv-Search Datalists ── */
@@ -3051,30 +3442,6 @@ function renderAssets(){
     }).join('');
   }
   renderPag('assetPagination',assetPage,pages,p=>{assetPage=p;renderAssets();});
-}
-
-/* ══ ASSIGNMENTS ══ */
-function renderAssignments(){
-  const body=document.getElementById('assignmentTableBody');
-  if(!body) return;
-  const assigned=assets.filter(a=>a.assignTo);
-  if(!assigned.length){ body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray-400)">No assignments</td></tr>`; return; }
-  body.innerHTML=assigned.map(a=>{
-    const u=users.find(x=>x.id===a.assignTo);
-    const stcls={Available:'available','In-Use':'in-use','Under Repair':'under-repair'}[a.status]||'in-use';
-    return `<tr>
-      <td class="mono" style="color:var(--gray-400)">${a.csvId}</td>
-      <td><strong>${a.name}</strong><br><span style="font-size:11px;color:var(--gray-400)">${a.brand}</span></td>
-      <td>${u?`<div class="user-cell"><div class="ava-sm" style="background:${aColor(u.first)}">${ini(u.first,u.last)}</div>${u.first} ${u.last}</div>`:'—'}</td>
-      <td><span class="tag">${u?.dept||a.dept}</span></td>
-      <td><span class="loc-tag"><svg viewBox="0 0 24 24"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"/><circle cx="12" cy="10" r="3"/></svg>${a.location}</span></td>
-      <td><span class="badge ${stcls}">${a.status}</span></td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-primary btn-sm" onclick="editAsset('${a.id}')" style="margin-right:4px" title="Change who this asset is assigned to">↔ Reassign</button>
-        <button class="btn btn-secondary btn-sm" onclick="unassign('${a.id}')">Unassign</button>
-      </td>
-    </tr>`;
-  }).join('');
 }
 
 async function unassign(id){
@@ -3801,11 +4168,12 @@ function renderInvoiceSubscriptionBreakdown(inv = {}) {
 
 function renderInvoiceList(invoices){
   const list = document.getElementById('invList');
-  if (!invoices.length){
+  const sorted = sortInvoicesByBillingPeriodDesc(invoices);
+  if (!sorted.length){
     list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>';
     return;
   }
-  list.innerHTML = invoices.map(inv => {
+  list.innerHTML = sorted.map(inv => {
     const uploaded = new Date(inv.uploadedAt).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
     const amt = inv.amount ? `${inv.currency || 'USD'} ${Number(inv.amount).toLocaleString('en-US', { minimumFractionDigits:2 })}` : '—';
     const fmtDate = d => d ? new Date(d).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' }) : null;
@@ -5745,6 +6113,406 @@ function renderSoftware(){
   renderPag('swPagination', swPage, pages, p=>{swPage=p;renderSoftware();});
 }
 
+let swDetailCurrentId = null;
+let swDetailInvoices = [];
+let swDetailCurrentTab = 'overview';
+let swDetailEditMode = false;
+let swDetailTabBeforeEdit = 'overview';
+
+function swdMoney(value, currency = 'USD') {
+  const n = Number(value || 0);
+  if (!Number.isFinite(n)) return '—';
+  const c = String(currency || 'USD').toUpperCase();
+  try {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: c }).format(n);
+  } catch {
+    return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+}
+
+function swdText(v) {
+  const s = String(v == null ? '' : v).trim();
+  return s || '—';
+}
+
+function invoiceSortDateMs(value) {
+  if (!value) return 0;
+  const ms = Date.parse(String(value));
+  return Number.isFinite(ms) ? ms : 0;
+}
+
+function sortInvoicesByBillingPeriodDesc(rows = []) {
+  const list = Array.isArray(rows) ? [...rows] : [];
+  return list.sort((a, b) => {
+    const bEnd = invoiceSortDateMs(b?.periodTo) || invoiceSortDateMs(b?.periodFrom) || invoiceSortDateMs(b?.uploadedAt);
+    const aEnd = invoiceSortDateMs(a?.periodTo) || invoiceSortDateMs(a?.periodFrom) || invoiceSortDateMs(a?.uploadedAt);
+    if (bEnd !== aEnd) return bEnd - aEnd;
+
+    const bStart = invoiceSortDateMs(b?.periodFrom) || invoiceSortDateMs(b?.periodTo) || invoiceSortDateMs(b?.uploadedAt);
+    const aStart = invoiceSortDateMs(a?.periodFrom) || invoiceSortDateMs(a?.periodTo) || invoiceSortDateMs(a?.uploadedAt);
+    if (bStart !== aStart) return bStart - aStart;
+
+    const bUp = invoiceSortDateMs(b?.uploadedAt);
+    const aUp = invoiceSortDateMs(a?.uploadedAt);
+    if (bUp !== aUp) return bUp - aUp;
+
+    return String(b?.filename || '').localeCompare(String(a?.filename || ''));
+  });
+}
+
+function swdApplyViewState() {
+  const isOverview = swDetailCurrentTab === 'overview' && !swDetailEditMode;
+  const isInvoices = swDetailCurrentTab === 'invoices' && !swDetailEditMode;
+  const isEdit = !!swDetailEditMode;
+
+  document.getElementById('swdTabOverviewBtn')?.classList.toggle('active', isOverview);
+  document.getElementById('swdTabInvoicesBtn')?.classList.toggle('active', isInvoices);
+  document.getElementById('swdPanelOverview')?.classList.toggle('active', isOverview);
+  document.getElementById('swdPanelInvoices')?.classList.toggle('active', isInvoices);
+  document.getElementById('swdPanelEdit')?.classList.toggle('active', isEdit);
+
+  const editBtn = document.getElementById('swdTopEditBtn');
+  if (editBtn) {
+    editBtn.textContent = isEdit ? '← Back' : '✏️ Edit';
+    editBtn.classList.toggle('btn-secondary', isEdit);
+    editBtn.classList.toggle('btn-primary', !isEdit);
+  }
+}
+
+function swdSwitchTab(tab) {
+  swDetailCurrentTab = tab === 'invoices' ? 'invoices' : 'overview';
+  if (swDetailEditMode) swDetailEditMode = false;
+  swdApplyViewState();
+}
+
+function swdShowPage() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-software-details')?.classList.add('active');
+  currentPage = 'software-details';
+  const titleEl = document.getElementById('pageTitle');
+  if (titleEl) titleEl.textContent = 'Software Details';
+  const addBtn = document.getElementById('addBtn');
+  if (addBtn) addBtn.style.display = 'none';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('.nav-item[onclick*=software]')?.classList.add('active');
+}
+
+function closeSoftwareDetailsPage() {
+  swDetailCurrentId = null;
+  swDetailInvoices = [];
+  swDetailCurrentTab = 'overview';
+  swDetailEditMode = false;
+  swDetailTabBeforeEdit = 'overview';
+  navigate('software', document.querySelector('.nav-item[onclick*=software]'));
+}
+
+function openSoftwareDetailsEdit() {
+  if (!swDetailCurrentId) return;
+  if (swDetailEditMode) {
+    swDetailEditMode = false;
+    swDetailCurrentTab = swDetailTabBeforeEdit || swDetailCurrentTab || 'overview';
+    swdApplyViewState();
+    return;
+  }
+  swDetailTabBeforeEdit = swDetailCurrentTab || 'overview';
+  swDetailEditMode = true;
+  swdPopulateEditForm();
+  swdApplyViewState();
+}
+
+function swdPopulateEditForm() {
+  const s = software.find(x => x.id === swDetailCurrentId);
+  if (!s) return;
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.value = value == null ? '' : value;
+  };
+  set('swdEditCsvId', String(s.csvId || '').toUpperCase());
+  set('swdEditName', s.name || '');
+  set('swdEditType', s.deploymentType || 'SAAS');
+  set('swdEditRenewal', s.renewalPeriod || '');
+  set('swdEditPurpose', s.purpose || '');
+  set('swdEditPlan', s.subscriptionPlan || '');
+  set('swdEditStatus', s.status || 'Active');
+  set('swdEditOwner', s.owner || '');
+  set('swdEditBilledTo', s.billedTo || '');
+  set('swdEditAdmins', s.admins || '');
+  set('swdEditLicPrice', Number(s.licensePricePerUserMonth || 0));
+  set('swdEditPurchased', Number(s.purchasedLicenses || 0));
+  set('swdEditUsed', Number(s.usedLicenses || 0));
+  set('swdEditCost', Number(s.annualCost || 0));
+  set('swdEditDept', getSoftwareMappedDepts(s));
+  const msg = document.getElementById('swdEditMsg');
+  if (msg) {
+    msg.style.display = 'none';
+    msg.textContent = '';
+    msg.classList.remove('error');
+  }
+}
+
+function swdCalcCost() {
+  const renewal = String(document.getElementById('swdEditRenewal')?.value || '').trim();
+  if (renewal === 'Pay-as-you-go' || renewal === 'Freeware') return;
+  const price = Number(document.getElementById('swdEditLicPrice')?.value || 0);
+  const qty = Number(document.getElementById('swdEditPurchased')?.value || 0);
+  const annual = Number.isFinite(price) && Number.isFinite(qty) ? price * qty * 12 : 0;
+  const costEl = document.getElementById('swdEditCost');
+  if (costEl) costEl.value = Number(annual.toFixed(2));
+}
+
+async function swdSaveEdit() {
+  const id = swDetailCurrentId;
+  if (!id) return;
+  const csvId = String(document.getElementById('swdEditCsvId')?.value || '').trim().toUpperCase();
+  const name = String(document.getElementById('swdEditName')?.value || '').trim();
+  if (!csvId || !name) {
+    showToast('App ID and Name are required', 'danger');
+    return;
+  }
+
+  const payload = {
+    csvId,
+    name,
+    deploymentType: String(document.getElementById('swdEditType')?.value || 'SAAS').trim(),
+    renewalPeriod: String(document.getElementById('swdEditRenewal')?.value || '').trim(),
+    purpose: String(document.getElementById('swdEditPurpose')?.value || '').trim(),
+    subscriptionPlan: String(document.getElementById('swdEditPlan')?.value || '').trim(),
+    status: String(document.getElementById('swdEditStatus')?.value || 'Active').trim(),
+    owner: String(document.getElementById('swdEditOwner')?.value || '').trim(),
+    billedTo: String(document.getElementById('swdEditBilledTo')?.value || '').trim(),
+    admins: String(document.getElementById('swdEditAdmins')?.value || '').trim(),
+    licensePricePerUserMonth: Number(document.getElementById('swdEditLicPrice')?.value || 0),
+    purchasedLicenses: Number(document.getElementById('swdEditPurchased')?.value || 0),
+    usedLicenses: Number(document.getElementById('swdEditUsed')?.value || 0),
+    annualCost: Number(document.getElementById('swdEditCost')?.value || 0),
+  };
+
+  const msg = document.getElementById('swdEditMsg');
+  if (msg) {
+    msg.style.display = '';
+    msg.classList.remove('error');
+    msg.textContent = 'Saving changes...';
+  }
+
+  try {
+    const updated = await apiFetch(`${API}/software/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    if (!updated || typeof updated !== 'object') throw new Error('Unexpected response while saving software');
+    const normalized = {
+      ...updated,
+      department: normalizeSoftwareDepartmentValue(updated?.department),
+    };
+    const idx = software.findIndex(x => x.id === id);
+    if (idx >= 0) software[idx] = normalized;
+    swdRenderOverview(normalized);
+    swdRenderInvoices(normalized);
+    await refreshSoftwareData({ requestKey: 'portal:software:details-inline-edit', render: false });
+    const after = software.find(x => x.id === id);
+    if (after) {
+      swdRenderOverview(after);
+      swdRenderInvoices(after);
+      swdPopulateEditForm();
+    }
+    swDetailEditMode = false;
+    swDetailCurrentTab = swDetailTabBeforeEdit || swDetailCurrentTab || 'overview';
+    swdApplyViewState();
+    showToast('Software updated', 'success');
+  } catch (e) {
+    const em = e?.message || 'Failed to save software';
+    if (msg) {
+      msg.style.display = '';
+      msg.classList.add('error');
+      msg.textContent = em;
+    }
+    showToast(em, 'danger');
+  }
+}
+
+function swdRenderOverview(s) {
+  const currency = String(s?.currency || swDetailInvoices?.[0]?.currency || 'USD').toUpperCase();
+  const activeServices = (Array.isArray(s?.services) ? s.services : []).filter(row => String(row?.status || 'Active') !== 'Inactive');
+  const addOnAnnual = activeServices.reduce((sum, row) => sum + Number(row?.annualCost || 0), 0);
+  const baseAnnual = Number(s?.annualCost || 0);
+
+  document.getElementById('swdName').textContent = swdText(s?.name);
+  document.getElementById('swdPurpose').textContent = swdText(s?.purpose);
+  document.getElementById('swdCsvId').textContent = swdText(s?.csvId);
+  document.getElementById('swdType').textContent = swdText(s?.deploymentType || 'SAAS');
+  document.getElementById('swdStatus').textContent = swdText(s?.status || 'Active');
+
+  document.getElementById('swdBaseCost').textContent = swdMoney(baseAnnual, currency);
+  document.getElementById('swdAddonCost').textContent = swdMoney(addOnAnnual, currency);
+  document.getElementById('swdTotalCost').textContent = swdMoney(baseAnnual + addOnAnnual, currency);
+
+  document.getElementById('swdPurchased').textContent = String(Number(s?.purchasedLicenses || 0));
+  document.getElementById('swdUsed').textContent = String(Number(s?.usedLicenses || 0));
+  document.getElementById('swdUnitPrice').textContent = swdMoney(Number(s?.licensePricePerUserMonth || 0), currency);
+
+  const infoRows = [
+    ['Subscription Plan', swdText(s?.subscriptionPlan)],
+    ['Renewal', swdText(s?.renewalPeriod)],
+    ['Owner', swdText(s?.owner)],
+    ['Admin(s)', swdText(s?.admins)],
+    ['Billed To', swdText(s?.billedTo)],
+    ['Department', swdText(getSoftwareMappedDepts(s))],
+    ['Provisioning', swdText(s?.provisioningMethod || 'Manual')],
+    ['Connector', swdText(s?.connectorType)],
+  ];
+  const infoEl = document.getElementById('swdInfoGrid');
+  if (infoEl) {
+    infoEl.innerHTML = infoRows.map(([label, value]) => `
+      <div class="swd-info-item">
+        <div class="swd-info-label">${label}</div>
+        <div class="swd-info-value">${value}</div>
+      </div>
+    `).join('');
+  }
+
+  const rowsHtml = activeServices.map((svc) => `
+    <tr>
+      <td>${swdText(svc?.name)}</td>
+      <td>${swdText(svc?.plan)}</td>
+      <td>${swdMoney(svc?.licensePricePerUserMonth || 0, currency)}</td>
+      <td>${swdText(svc?.purchasedLicenses)}</td>
+      <td>${swdText(svc?.usedLicenses)}</td>
+      <td>${swdMoney(svc?.annualCost || 0, currency)}</td>
+      <td>${swdText(svc?.renewalPeriod)}</td>
+      <td>${swdText(svc?.status || 'Active')}</td>
+    </tr>
+  `).join('');
+  const serviceEl = document.getElementById('swdServiceRows');
+  if (serviceEl) {
+    serviceEl.innerHTML = rowsHtml || '<tr><td colspan="8" style="text-align:center;color:var(--gray-400)">No add-on services.</td></tr>';
+  }
+}
+
+function swdRenderInvoices(s) {
+  const currency = String(s?.currency || swDetailInvoices?.[0]?.currency || 'USD').toUpperCase();
+  const sorted = sortInvoicesByBillingPeriodDesc(Array.isArray(swDetailInvoices) ? swDetailInvoices : []);
+  const total = sorted.reduce((sum, inv) => sum + Number(inv?.amount || 0), 0);
+  const latest = sorted[0] || null;
+
+  document.getElementById('swdInvTotal').textContent = swdMoney(total, currency);
+  document.getElementById('swdInvCount').textContent = String(sorted.length);
+  document.getElementById('swdInvLatest').textContent = latest ? swdMoney(latest.amount || 0, latest.currency || currency) : '—';
+
+  const listEl = document.getElementById('swdInvoiceList');
+  if (!listEl) return;
+  if (!sorted.length) {
+    listEl.innerHTML = '<div class="swd-msg">No invoices attached yet.</div>';
+    return;
+  }
+
+  listEl.innerHTML = sorted.map((inv) => {
+    const from = inv?.periodFrom ? String(inv.periodFrom).slice(0, 10) : '—';
+    const to = inv?.periodTo ? String(inv.periodTo).slice(0, 10) : '—';
+    const uploaded = inv?.uploadedAt ? new Date(inv.uploadedAt).toLocaleString('en-IN') : '—';
+    const safeName = String(inv?.filename || 'invoice.pdf').replace(/'/g, '');
+    return `
+      <div class="swd-inv-item">
+        <div class="swd-inv-head">
+          <div class="swd-inv-name">${swdText(inv?.filename)}</div>
+          <button class="btn btn-secondary btn-sm" onclick="swdDownloadInvoice('${inv?.id}', '${safeName}')">Download</button>
+        </div>
+        <div class="swd-inv-meta">
+          Amount: <strong>${swdMoney(inv?.amount || 0, inv?.currency || currency)}</strong> · Billing: ${swdText(inv?.billingPeriod)} · Plan: ${swdText(inv?.subscriptionPlan)}<br>
+          Qty: ${swdText(inv?.licenseQuantity)} · Unit: ${swdMoney(inv?.licenseUnitPrice || 0, inv?.currency || currency)} · Period: ${from} → ${to}<br>
+          Uploaded: ${uploaded}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function swdDownloadInvoice(invId, filename) {
+  if (!swDetailCurrentId || !invId) return;
+  const safeName = String(filename || 'invoice.pdf').replace(/[\\/:*?"<>|]+/g, '_');
+  try {
+    const res = await authFetch(`/api/software/${encodeURIComponent(swDetailCurrentId)}/invoices/${encodeURIComponent(invId)}/download`, {
+      method: 'GET',
+      timeoutMs: 120000,
+    });
+    if (!res.ok) {
+      let message = `Download failed (${res.status})`;
+      try {
+        const body = await res.json();
+        if (body?.error) message = body.error;
+      } catch {}
+      throw new Error(message);
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = safeName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (e) {
+    showToast(e?.message || 'Invoice download failed', 'danger');
+  }
+}
+
+async function openSoftwareDetailsPage(id) {
+  const swId = String(id || '').trim();
+  if (!swId) return;
+  swDetailCurrentId = swId;
+  swDetailInvoices = [];
+  swDetailCurrentTab = 'overview';
+  swDetailEditMode = false;
+  swDetailTabBeforeEdit = 'overview';
+  swdShowPage();
+  swdSwitchTab('overview');
+  const errEl = document.getElementById('swdError');
+  if (errEl) {
+    errEl.style.display = 'none';
+    errEl.textContent = '';
+  }
+
+  let swObj = software.find(x => x.id === swId) || null;
+  if (swObj) {
+    swdRenderOverview(swObj);
+    swdRenderInvoices(swObj);
+    swdPopulateEditForm();
+  } else {
+    if (errEl) {
+      errEl.style.display = '';
+      errEl.textContent = 'Loading software details...';
+    }
+  }
+
+  try {
+    const [freshSw, invRows] = await Promise.all([
+      apiFetch(`/api/software/${encodeURIComponent(swId)}`).catch(() => null),
+      apiFetch(`/api/software/${encodeURIComponent(swId)}/invoices`).catch(() => []),
+    ]);
+
+    if (freshSw && typeof freshSw === 'object') {
+      swObj = {
+        ...freshSw,
+        department: normalizeSoftwareDepartmentValue(freshSw?.department),
+      };
+      const idx = software.findIndex(x => x.id === swId);
+      if (idx >= 0) software[idx] = swObj;
+    }
+    swObj = swObj || software.find(x => x.id === swId) || null;
+    if (!swObj) throw new Error('Software not found');
+
+    swDetailInvoices = Array.isArray(invRows) ? invRows : [];
+    swdRenderOverview(swObj);
+    swdRenderInvoices(swObj);
+    swdPopulateEditForm();
+  } catch (e) {
+    if (errEl) {
+      errEl.style.display = '';
+      errEl.textContent = e?.message || 'Failed to load software details';
+    }
+  }
+}
+
 /* software budget dashboard widget */
 async function renderSoftwareBudgetWidget(){
   try {
@@ -6270,11 +7038,12 @@ async function swDmLoadInvoiceSummary(id) {
   if (!body) return;
   try {
     const invoices = await apiFetch(`/api/software/${id}/invoices`);
+    const sortedInvoices = sortInvoicesByBillingPeriodDesc(invoices);
     // Update badge count on Invoices tab
     const badge = document.getElementById('swDmInvCount');
     if (badge) { badge.textContent = invoices.length; badge.style.background = invoices.length ? 'var(--primary)' : 'var(--gray-300)'; }
 
-    if (!invoices.length) {
+    if (!sortedInvoices.length) {
       if (costSource) costSource.textContent = '';
       body.innerHTML = `<div style="font-size:12px;color:var(--gray-400);padding:6px 0">No invoices uploaded yet.
         <span onclick="swDmTab('invoices')" style="color:var(--primary);cursor:pointer;font-weight:600;margin-left:4px">+ Attach one</span>
@@ -6283,11 +7052,9 @@ async function swDmLoadInvoiceSummary(id) {
     }
 
     const fmtD = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-    const totalSpend = invoices.reduce((s,i) => s + (i.amount||0), 0);
-    const latestInv = [...invoices].sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
-    const latestWithBreakdown = [...invoices]
-      .sort((a,b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
-      .find(inv => Array.isArray(inv?.lineItems) && inv.lineItems.length) || null;
+    const totalSpend = sortedInvoices.reduce((s,i) => s + (i.amount||0), 0);
+    const latestInv = sortedInvoices[0];
+    const latestWithBreakdown = sortedInvoices.find(inv => Array.isArray(inv?.lineItems) && inv.lineItems.length) || null;
     const derived = latestWithBreakdown ? deriveOverviewCostFromInvoice(sw, latestWithBreakdown) : null;
     if (derived) {
       document.getElementById('swDrBaseCost').textContent = formatCompactCurrency(derived.baseAnnual);
@@ -6332,7 +7099,7 @@ async function swDmLoadInvoiceSummary(id) {
         </div>
         <div style="flex:1;min-width:120px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50)">
           <div style="font-size:11px;color:var(--gray-400);margin-bottom:3px">Invoices</div>
-          <div style="font-size:16px;font-weight:800;color:var(--gray-700)">${invoices.length}</div>
+          <div style="font-size:16px;font-weight:800;color:var(--gray-700)">${sortedInvoices.length}</div>
         </div>
         <div style="flex:1;min-width:160px;padding:10px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--gray-50)">
           <div style="font-size:11px;color:var(--gray-400);margin-bottom:3px">Latest Invoice</div>
@@ -6342,7 +7109,7 @@ async function swDmLoadInvoiceSummary(id) {
       </div>
       ${mixHtml}
       <div style="font-size:11px;margin-bottom:6px;font-weight:600;color:var(--gray-500)">RECENT</div>
-      ${invoices.slice(0,3).map(inv => {
+      ${sortedInvoices.slice(0,3).map(inv => {
         const bp = inv.billingPeriod ? `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:9999px;background:${inv.billingPeriod==='Annual'?'#dcfce7':inv.billingPeriod==='Quarterly'?'#fef3c7':'#eff6ff'};color:${inv.billingPeriod==='Annual'?'#166534':inv.billingPeriod==='Quarterly'?'#92400e':'#1e40af'};margin-left:4px">${inv.billingPeriod}</span>` : '';
         return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--gray-100)">
           <span style="font-size:12px">📄</span>
@@ -6371,7 +7138,7 @@ async function swDmLoadInvoices(){
   list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:12px">Loading…</div>';
   try {
     const data = await apiFetch(`/api/software/${id}/invoices`);
-    swDmRenderInvoices(data);
+    swDmRenderInvoices(sortInvoicesByBillingPeriodDesc(data));
     document.getElementById('swDmInvCount').textContent = data.length;
     document.getElementById('swDmInvCount').style.background = data.length ? 'var(--primary)' : 'var(--gray-300)';
   } catch(e){
@@ -6547,11 +7314,12 @@ async function swDmIgnoreMailEvent(eventId){
 function swDmRenderInvoices(invoices){
   const id   = _swDmCurrentId;
   const list = document.getElementById('swDmInvList');
-  if(!invoices.length){
+  const sorted = sortInvoicesByBillingPeriodDesc(invoices);
+  if(!sorted.length){
     list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--gray-400);font-size:12.5px">No invoices attached yet.</div>';
     return;
   }
-  list.innerHTML = invoices.map(inv => {
+  list.innerHTML = sorted.map(inv => {
     const uploaded  = new Date(inv.uploadedAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
     const amt       = inv.amount ? `${inv.currency||'USD'} ${Number(inv.amount).toLocaleString('en-US',{minimumFractionDigits:2})}` : '—';
     const fmtD      = d => d ? new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : null;
@@ -7074,7 +7842,7 @@ function openSwDm(id){
 function openSwDrawer(id){
   const swId = String(id || '').trim();
   if (!swId) return;
-  window.location.href = `/software-details?id=${encodeURIComponent(swId)}`;
+  openSoftwareDetailsPage(swId);
 }
 
 function closeSwDm(){
@@ -7418,12 +8186,18 @@ async function swdeSave(){
     })),
   };
   try {
+    const modalWasOpen = document.getElementById('swDmOverlay')?.classList.contains('open');
     const res = await authFetch(`${API}/software/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     if(!res.ok){ const e=await res.json(); throw new Error(e.error||'Server error'); }
     showToast('Software updated','success');
     await loadData();
-    openSwDm(id);
-    swDmTab('services');
+    if (swDetailCurrentId === id) {
+      await openSoftwareDetailsPage(id);
+    }
+    if (modalWasOpen) {
+      openSwDm(id);
+      swDmTab('overview');
+    }
   } catch(e){ showToast(e.message,'danger'); }
 }
 
@@ -8565,7 +9339,8 @@ function setScimFilter(f){
   _scimFilter = f;
   ['all','ready','upgrade','unknown'].forEach(k=>{
     const btn = document.getElementById('scimFilter'+k.charAt(0).toUpperCase()+k.slice(1));
-    if(btn){ btn.className = k===f ? 'btn btn-sm' : 'btn btn-secondary btn-sm'; btn.style.background = k===f?'var(--primary)':''; btn.style.color = k===f?'#fff':''; btn.style.border = k===f?'none':''; }
+    if(!btn) return;
+    btn.className = `btn btn-sm scim-filter-btn scim-filter-${k}${k === f ? ' is-active' : ''}`;
   });
   renderScimAuditRows();
 }
@@ -8598,22 +9373,22 @@ function renderScimAuditRows(){
     const minScim  = scimMinPlan(dbEntry);
     const licenses = s.purchasedLicenses || s.usedLicenses || 0;
 
-    let status, statusLabel, statusColor, statusBg;
+    let status, statusLabel;
     let reqPlan = null, reqPpu = null;
     let curPpu  = curPlan ? curPlan.ppu : (s.licensePricePerUserMonth || null);
     let annualDelta = null;
 
     if(!dbEntry){
-      status = 'unknown'; statusLabel = '⚪ Unknown'; statusColor = 'var(--gray-500)'; statusBg = 'var(--gray-100)';
+      status = 'unknown'; statusLabel = 'Unknown Plan';
     } else if(!curPlan){
       // Plan name not matched in DB — show vendor known but plan not matched
-      status = 'unknown'; statusLabel = '⚪ Plan Not Matched'; statusColor = 'var(--gray-500)'; statusBg = 'var(--gray-100)';
+      status = 'unknown'; statusLabel = 'Plan Not Matched';
       // Still show the minimum SCIM plan as reference
       if(minScim){ reqPlan = minScim.name; reqPpu = minScim.ppu; }
     } else if(curPlan.scim){
-      status = 'ready'; statusLabel = '✅ SCIM Ready'; statusColor = '#16a34a'; statusBg = '#f0fdf4';
+      status = 'ready'; statusLabel = 'SCIM Ready';
     } else {
-      status = 'upgrade'; statusLabel = '🔶 Needs Upgrade'; statusColor = '#d97706'; statusBg = '#fffbeb';
+      status = 'upgrade'; statusLabel = 'Needs Upgrade';
       if(minScim){ reqPlan = minScim.name; reqPpu = minScim.ppu; }
       // Compute annual delta
       if(curPpu !== null && reqPpu !== null && licenses > 0){
@@ -8621,7 +9396,7 @@ function renderScimAuditRows(){
       }
     }
 
-    return { s, status, statusLabel, statusColor, statusBg, curPlan, reqPlan, curPpu, reqPpu, licenses, annualDelta, dbEntry };
+    return { s, status, statusLabel, curPlan, reqPlan, curPpu, reqPpu, licenses, annualDelta, dbEntry };
   });
 
   // Summary chips
@@ -8631,22 +9406,22 @@ function renderScimAuditRows(){
   const totalDelta = rows.filter(r=>r.annualDelta!==null).reduce((a,r)=>a+r.annualDelta,0);
 
   document.getElementById('scimAuditSummary').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.28);border-radius:12px;flex:1;min-width:160px">
-      <span style="font-size:20px">✅</span>
-      <div><div style="font-size:22px;font-weight:800;color:#a3ffd3;line-height:1">${ready}</div><div style="font-size:11px;color:#6ee7b7;font-weight:600">SCIM Ready</div></div>
+    <div class="scim-audit-sum-card ready">
+      <span class="icon">✅</span>
+      <div><div class="value">${ready}</div><div class="label">SCIM Ready</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.28);border-radius:12px;flex:1;min-width:160px">
-      <span style="font-size:20px">🔶</span>
-      <div><div style="font-size:22px;font-weight:800;color:#fcd34d;line-height:1">${upgrade}</div><div style="font-size:11px;color:#fbbf24;font-weight:600">Needs Upgrade</div></div>
+    <div class="scim-audit-sum-card upgrade">
+      <span class="icon">🔶</span>
+      <div><div class="value">${upgrade}</div><div class="label">Needs Upgrade</div></div>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(130,96,185,.12);border:1px solid rgba(130,96,185,.28);border-radius:12px;flex:1;min-width:160px">
-      <span style="font-size:20px">⚪</span>
-      <div><div style="font-size:22px;font-weight:800;color:#d8ccec;line-height:1">${unknown}</div><div style="font-size:11px;color:#b8a9cf;font-weight:600">Plan Unknown</div></div>
+    <div class="scim-audit-sum-card unknown">
+      <span class="icon">⚪</span>
+      <div><div class="value">${unknown}</div><div class="label">Plan Unknown</div></div>
     </div>
     ${totalDelta>0?`
-    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.28);border-radius:12px;flex:1;min-width:180px">
-      <span style="font-size:20px">💸</span>
-      <div><div style="font-size:18px;font-weight:800;color:#ffb6b6;line-height:1">$${totalDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}/yr</div><div style="font-size:11px;color:#fca5a5;font-weight:600">Total Upgrade Cost Delta</div></div>
+    <div class="scim-audit-sum-card delta">
+      <span class="icon">💸</span>
+      <div><div class="value">$${totalDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}/yr</div><div class="label">Total Upgrade Cost Delta</div></div>
     </div>`:''}
   `;
 
@@ -8655,60 +9430,58 @@ function renderScimAuditRows(){
 
   const body = document.getElementById('scimAuditBody');
   if(!visible.length){
-    body.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray-400)">No apps match this filter.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="9" class="scim-audit-empty">No apps match this filter.</td></tr>`;
     return;
   }
 
-  body.innerHTML = visible.map(({ s, status, statusLabel, statusColor, statusBg, curPlan, reqPlan, curPpu, reqPpu, licenses, annualDelta, dbEntry }) => {
-    const curPpuStr  = curPpu  !== null && curPpu  !== undefined ? `$${curPpu.toFixed(2)}` : '<span style="color:#9b8ab9">—</span>';
-    const reqPpuStr  = reqPpu  !== null && reqPpu  !== undefined ? `$${reqPpu.toFixed(2)}`  : (reqPlan ? '<span style="color:#9b8ab9">Custom</span>' : '<span style="color:#9b8ab9">—</span>');
+  body.innerHTML = visible.map(({ s, status, statusLabel, reqPlan, curPpu, reqPpu, licenses, annualDelta, dbEntry }) => {
+    const curPpuStr  = curPpu  !== null && curPpu  !== undefined ? `$${curPpu.toFixed(2)}` : '<span class="scim-audit-muted">—</span>';
+    const reqPpuStr  = reqPpu  !== null && reqPpu  !== undefined ? `$${reqPpu.toFixed(2)}`  : (reqPlan ? '<span class="scim-audit-muted">Custom</span>' : '<span class="scim-audit-muted">—</span>');
     const deltaStr   = annualDelta !== null
-      ? `<span style="font-weight:700;color:#ffb6b6">+$${annualDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</span>`
-      : (status==='ready' ? '<span style="color:#a3ffd3;font-weight:600">No cost</span>' : '<span style="color:#9b8ab9">—</span>');
+      ? `<span class="scim-audit-delta-plus">+$${annualDelta.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0})}</span>`
+      : (status==='ready' ? '<span class="scim-audit-no-cost">No cost</span>' : '<span class="scim-audit-muted">—</span>');
     const reqPlanStr = reqPlan
-      ? `<span style="background:rgba(245,158,11,.15);color:#fcd34d;border:1px solid rgba(245,158,11,.3);padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">${reqPlan}</span>`
-      : (status==='ready' ? '<span style="color:#9b8ab9;font-size:12px">Already on SCIM plan</span>' : '<span style="color:#9b8ab9">—</span>');
+      ? `<span class="scim-audit-plan-chip required">${escHtml(reqPlan)}</span>`
+      : (status==='ready' ? '<span class="scim-audit-muted">Already on SCIM plan</span>' : '<span class="scim-audit-muted">—</span>');
     const curPlanStr = s.subscriptionPlan
-      ? `<span style="background:rgba(124,92,255,.18);color:#c4b5fd;border:1px solid rgba(124,92,255,.35);padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600">${s.subscriptionPlan}</span>`
-      : '<span style="color:#9b8ab9;font-size:12px;font-style:italic">Not set</span>';
+      ? `<span class="scim-audit-plan-chip current">${escHtml(s.subscriptionPlan)}</span>`
+      : '<span class="scim-audit-muted scim-audit-italic">Not set</span>';
+    const statusPrefix = status === 'ready' ? '✅' : (status === 'upgrade' ? '🔶' : '⚪');
 
     // Connector cell — only shown for SCIM-ready apps that have a connector def
     const connKey = scimConnectorKey(s.name);
     const connDef = connKey ? SCIM_CONNECTOR_DEFS[connKey] : null;
-    let connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(124,58,237,.07)"></td>`;
+    let connCell = `<td class="scim-audit-connector-cell"></td>`;
     if(status === 'ready' && connDef){
       const existing = appConnectors.find(c => c.appName === connDef.appName);
       if(existing && existing.enabled){
-        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(124,58,237,.07)">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-            <span style="background:rgba(52,211,153,.14);color:#a3ffd3;border:1px solid rgba(52,211,153,.3);padding:3px 10px;border-radius:9999px;font-size:11.5px;font-weight:700;white-space:nowrap">✓ Connected</span>
-            <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" style="background:none;border:none;color:#c4b5fd;font-size:11px;cursor:pointer;text-decoration:underline;padding:0">Edit</button>
+        connCell = `<td class="scim-audit-connector-cell">
+          <div class="scim-audit-conn-wrap">
+            <span class="scim-audit-conn-badge">✓ Connected</span>
+            <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" class="scim-audit-link-btn">Edit</button>
           </div>
         </td>`;
       } else {
-        connCell = `<td style="padding:10px 16px;text-align:center;background:rgba(124,58,237,.07)">
-          <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')"
-            style="background:linear-gradient(135deg,#3757e6,#7c5cff);color:#fff;border:none;padding:5px 13px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(124,92,255,.35)">
-            🔌 Set Up
-          </button>
+        connCell = `<td class="scim-audit-connector-cell">
+          <button onclick="openConnectorSetup('${connDef.appName}','${s.csvId}')" class="scim-audit-setup-btn">🔌 Set Up</button>
         </td>`;
       }
     }
 
-    return `<tr style="border-top:1px solid rgba(130,96,185,.18);transition:background .12s" onmouseover="this.style.background='rgba(124,92,255,.07)'" onmouseout="this.style.background=''">
-      <td style="padding:12px 16px">
-        <div style="font-weight:700;font-size:13px;color:#f5efff">${s.name}</div>
-        <div style="font-size:11px;color:#9b8ab9">${dbEntry ? dbEntry.vendor : s.deploymentType}</div>
+    return `<tr class="scim-audit-row">
+      <td>
+        <div class="scim-audit-app-name">${escHtml(s.name || '')}</div>
+        <div class="scim-audit-app-sub">${escHtml((dbEntry ? dbEntry.vendor : s.deploymentType) || '—')}</div>
       </td>
-      <td style="padding:12px 16px">${curPlanStr}</td>
-      <td style="padding:12px 16px;font-size:12px;color:#d8ccec">${licenses > 0 ? `<span style="background:rgba(124,92,255,.18);color:#c4b5fd;border:1px solid rgba(124,92,255,.3);padding:2px 9px;border-radius:9999px;font-size:11.5px;font-weight:700">${licenses}</span>` : '<span style="color:#9b8ab9">—</span>'}</td>
-      <td style="padding:12px 16px">
-        <span style="background:${statusBg};color:${statusColor};padding:3px 9px;border-radius:9999px;font-size:12px;font-weight:600;white-space:nowrap">${statusLabel}</span>
+      <td>${curPlanStr}</td>
+      <td>${licenses > 0 ? `<span class="scim-audit-licenses-chip">${licenses}</span>` : '<span class="scim-audit-muted">—</span>'}</td>
+      <td>
+        <span class="scim-audit-status ${status}">${statusPrefix} ${statusLabel}</span>
       </td>
-      <td style="padding:12px 16px">${reqPlanStr}</td>
-      <td style="padding:12px 16px;text-align:right;font-size:12.5px;color:#d8ccec">${curPpuStr}</td>
-      <td style="padding:12px 16px;text-align:right;font-size:12.5px;color:#d8ccec">${reqPpuStr}</td>
-      <td style="padding:12px 16px;text-align:right;background:rgba(245,158,11,.07)">${deltaStr}</td>
+      <td>${reqPlanStr}</td>
+      <td class="col-money scim-audit-money">${curPpuStr}</td>
+      <td class="col-money scim-audit-money">${reqPpuStr}</td>
+      <td class="col-money scim-audit-delta-cell">${deltaStr}</td>
       ${connCell}
     </tr>`;
   }).join('');
@@ -9590,53 +10363,53 @@ function toggleNotifCollapse() {
 
 <!-- DEPT USERS MODAL -->
 <!-- ══ SCIM AUDIT MODAL ══ -->
-<div id="scimAuditModal" onclick="if(event.target===this)closeScimAudit()" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(8,4,16,.72);align-items:flex-start;justify-content:center;padding:24px;overflow-y:auto;backdrop-filter:blur(6px)">
-  <div style="background:rgba(22,14,34,.97);border:1px solid rgba(130,96,185,.3);border-radius:18px;width:min(1100px,100%);box-shadow:0 32px 90px rgba(0,0,0,.6),0 0 0 1px rgba(124,92,255,.12);margin:auto">
+<div id="scimAuditModal" class="scim-audit-modal" onclick="if(event.target===this)closeScimAudit()">
+  <div class="scim-audit-panel">
     <!-- Header -->
-    <div style="padding:20px 26px 16px;border-bottom:1px solid rgba(130,96,185,.2);display:flex;align-items:center;justify-content:space-between">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(124,92,255,.35));border:1px solid rgba(124,92,255,.4);display:flex;align-items:center;justify-content:center">
-          <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:#a78bfa;fill:none;stroke-width:2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+    <div class="scim-audit-head">
+      <div class="scim-audit-head-left">
+        <div class="scim-audit-head-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
         </div>
         <div>
-          <div style="font-size:15px;font-weight:700;color:#f5efff">SCIM Readiness Audit</div>
-          <div style="font-size:11.5px;color:#9b8ab9">Which SAAS apps can use SCIM and what upgrades are needed</div>
+          <div class="scim-audit-title">SCIM Readiness Audit</div>
+          <div class="scim-audit-subtitle">Which SAAS apps can use SCIM and what upgrades are needed</div>
         </div>
       </div>
-      <button onclick="closeScimAudit()" style="background:rgba(124,92,255,.12);border:1px solid rgba(124,92,255,.22);cursor:pointer;color:#b8a9cf;font-size:22px;line-height:1;padding:4px 10px;border-radius:8px;transition:all .14s" onmouseover="this.style.background='rgba(124,92,255,.22)'" onmouseout="this.style.background='rgba(124,92,255,.12)'" title="Close">&times;</button>
+      <button onclick="closeScimAudit()" class="scim-audit-close" title="Close">&times;</button>
     </div>
     <!-- Summary chips -->
-    <div id="scimAuditSummary" style="display:flex;gap:12px;padding:16px 26px;border-bottom:1px solid rgba(130,96,185,.2);flex-wrap:wrap"></div>
+    <div id="scimAuditSummary"></div>
     <!-- Filters -->
-    <div style="padding:10px 26px;border-bottom:1px solid rgba(130,96,185,.2);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <span style="font-size:12px;color:#9b8ab9;font-weight:600">Filter:</span>
-      <button class="btn btn-sm" id="scimFilterAll"    onclick="setScimFilter('all')"     style="background:linear-gradient(135deg,#3757e6,#7c5cff);color:#fff;border:none;box-shadow:0 4px 14px rgba(124,92,255,.35)">All</button>
-      <button class="btn btn-sm" id="scimFilterReady"   onclick="setScimFilter('ready')"   style="background:rgba(52,211,153,.12);color:#a3ffd3;border:1px solid rgba(52,211,153,.3)">✅ SCIM Ready</button>
-      <button class="btn btn-sm" id="scimFilterUpgrade" onclick="setScimFilter('upgrade')" style="background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.3)">🔶 Needs Upgrade</button>
-      <button class="btn btn-sm" id="scimFilterUnknown" onclick="setScimFilter('unknown')" style="background:rgba(148,163,184,.1);color:#d8ccec;border:1px solid rgba(130,96,185,.28)">⚪ Unknown Plan</button>
+    <div class="scim-audit-filters">
+      <span class="label">Filter:</span>
+      <button class="btn btn-sm scim-filter-btn scim-filter-all is-active" id="scimFilterAll" onclick="setScimFilter('all')">All</button>
+      <button class="btn btn-sm scim-filter-btn scim-filter-ready" id="scimFilterReady" onclick="setScimFilter('ready')">✅ SCIM Ready</button>
+      <button class="btn btn-sm scim-filter-btn scim-filter-upgrade" id="scimFilterUpgrade" onclick="setScimFilter('upgrade')">🔶 Needs Upgrade</button>
+      <button class="btn btn-sm scim-filter-btn scim-filter-unknown" id="scimFilterUnknown" onclick="setScimFilter('unknown')">⚪ Unknown Plan</button>
     </div>
     <!-- Table -->
-    <div style="overflow-x:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
+    <div class="scim-audit-table-wrap">
+      <table class="scim-audit-table">
         <thead>
-          <tr style="background:rgba(31,20,46,.9)">
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">App</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Current Plan</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Licenses</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">SCIM Status</th>
-            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Required Plan</th>
-            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Current Cost/user/mo</th>
-            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#9b8ab9;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap">Upgrade Cost/user/mo</th>
-            <th style="padding:10px 16px;text-align:right;font-size:11px;font-weight:700;color:#fcd34d;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(245,158,11,.08)">Annual Cost Delta</th>
-            <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:700;color:#c4b5fd;text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;background:rgba(124,58,237,.12)">Connector</th>
+          <tr>
+            <th>App</th>
+            <th>Current Plan</th>
+            <th>Licenses</th>
+            <th>SCIM Status</th>
+            <th>Required Plan</th>
+            <th class="col-money">Current Cost/user/mo</th>
+            <th class="col-money">Upgrade Cost/user/mo</th>
+            <th class="col-money col-delta">Annual Cost Delta</th>
+            <th class="col-connector">Connector</th>
           </tr>
         </thead>
         <tbody id="scimAuditBody"></tbody>
       </table>
     </div>
     <!-- Footer note -->
-    <div style="padding:14px 26px;border-top:1px solid rgba(130,96,185,.2);font-size:11px;color:#9b8ab9;display:flex;align-items:center;gap:8px;background:rgba(31,20,46,.5);border-radius:0 0 18px 18px">
-      <svg viewBox="0 0 24 24" style="width:13px;height:13px;flex-shrink:0;stroke:#a78bfa;fill:none;stroke-width:2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <div class="scim-audit-foot">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
       Plan pricing shown is per-user/month (billed annually) based on publicly available rates as of early 2025. Actual pricing may vary — confirm with each vendor.
     </div>
   </div>

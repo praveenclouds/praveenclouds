@@ -12,13 +12,27 @@
  */
 const { apiGet, apiPost } = require('../utils/http');
 
+const HEADER_UNSAFE_OR_ZERO_WIDTH_RE = /[\u0000-\u001F\u007F\u200B-\u200D\uFEFF]/g;
+function sanitizeBearerToken(value = '', label = 'API token') {
+  const token = String(value || '')
+    .replace(HEADER_UNSAFE_OR_ZERO_WIDTH_RE, '')
+    .trim();
+
+  if (!token) throw new Error(`${label} is missing.`);
+  if (/\s/.test(token)) {
+    throw new Error(`${label} contains whitespace or line-break characters. Paste a single-line token.`);
+  }
+  return token;
+}
+
 // ══════════════════════════════════════════════════════════════════
 //  SYNC FUNCTIONS
 // ══════════════════════════════════════════════════════════════════
 
 async function syncGitHub(connector) {
+  const token = sanitizeBearerToken(connector.apiToken, 'GitHub API token');
   const headers = {
-    Authorization:         `Bearer ${connector.apiToken}`,
+    Authorization:         `Bearer ${token}`,
     'X-GitHub-Api-Version': '2022-11-28',
     'User-Agent':           'Terzo-Portal/1.0',
     Accept:                 'application/vnd.github+json',
@@ -56,7 +70,11 @@ async function syncGitHub(connector) {
 }
 
 async function syncSlack(connector) {
-  const authHeader = { Authorization: `Bearer ${connector.apiToken}` };
+  const token = sanitizeBearerToken(connector.apiToken, 'Slack bot token');
+  if (!token.startsWith('xoxb-')) {
+    throw new Error('Slack Bot Token must start with "xoxb-".');
+  }
+  const authHeader = { Authorization: `Bearer ${token}` };
 
   // Users list
   const usersRaw  = await apiGet('https://slack.com/api/users.list?limit=500', authHeader);
@@ -146,12 +164,13 @@ async function syncConnector(connector) {
 
 async function inviteGitHub(connector, user) {
   try {
+    const token = sanitizeBearerToken(connector.apiToken, 'GitHub API token');
     const raw = await apiPost(
       'api.github.com',
       `/orgs/${encodeURIComponent(connector.orgSlug)}/invitations`,
       JSON.stringify({ email: user.email, role: 'direct_member' }),
       {
-        Authorization:         `Bearer ${connector.apiToken}`,
+        Authorization:         `Bearer ${token}`,
         'X-GitHub-Api-Version': '2022-11-28',
         Accept:                 'application/vnd.github+json',
       }
@@ -166,11 +185,12 @@ async function inviteGitHub(connector, user) {
 
 async function inviteSlack(connector, user) {
   try {
+    const token = sanitizeBearerToken(connector.apiToken, 'Slack bot token');
     const raw = await apiPost(
       'slack.com',
       '/api/admin.users.invite',
       JSON.stringify({ email: user.email, team_id: connector.orgSlug, channel_ids: [] }),
-      { Authorization: `Bearer ${connector.apiToken}` }
+      { Authorization: `Bearer ${token}` }
     );
     const data = JSON.parse(raw);
     if (data.ok) return { status: 'invited', message: `Slack invitation sent to ${user.email}` };

@@ -11,6 +11,10 @@
       --primary: #7c3aed; --primary-light: #9333ea; --primary-dark: #6d28d9;
       --accent: #a855f7; --accent-light: #c084fc;
       --success: #16a34a; --danger: #dc2626; --warning: #d97706;
+      --toast-success-bg: rgba(22,163,74,0.2);
+      --toast-success-border: rgba(22,163,74,0.35);
+      --toast-success-text: #4ade80;
+      --status-success-color: #4ade80;
       --bg: #0e0a0f; --surface: #16101a; --surface2: #1e1525;
       --border: rgba(153,102,255,0.18);
       --text: #f0eeff; --text-muted: rgba(180,170,210,0.7);
@@ -20,6 +24,10 @@
       --bg: #f1f5f9; --surface: #ffffff; --surface2: #f8fafc;
       --border: rgba(148,163,184,0.35);
       --text: #1e293b; --text-muted: #64748b;
+      --toast-success-bg: rgba(124,58,237,0.12);
+      --toast-success-border: rgba(124,58,237,0.32);
+      --toast-success-text: #6d28d9;
+      --status-success-color: #7c3aed;
     }
     [data-theme="light"] body { background: var(--bg); color: var(--text); }
     [data-theme="light"] .sidebar { background: #ffffff; border-color: #e2e8f0; }
@@ -49,11 +57,19 @@
 
     /* SIDEBAR */
     .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
-    .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 11px; }
-    .logo-icon { width: 36px; height: 36px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .logo-icon svg { width: 18px; height: 18px; fill: #fff; }
-    .logo-text { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; letter-spacing: -0.01em; }
-    .logo-sub  { font-size: 11px; color: rgba(153,102,255,0.6); margin-top: 1px; }
+    .logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); display: block; }
+    .logo-brand { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .logo-image-wrap {
+      width: 170px; height: 48px; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--border); background: #fff;
+    }
+    .logo-image { width: 100%; height: 100%; display: none; }
+    .logo-image--light { object-fit: contain; object-position: left center; padding: 3px 8px; box-sizing: border-box; background: #fff; }
+    .logo-image--dark { object-fit: cover; object-position: center; }
+    body[data-portal-theme="white"] .logo-image--light { display: block; }
+    body[data-portal-theme="dark"] .logo-image--dark { display: block; }
+    body[data-portal-theme="dark"] .logo-image-wrap { background: #140f24; border-color: rgba(153,102,255,0.3); }
+    .logo-sub  { font-size: 11px; color: rgba(153,102,255,0.6); margin-top: 0; }
 
     nav { padding: 16px 10px; flex: 1; }
     .nav-label { font-size: 10.5px; font-weight: 600; color: rgba(153,102,255,0.55); text-transform: uppercase; letter-spacing: .08em; padding: 10px 10px 6px; }
@@ -143,7 +159,7 @@
     /* TOAST */
     .toast-wrap { position: fixed; bottom: 22px; right: 22px; display: flex; flex-direction: column; gap: 8px; z-index: 999; }
     .toast { padding: 10px 16px; border-radius: 9px; font-size: 13px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.4); animation: slideIn .25s ease; display: flex; align-items: center; gap: 8px; min-width: 220px; }
-    .toast.success { background: rgba(22,163,74,0.2); border: 1px solid rgba(22,163,74,0.35); color: #4ade80; }
+    .toast.success { background: var(--toast-success-bg); border: 1px solid var(--toast-success-border); color: var(--toast-success-text); }
     .toast.danger  { background: rgba(220,38,38,0.18); border: 1px solid rgba(220,38,38,0.35); color: #f87171; }
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -269,12 +285,21 @@
     .alert-tag.thr       { background:rgba(251,191,36,.1); color:#fbbf24;border:1px solid rgba(251,191,36,.2); }
     .alert-card-actions { display:flex;align-items:center;gap:8px;flex-shrink:0; }
     .alert-empty { text-align:center;padding:36px 20px;background:rgba(153,102,255,.03);border:1px dashed rgba(153,102,255,.18);border-radius:12px;color:rgba(153,102,255,.45);font-size:13px;margin-bottom:9px; }
-    .modal-box.wide { width:580px; }
-    .channel-pills { display:flex;gap:8px;flex-wrap:wrap; }
-    .channel-pill { display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:20px;font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:rgba(153,102,255,.06);color:var(--text-muted);transition:all .14s;user-select:none; }
-    .channel-pill:hover { border-color:rgba(99,66,255,.4);color:var(--text); }
-    .channel-pill.ch-active { background:rgba(99,66,255,.18);border-color:rgba(99,66,255,.5);color:#c4b5fd; }
-    .channel-pill svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2; }
+    .alert-disabled-note { font-size:11px; font-weight:700; color:#fbbf24; border:1px solid rgba(251,191,36,.35); background:rgba(251,191,36,.08); border-radius:999px; padding:2px 8px; }
+    .config-box { border:1px solid var(--border); border-radius:10px; background:var(--surface2); padding:12px; margin-bottom:12px; }
+    .cfg-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:10px; }
+    .cfg-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px solid rgba(153,102,255,.08); }
+    .cfg-row:last-child { border-bottom:none; }
+    .cfg-row .meta { min-width:0; }
+    .cfg-row .meta .name { font-size:12.5px; font-weight:600; color:var(--text); }
+    .cfg-row .meta .sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+    .cfg-cond-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .cfg-cond-table th { padding:7px 8px; font-size:10.5px; text-transform:uppercase; color:var(--text-muted); border-bottom:1px solid rgba(153,102,255,.12); letter-spacing:.04em; }
+    .cfg-cond-table td { padding:8px; border-bottom:1px solid rgba(153,102,255,.08); vertical-align:middle; }
+    .cfg-cond-table tr:last-child td { border-bottom:none; }
+    .cfg-cond-inv-off { opacity:.5; pointer-events:none; }
+    .cfg-help { font-size:11px; color:var(--text-muted); margin-top:8px; line-height:1.45; }
+    .modal-box.xwide { width:min(920px,96vw); }
 
     /* ── SOFT DOCS ── */
     .softdocs-layout { display:grid; grid-template-columns: 300px minmax(0,1fr); gap:14px; }
@@ -316,11 +341,11 @@
 <!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    </div>
-    <div>
-      <div class="logo-text">Terzo</div>
+    <div class="logo-brand">
+      <div class="logo-image-wrap">
+        <img class="logo-image logo-image--light" src="/assets/branding/terzo_logo_light.jpg" alt="Terzo logo light theme" />
+        <img class="logo-image logo-image--dark" src="/assets/branding/terzo_logo_dark.jpg" alt="Terzo logo dark theme" />
+      </div>
       <div class="logo-sub">Admin Console</div>
     </div>
   </div>
@@ -970,63 +995,57 @@
       <!-- Header bar -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <div>
-          <div style="font-size:16px;font-weight:800;color:var(--text)">Alert Rules</div>
-          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Create and manage custom alerts for Users, Software, and Assets</div>
+          <div style="font-size:16px;font-weight:800;color:var(--text)">Alerts Configuration</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:3px">Manage inventory-level alert switches, condition thresholds, and delivery channels</div>
         </div>
-        <button class="btn btn-primary btn-sm" onclick="openAlertModal()">
+        <button class="btn btn-primary btn-sm" onclick="openAlertConfigModal()">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-          Create Alert
+          Create Configuration
         </button>
       </div>
 
       <!-- ── Users alerts section ── -->
-      <div class="card" style="margin-bottom:18px">
+      <div class="card" style="margin-bottom:18px" id="alertSection-users">
         <div class="card-header">
           <div class="alert-category-icon users"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
           <div style="flex:1">
             <div class="alert-category-title">User Alerts</div>
             <div class="alert-category-sub">Notify on user account changes, logins, role updates</div>
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="openAlertModal('users')">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
-          </button>
+          <span class="alert-disabled-note" id="alertInvStatus-users" style="display:none">Disabled</span>
         </div>
         <div style="padding:16px" id="alertList-users">
-          <div class="alert-empty">No user alerts configured yet. Click <strong>Add</strong> to create one.</div>
+          <div class="alert-empty">No user alerts configured yet. Click <strong>Create Configuration</strong> to enable conditions.</div>
         </div>
       </div>
 
       <!-- ── Software alerts section ── -->
-      <div class="card" style="margin-bottom:18px">
+      <div class="card" style="margin-bottom:18px" id="alertSection-software">
         <div class="card-header">
           <div class="alert-category-icon software"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
           <div style="flex:1">
             <div class="alert-category-title">Software Inventory Alerts</div>
             <div class="alert-category-sub">License usage, renewals, cost thresholds, new apps</div>
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="openAlertModal('software')">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
-          </button>
+          <span class="alert-disabled-note" id="alertInvStatus-software" style="display:none">Disabled</span>
         </div>
         <div style="padding:16px" id="alertList-software">
-          <div class="alert-empty">No software alerts configured yet. Click <strong>Add</strong> to create one.</div>
+          <div class="alert-empty">No software alerts configured yet. Click <strong>Create Configuration</strong> to enable conditions.</div>
         </div>
       </div>
 
       <!-- ── Asset alerts section ── -->
-      <div class="card" style="margin-bottom:18px">
+      <div class="card" style="margin-bottom:18px" id="alertSection-assets">
         <div class="card-header">
           <div class="alert-category-icon assets"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
           <div style="flex:1">
             <div class="alert-category-title">Asset Inventory Alerts</div>
             <div class="alert-category-sub">Assignments, repairs, retirements, stock thresholds</div>
           </div>
-          <button class="btn btn-secondary btn-sm" onclick="openAlertModal('assets')">
-            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Add
-          </button>
+          <span class="alert-disabled-note" id="alertInvStatus-assets" style="display:none">Disabled</span>
         </div>
         <div style="padding:16px" id="alertList-assets">
-          <div class="alert-empty">No asset alerts configured yet. Click <strong>Add</strong> to create one.</div>
+          <div class="alert-empty">No asset alerts configured yet. Click <strong>Create Configuration</strong> to enable conditions.</div>
         </div>
       </div>
 
@@ -1229,87 +1248,127 @@
   </div>
 </div>
 
-<!-- ══ ALERT CREATE / EDIT MODAL ══ -->
-<div class="modal-overlay" id="alertModal" onclick="if(event.target===this)closeAlertModal()">
-  <div class="modal-box wide" style="max-height:90vh;overflow-y:auto">
+<!-- ══ ALERT CONFIGURATION MODAL ══ -->
+<div class="modal-overlay" id="alertConfigModal" onclick="if(event.target===this)closeAlertConfigModal()">
+  <div class="modal-box xwide" style="max-height:92vh;overflow-y:auto">
     <div class="modal-head">
-      <h3 id="alertModalTitle">Create Alert</h3>
-      <button class="modal-close" onclick="closeAlertModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <h3>Alerts Configuration</h3>
+      <button class="modal-close" onclick="closeAlertConfigModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
-
-      <!-- Alert Name -->
-      <div class="form-group">
-        <label>Alert Name *</label>
-        <input type="text" id="aName" placeholder="e.g. License over 90% used" maxlength="80"/>
-      </div>
-
-      <!-- Category -->
-      <div class="form-group">
-        <label>Category *</label>
-        <select id="aCategory" onchange="onAlertCategoryChange()">
-          <option value="">— Select category —</option>
-          <option value="users">👤  Users</option>
-          <option value="software">💻  Software Inventory</option>
-          <option value="assets">🖥️  Asset Inventory</option>
-        </select>
-      </div>
-
-      <!-- Condition — changes based on category -->
-      <div class="form-group" id="aConditionGroup" style="display:none">
-        <label>Trigger Condition *</label>
-        <select id="aCondition" onchange="onAlertConditionChange()">
-          <option value="">— Select condition —</option>
-        </select>
-      </div>
-
-      <!-- Threshold (shown for conditions that need a number) -->
-      <div class="form-group" id="aThresholdGroup" style="display:none">
-        <label id="aThresholdLabel">Threshold Value</label>
-        <input type="number" id="aThreshold" placeholder="e.g. 90" min="0"/>
-        <span style="font-size:11px;color:var(--text-muted);margin-top:4px" id="aThresholdHint"></span>
-      </div>
-
-      <!-- Description -->
-      <div class="form-group">
-        <label>Description <span style="font-weight:400;text-transform:none;font-size:10px">(optional)</span></label>
-        <input type="text" id="aDesc" placeholder="Brief note about this alert" maxlength="140"/>
-      </div>
-
-      <!-- Notification Channels -->
-      <div class="form-group">
-        <label>Notification Channels</label>
-        <div class="channel-pills">
-          <div class="channel-pill ch-active" id="chInApp" onclick="toggleChannel('inApp')">
-            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            In-App
+      <div class="config-box">
+        <div class="cfg-title">1. Alert Options</div>
+        <div class="cfg-row">
+          <div class="meta">
+            <div class="name">User Inventory Alerts</div>
+            <div class="sub">Enable or disable all user inventory alert conditions.</div>
           </div>
-          <div class="channel-pill" id="chEmail" onclick="toggleChannel('email')">
-            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Email
+          <label class="toggle"><input type="checkbox" id="cfgInvUsers" checked onchange="syncAlertConfigInventoryUi()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="cfg-row">
+          <div class="meta">
+            <div class="name">Asset Inventory Alerts</div>
+            <div class="sub">Enable or disable all asset inventory alert conditions.</div>
           </div>
-          <div class="channel-pill" id="chSlack" onclick="toggleChannel('slack')">
-            <svg viewBox="0 0 24 24"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8H3.5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
-            Slack
+          <label class="toggle"><input type="checkbox" id="cfgInvAssets" checked onchange="syncAlertConfigInventoryUi()"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="cfg-row">
+          <div class="meta">
+            <div class="name">Software Inventory Alerts</div>
+            <div class="sub">Enable or disable all software inventory alert conditions.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="cfgInvSoftware" checked onchange="syncAlertConfigInventoryUi()"><span class="toggle-slider"></span></label>
+        </div>
+
+        <div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--text)">Condition Controls</div>
+        <div class="cfg-help">Enable or disable specific conditions like cron-tab style control. Threshold values apply only when condition is enabled.</div>
+        <div style="margin-top:10px" id="cfgCondUsersWrap"></div>
+        <div style="margin-top:10px" id="cfgCondSoftwareWrap"></div>
+        <div style="margin-top:10px" id="cfgCondAssetsWrap"></div>
+      </div>
+
+      <div class="config-box">
+        <div class="cfg-title">2. Notification Options</div>
+        <div class="cfg-row">
+          <div class="meta"><div class="name">In-App Notification</div><div class="sub">Show alerts in dashboard and bell notifications.</div></div>
+          <label class="toggle"><input type="checkbox" id="cfgNotifInApp" checked><span class="toggle-slider"></span></label>
+        </div>
+        <div class="cfg-row">
+          <div class="meta"><div class="name">Slack Notification</div><div class="sub">Deliver alert messages through Slack integration.</div></div>
+          <label class="toggle"><input type="checkbox" id="cfgNotifSlack"><span class="toggle-slider"></span></label>
+        </div>
+        <div class="cfg-row">
+          <div class="meta"><div class="name">Email Notification</div><div class="sub">Deliver alert messages through SMTP email automation.</div></div>
+          <label class="toggle"><input type="checkbox" id="cfgNotifEmail"><span class="toggle-slider"></span></label>
+        </div>
+
+        <div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--text)">Slack Setup</div>
+        <div class="form-row" style="margin-top:8px">
+          <div class="form-group">
+            <label>Enable Slack Integration</label>
+            <label class="toggle"><input type="checkbox" id="cfgSlackEnabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-group">
+            <label>Slack Signing Secret</label>
+            <input type="password" id="cfgSlackSigningSecret" placeholder="Keep blank to retain existing secret">
           </div>
         </div>
-        <span style="font-size:11px;color:var(--text-muted);margin-top:6px">Email and Slack require SMTP / Slack connector configured in Integrations.</span>
-      </div>
 
-      <!-- Enabled toggle -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:rgba(153,102,255,.06);border:1px solid var(--border);border-radius:9px">
-        <div>
-          <div style="font-size:13px;font-weight:600;color:var(--text)">Enable this alert</div>
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Alert will be active and trigger notifications when conditions are met</div>
+        <div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--text)">Email Setup</div>
+        <div class="form-row" style="margin-top:8px">
+          <div class="form-group">
+            <label>Enable Email Integration</label>
+            <label class="toggle"><input type="checkbox" id="cfgEmailEnabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="form-group">
+            <label>SMTP Host</label>
+            <input type="text" id="cfgEmailSmtpHost" placeholder="smtp.gmail.com">
+          </div>
         </div>
-        <label class="toggle"><input type="checkbox" id="aEnabled" checked><span class="toggle-slider"></span></label>
+        <div class="form-row">
+          <div class="form-group">
+            <label>SMTP Port</label>
+            <input type="number" id="cfgEmailSmtpPort" placeholder="587">
+          </div>
+          <div class="form-group">
+            <label>SMTP Secure</label>
+            <select id="cfgEmailSmtpSecure">
+              <option value="false">false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>SMTP User</label>
+            <input type="text" id="cfgEmailSmtpUser" placeholder="smtp-user">
+          </div>
+          <div class="form-group">
+            <label>SMTP Password</label>
+            <input type="password" id="cfgEmailSmtpPass" placeholder="Keep blank to retain existing password">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>From Email</label>
+            <input type="email" id="cfgEmailFromEmail" placeholder="support@company.com">
+          </div>
+          <div class="form-group">
+            <label>From Name</label>
+            <input type="text" id="cfgEmailFromName" placeholder="Terzo Support">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>App Base URL</label>
+          <input type="text" id="cfgEmailAppBaseUrl" placeholder="https://portal.company.com">
+        </div>
       </div>
 
-      <div style="font-size:12px;color:#f87171" id="alertModalErr"></div>
+      <div style="font-size:12px;color:#f87171" id="alertConfigErr"></div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-secondary" onclick="closeAlertModal()">Cancel</button>
-      <button class="btn btn-primary" id="alertSaveBtn" onclick="saveAlert()">Create Alert</button>
+      <button class="btn btn-secondary" onclick="closeAlertConfigModal()">Cancel</button>
+      <button class="btn btn-primary" id="alertConfigSaveBtn" onclick="saveAlertConfiguration()">Save Configuration</button>
     </div>
   </div>
 </div>
@@ -2233,7 +2292,7 @@ function setSoftDocsStatus(message, tone = 'muted') {
   if (!el) return;
   const colors = {
     muted: 'var(--text-muted)',
-    success: '#4ade80',
+    success: 'var(--status-success-color)',
     danger: '#f87171',
     warning: '#fbbf24',
   };
@@ -3362,6 +3421,12 @@ function toggleVisibility(inputId, eyeId) {
   }
 }
 
+function normalizeConnectorToken(raw = '') {
+  return String(raw || '')
+    .replace(/[\u0000-\u001F\u007F\u200B-\u200D\uFEFF]/g, '')
+    .trim();
+}
+
 async function saveConnector(appName) {
   const prefix = CONNECTOR_DEFS[appName]?.prefix || 'gws';
   const btn = document.getElementById(`${prefix}SaveBtn`);
@@ -3371,12 +3436,29 @@ async function saveConnector(appName) {
   const tokenEl = document.getElementById(`${prefix}Token`) || document.getElementById('gwsKeyJson');
   const orgEl   = document.getElementById(`${prefix}Org`)   || document.getElementById('gwsAdminEmail');
   const apiToken = tokenEl ? tokenEl.value : '';
+  const normalizedToken = normalizeConnectorToken(apiToken);
+  const hasMaskedToken = (
+    apiToken === '••••••••'
+    || apiToken === '[key stored]'
+    || apiToken === '[key stored — paste new JSON to replace]'
+  );
+
+  if (!hasMaskedToken && normalizedToken && /\s/.test(normalizedToken)) {
+    err.textContent = 'Token contains whitespace or line breaks. Paste a single-line token.';
+    btn.disabled = false; btn.textContent = 'Save';
+    return;
+  }
+  if (appName === 'slack' && !hasMaskedToken && normalizedToken && !normalizedToken.startsWith('xoxb-')) {
+    err.textContent = 'Slack Bot Token must start with "xoxb-".';
+    btn.disabled = false; btn.textContent = 'Save';
+    return;
+  }
 
   const body = {
     enabled:       document.getElementById(`${prefix}Enabled`).checked,
     orgSlug:       orgEl ? orgEl.value.trim() : '',
     softwareCsvId: (document.getElementById(`${prefix}Software`) || {}).value || '',
-    apiToken:      (apiToken === '••••••••' || apiToken === '[key stored — paste new JSON to replace]') ? undefined : apiToken,
+    apiToken:      hasMaskedToken ? undefined : normalizedToken,
   };
 
   try {
@@ -3855,8 +3937,43 @@ const CHANNEL_META = {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let alertsList = [];
-let alertEditingId = null;
-let alertChannels = ['inApp'];
+const DEFAULT_ALERT_CONFIG = {
+  inventory: { users: true, software: true, assets: true },
+  notifications: { inApp: true, email: false, slack: false },
+};
+let alertConfig = JSON.parse(JSON.stringify(DEFAULT_ALERT_CONFIG));
+let alertIntegrations = {
+  slack: { enabled: false, hasSigningSecret: false },
+  email: {
+    enabled: false,
+    smtpHost: '',
+    smtpPort: 587,
+    smtpSecure: false,
+    smtpUser: '',
+    fromEmail: '',
+    fromName: 'Terzo Support',
+    appBaseUrl: '',
+    hasSmtpPass: false,
+  },
+};
+
+function normalizeAlertConfig(raw) {
+  const inventory = raw && typeof raw === 'object' ? (raw.inventory || {}) : {};
+  const notifications = raw && typeof raw === 'object' ? (raw.notifications || {}) : {};
+  return {
+    inventory: {
+      users: inventory.users !== false,
+      software: inventory.software !== false,
+      assets: inventory.assets !== false,
+    },
+    notifications: {
+      inApp: notifications.inApp !== false,
+      email: notifications.email === true,
+      slack: notifications.slack === true,
+    },
+  };
+}
+
 const adminStore = window.tcApi.createStore({
   adminUsers: [],
   adminDepts: [],
@@ -3874,12 +3991,48 @@ adminStore.subscribe((nextState) => {
 });
 
 async function loadAlertsFromServer() {
-  const r = await authFetch('/api/admin/alerts', { requestKey: 'admin:alerts:load', cancelPrevious: true });
-  if (!r.ok) {
-    const data = await r.json().catch(() => ({}));
+  const [rulesResp, configResp, integrationsResp] = await Promise.all([
+    authFetch('/api/admin/alerts', { requestKey: 'admin:alerts:load', cancelPrevious: true }),
+    authFetch('/api/admin/alerts/config', { requestKey: 'admin:alerts:config', cancelPrevious: true }),
+    authFetch('/api/admin/integrations', { requestKey: 'admin:alerts:integrations', cancelPrevious: true }),
+  ]);
+
+  if (!rulesResp.ok) {
+    const data = await rulesResp.json().catch(() => ({}));
     throw new Error(data.error || 'Failed to load alerts');
   }
-  adminStore.setState({ alertRules: await r.json() }, 'admin:alerts:loaded');
+
+  const rulesRows = await rulesResp.json();
+  adminStore.setState({ alertRules: Array.isArray(rulesRows) ? rulesRows : [] }, 'admin:alerts:loaded');
+
+  if (configResp.ok) {
+    const cfg = await configResp.json().catch(() => ({}));
+    alertConfig = normalizeAlertConfig(cfg);
+  } else {
+    alertConfig = JSON.parse(JSON.stringify(DEFAULT_ALERT_CONFIG));
+  }
+
+  if (integrationsResp.ok) {
+    const integ = await integrationsResp.json().catch(() => ({}));
+    alertIntegrations = {
+      slack: {
+        enabled: !!(integ?.slack?.enabled),
+        hasSigningSecret: !!(integ?.slack?.hasSigningSecret),
+      },
+      email: {
+        enabled: !!(integ?.email?.enabled),
+        smtpHost: String(integ?.email?.smtpHost || '').trim(),
+        smtpPort: Number(integ?.email?.smtpPort || 587),
+        smtpSecure: !!(integ?.email?.smtpSecure),
+        smtpUser: String(integ?.email?.smtpUser || '').trim(),
+        fromEmail: String(integ?.email?.fromEmail || '').trim(),
+        fromName: String(integ?.email?.fromName || 'Terzo Support').trim(),
+        appBaseUrl: String(integ?.email?.appBaseUrl || '').trim(),
+        hasSmtpPass: !!(integ?.email?.hasSmtpPass),
+      },
+    };
+  }
+
   return alertsList;
 }
 
@@ -3887,11 +4040,22 @@ async function loadAlertsFromServer() {
 function renderAlerts() {
   ['users', 'software', 'assets'].forEach(cat => {
     const container = document.getElementById('alertList-' + cat);
+    const section = document.getElementById('alertSection-' + cat);
+    const statusBadge = document.getElementById('alertInvStatus-' + cat);
     if (!container) return;
+    const inventoryEnabled = alertConfig?.inventory?.[cat] !== false;
+    if (statusBadge) statusBadge.style.display = inventoryEnabled ? 'none' : 'inline-flex';
+    if (section) section.style.opacity = inventoryEnabled ? '1' : '0.85';
+
+    if (!inventoryEnabled) {
+      container.innerHTML = '<div class="alert-empty">This inventory alerts category is disabled. Enable it from <strong>Create Configuration</strong>.</div>';
+      return;
+    }
+
     const items = alertsList.filter(a => a.category === cat);
     if (!items.length) {
       const label = cat === 'users' ? 'user' : cat === 'software' ? 'software' : 'asset';
-      container.innerHTML = `<div class="alert-empty">No ${label} alerts configured yet. Click <strong>Add</strong> to create one.</div>`;
+      container.innerHTML = `<div class="alert-empty">No ${label} alerts configured yet. Click <strong>Create Configuration</strong> to enable conditions.</div>`;
       return;
     }
     container.innerHTML = items.map(a => renderAlertCard(a)).join('');
@@ -3924,23 +4088,17 @@ function renderAlertCard(a) {
           ${channels}
         </div>
       </div>
-      <div class="alert-card-actions">
-        <button class="btn btn-secondary btn-sm btn-icon" onclick="openAlertModal(null,'${a.id}')" title="Edit alert">
-          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="btn btn-danger btn-sm btn-icon" onclick="deleteAlert('${a.id}')" title="Delete alert">
-          <svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        </button>
-      </div>
+      <div class="alert-card-actions"></div>
     </div>`;
 }
 
 function updateAlertStats() {
-  const total   = alertsList.length;
-  const enabled = alertsList.filter(a => a.enabled).length;
-  const users   = alertsList.filter(a => a.category === 'users').length;
-  const soft    = alertsList.filter(a => a.category === 'software').length;
-  const assets  = alertsList.filter(a => a.category === 'assets').length;
+  const visibleRules = alertsList.filter(a => alertConfig?.inventory?.[a.category] !== false);
+  const total   = visibleRules.length;
+  const enabled = visibleRules.filter(a => a.enabled).length;
+  const users   = visibleRules.filter(a => a.category === 'users').length;
+  const soft    = visibleRules.filter(a => a.category === 'software').length;
+  const assets  = visibleRules.filter(a => a.category === 'assets').length;
   const setEl = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
   setEl('alertStatTotal',   total);
   setEl('alertStatEnabled', enabled);
@@ -3952,6 +4110,234 @@ function updateAlertStats() {
   const navBadge = document.getElementById('navAlertCount');
   if (badge)    { badge.style.display    = enabled > 0 ? 'block' : 'none'; }
   if (navBadge) { navBadge.style.display = total   > 0 ? 'inline' : 'none'; navBadge.textContent = total; }
+}
+
+function findAlertRuleByCondition(category, condition) {
+  return alertsList.find(a => a.category === category && a.condition === condition) || null;
+}
+
+function renderAlertConfigConditionTable(category, title, containerId) {
+  const host = document.getElementById(containerId);
+  if (!host) return;
+  const rows = ALERT_CONDITIONS[category] || [];
+  host.innerHTML = `
+    <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">${title}</div>
+    <table class="cfg-cond-table" id="cfgCondTable-${category}">
+      <thead>
+        <tr>
+          <th style="width:58%">Condition</th>
+          <th style="width:20%">Threshold</th>
+          <th style="width:22%;text-align:right">Enabled</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(row => {
+          const existing = findAlertRuleByCondition(category, row.value);
+          const enabled = existing ? existing.enabled === true : false;
+          const thresholdVal = row.hasThreshold
+            ? (existing?.threshold ?? row.thresholdDefault ?? '')
+            : '';
+          return `
+            <tr>
+              <td>
+                <div style="font-size:12px;font-weight:600;color:var(--text)">${escapeHtml(row.label)}</div>
+                <div style="font-size:10.5px;color:var(--text-muted);margin-top:2px">${escapeHtml(row.thresholdHint || '')}</div>
+              </td>
+              <td>
+                ${row.hasThreshold
+                  ? `<input type="number" min="0" step="any" id="cfgThr_${category}_${row.value}" value="${thresholdVal}" style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text)">`
+                  : '<span style="font-size:11px;color:var(--text-muted)">—</span>'
+                }
+              </td>
+              <td style="text-align:right">
+                <label class="toggle">
+                  <input type="checkbox" id="cfgCond_${category}_${row.value}" ${enabled ? 'checked' : ''}>
+                  <span class="toggle-slider"></span>
+                </label>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function syncAlertConfigInventoryUi() {
+  const onUsers = !!document.getElementById('cfgInvUsers')?.checked;
+  const onSoftware = !!document.getElementById('cfgInvSoftware')?.checked;
+  const onAssets = !!document.getElementById('cfgInvAssets')?.checked;
+  const map = [
+    ['users', onUsers],
+    ['software', onSoftware],
+    ['assets', onAssets],
+  ];
+  map.forEach(([cat, on]) => {
+    const table = document.getElementById('cfgCondTable-' + cat);
+    if (!table) return;
+    table.classList.toggle('cfg-cond-inv-off', !on);
+  });
+}
+
+async function openAlertConfigModal() {
+  try {
+    await loadAlertsFromServer();
+  } catch (error) {
+    showToast(error.message || 'Failed to load alert configuration', 'danger');
+  }
+
+  const cfg = normalizeAlertConfig(alertConfig);
+  document.getElementById('cfgInvUsers').checked = cfg.inventory.users;
+  document.getElementById('cfgInvSoftware').checked = cfg.inventory.software;
+  document.getElementById('cfgInvAssets').checked = cfg.inventory.assets;
+
+  document.getElementById('cfgNotifInApp').checked = cfg.notifications.inApp;
+  document.getElementById('cfgNotifSlack').checked = cfg.notifications.slack;
+  document.getElementById('cfgNotifEmail').checked = cfg.notifications.email;
+
+  document.getElementById('cfgSlackEnabled').checked = !!alertIntegrations?.slack?.enabled;
+  document.getElementById('cfgSlackSigningSecret').value = '';
+
+  document.getElementById('cfgEmailEnabled').checked = !!alertIntegrations?.email?.enabled;
+  document.getElementById('cfgEmailSmtpHost').value = alertIntegrations?.email?.smtpHost || '';
+  document.getElementById('cfgEmailSmtpPort').value = alertIntegrations?.email?.smtpPort || 587;
+  document.getElementById('cfgEmailSmtpSecure').value = alertIntegrations?.email?.smtpSecure ? 'true' : 'false';
+  document.getElementById('cfgEmailSmtpUser').value = alertIntegrations?.email?.smtpUser || '';
+  document.getElementById('cfgEmailSmtpPass').value = '';
+  document.getElementById('cfgEmailFromEmail').value = alertIntegrations?.email?.fromEmail || '';
+  document.getElementById('cfgEmailFromName').value = alertIntegrations?.email?.fromName || 'Terzo Support';
+  document.getElementById('cfgEmailAppBaseUrl').value = alertIntegrations?.email?.appBaseUrl || `${location.protocol}//${location.host}`;
+
+  renderAlertConfigConditionTable('users', 'User Inventory Conditions', 'cfgCondUsersWrap');
+  renderAlertConfigConditionTable('software', 'Software Inventory Conditions', 'cfgCondSoftwareWrap');
+  renderAlertConfigConditionTable('assets', 'Asset Inventory Conditions', 'cfgCondAssetsWrap');
+  syncAlertConfigInventoryUi();
+  document.getElementById('alertConfigErr').textContent = '';
+  document.getElementById('alertConfigModal').classList.add('open');
+}
+
+function closeAlertConfigModal() {
+  document.getElementById('alertConfigModal').classList.remove('open');
+}
+
+function collectAlertConfigurationConditions() {
+  const rows = [];
+  ['users', 'software', 'assets'].forEach((category) => {
+    (ALERT_CONDITIONS[category] || []).forEach((conditionDef) => {
+      const enabledEl = document.getElementById(`cfgCond_${category}_${conditionDef.value}`);
+      const thresholdEl = document.getElementById(`cfgThr_${category}_${conditionDef.value}`);
+      let threshold = null;
+      if (conditionDef.hasThreshold) {
+        const raw = String(thresholdEl?.value || '').trim();
+        threshold = raw === '' ? (conditionDef.thresholdDefault ?? null) : Number(raw);
+        if (!Number.isFinite(threshold) || threshold < 0) threshold = conditionDef.thresholdDefault ?? 0;
+      }
+      rows.push({
+        category,
+        condition: conditionDef.value,
+        enabled: !!enabledEl?.checked,
+        threshold,
+        name: `${category[0].toUpperCase()}${category.slice(1)}: ${conditionDef.label}`,
+        description: '',
+      });
+    });
+  });
+  return rows;
+}
+
+async function saveAlertConfiguration() {
+  const errEl = document.getElementById('alertConfigErr');
+  const saveBtn = document.getElementById('alertConfigSaveBtn');
+  errEl.textContent = '';
+
+  const inventory = {
+    users: !!document.getElementById('cfgInvUsers').checked,
+    software: !!document.getElementById('cfgInvSoftware').checked,
+    assets: !!document.getElementById('cfgInvAssets').checked,
+  };
+  const notifications = {
+    inApp: !!document.getElementById('cfgNotifInApp').checked,
+    slack: !!document.getElementById('cfgNotifSlack').checked,
+    email: !!document.getElementById('cfgNotifEmail').checked,
+  };
+  if (!notifications.inApp && !notifications.slack && !notifications.email) {
+    errEl.textContent = 'Enable at least one notification channel.';
+    return;
+  }
+
+  const slackEnabled = !!document.getElementById('cfgSlackEnabled').checked;
+  const emailEnabled = !!document.getElementById('cfgEmailEnabled').checked;
+  if (notifications.slack && !slackEnabled) {
+    errEl.textContent = 'Slack notifications selected: enable Slack integration in this configuration.';
+    return;
+  }
+  if (notifications.email && !emailEnabled) {
+    errEl.textContent = 'Email notifications selected: enable Email integration in this configuration.';
+    return;
+  }
+
+  const conditions = collectAlertConfigurationConditions();
+  const integrationPayload = {
+    slack: {
+      enabled: slackEnabled,
+      signingSecret: String(document.getElementById('cfgSlackSigningSecret').value || '').trim(),
+    },
+    email: {
+      enabled: emailEnabled,
+      smtpHost: String(document.getElementById('cfgEmailSmtpHost').value || '').trim(),
+      smtpPort: Number(document.getElementById('cfgEmailSmtpPort').value || 587),
+      smtpSecure: document.getElementById('cfgEmailSmtpSecure').value === 'true',
+      smtpUser: String(document.getElementById('cfgEmailSmtpUser').value || '').trim(),
+      smtpPass: String(document.getElementById('cfgEmailSmtpPass').value || '').trim(),
+      fromEmail: String(document.getElementById('cfgEmailFromEmail').value || '').trim(),
+      fromName: String(document.getElementById('cfgEmailFromName').value || 'Terzo Support').trim(),
+      appBaseUrl: String(document.getElementById('cfgEmailAppBaseUrl').value || '').trim(),
+    },
+  };
+
+  try {
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving...';
+
+    const syncResp = await authFetch('/api/admin/alerts/sync', {
+      method: 'POST',
+      body: JSON.stringify({ inventory, notifications, conditions }),
+    });
+    if (!syncResp.ok) {
+      const data = await syncResp.json().catch(() => ({}));
+      throw new Error(data.error || 'Failed to save alert configuration');
+    }
+    const syncData = await syncResp.json().catch(() => ({}));
+    if (Array.isArray(syncData?.rules)) {
+      adminStore.setState({ alertRules: syncData.rules }, 'admin:alerts:sync');
+    } else {
+      await loadAlertsFromServer();
+    }
+    if (syncData?.config) {
+      alertConfig = normalizeAlertConfig(syncData.config);
+    } else {
+      alertConfig = normalizeAlertConfig({ inventory, notifications });
+    }
+
+    const integrationResp = await authFetch('/api/admin/integrations', {
+      method: 'PUT',
+      body: JSON.stringify(integrationPayload),
+    });
+    if (!integrationResp.ok) {
+      const data = await integrationResp.json().catch(() => ({}));
+      throw new Error(data.error || 'Alert configuration saved, but notification integration save failed');
+    }
+
+    await loadAlertsFromServer();
+    renderAlerts();
+    closeAlertConfigModal();
+    showToast('Alert configuration saved');
+  } catch (error) {
+    errEl.textContent = error.message || 'Failed to save alert configuration';
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Configuration';
+  }
 }
 
 // ── Toggle enabled ────────────────────────────────────────────────────────────
@@ -3989,185 +4375,6 @@ async function toggleAlertEnabled(id, enabled) {
   } catch (error) {
     showToast(error.message || 'Failed to update alert', 'danger');
     renderAlerts();
-  }
-}
-
-// ── Delete ────────────────────────────────────────────────────────────────────
-async function deleteAlert(id) {
-  if (!confirm('Delete this alert? This cannot be undone.')) return;
-  try {
-    const r = await authFetch(`/api/admin/alerts/${encodeURIComponent(id)}`, { method: 'DELETE' });
-    if (!r.ok) {
-      const data = await r.json().catch(() => ({}));
-      throw new Error(data.error || 'Failed to delete alert');
-    }
-    alertsList = alertsList.filter(a => a.id !== id);
-    renderAlerts();
-    showToast('Alert deleted');
-  } catch (error) {
-    showToast(error.message || 'Failed to delete alert', 'danger');
-  }
-}
-
-// ── Modal open/close ─────────────────────────────────────────────────────────
-function openAlertModal(presetCategory, editId) {
-  alertEditingId = editId || null;
-  alertChannels  = ['inApp'];
-
-  // Reset form
-  document.getElementById('aName').value        = '';
-  document.getElementById('aDesc').value        = '';
-  document.getElementById('aCategory').value    = '';
-  document.getElementById('aCondition').value   = '';
-  document.getElementById('aThreshold').value   = '';
-  document.getElementById('aEnabled').checked   = true;
-  document.getElementById('alertModalErr').textContent = '';
-  document.getElementById('aConditionGroup').style.display = 'none';
-  document.getElementById('aThresholdGroup').style.display = 'none';
-  document.getElementById('alertSaveBtn').textContent = editId ? 'Save Changes' : 'Create Alert';
-  document.getElementById('alertModalTitle').textContent  = editId ? 'Edit Alert' : 'Create Alert';
-
-  // If editing, pre-fill
-  if (editId) {
-    const a = alertsList.find(x => x.id === editId);
-    if (a) {
-      document.getElementById('aName').value     = a.name;
-      document.getElementById('aDesc').value     = a.description || '';
-      document.getElementById('aCategory').value = a.category;
-      document.getElementById('aEnabled').checked= a.enabled;
-      alertChannels = [...(a.channels || ['inApp'])];
-      onAlertCategoryChange();
-      document.getElementById('aCondition').value = a.condition;
-      onAlertConditionChange();
-      if (a.threshold != null) document.getElementById('aThreshold').value = a.threshold;
-    }
-  } else if (presetCategory) {
-    document.getElementById('aCategory').value = presetCategory;
-    onAlertCategoryChange();
-  }
-
-  syncChannelPills();
-  document.getElementById('alertModal').classList.add('open');
-}
-
-function closeAlertModal() {
-  document.getElementById('alertModal').classList.remove('open');
-  alertEditingId = null;
-}
-
-// ── Dynamic form — category change ───────────────────────────────────────────
-function onAlertCategoryChange() {
-  const cat = document.getElementById('aCategory').value;
-  const condGroup = document.getElementById('aConditionGroup');
-  const condSel   = document.getElementById('aCondition');
-  condSel.innerHTML = '<option value="">— Select condition —</option>';
-  document.getElementById('aThresholdGroup').style.display = 'none';
-
-  if (!cat) { condGroup.style.display = 'none'; return; }
-  condGroup.style.display = 'flex';
-  const conditions = ALERT_CONDITIONS[cat] || [];
-  conditions.forEach(c => {
-    const opt = document.createElement('option');
-    opt.value = c.value;
-    opt.textContent = c.label;
-    condSel.appendChild(opt);
-  });
-}
-
-function onAlertConditionChange() {
-  const cat  = document.getElementById('aCategory').value;
-  const cond = document.getElementById('aCondition').value;
-  const thrGroup = document.getElementById('aThresholdGroup');
-  const condDef  = (ALERT_CONDITIONS[cat] || []).find(c => c.value === cond);
-  if (condDef && condDef.hasThreshold) {
-    thrGroup.style.display = 'flex';
-    document.getElementById('aThresholdLabel').textContent = condDef.thresholdLabel || 'Threshold';
-    document.getElementById('aThresholdHint').textContent  = condDef.thresholdHint  || '';
-    const thrInput = document.getElementById('aThreshold');
-    if (!thrInput.value) thrInput.value = condDef.thresholdDefault ?? '';
-  } else {
-    thrGroup.style.display = 'none';
-    document.getElementById('aThreshold').value = '';
-  }
-}
-
-// ── Channel pill toggles ──────────────────────────────────────────────────────
-function toggleChannel(ch) {
-  const idx = alertChannels.indexOf(ch);
-  if (idx === -1) alertChannels.push(ch);
-  else if (alertChannels.length > 1) alertChannels.splice(idx, 1); // keep at least 1
-  syncChannelPills();
-}
-
-function syncChannelPills() {
-  ['inApp', 'email', 'slack'].forEach(ch => {
-    const el = document.getElementById('ch' + ch.charAt(0).toUpperCase() + ch.slice(1));
-    if (el) el.classList.toggle('ch-active', alertChannels.includes(ch));
-  });
-}
-
-// ── Save alert ────────────────────────────────────────────────────────────────
-async function saveAlert() {
-  const name     = document.getElementById('aName').value.trim();
-  const category = document.getElementById('aCategory').value;
-  const condition= document.getElementById('aCondition').value;
-  const thrRaw   = document.getElementById('aThreshold').value;
-  const desc     = document.getElementById('aDesc').value.trim();
-  const enabled  = document.getElementById('aEnabled').checked;
-  const errEl    = document.getElementById('alertModalErr');
-  errEl.textContent = '';
-
-  if (!name)      { errEl.textContent = 'Alert name is required.'; return; }
-  if (!category)  { errEl.textContent = 'Please select a category.'; return; }
-  if (!condition) { errEl.textContent = 'Please select a trigger condition.'; return; }
-
-  const condDef = (ALERT_CONDITIONS[category] || []).find(c => c.value === condition);
-  let threshold = null;
-  if (condDef && condDef.hasThreshold) {
-    threshold = parseFloat(thrRaw);
-    if (isNaN(threshold) || threshold < 0) { errEl.textContent = 'Please enter a valid threshold value.'; return; }
-  }
-
-  const payload = {
-    name,
-    category,
-    condition,
-    threshold,
-    description: desc,
-    channels: [...alertChannels],
-    enabled,
-  };
-  try {
-    if (alertEditingId) {
-      const r = await authFetch(`/api/admin/alerts/${encodeURIComponent(alertEditingId)}`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-      if (!r.ok) {
-        const data = await r.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to update alert');
-      }
-      const updated = await r.json();
-      const idx = alertsList.findIndex(a => a.id === alertEditingId);
-      if (idx !== -1) alertsList[idx] = updated;
-      showToast('Alert updated');
-    } else {
-      const r = await authFetch('/api/admin/alerts', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
-      if (!r.ok) {
-        const data = await r.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to create alert');
-      }
-      const created = await r.json();
-      alertsList.unshift(created);
-      showToast('Alert created');
-    }
-    closeAlertModal();
-    renderAlerts();
-  } catch (error) {
-    errEl.textContent = error.message || 'Failed to save alert';
   }
 }
 

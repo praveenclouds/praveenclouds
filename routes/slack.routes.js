@@ -6,6 +6,7 @@ const { JWT_SECRET } = require('../config');
 const { apiPost } = require('../utils/http');
 const { createSupportRequest, listWorkflowOptions } = require('../services/support-request.service');
 const { decryptSecret } = require('../utils/secret-crypto');
+const { resolveSlackBotToken } = require('../utils/slack-token');
 const {
   logSupportCommentAdded,
   logSupportRequestCreated,
@@ -77,7 +78,7 @@ async function getSlackBotToken() {
   if (!connector?.apiToken) {
     throw Object.assign(new Error('Slack Bot Token is not configured. Save the Slack connector bot token under SCIM -> App Connectors first.'), { status: 503 });
   }
-  return connector.apiToken;
+  return resolveSlackBotToken(connector.apiToken, { label: 'Slack Bot Token' });
 }
 
 async function callSlackApi(path, body) {
@@ -961,54 +962,56 @@ async function handleCommentModalSubmission(payload = {}) {
   return { ok: true };
 }
 
-router.post(
-  '/support-command',
-  express.urlencoded({
-    extended: false,
-    limit: '1mb',
-    verify: (req, res, buf) => {
-      req.rawBody = buf.toString('utf8');
-    },
-  }),
-  async (req, res) => {
-    try {
-      await verifySlackRequest(req);
-      // Ack immediately so Slack never times out this slash command.
-      // Modal open is done asynchronously and still uses the same trigger_id.
-      res.status(200).send('');
-      void (async () => {
-        try {
-          const options = await listWorkflowOptions();
-          const referenceData = await listSlackFormReferenceData();
-          const initialWorkflowType = resolveInitialWorkflowType(req.body?.text || '', options);
-          const schemaFingerprint = workflowDefinitionsSignature(options);
-          const privateMetadata = {
-            channelId: req.body?.channel_id || '',
-            teamId: req.body?.team_id || '',
-            commandUserId: req.body?.user_id || '',
-            requestorName: req.body?.user_name || 'Slack User',
-            requestorEmail: '',
-            schemaFingerprint,
-            schemaRefreshed: false,
-          };
-          await callSlackApi('/api/views.open', {
-            trigger_id: req.body?.trigger_id,
-            view: buildSupportRequestModal(options, referenceData, initialWorkflowType, privateMetadata),
-          });
-        } catch (backgroundError) {
-          console.error('[slack support-command] modal open failed:', backgroundError.message);
-        }
-      })();
-      return;
-    } catch (e) {
-      console.error('[slack support-command] request rejected:', e.message);
-      res.status(200).json({
-        response_type: 'ephemeral',
-        text: e.message || 'Slack support request form could not be opened.',
-      });
-    }
+const slackCommandParser = express.urlencoded({
+  extended: false,
+  limit: '1mb',
+  verify: (req, res, buf) => {
+    req.rawBody = buf.toString('utf8');
+  },
+});
+
+async function supportCommandHandler(req, res) {
+  try {
+    await verifySlackRequest(req);
+    // ACK immediately to avoid Slack 3-second slash command timeout.
+    res.status(200).send('');
+    void (async () => {
+      try {
+        const [options, referenceData] = await Promise.all([
+          listWorkflowOptions(),
+          listSlackFormReferenceData(),
+        ]);
+        const initialWorkflowType = resolveInitialWorkflowType(req.body?.text || '', options);
+        const schemaFingerprint = workflowDefinitionsSignature(options);
+        const privateMetadata = {
+          channelId: req.body?.channel_id || '',
+          teamId: req.body?.team_id || '',
+          commandUserId: req.body?.user_id || '',
+          requestorName: req.body?.user_name || 'Slack User',
+          requestorEmail: '',
+          schemaFingerprint,
+          schemaRefreshed: false,
+        };
+        await callSlackApi('/api/views.open', {
+          trigger_id: req.body?.trigger_id,
+          view: buildSupportRequestModal(options, referenceData, initialWorkflowType, privateMetadata),
+        });
+      } catch (backgroundError) {
+        console.error('[slack support-command] modal open failed:', backgroundError.message);
+      }
+    })();
+    return;
+  } catch (e) {
+    console.error('[slack support-command] request rejected/modal failed:', e.message);
+    res.status(200).json({
+      response_type: 'ephemeral',
+      text: e.message || 'Slack support request form could not be opened.',
+    });
   }
-);
+}
+
+router.post('/support-command', slackCommandParser, supportCommandHandler);
+router.post('/it-request', slackCommandParser, supportCommandHandler);
 
 router.post(
   '/interactivity',

@@ -129,6 +129,7 @@ app.use((req, res, next) => {
     '/api/v1/auth/google/callback',
   ]);
   if (req.path.startsWith('/scim/') ||
+      req.path.startsWith('/api/slack/') ||
       csrfBypassPaths.has(req.path)) {
     return next();
   }

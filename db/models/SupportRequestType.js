@@ -160,6 +160,7 @@ const requestTypeStepSchema = new mongoose.Schema(
     key: { type: String, required: true, trim: true },
     label: { type: String, required: true, trim: true },
     area: { type: String, default: '', trim: true },
+    handoffMessage: { type: String, default: '', trim: true },
     dependsOn: { type: String, default: '', trim: true },
     defaultOwner: { type: String, default: '', trim: true },
     defaultOwnerUserId: { type: String, default: '', trim: true },

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const { AppConnector } = require('../db');
 const { JWT_SECRET } = require('../config');
 const { apiPost } = require('../utils/http');
+const { resolveSlackBotToken } = require('../utils/slack-token');
 
 function asObject(request = {}) {
   return request?.toObject ? request.toObject() : { ...(request || {}) };
@@ -198,7 +199,7 @@ function buildUpdatedMessage(previousRequest = {}, currentRequest = {}) {
 async function getSlackBotToken() {
   const connector = await AppConnector.findOne({ appName: 'slack' }).lean();
   if (!connector?.apiToken) throw new Error('Slack Bot Token is not configured.');
-  return connector.apiToken;
+  return resolveSlackBotToken(connector.apiToken, { label: 'Slack Bot Token' });
 }
 
 async function callSlackApi(path, body) {

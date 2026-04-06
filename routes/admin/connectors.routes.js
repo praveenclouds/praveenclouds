@@ -7,31 +7,26 @@
  * POST /api/admin/connectors/:app/sync — full sync + update Software record
  */
 const router = require('express').Router();
-const crypto = require('crypto');
 const { AppConnector, Software } = require('../../db');
 const { requireAuth, canManageIntegrations } = require('../../middleware/auth');
 const { syncConnector } = require('../../services/connector.service');
+const { encryptSecret, decryptSecret } = require('../../utils/secret-crypto');
+const { sanitizeSlackToken, normalizeSlackBotToken } = require('../../utils/slack-token');
 
-// ── Secret encryption helpers ─────────────────────────────────────────────────
-const ENCRYPT_KEY = process.env.ENCRYPT_KEY || process.env.JWT_SECRET || 'terzo_encrypt_fallback_dev';
-function deriveKey(secret) {
-  return crypto.createHash('sha256').update(secret).digest();
+const HEADER_UNSAFE_OR_ZERO_WIDTH_RE = /[\u0000-\u001F\u007F\u200B-\u200D\uFEFF]/g;
+function sanitizeToken(value = '') {
+  return String(value || '')
+    .replace(HEADER_UNSAFE_OR_ZERO_WIDTH_RE, '')
+    .trim();
 }
-function encryptSecret(plaintext) {
-  if (!plaintext) return plaintext;
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-cbc', deriveKey(ENCRYPT_KEY), iv);
-  let encrypted = cipher.update(plaintext, 'utf8', 'hex');
-  encrypted += cipher.final('hex');
-  return `enc:${iv.toString('hex')}:${encrypted}`;
-}
-function decryptSecret(stored) {
-  if (!stored || !stored.startsWith('enc:')) return stored;
-  const [, ivHex, encrypted] = stored.split(':');
-  const decipher = crypto.createDecipheriv('aes-256-cbc', deriveKey(ENCRYPT_KEY), Buffer.from(ivHex, 'hex'));
-  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-  decrypted += decipher.final('utf8');
-  return decrypted;
+
+function validateConnectorToken(appName = '', token = '') {
+  if (!token) throw new Error('API token cannot be empty.');
+  if (/\s/.test(token)) throw new Error('API token contains whitespace or line-break characters. Paste a single-line token.');
+
+  if (String(appName || '').toLowerCase() === 'slack') {
+    normalizeSlackBotToken(token, { label: 'Slack Bot Token' });
+  }
 }
 
 // ── GET /api/admin/connectors ─────────────────────────────────────────────────
@@ -58,8 +53,12 @@ router.put('/:app', requireAuth, canManageIntegrations, async (req, res) => {
 
     // Only overwrite the stored token when a real, non-masked value is provided
     if (apiToken && apiToken !== '••••••••' && apiToken !== '[key stored]') {
-      update.apiToken  = encryptSecret(apiToken);
-      update.tokenHint = apiToken.length > 4 ? apiToken.slice(-4) : '****';
+      const normalizedToken = String(appName || '').toLowerCase() === 'slack'
+        ? sanitizeSlackToken(apiToken)
+        : sanitizeToken(apiToken);
+      validateConnectorToken(appName, normalizedToken);
+      update.apiToken = encryptSecret(normalizedToken);
+      update.tokenHint = normalizedToken.length > 4 ? normalizedToken.slice(-4) : '****';
     }
 
     const connector = await AppConnector.findOneAndUpdate(
@@ -81,7 +80,10 @@ router.post('/:app/test', requireAuth, canManageIntegrations, async (req, res) =
     }
     // Decrypt token before passing to service
     const connObj = connector.toObject();
-    connObj.apiToken = decryptSecret(connObj.apiToken);
+    connObj.apiToken = String(appName || '').toLowerCase() === 'slack'
+      ? normalizeSlackBotToken(decryptSecret(connObj.apiToken), { label: 'Slack Bot Token' })
+      : sanitizeToken(decryptSecret(connObj.apiToken));
+    validateConnectorToken(appName, connObj.apiToken);
     const result = await syncConnector(connObj);
     res.json({ ok: true, message: result.message, userCount: result.userCount, plan: result.plan });
   } catch (e) {
@@ -99,7 +101,10 @@ router.post('/:app/sync', requireAuth, canManageIntegrations, async (req, res) =
     }
     // Decrypt token before passing to service
     const connObj = connector.toObject();
-    connObj.apiToken = decryptSecret(connObj.apiToken);
+    connObj.apiToken = String(appName || '').toLowerCase() === 'slack'
+      ? normalizeSlackBotToken(decryptSecret(connObj.apiToken), { label: 'Slack Bot Token' })
+      : sanitizeToken(decryptSecret(connObj.apiToken));
+    validateConnectorToken(appName, connObj.apiToken);
     const result = await syncConnector(connObj);
 
     // Update linked Software Inventory record

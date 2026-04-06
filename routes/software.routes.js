@@ -1350,6 +1350,11 @@ router.get('/:id/invoices', requireAuth, async (req, res) => {
   try {
     const sw = await Software.findById(req.params.id).select('invoices').lean();
     if (!sw) return res.status(404).json({ error: 'Software not found' });
+    const dateMs = (value) => {
+      if (!value) return 0;
+      const ms = Date.parse(String(value));
+      return Number.isFinite(ms) ? ms : 0;
+    };
     const list = (sw.invoices || []).map(inv => ({
       id: inv._id.toString(), filename: inv.filename,
       uploadedAt: inv.uploadedAt, amount: inv.amount,
@@ -1367,7 +1372,17 @@ router.get('/:id/invoices', requireAuth, async (req, res) => {
       matchScore: Number.isFinite(Number(inv.matchScore)) ? Number(inv.matchScore) : 0,
       extractionSource: inv.extractionSource || '',
       lineItems: Array.isArray(inv.lineItems) ? inv.lineItems : [],
-    }));
+    })).sort((a, b) => {
+      const bEnd = dateMs(b.periodTo) || dateMs(b.periodFrom) || dateMs(b.uploadedAt);
+      const aEnd = dateMs(a.periodTo) || dateMs(a.periodFrom) || dateMs(a.uploadedAt);
+      if (bEnd !== aEnd) return bEnd - aEnd;
+
+      const bStart = dateMs(b.periodFrom) || dateMs(b.periodTo) || dateMs(b.uploadedAt);
+      const aStart = dateMs(a.periodFrom) || dateMs(a.periodTo) || dateMs(a.uploadedAt);
+      if (bStart !== aStart) return bStart - aStart;
+
+      return dateMs(b.uploadedAt) - dateMs(a.uploadedAt);
+    });
     res.json(list);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

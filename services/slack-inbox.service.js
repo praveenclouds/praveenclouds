@@ -1,5 +1,6 @@
 const { AppConnector } = require('../db');
 const { apiPostForm } = require('../utils/http');
+const { resolveSlackBotToken } = require('../utils/slack-token');
 
 const slackUserByEmailCache = new Map();
 const SLACK_USER_DIRECTORY_TTL_MS = 5 * 60 * 1000;
@@ -34,7 +35,7 @@ async function getSlackBotToken() {
   if (!connector?.apiToken) {
     throw new Error('Slack Bot Token is not configured.');
   }
-  return connector.apiToken;
+  return resolveSlackBotToken(connector.apiToken, { label: 'Slack Bot Token' });
 }
 
 async function callSlackFormApi(path, body = {}) {

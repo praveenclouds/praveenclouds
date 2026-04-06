@@ -74,6 +74,7 @@ const SlackWorkflowImport = require('./models/SlackWorkflowImport');
 const RolePermission      = require('./models/RolePermission');
 const Department          = require('./models/Department');
 const AlertRule           = require('./models/AlertRule');
+const AlertConfig         = require('./models/AlertConfig');
 const MailInvoiceRule     = require('./models/MailInvoiceRule');
 const MailInvoiceEvent    = require('./models/MailInvoiceEvent');
 const MailInvoiceBlob     = require('./models/MailInvoiceBlob');
@@ -96,6 +97,7 @@ module.exports = {
   RolePermission,
   Department,
   AlertRule,
+  AlertConfig,
   MailInvoiceRule,
   MailInvoiceEvent,
   MailInvoiceBlob,
