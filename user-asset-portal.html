@@ -499,7 +499,7 @@
     .swd-grid3 { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
     .swd-card { border:1px solid var(--gray-200); border-radius:12px; background:var(--gray-50); padding:12px 14px; }
     .swd-k { color:var(--gray-400); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
-    .swd-v { color:var(--gray-800); font-size:22px; line-height:1.08; font-weight:800; }
+    .swd-v { color:var(--gray-800); font-size:15px; line-height:1.08; font-weight:700; }
     .swd-info-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; margin-bottom:10px; }
     .swd-info-item { border:1px solid var(--gray-200); border-radius:10px; background:var(--gray-50); padding:10px 12px; }
     .swd-info-label { color:var(--gray-400); font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
@@ -531,7 +531,7 @@
       .swd-grid3 { grid-template-columns:1fr; }
       .swd-info-grid { grid-template-columns:1fr; }
       .swd-title { font-size:20px; }
-      .swd-v { font-size:20px; }
+      .swd-v { font-size:14px; }
       .swd-edit-grid { grid-template-columns:1fr; }
     }
 
@@ -1684,6 +1684,75 @@ body.support-theme-portal .sw-dm-box, body.support-theme-portal .sw-dm-head, bod
             <div class="swd-card"><div class="swd-k">Total Invoiced</div><div class="swd-v" id="swdInvTotal">$0.00</div></div>
             <div class="swd-card"><div class="swd-k">Invoices</div><div class="swd-v" id="swdInvCount">0</div></div>
             <div class="swd-card"><div class="swd-k">Latest Invoice</div><div class="swd-v" id="swdInvLatest">—</div></div>
+          </div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px 16px;margin-bottom:12px">
+            <div style="font-size:12.5px;font-weight:600;color:var(--gray-700);margin-bottom:10px">📎 Attach Invoice</div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group" style="flex:2">
+                <label>Invoice File (PDF / image)</label>
+                <input type="file" id="swdInvFile" accept=".pdf,.png,.jpg,.jpeg"
+                  style="font-size:12px;padding:6px 8px;border:1px solid var(--gray-200);border-radius:6px;background:#fff;width:100%"
+                  onchange="onSwdInvFileSelected(this)">
+              </div>
+              <div class="form-group" style="flex:1;padding-top:22px">
+                <div id="swdInvParseStatus" style="font-size:11px;color:var(--gray-400);padding:4px 0"></div>
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group">
+                <label>Amount <span id="swdInvAmtHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="number" id="swdInvAmount" placeholder="0.00" min="0" step="0.01" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
+                <label>Currency</label>
+                <select id="swdInvCurrency" style="font-size:12.5px">
+                  <option value="USD">USD</option><option value="CAD">CAD</option>
+                  <option value="INR">INR</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>License Quantity <span id="swdInvQtyHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="number" id="swdInvLicenseQty" placeholder="e.g. 7" min="0" step="1" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
+                <label>Unit Price / License <span id="swdInvUnitHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="number" id="swdInvUnitPrice" placeholder="e.g. 12.50" min="0" step="0.01" style="font-size:12.5px">
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group">
+                <label>Billing Period <span id="swdInvPeriodHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <select id="swdInvBillingPeriod" style="font-size:12.5px">
+                  <option value="">— select —</option>
+                  <option value="Monthly">Monthly</option>
+                  <option value="Quarterly">Quarterly</option>
+                  <option value="Annual">Annual</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Period From <span id="swdInvFromHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="date" id="swdInvPeriodFrom" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
+                <label>Period To <span id="swdInvToHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="date" id="swdInvPeriodTo" style="font-size:12.5px">
+              </div>
+            </div>
+            <div class="form-row" style="margin-bottom:8px">
+              <div class="form-group">
+                <label>Subscription Plan <span id="swdInvPlanHint" style="font-size:10px;color:#10b981;font-weight:400"></span></label>
+                <input type="text" id="swdInvSubscriptionPlan" placeholder="e.g. Full Seat" style="font-size:12.5px">
+              </div>
+              <div class="form-group">
+                <label>Note (optional)</label>
+                <input type="text" id="swdInvNote" placeholder="e.g. March 2026 invoice" style="font-size:12.5px">
+              </div>
+            </div>
+            <div id="swdInvAdditionalSvcPreview" style="display:none;margin:4px 0 10px;padding:10px 12px;border:1px dashed var(--gray-300);border-radius:8px;background:var(--gray-50)"></div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;align-items:center">
+              <span id="swdInvUploadStatus" style="font-size:11px;color:var(--gray-400)"></span>
+              <button class="btn btn-primary btn-sm rbac-sw-write" onclick="swdUploadInvoice()">Upload Invoice</button>
+            </div>
           </div>
           <div id="swdInvoiceList" class="swd-inv-list"></div>
         </div>
